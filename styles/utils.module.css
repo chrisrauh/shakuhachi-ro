@@ -50,3 +50,18 @@
 .lightText {
   color: #666;
 }
+
+.letterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  align-items: center;
+}
+
+.letterGrid div {
+  line-height: 1rem;
+}
+
+.letterSVG {
+  width: 40px;
+  height: 40px;
+}
