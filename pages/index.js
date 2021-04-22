@@ -1,50 +1,80 @@
-import Head from 'next/head'
-import Layout, { siteTitle } from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
-import {getSortedPostsData} from '../lib/posts'
-import Link from 'next/link'
-import Date from '../components/date'
+import Head from "next/head";
+import Layout, {siteTitle} from "../components/layout";
+import utilStyles from "../styles/utils.module.css";
+import {getSortedPostsData} from "../lib/posts";
+import Link from "next/link";
+import Date from "../components/date";
+import Image from "next/image";
+import RoSVG from "../svgs/Japanese_Katakana_kyokashotai_RO.svg";
+import TsuSVG from "../svgs/Japanese_Katakana_kyokashotai_TU.svg";
+import ReSVG from "../svgs/Japanese_Katakana_kyokashotai_RE.svg";
+import ChiSVG from "../svgs/Japanese_Katakana_kyokashotai_TI.svg";
+import RiSVG from "../svgs/Japanese_Katakana_kyokashotai_RI.svg";
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData()
+  const allPostsData = getSortedPostsData();
   return {
     props: {
-      allPostsData
-    }
-  }
+      allPostsData,
+    },
+  };
 }
 
-export default function Home({ allPostsData }) {
+export default function Home({allPostsData}) {
   return (
     <Layout home>
       <Head>
         <title>{siteTitle}</title>
       </Head>
       <section className={utilStyles.headingMd}>
-        <p>Hello! Hello! Hello!</p>
-        <p>
-          (This is a sample website - you’ll be building a site like this on{' '}
-          <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
-        </p>
+        <h2 className={utilStyles.headingLg}>
+          What are the correct charaters for the notes?
+        </h2>
+        <div className={utilStyles.letterGrid}>
+          <div>Ro</div>
+          <div>ロ</div>
+          <div>
+            <RoSVG className={utilStyles.letterSVG} />
+          </div>
+          <div>Tsu</div>
+          <div>ツ</div>
+          <div>
+            <TsuSVG className={utilStyles.letterSVG} />
+          </div>
+          <div>Re</div>
+          <div>レ</div>
+          <div>
+            <ReSVG className={utilStyles.letterSVG} />
+          </div>
+          <div>Chi</div>
+          <div>チ</div>
+          <div>
+            <ChiSVG className={utilStyles.letterSVG} />
+          </div>
+          <div>Ri</div>
+          <div>リ</div>
+          <div>
+            <RiSVG className={utilStyles.letterSVG} />
+          </div>
+        </div>
       </section>
 
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Blog</h2>
+        <h2 className={utilStyles.headingLg}>Pieces</h2>
         <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, date, title }) => (
+          {allPostsData.map(({id, date, title}) => (
             <li className={utilStyles.listItem} key={id}>
-            <Link href={`/posts/${id}`}>
-              <a>{title}</a>
-            </Link>
-            <br />
-            <small className={utilStyles.lightText}>
-              <Date dateString={date} />
-            </small>
-          </li>
+              <Link href={`/posts/${id}`}>
+                <a>{title}</a>
+              </Link>
+              <br />
+              <small className={utilStyles.lightText}>
+                <Date dateString={date} />
+              </small>
+            </li>
           ))}
         </ul>
       </section>
-
     </Layout>
-  )
+  );
 }
