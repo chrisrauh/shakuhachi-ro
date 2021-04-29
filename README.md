@@ -17,3 +17,9 @@ https://download.cnet.com/Shakuhachi-Score/3000-2133_4-75118874.html
 https://sites.google.com/site/razvanswebsite/software/shakuviewer?authuser=0
 http://www-b.uec.tmu.ac.jp/shakuhachi/MuseScore_Shakuhachi/#ShakuViewer
 https://fluteywinds.com/japoscore/softwaredownloadeng/
+
+Javascript
+
+https://www.vexflow.com/ - javascript music notation rendering
+https://opensheetmusicdisplay.org/ - renders musicxml on the browser using vexflow
+https://github.com/saebekassebil/musicjson - musicxml <-> musicjson converter

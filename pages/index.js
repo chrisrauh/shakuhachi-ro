@@ -1,26 +1,25 @@
-import Head from "next/head";
-import Layout, {siteTitle} from "../components/layout";
-import utilStyles from "../styles/utils.module.css";
-import {getSortedPostsData} from "../lib/posts";
-import Link from "next/link";
-import Date from "../components/date";
-import Image from "next/image";
-import RoSVG from "../svgs/Japanese_Katakana_kyokashotai_RO.svg";
-import TsuSVG from "../svgs/Japanese_Katakana_kyokashotai_TU.svg";
-import ReSVG from "../svgs/Japanese_Katakana_kyokashotai_RE.svg";
-import ChiSVG from "../svgs/Japanese_Katakana_kyokashotai_TI.svg";
-import RiSVG from "../svgs/Japanese_Katakana_kyokashotai_RI.svg";
+import { getSortedPostsData } from '../lib/posts';
+import ChiSVG from '../svgs/Japanese_Katakana_kyokashotai_TI.svg';
+import Date from '../components/date';
+import Head from 'next/head';
+import Layout, { siteTitle } from '../components/layout';
+import Link from 'next/link';
+import ReSVG from '../svgs/Japanese_Katakana_kyokashotai_RE.svg';
+import RiSVG from '../svgs/Japanese_Katakana_kyokashotai_RI.svg';
+import RoSVG from '../svgs/Japanese_Katakana_kyokashotai_RO.svg';
+import TsuSVG from '../svgs/Japanese_Katakana_kyokashotai_TU.svg';
+import utilStyles from '../styles/utils.module.css';
 
 export async function getStaticProps() {
   const allPostsData = getSortedPostsData();
   return {
     props: {
       allPostsData,
-    },
+    }
   };
 }
 
-export default function Home({allPostsData}) {
+export default function Home({ allPostsData }) {
   return (
     <Layout home>
       <Head>
@@ -62,7 +61,7 @@ export default function Home({allPostsData}) {
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>Pieces</h2>
         <ul className={utilStyles.list}>
-          {allPostsData.map(({id, date, title}) => (
+          {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
               <Link href={`/posts/${id}`}>
                 <a>{title}</a>
