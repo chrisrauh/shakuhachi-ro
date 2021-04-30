@@ -15,7 +15,7 @@ export async function getStaticProps() {
   return {
     props: {
       allPostsData,
-    }
+    },
   };
 }
 
@@ -27,7 +27,7 @@ export default function Home({ allPostsData }) {
       </Head>
       <section className={utilStyles.headingMd}>
         <h2 className={utilStyles.headingLg}>
-          What are the correct charaters for the notes?
+          What are the correct characters for the notes?
         </h2>
         <div className={utilStyles.letterGrid}>
           <div>Ro</div>

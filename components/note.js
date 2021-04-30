@@ -1,6 +1,5 @@
 import ChiSVG from '../svgs/Japanese_Katakana_kyokashotai_TI.svg';
 import ReSVG from '../svgs/Japanese_Katakana_kyokashotai_RE.svg';
-import React from 'react';
 import RiSVG from '../svgs/Japanese_Katakana_kyokashotai_RI.svg';
 import RoSVG from '../svgs/Japanese_Katakana_kyokashotai_RO.svg';
 import TsuSVG from '../svgs/Japanese_Katakana_kyokashotai_TU.svg';

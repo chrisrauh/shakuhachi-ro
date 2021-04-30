@@ -19,12 +19,12 @@ export default function Post({ postData }) {
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
         <ul className={utilStyles.list}>
-        {postData.contentNotes.map((item, index) => (
-          <li className={utilStyles.listItem} key={index}>
-            <Note noteString={item} />
-          </li>
-        ))}
-          </ul>
+          {postData.contentNotes.map((item, index) => (
+            <li className={utilStyles.listItem} key={index}>
+              <Note noteString={item} />
+            </li>
+          ))}
+        </ul>
       </article>
     </Layout>
   );
@@ -34,7 +34,7 @@ export async function getStaticPaths() {
   const paths = getAllPostIds();
   return {
     paths,
-    fallback: false
+    fallback: false,
   };
 }
 
@@ -42,7 +42,7 @@ export async function getStaticProps({ params }) {
   const postData = await getPostData(params.id);
   return {
     props: {
-      postData
-    }
+      postData,
+    },
   };
 }
