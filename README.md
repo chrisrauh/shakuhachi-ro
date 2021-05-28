@@ -1,3 +1,11 @@
+# Shakuhachi.ro
+
+## To Do
+
+[ ] Toggle between different note representations (name or fonts)
+
+## Resources
+
 Japanese Letters
 
 https://en.wikipedia.org/wiki/Ro_(kana)

@@ -13,3 +13,23 @@
 .backToHome {
   margin: 3rem 0 0;
 }
+
+.rowButtonGroup {
+  display: flex;
+  align-items: baseline;
+  font-size: 10px;
+}
+
+.rowButton {
+  border: solid orangered;
+}
+
+.rowButtonChecked {
+  border: solid blue;
+}
+
+.rowButtonletterSVG {
+  width: 14px;
+  height: 14px;
+  align-self: flex-end;
+}
