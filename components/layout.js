@@ -1,11 +1,49 @@
+import { RadioGroup } from '@headlessui/react';
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import React from 'react';
+import RoSVG from '../svgs/Japanese_Katakana_kyokashotai_RO.svg';
+
 import styles from './layout.module.css';
 import utilStyles from '../styles/utils.module.css';
 
 const name = 'Shakuhachi.ro';
 export const siteTitle = 'Next.js Sample Website';
+
+function MyRadioGroup() {
+  const [plan, setPlan] = useState('Font');
+
+  return (
+    <RadioGroup
+      value={plan}
+      onChange={setPlan}
+      className={styles.rowButtonGroup}
+    >
+      <RadioGroup.Label>Note Style</RadioGroup.Label>
+      <RadioGroup.Option value="font">
+        {({ checked }) => (
+          <div className={checked ? styles.rowButtonChecked : styles.rowButton}>
+            ロ
+          </div>
+        )}
+      </RadioGroup.Option>
+      <RadioGroup.Option value="hand">
+        {({ checked }) => (
+          <div className={checked ? styles.rowButtonChecked : styles.rowButton}>
+            <RoSVG className={styles.rowButtonletterSVG} />
+          </div>
+        )}
+      </RadioGroup.Option>
+      <RadioGroup.Option value="name" styles="align-self: flex-end" >
+        {({ checked }) => (
+          <div className={checked ? styles.rowButtonChecked : styles.rowButton}>
+            Ro
+          </div>
+        )}
+      </RadioGroup.Option>
+    </RadioGroup>
+  );
+}
 
 export default function Layout({ children, home }) {
   return (
@@ -29,11 +67,16 @@ export default function Layout({ children, home }) {
         {home ? (
           <h1 className={utilStyles.heading2Xl}>{name}</h1>
         ) : (
-          <h2 className={utilStyles.headingLg}>
-            <Link href="/">
-              <a className={utilStyles.colorInherit}>{name}</a>
-            </Link>
-          </h2>
+          <>
+            <h2 className={utilStyles.headingLg}>
+              <Link href="/">
+                <a className={utilStyles.colorInherit}>{name}</a>
+              </Link>
+            </h2>
+            <div>
+              <MyRadioGroup />
+            </div>
+          </>
         )}
       </header>
       <main>{children}</main>
