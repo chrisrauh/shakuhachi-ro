@@ -28,21 +28,24 @@ Visit http://localhost:5173 (or port shown in terminal)
 
 ## Testing
 
+This project uses both **unit tests** (Vitest) and **visual browser tests**.
+
 ```bash
-# Run tests in watch mode
+# Run unit tests
 npm test
 
-# Run tests once
+# Run unit tests once
 npm run test:run
 
-# Run tests with UI
-npm run test:ui
-
-# Run tests with coverage
+# Run with coverage
 npm run test:coverage
+
+# Visual tests - start dev server and visit test/ files in browser
+npm run dev
+# Then navigate to: http://localhost:3000/test/test-parser.html
 ```
 
-See [tests/README.md](tests/README.md) for more details.
+See [test/README.md](test/README.md) for detailed testing guide.
 
 ## Demos
 
