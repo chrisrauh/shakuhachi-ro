@@ -1,10 +1,10 @@
 // Test the VerticalSystem - traditional shakuhachi layout!
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { VerticalSystem } from './renderer/VerticalSystem';
-import { ShakuNote } from './notes/ShakuNote';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
-import { MeriKariModifier } from './modifiers/MeriKariModifier';
-import { AtariModifier } from './modifiers/AtariModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { VerticalSystem } from '/src/renderer/VerticalSystem';
+import { ShakuNote } from '/src/notes/ShakuNote';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
+import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
+import { AtariModifier } from '/src/modifiers/AtariModifier';
 
 console.log('📜 Testing VerticalSystem...\n');
 

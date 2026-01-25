@@ -1,6 +1,6 @@
 // Test the OctaveDotsModifier implementation
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
 
 console.log('🎵 Testing OctaveDotsModifier...\n');
 
