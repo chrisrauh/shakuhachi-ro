@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakuNote Class Test</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    .info {
+      background: #E8F5E9;
+      padding: 15px;
+      border-left: 4px solid #4CAF50;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .info h2 {
+      margin-top: 0;
+      color: #2E7D32;
+    }
+    #shakunote-test {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin: 20px 0;
+      border: 2px solid #ccc;
+    }
+    .highlight-box {
+      background: #FFF3E0;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+      border-left: 4px solid #FF9800;
+    }
+    .highlight-box h3 {
+      margin-top: 0;
+      color: #E65100;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .feature-item {
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      border-left: 3px solid #4CAF50;
+    }
+    .feature-item strong {
+      color: #2E7D32;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎋 ShakuNote Class - Complete Integration</h1>
+
+  <div class="info">
+    <h2>Testing the Complete ShakuNote System</h2>
+    <p>This page demonstrates the <strong>ShakuNote</strong> class - the core component that brings together everything we've built:</p>
+    <ul>
+      <li>✓ <strong>SVGRenderer</strong> - Drawing primitives</li>
+      <li>✓ <strong>Kinko symbol mappings</strong> - Note data (ロ, ツ, レ, チ, リ)</li>
+      <li>✓ <strong>OctaveDotsModifier</strong> - Octave indicators</li>
+      <li>✓ <strong>MeriKariModifier</strong> - Pitch alterations</li>
+      <li>✓ <strong>AtariModifier</strong> - Percussive attacks</li>
+    </ul>
+    <p><strong>📝 Open the browser console (F12) to see detailed test output.</strong></p>
+  </div>
+
+  <div class="highlight-box">
+    <h3>🎯 What ShakuNote Does</h3>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <strong>Symbol Rendering</strong><br>
+        Renders Japanese kana from romaji names using kinkoMap
+      </div>
+      <div class="feature-item">
+        <strong>Modifier Management</strong><br>
+        Manages and renders multiple modifiers per note
+      </div>
+      <div class="feature-item">
+        <strong>Positioning</strong><br>
+        Handles note positioning at specific coordinates
+      </div>
+      <div class="feature-item">
+        <strong>Bounding Box</strong><br>
+        Calculates bbox for layout (note + modifiers)
+      </div>
+      <div class="feature-item">
+        <strong>Fluent API</strong><br>
+        Method chaining for easy configuration
+      </div>
+      <div class="feature-item">
+        <strong>Integration</strong><br>
+        Works seamlessly with all modifiers
+      </div>
+    </div>
+  </div>
+
+  <div id="shakunote-test">
+    <!-- SVG will be rendered here -->
+  </div>
+
+  <div class="info">
+    <h3>Visual Tests Performed:</h3>
+    <ol>
+      <li><strong>Basic Notes</strong> - Five fundamental notes (ロ ツ レ チ リ) from romaji names</li>
+      <li><strong>Octave Modifiers</strong> - Otsu, kan, daikan variations</li>
+      <li><strong>Pitch Alterations</strong> - Natural, meri, dai-meri, kari</li>
+      <li><strong>Multiple Modifiers</strong> - Notes with 2-3 modifiers combined</li>
+      <li><strong>Fluent API</strong> - Method chaining demonstration (blue note)</li>
+      <li><strong>Traditional Phrase</strong> - Complete honkyoku excerpt with mixed modifiers</li>
+      <li><strong>Bounding Box</strong> - Purple rectangle showing calculated bbox</li>
+    </ol>
+
+    <h3>🎉 What This Means:</h3>
+    <p><strong>We can now render complete shakuhachi notation!</strong> The ShakuNote class successfully integrates all components. Next steps:</p>
+    <ul>
+      <li>Formatter - For automatic note spacing</li>
+      <li>VerticalSystem - For vertical layout and columns</li>
+      <li>Complete renderer for traditional scores</li>
+    </ul>
+  </div>
+
+  <script type="module" src="/src/test-shakunote.js"></script>
+</body>
+</html>
