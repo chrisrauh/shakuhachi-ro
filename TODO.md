@@ -10,19 +10,21 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 #### Phase 1: Score Data Format Design
 
-- [ ] Analyze example score image to identify all notation elements
-  - [ ] Note symbols (ロ, ツ, レ, チ, リ, etc.)
-  - [ ] Octave indicators (dots above/below)
-  - [ ] Meri/kari pitch marks
-  - [ ] Technique marks (atari, yuri, etc.)
-  - [ ] Duration indicators (dots, dashes)
-  - [ ] Column breaks and spacing
+- [x] Analyze example score image to identify all notation elements
+  - [x] Note symbols (ロ, ツ, レ, チ, リ, etc.)
+  - [x] Octave indicators (dots above/below)
+  - [x] Meri/kari pitch marks
+  - [x] Technique marks (atari, yuri, etc.)
+  - [x] Duration indicators (dots, dashes)
+  - [x] Column breaks and spacing
+  - **Analysis documented in**: `docs/score-notation-analysis.md`
 
-- [ ] Design shakuhachi score data format
-  - [ ] Choose format: JSON vs custom DSL vs extended markdown
-  - [ ] Define schema for notes, modifiers, columns, metadata
-  - [ ] Document format in ARCHITECTURE.md
-  - [ ] Create example: Akatombo in new format
+- [x] Design shakuhachi score data format
+  - [x] Choose format: JSON (minimal, with MusicXML import/export planned for future)
+  - [x] Define schema for notes, modifiers, columns, metadata
+  - [x] Document format in ARCHITECTURE.md and docs/score-data-format.md
+  - [x] Create example: Akatombo in new format (src/data/scores/Akatombo.json)
+  - [x] Create TypeScript type definitions (src/types/ScoreData.ts)
 
 #### Phase 2: Score Parser Implementation
 
