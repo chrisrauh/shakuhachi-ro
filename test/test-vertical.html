@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerticalSystem Test - Traditional Shakuhachi Layout</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #E91E63;
+      padding-bottom: 10px;
+    }
+    .info {
+      background: #FCE4EC;
+      padding: 15px;
+      border-left: 4px solid #E91E63;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .info h2 {
+      margin-top: 0;
+      color: #C2185B;
+    }
+    #vertical-test {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin: 20px 0;
+      border: 2px solid #ccc;
+      overflow-x: auto;
+    }
+    .concept-box {
+      background: #E8F5E9;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+    }
+    .concept-box h3 {
+      margin-top: 0;
+      color: #2E7D32;
+    }
+    .traditional-layout {
+      background: white;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 10px;
+      border: 2px dashed #4CAF50;
+    }
+    .traditional-layout p {
+      margin: 5px 0;
+      font-family: 'Courier New', monospace;
+      color: #1B5E20;
+    }
+    .feature-list {
+      background: #FFF3E0;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+      border-left: 4px solid #FF9800;
+    }
+    .feature-list h3 {
+      margin-top: 0;
+      color: #E65100;
+    }
+    .feature-list ul {
+      margin: 10px 0;
+    }
+    .feature-list li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📜 VerticalSystem - Traditional Shakuhachi Layout</h1>
+
+  <div class="info">
+    <h2>Testing the VerticalSystem Class</h2>
+    <p>The <strong>VerticalSystem</strong> transforms horizontally formatted notes into traditional vertical columns that read right to left (縦書き, tategaki).</p>
+    <p><strong>📝 Open the browser console (F12) to see detailed test output.</strong></p>
+  </div>
+
+  <div class="concept-box">
+    <h3>Traditional Shakuhachi Layout</h3>
+    <p><strong>Vertical Orientation:</strong> Shakuhachi notation is traditionally written vertically, reading from top to bottom within each column.</p>
+    <p><strong>Right-to-Left Reading:</strong> Columns progress from right to left across the page, following traditional Japanese writing conventions.</p>
+
+    <div class="traditional-layout">
+      <p>Reading Order Visualization:</p>
+      <p>     3rd   2nd   1st  ← Start reading here (rightmost column)</p>
+      <p>      ↓     ↓     ↓</p>
+      <p>      リ    ロ    ロ</p>
+      <p>      チ    ツ    ツ</p>
+      <p>      レ    レ    レ</p>
+      <p>      ツ    チ    チ</p>
+      <p>      ロ    リ    リ</p>
+    </div>
+
+    <p style="margin-top: 10px;"><strong>Implementation:</strong></p>
+    <ul>
+      <li>Uses SVG group transforms with <code>rotate(-90)</code></li>
+      <li>Formatter calculates horizontal spacing (becomes vertical after rotation)</li>
+      <li>Multi-column support with configurable spacing</li>
+      <li>Preserves all modifier positions during transformation</li>
+    </ul>
+  </div>
+
+  <div id="vertical-test">
+    <!-- SVG will be rendered here -->
+  </div>
+
+  <div class="info">
+    <h3>Visual Tests Performed:</h3>
+    <ol>
+      <li><strong>Single Column</strong> - Basic vertical column with rotation transform</li>
+      <li><strong>Column with Modifiers</strong> - Octave dots, meri/kari, atari all render correctly</li>
+      <li><strong>Multi-Column Layout</strong> - Right-to-left reading order with 3 columns</li>
+      <li><strong>Horizontal vs Vertical</strong> - Side-by-side comparison showing transformation</li>
+    </ol>
+
+    <h3>Key Features Verified:</h3>
+    <ul>
+      <li>✓ Vertical text orientation (top to bottom)</li>
+      <li>✓ Right-to-left column progression</li>
+      <li>✓ SVG group transforms working correctly</li>
+      <li>✓ All modifiers render in vertical layout</li>
+      <li>✓ Duration-based spacing preserved</li>
+      <li>✓ Configurable column height and spacing</li>
+      <li>✓ Multi-column phrase layout</li>
+      <li>✓ Traditional shakuhachi reading conventions</li>
+    </ul>
+  </div>
+
+  <div class="feature-list">
+    <h3>Configuration Options</h3>
+    <ul>
+      <li><code>x, y</code> - Starting position for the system</li>
+      <li><code>columnHeight</code> - Height of each vertical column (default: 500px)</li>
+      <li><code>columnSpacing</code> - Horizontal distance between columns (default: 80px)</li>
+      <li><code>notesPerColumn</code> - Maximum notes per column before wrapping (default: 20)</li>
+      <li><code>formatterOptions</code> - Controls spacing density within columns</li>
+    </ul>
+
+    <h3>API Methods</h3>
+    <ul>
+      <li><code>renderColumn(notes, renderer, columnX)</code> - Render single vertical column</li>
+      <li><code>renderColumns(notes, renderer)</code> - Render multiple columns (right-to-left)</li>
+      <li><code>renderSingleColumn(notes, renderer, x, y)</code> - Render at specific position</li>
+      <li><code>getFormatter()</code> - Access the internal formatter for calculations</li>
+    </ul>
+  </div>
+
+  <div class="info" style="background: #E8F5E9; border-left-color: #4CAF50;">
+    <h2 style="color: #2E7D32;">🎉 Complete Shakuhachi Renderer!</h2>
+    <p>With the VerticalSystem complete, we now have a <strong>full-featured shakuhachi score renderer</strong> that can create traditional vertical, right-to-left notation!</p>
+
+    <h3>Complete Feature Set:</h3>
+    <ul>
+      <li>✓ <strong>SVGRenderer</strong> - Core rendering with drawing primitives</li>
+      <li>✓ <strong>Symbol Mappings</strong> - Kinko-ryū notation (ro, tsu, re, chi, ri, u, hi)</li>
+      <li>✓ <strong>Modifier System</strong> - Octave dots, meri/kari, atari marks</li>
+      <li>✓ <strong>ShakuNote</strong> - Complete note class with modifiers</li>
+      <li>✓ <strong>Formatter</strong> - Automatic duration-based spacing</li>
+      <li>✓ <strong>VerticalSystem</strong> - Traditional vertical, right-to-left layout</li>
+    </ul>
+
+    <p><strong>Next Steps:</strong> We can now build higher-level features like phrase management, measure lines, section markers, and eventually a full score editor!</p>
+  </div>
+
+  <script type="module" src="/src/test-vertical.js"></script>
+</body>
+</html>
