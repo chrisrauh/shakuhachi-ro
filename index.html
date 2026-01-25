@@ -1,104 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shakuhachi Score Renderer</title>
+  <title>Akatombo - Full Score</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Noto Sans JP', sans-serif;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      background: #f5f5f5;
-    }
-    h1 {
-      color: #333;
-      border-bottom: 3px solid #0f4775;
-      padding-bottom: 10px;
-    }
-    .info {
-      background: #E3F2FD;
-      padding: 15px;
-      border-left: 4px solid #2196F3;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .info h2 {
-      margin-top: 0;
-      color: #1976D2;
-    }
-    #svg-container {
-      border: 2px solid #ccc;
-      margin: 20px 0;
-      padding: 20px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 40px;
     }
-    .test-list {
-      columns: 2;
-      list-style: none;
-      padding: 0;
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 300;
     }
-    .test-list li {
-      padding: 5px 0;
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.9rem;
     }
-    .test-list li:before {
-      content: "✓ ";
-      color: #4CAF50;
-      font-weight: bold;
+
+    #display {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+      min-height: 600px;
+    }
+
+    .error {
+      color: #e74c3c;
+      padding: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🪈 Shakuhachi Score Renderer</h1>
+  <h1>Akatombo - Full Score (Single Column)</h1>
+  <p class="subtitle">All notes from MusicXML rendered vertically <span id="debug-indicator"></span></p>
 
-  <div class="info">
-    <h2>Shakuhachi Score Renderer - Test Suite</h2>
-    <p>A standalone shakuhachi notation renderer inspired by VexFlow's architecture. Each component has been tested visually:</p>
+  <div id="display"></div>
 
-    <div style="background: #C8E6C9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4CAF50;">
-      <h3 style="margin: 0 0 10px 0; color: #2E7D32;">🎉 Renderer Complete!</h3>
-      <p style="margin: 0 0 10px 0; color: #1B5E20;">Check out the polished demo: <a href="/demo.html" style="color: #2E7D32; font-weight: bold; text-decoration: none;">View Akatombo Demo →</a></p>
-      <p style="margin: 0; color: #1B5E20; font-size: 0.9rem;">See all components working together in a beautiful traditional layout!</p>
-    </div>
+  <script type="module">
+    import { MusicXMLParser } from '/src/parser/MusicXMLParser';
+    import { ScoreParser } from '/src/parser/ScoreParser';
+    import { SVGRenderer } from '/src/renderer/SVGRenderer';
 
-    <h3 style="margin-top: 15px;">Component Test Pages:</h3>
-    <ul style="list-style: none; padding-left: 0;">
-      <li>📐 <a href="/index.html" style="color: #1976D2; text-decoration: none;"><strong>SVGRenderer</strong></a> - Core rendering engine with drawing primitives</li>
-      <li>🔤 <a href="/test/test-mappings.html" style="color: #1976D2; text-decoration: none;"><strong>Symbol Mappings</strong></a> - Kinko-ryū notation symbols</li>
-      <li>🎨 <a href="/test/test-modifiers.html" style="color: #1976D2; text-decoration: none;"><strong>Base Modifier</strong></a> - Modifier system architecture</li>
-      <li>⚫ <a href="/test/test-octave-dots.html" style="color: #1976D2; text-decoration: none;"><strong>OctaveDotsModifier</strong></a> - Octave indicators (kan, daikan)</li>
-      <li>📏 <a href="/test/test-merikari.html" style="color: #1976D2; text-decoration: none;"><strong>MeriKariModifier</strong></a> - Pitch alteration marks</li>
-      <li>🎯 <a href="/test/test-atari.html" style="color: #1976D2; text-decoration: none;"><strong>AtariModifier</strong></a> - Percussive attack marks</li>
-      <li>🎵 <a href="/test/test-shakunote.html" style="color: #1976D2; text-decoration: none;"><strong>ShakuNote</strong></a> - Complete note class with modifiers</li>
-      <li>📊 <a href="/test/test-formatter.html" style="color: #1976D2; text-decoration: none;"><strong>Formatter</strong></a> - Automatic duration-based spacing</li>
-      <li>📜 <a href="/test/test-vertical.html" style="color: #1976D2; text-decoration: none;"><strong>VerticalSystem</strong></a> - Traditional vertical, right-to-left layout</li>
-    </ul>
+    const display = document.getElementById('display');
 
-    <h3 style="margin-top: 15px;">SVGRenderer Tests on This Page:</h3>
-    <ul class="test-list">
-      <li>Text rendering (English & Japanese kana)</li>
-      <li>Circles (filled, stroked, combined)</li>
-      <li>Lines (various stroke widths)</li>
-      <li>Rectangles (filled, stroked, combined)</li>
-      <li>SVG paths (triangles, curves)</li>
-      <li>Group management (open/close)</li>
-      <li>Nested groups</li>
-      <li>Transforms (rotation, translation)</li>
-      <li>Shakuhachi notation simulation</li>
-      <li>Vertical layout preview</li>
-      <li>Coordinate precision (3 decimals)</li>
-    </ul>
-    <p><strong>📝 Open the browser console to see detailed test results!</strong></p>
-  </div>
+    // Check for debug query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const showRomanji = urlParams.get('debug') === 'true' || urlParams.get('romanji') === 'true';
 
-  <div id="svg-container">
-    <!-- SVG will be rendered here by SVGRenderer -->
-  </div>
+    if (showRomanji) {
+      console.log('Debug mode: Romanji labels enabled');
+      document.getElementById('debug-indicator').innerHTML = '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
+    }
 
-  <script type="module" src="/src/main.js"></script>
+    async function renderFirstColumn() {
+      try {
+        console.log('Loading Akatombo from MusicXML...');
+
+        // Parse MusicXML file
+        const scoreData = await MusicXMLParser.parseFromURL('/data/Akatombo.musicxml');
+        console.log('Parsed MusicXML:', scoreData);
+        console.log('Total notes:', scoreData.notes.length);
+
+        // Convert to ShakuNote objects using ScoreParser
+        const allNotes = ScoreParser.parse(scoreData);
+        console.log(`Converted to ${allNotes.length} ShakuNote objects`);
+
+        // Render ALL notes in a single column
+        const firstColumnNotes = allNotes;
+        console.log('Rendering all notes:', firstColumnNotes.length);
+
+        // Debug: log each note's modifiers
+        firstColumnNotes.forEach((note, i) => {
+          const mods = note.getModifiers();
+          console.log(`Note ${i} (${note.getKana()}):`, mods.length, 'modifiers', mods);
+
+          // Adjust octave dots for vertical layout (dots should appear to the right)
+          mods.forEach(mod => {
+            if (mod.constructor.name === 'OctaveDotsModifier') {
+              mod.setDotRadius(4) // Visible size
+                 .setColor('#000')  // Black
+                 .setOffset(20, 0); // Position to the right at same vertical level
+            }
+          });
+        });
+
+        // Create SVG renderer - very tall for all notes
+        const renderer = new SVGRenderer(display, 400, 3000);
+        console.log('Renderer created');
+
+        // Render notes vertically (top to bottom) without rotation
+        const startX = 150; // X position for the column
+        const startY = 100; // Top margin
+        const verticalSpacing = 60; // Spacing between notes (slightly tighter for many notes)
+
+        firstColumnNotes.forEach((note, index) => {
+          const y = startY + (index * verticalSpacing);
+          note.setPosition(startX, y);
+          note.render(renderer);
+
+          // Debug: render romanji label and note number to the right
+          if (showRomanji) {
+            const symbolInfo = note.getSymbolInfo();
+            const romanji = symbolInfo?.romaji || 'unknown';
+            const octave = note.getModifiers().some(m => m.constructor.name === 'OctaveDotsModifier') ?
+              '(kan)' : '';
+            const label = `#${index + 1} ${romanji} ${octave}`.trim();
+
+            renderer.drawText(
+              label,
+              startX + 40, // Position to the right of the note
+              y + 5,       // Slightly below baseline
+              12,          // Small font size
+              'monospace', // Monospace font for alignment
+              '#999'       // Gray color
+            );
+          }
+        });
+
+        console.log('First column rendered vertically from MusicXML!');
+
+      } catch (error) {
+        console.error('Error:', error);
+        display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
+      }
+    }
+
+    // Render when page loads
+    renderFirstColumn();
+  </script>
 </body>
 </html>

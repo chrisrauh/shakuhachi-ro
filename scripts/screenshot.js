@@ -6,7 +6,7 @@ async function takeScreenshot() {
 
   try {
     // Navigate to the dev server
-    await page.goto('http://localhost:3001', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:3002?debug=true', { waitUntil: 'networkidle' });
 
     // Take screenshot
     await page.screenshot({
