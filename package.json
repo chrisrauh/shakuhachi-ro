@@ -12,7 +12,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
     "@vitest/ui": "^4.0.17",
@@ -26,6 +27,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "jsdom": "^27.4.0",
+    "playwright": "^1.57.0",
     "prettier": "2.2.1",
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
