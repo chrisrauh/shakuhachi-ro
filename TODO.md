@@ -1,12 +1,41 @@
 # TODO - Shakuhachi Score Renderer
 
-This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, finish a task before starting the next,following the workflow defined in `CLAUDE.md`.
+This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, finish a task before starting the next, following the workflow defined in `CLAUDE.md`.
 
-## Current Sprint
+## Current Sprint: Perfect First Column Rendering
 
-### Feature: Score Data Reader and Renderer
+**Goal:** Perfectly render the first column (rightmost column) of Akatombo matching `examples/scores-pictures/akatombo-kinko-score.png`
 
-**Goal:** Build a feature that reads score data from `src/data` and renders it on an HTML page matching the traditional shakuhachi score layout (example: akatombo-kinko-score.png).
+**Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
+
+### Tasks
+
+- [ ] Verify octave dots render correctly above notes
+  - [ ] Test OctaveDotsModifier positioning
+  - [ ] Ensure dots are visible and correctly placed
+
+- [ ] Identify all notes in first column of example image
+  - [ ] Transcribe exact sequence from top to bottom
+  - [ ] Document all modifiers (octave dots, meri marks, etc.)
+
+- [ ] Create test data for first column only
+  - [ ] Match exact notes from example image
+  - [ ] Include all modifiers
+
+- [ ] Render first column vertically
+  - [ ] Use VerticalSystem.renderSingleColumn()
+  - [ ] Match vertical spacing from example
+  - [ ] Ensure proper rotation and positioning
+
+- [ ] Visual validation
+  - [ ] Screenshot comparison with example image
+  - [ ] Verify all symbols match
+  - [ ] Verify all modifiers match
+  - [ ] Check spacing and alignment
+
+---
+
+## Completed Work
 
 #### Phase 1: Score Data Format Design
 
