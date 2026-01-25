@@ -51,6 +51,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 #### Phase 3: Score Page Layout
 
 - [x] Create score.html page
+
   - [x] Page structure matching example layout
   - [x] Load score data from file
   - [x] Header with score title and metadata
@@ -59,10 +60,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 - [ ] Style score page to match example
 
-  - [ ] Vertical column layout (single column)
-  - [ ] Multi-column layout (right-to-left) based on available space
+  - [ ] Make sure all notes are rendering according to the example
   - [ ] Responsive layout considerations
-  - [ ] Column separator lines
+  - [x] Column separator lines
   - [ ] Proper margins and spacing
   - [ ] Traditional shakuhachi aesthetic
 
@@ -178,10 +178,3 @@ These are for the future score-sharing platform (post-renderer completion):
 - [ ] Automatic column breaking algorithm
 
 ---
-
-**Note:** When implementing tasks, follow the workflow in `CLAUDE.md`:
-
-1. Create feature branch
-2. Implement the feature
-3. Create pull request
-4. Review and merge
