@@ -125,7 +125,45 @@ export class VerticalSystem {
       columnGroups.push(group);
     });
 
+    // Draw separator lines between columns
+    this.drawColumnSeparators(columns.length, startX, renderer);
+
     return columnGroups;
+  }
+
+  /**
+   * Draws vertical separator lines between columns
+   *
+   * @param columnCount - Number of columns
+   * @param startX - X position of rightmost column
+   * @param renderer - SVGRenderer instance
+   */
+  private drawColumnSeparators(
+    columnCount: number,
+    startX: number,
+    renderer: SVGRenderer
+  ): void {
+    if (columnCount <= 1) {
+      return; // No separators needed for single column
+    }
+
+    // Draw separator lines between each pair of columns
+    for (let i = 0; i < columnCount - 1; i++) {
+      // Calculate X position halfway between columns
+      const column1X = startX - (i * this.columnSpacing);
+      const column2X = startX - ((i + 1) * this.columnSpacing);
+      const separatorX = (column1X + column2X) / 2;
+
+      // Draw vertical line
+      renderer.drawLine(
+        separatorX,
+        this.y - 20, // Extend slightly above
+        separatorX,
+        this.y + this.columnHeight + 20, // Extend slightly below
+        '#ccc', // Light gray color
+        1 // Line width
+      );
+    }
   }
 
   /**
