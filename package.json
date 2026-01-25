@@ -1,23 +1,14 @@
 {
-  "name": "learn-starter",
-  "version": "0.1.0",
+  "name": "shakuhachi-ro",
+  "version": "0.2.0",
+  "description": "Shakuhachi score renderer - vanilla TypeScript implementation",
+  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint ./"
-  },
-  "dependencies": {
-    "@headlessui/react": "^1.1.1",
-    "babel-plugin-inline-react-svg": "^2.0.1",
-    "date-fns": "^2.21.1",
-    "gray-matter": "^4.0.3",
-    "next": "^10.2.0",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
-    "remark": "^13.0.0",
-    "remark-html": "^13.0.1"
   },
   "devDependencies": {
     "eslint": "^7.25.0",
@@ -28,10 +19,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-react": "^7.23.2",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "eslint-plugin-standard": "^5.0.0",
-    "prettier": "2.2.1"
+    "prettier": "2.2.1",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
   }
 }
