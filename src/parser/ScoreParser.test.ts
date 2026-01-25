@@ -1,0 +1,294 @@
+/**
+ * ScoreParser Unit Tests
+ */
+
+import { describe, it, expect } from 'vitest';
+import { ScoreParser } from './ScoreParser';
+import type { ScoreData } from '../types/ScoreData';
+
+describe('ScoreParser', () => {
+  describe('parse()', () => {
+    it('should parse a valid score with single note', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          {
+            pitch: { step: 'ro', octave: 0 },
+            duration: 1
+          }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(1);
+      expect(notes[0].getKana()).toBe('ロ');
+      expect(notes[0].getDuration()).toBe('q');
+    });
+
+    it('should parse notes with octave modifiers', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+          { pitch: { step: 'tsu', octave: 1 }, duration: 1 },
+          { pitch: { step: 'tsu', octave: 2 }, duration: 1 }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(3);
+
+      // Otsu - no modifiers
+      expect(notes[0].getModifiers()).toHaveLength(0);
+
+      // Kan - 1 octave dot
+      expect(notes[1].getModifiers()).toHaveLength(1);
+
+      // Daikan - 2 octave dots
+      expect(notes[2].getModifiers()).toHaveLength(1);
+    });
+
+    it('should parse notes with meri modifier', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1, meri: true }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(1);
+      expect(notes[0].getModifiers()).toHaveLength(1);
+    });
+
+    it('should parse notes with multiple modifiers', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'chi', octave: 1 }, duration: 1, meri: true }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(1);
+      // Should have both octave and meri modifiers
+      expect(notes[0].getModifiers()).toHaveLength(2);
+    });
+
+    it('should map durations correctly', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+          { pitch: { step: 'tsu', octave: 0 }, duration: 2 },
+          { pitch: { step: 're', octave: 0 }, duration: 4 }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes[0].getDuration()).toBe('q'); // quarter
+      expect(notes[1].getDuration()).toBe('h'); // half
+      expect(notes[2].getDuration()).toBe('w'); // whole
+    });
+
+    it('should parse all valid pitch steps', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+          { pitch: { step: 're', octave: 0 }, duration: 1 },
+          { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+          { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+          { pitch: { step: 'u', octave: 0 }, duration: 1 },
+          { pitch: { step: 'hi', octave: 0 }, duration: 1 }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(7);
+      expect(notes[0].getKana()).toBe('ロ');
+      expect(notes[1].getKana()).toBe('ツ');
+      expect(notes[2].getKana()).toBe('レ');
+      expect(notes[3].getKana()).toBe('チ');
+      expect(notes[4].getKana()).toBe('リ');
+      expect(notes[5].getKana()).toBe('ウ');
+      expect(notes[6].getKana()).toBe('ヒ');
+    });
+  });
+
+  describe('validate()', () => {
+    it('should throw error if score data is null', () => {
+      expect(() => ScoreParser.parse(null as any)).toThrow('Score data is required');
+    });
+
+    it('should throw error if title is missing', () => {
+      const scoreData = {
+        style: 'kinko',
+        notes: []
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Score title is required');
+    });
+
+    it('should throw error if style is missing', () => {
+      const scoreData = {
+        title: 'Test',
+        notes: []
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Score style is required');
+    });
+
+    it('should throw error if notes is not an array', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: 'not an array'
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Score notes must be an array');
+    });
+
+    it('should throw error if notes array is empty', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: []
+      };
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Score must contain at least one note');
+    });
+
+    it('should throw error if note is missing pitch', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { duration: 1 }
+        ]
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 is missing pitch');
+    });
+
+    it('should throw error if note is missing pitch.step', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { octave: 0 }, duration: 1 }
+        ]
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 is missing pitch.step');
+    });
+
+    it('should throw error if note is missing pitch.octave', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro' }, duration: 1 }
+        ]
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 is missing pitch.octave');
+    });
+
+    it('should throw error if note is missing duration', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 } }
+        ]
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 is missing duration');
+    });
+
+    it('should throw error if octave is out of range (too low)', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: -1 }, duration: 1 }
+        ]
+      };
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 has invalid octave: -1');
+    });
+
+    it('should throw error if octave is out of range (too high)', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 3 }, duration: 1 }
+        ]
+      };
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 has invalid octave: 3');
+    });
+
+    it('should throw error if duration is zero', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 0 }
+        ]
+      };
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 has invalid duration: 0');
+    });
+
+    it('should throw error if duration is negative', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: -1 }
+        ]
+      };
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 has invalid duration: -1');
+    });
+  });
+
+  describe('parseJSON()', () => {
+    it('should parse valid JSON string', () => {
+      const json = JSON.stringify({
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 }
+        ]
+      });
+
+      const notes = ScoreParser.parseJSON(json);
+
+      expect(notes).toHaveLength(1);
+      expect(notes[0].getKana()).toBe('ロ');
+    });
+
+    it('should throw error for invalid JSON', () => {
+      const invalidJson = '{ invalid json }';
+
+      expect(() => ScoreParser.parseJSON(invalidJson)).toThrow('Invalid JSON');
+    });
+  });
+});

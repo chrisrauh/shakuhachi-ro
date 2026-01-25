@@ -4,7 +4,7 @@ import {
   getKinkoSymbols,
   getSymbolByKana,
   getSymbolByRomaji,
-} from './index.ts';
+} from '/src/index.ts';
 
 console.log('📋 Testing Kinko Symbol Mappings...\n');
 

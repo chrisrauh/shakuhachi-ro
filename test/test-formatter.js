@@ -1,9 +1,9 @@
 // Test the Formatter class - automatic note spacing
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { Formatter } from './renderer/Formatter';
-import { ShakuNote } from './notes/ShakuNote';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
-import { MeriKariModifier } from './modifiers/MeriKariModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { Formatter } from '/src/renderer/Formatter';
+import { ShakuNote } from '/src/notes/ShakuNote';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
+import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
 
 console.log('📏 Testing Formatter class...\n');
 

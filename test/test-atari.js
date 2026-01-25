@@ -1,8 +1,8 @@
 // Test the AtariModifier implementation
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { AtariModifier } from './modifiers/AtariModifier';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
-import { MeriKariModifier } from './modifiers/MeriKariModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { AtariModifier } from '/src/modifiers/AtariModifier';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
+import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
 
 console.log('🥁 Testing AtariModifier...\n');
 

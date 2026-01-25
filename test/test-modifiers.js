@@ -1,6 +1,6 @@
 // Test the Modifier base class and TestModifier implementation
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { TestModifier } from './modifiers/TestModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { TestModifier } from '/src/modifiers/TestModifier';
 
 console.log('🎯 Testing Modifier Base Class...\n');
 

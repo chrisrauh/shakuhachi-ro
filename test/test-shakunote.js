@@ -1,9 +1,9 @@
 // Test the ShakuNote class - bringing everything together!
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { ShakuNote } from './notes/ShakuNote';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
-import { MeriKariModifier } from './modifiers/MeriKariModifier';
-import { AtariModifier } from './modifiers/AtariModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { ShakuNote } from '/src/notes/ShakuNote';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
+import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
+import { AtariModifier } from '/src/modifiers/AtariModifier';
 
 console.log('🎋 Testing ShakuNote class...\n');
 

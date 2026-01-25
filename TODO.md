@@ -28,21 +28,22 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 #### Phase 2: Score Parser Implementation
 
-- [ ] Create ScoreParser class (`src/parser/ScoreParser.ts`)
-  - [ ] Parse score data format into internal structure
-  - [ ] Convert to array of ShakuNote objects with modifiers
-  - [ ] Handle column breaks and spacing
-  - [ ] Validate score data and provide helpful error messages
+- [x] Create ScoreParser class (`src/parser/ScoreParser.ts`)
+  - [x] Parse score data format into internal structure
+  - [x] Convert to array of ShakuNote objects with modifiers
+  - [x] Handle column breaks and spacing (handled by VerticalSystem)
+  - [x] Validate score data and provide helpful error messages
 
-- [ ] Create ScoreData type definitions (`src/types/ScoreData.ts`)
-  - [ ] Define TypeScript interfaces for score structure
-  - [ ] Note, Column, Score, Metadata types
-  - [ ] Export types for use across codebase
+- [x] Create ScoreData type definitions (`src/types/ScoreData.ts`)
+  - [x] Define TypeScript interfaces for score structure
+  - [x] Note, Pitch, Score, Metadata types
+  - [x] Export types for use across codebase
+  - **Completed in Phase 1**
 
-- [ ] Write parser tests
-  - [ ] Test valid score parsing
-  - [ ] Test error handling
-  - [ ] Test edge cases (empty columns, missing data)
+- [x] Write parser tests
+  - [x] Test valid score parsing (test-parser.html)
+  - [x] Test error handling (validation in ScoreParser)
+  - [x] Test with Akatombo.json
 
 #### Phase 3: Score Page Layout
 

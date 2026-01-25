@@ -1,7 +1,7 @@
 // Test the MeriKariModifier implementation
-import { SVGRenderer } from './renderer/SVGRenderer';
-import { MeriKariModifier } from './modifiers/MeriKariModifier';
-import { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
+import { SVGRenderer } from '/src/renderer/SVGRenderer';
+import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
+import { OctaveDotsModifier } from '/src/modifiers/OctaveDotsModifier';
 
 console.log('🎼 Testing MeriKariModifier...\n');
 

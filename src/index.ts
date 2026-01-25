@@ -12,6 +12,9 @@ export type { FormatterOptions } from './renderer/Formatter';
 export { VerticalSystem } from './renderer/VerticalSystem';
 export type { VerticalSystemOptions } from './renderer/VerticalSystem';
 
+// Parser exports
+export { ScoreParser } from './parser/ScoreParser';
+
 // Note exports
 export { ShakuNote } from './notes/ShakuNote';
 export type { ShakuNoteOptions, NoteDuration, BoundingBox } from './notes/ShakuNote';
@@ -47,5 +50,8 @@ export type {
   Technique,
   Fingering
 } from './data/mappings';
+
+// Score Data types
+export type { ScoreData, ScoreNote, Pitch, PitchStep, NotationStyle } from './types/ScoreData';
 
 // Uncomment exports as we implement each component
