@@ -26,6 +26,24 @@ npm run build
 
 Visit http://localhost:5173 (or port shown in terminal)
 
+## Testing
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once
+npm run test:run
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+See [tests/README.md](tests/README.md) for more details.
+
 ## Demos
 
 Open these files in your browser after starting the dev server:
