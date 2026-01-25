@@ -1,6 +1,6 @@
 # TODO - Shakuhachi Score Renderer
 
-This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, following the workflow defined in `CLAUDE.md`.
+This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, finish a task before starting the next,following the workflow defined in `CLAUDE.md`.
 
 ## Current Sprint
 
@@ -11,6 +11,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 #### Phase 1: Score Data Format Design
 
 - [x] Analyze example score image to identify all notation elements
+
   - [x] Note symbols (ロ, ツ, レ, チ, リ, etc.)
   - [x] Octave indicators (dots above/below)
   - [x] Meri/kari pitch marks
@@ -29,12 +30,14 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 #### Phase 2: Score Parser Implementation
 
 - [x] Create ScoreParser class (`src/parser/ScoreParser.ts`)
+
   - [x] Parse score data format into internal structure
   - [x] Convert to array of ShakuNote objects with modifiers
   - [x] Handle column breaks and spacing (handled by VerticalSystem)
   - [x] Validate score data and provide helpful error messages
 
 - [x] Create ScoreData type definitions (`src/types/ScoreData.ts`)
+
   - [x] Define TypeScript interfaces for score structure
   - [x] Note, Pitch, Score, Metadata types
   - [x] Export types for use across codebase
@@ -47,19 +50,21 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 #### Phase 3: Score Page Layout
 
-- [ ] Create score.html page
-  - [ ] Page structure matching example layout
-  - [ ] Load score data from file
-  - [ ] Header with score title and metadata
-  - [ ] Main score display area
-  - [ ] 🪈 Flute emoji favicon
+- [x] Create score.html page
+  - [x] Page structure matching example layout
+  - [x] Load score data from file
+  - [x] Header with score title and metadata
+  - [x] Main score display area
+  - [x] 🪈 Flute emoji favicon
 
 - [ ] Style score page to match example
-  - [ ] Vertical column layout (right-to-left)
+
+  - [ ] Vertical column layout (single column)
+  - [ ] Multi-column layout (right-to-left) based on available space
+  - [ ] Responsive layout considerations
   - [ ] Column separator lines
   - [ ] Proper margins and spacing
   - [ ] Traditional shakuhachi aesthetic
-  - [ ] Responsive layout considerations
 
 - [ ] Add score selector
   - [ ] Dropdown or navigation to switch between scores
@@ -68,12 +73,14 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 #### Phase 4: Integration
 
 - [ ] Wire parser to renderer
+
   - [ ] Load score data file
   - [ ] Parse into ShakuNote objects
   - [ ] Pass to VerticalSystem renderer
   - [ ] Display on page
 
 - [ ] Create Akatombo score data file
+
   - [ ] Transcribe example image to new format
   - [ ] Verify all notation elements captured
   - [ ] Test rendering matches example
@@ -87,10 +94,12 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 #### Phase 5: Polish
 
 - [ ] Add score metadata display
+
   - [ ] Title, composer, tempo, key
   - [ ] Display above score
 
 - [ ] Error handling
+
   - [ ] Graceful degradation if score file missing
   - [ ] User-friendly error messages
   - [ ] Fallback to demo if data unavailable
@@ -103,6 +112,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ### Documentation & Polish
 
 - [ ] Add comprehensive JSDoc comments to all public APIs
+
   - [ ] SVGRenderer class and methods
   - [ ] Formatter class and methods
   - [ ] VerticalSystem class and methods
@@ -111,6 +121,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
   - [ ] ScoreParser class and methods
 
 - [ ] Write usage guide in examples/README.md
+
   - [ ] Basic usage examples
   - [ ] Code samples for each modifier type
   - [ ] Common patterns and best practices
@@ -125,11 +136,13 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ### Optional Enhancements
 
 - [ ] Add Tozan-ryū support
+
   - [ ] Implement numeric symbol rendering
   - [ ] Add Tozan-specific modifiers
   - [ ] Create Tozan examples
 
 - [ ] Additional technique modifiers
+
   - [ ] YuriModifier (vibrato)
   - [ ] MuraikiModifier (breathy tone)
   - [ ] SuriModifier (sliding)
@@ -167,6 +180,7 @@ These are for the future score-sharing platform (post-renderer completion):
 ---
 
 **Note:** When implementing tasks, follow the workflow in `CLAUDE.md`:
+
 1. Create feature branch
 2. Implement the feature
 3. Create pull request
