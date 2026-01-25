@@ -145,6 +145,61 @@ Location: `src/data/mappings.ts`
 - `'e'` - Eighth note
 - `'s'` - Sixteenth note
 
+## Score Data Format
+
+### Minimal JSON Format
+
+Shakuhachi scores are stored as simple JSON files containing a flat sequence of notes and metadata. The format follows MusicXML-like structure for familiarity and future interoperability.
+
+**File Location:** `src/data/scores/`
+
+**Format Structure:**
+```typescript
+{
+  "title": string,           // Score title
+  "style": "kinko",          // Notation style (kinko or tozan)
+  "notes": Note[]            // Flat array of notes in performance order
+}
+
+Note = {
+  "pitch": {
+    "step": string,          // Fingering: "ro" | "tsu" | "re" | "chi" | "ri" | "u" | "hi"
+    "octave": number         // 0=otsu (base), 1=kan, 2=daikan
+  },
+  "duration": number,        // Duration in relative timing units
+  "meri"?: boolean           // Optional: true if meri mark present
+}
+```
+
+**Design Principles:**
+- **Minimal** - Only includes what's needed (no over-engineering)
+- **MusicXML-like** - Follows MusicXML structure (pitch.step, pitch.octave, duration)
+- **Flat structure** - Just a sequence of notes in performance order
+- **Separation of concerns** - Data describes notes, renderer handles column layout
+
+**Column Layout:**
+Column breaks are determined dynamically by the renderer based on available space, not stored in the data. This allows responsive layouts for different screen sizes and print formats.
+
+**Example:**
+```json
+{
+  "title": "Akatombo",
+  "style": "kinko",
+  "notes": [
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "re", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 }
+  ]
+}
+```
+
+**Future Enhancements:**
+- MusicXML import/export for interoperability with Western music software
+- Extended modifiers (kari, atari, yuri)
+- Score metadata (composer, tempo, mood)
+
+**See:** `docs/score-data-format.md` for detailed format specification
+
 ## Column & Pagination
 
 - Build a simple **columnizer**: cut a long sequence of `ShakuNote`s into vertical columns of N tokens (configurable)

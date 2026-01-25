@@ -1,0 +1,26 @@
+{
+  "title": "Akatombo",
+  "style": "kinko",
+  "notes": [
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "re", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 }
+  ]
+}
