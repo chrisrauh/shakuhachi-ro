@@ -58,26 +58,32 @@ describe('ScoreParser', () => {
 
 ## 2. Visual Browser Tests
 
-**Location:** `test/` directory (HTML files) + `src/test-*.js` (scripts)
+**Location:** `test/` directory
 
 ```
 test/
-  test-parser.html          # ScoreParser visual test
+  README.md                 # This file
+  test-parser.html          # ScoreParser visual test (inline script)
   test-vertical.html        # VerticalSystem visual test
-  test-shakunote.html       # ShakuNote visual test
-  test-octave-dots.html     # OctaveDotsModifier visual test
-  test-merikari.html        # MeriKariModifier visual test
-  test-atari.html           # AtariModifier visual test
-  test-formatter.html       # Formatter visual test
-  test-modifiers.html       # Modifier system visual test
-  test-mappings.html        # Symbol mappings visual test
-  test-note-parser.html     # Note parser visual test
-
-src/
   test-vertical.js          # Script for test-vertical.html
+  test-shakunote.html       # ShakuNote visual test
   test-shakunote.js         # Script for test-shakunote.html
-  # etc...
+  test-octave-dots.html     # OctaveDotsModifier visual test
+  test-octave-dots.js       # Script for test-octave-dots.html
+  test-merikari.html        # MeriKariModifier visual test
+  test-merikari.js          # Script for test-merikari.html
+  test-atari.html           # AtariModifier visual test
+  test-atari.js             # Script for test-atari.html
+  test-formatter.html       # Formatter visual test
+  test-formatter.js         # Script for test-formatter.html
+  test-modifiers.html       # Modifier system visual test
+  test-modifiers.js         # Script for test-modifiers.html
+  test-mappings.html        # Symbol mappings visual test
+  test-mappings.js          # Script for test-mappings.html
+  test-note-parser.html     # Note parser visual test (inline script)
 ```
+
+**Note:** Each visual test is a pair of HTML + JS files (or inline script) in the same directory for easy navigation.
 
 **Running Visual Tests:**
 
