@@ -5,7 +5,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 **Goal:** Render the Akatombo score matching the reference image.
 **Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
 
-## Current Sprint
+## Current Tasks
 
 **Layout & Styling**
 - [ ] Proper margins and spacing to match reference
@@ -24,7 +24,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Visual comparison: rendered vs reference screenshot
 - [ ] Adjust positioning/spacing as needed
 
-## Multi-Column Layout (Next Sprint)
+## Multi-Column Layout
 
 - [ ] Implement column breaking logic
 - [ ] Render multiple columns right-to-left
