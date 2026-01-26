@@ -121,17 +121,21 @@
               mods
             );
 
-            // Adjust octave dots for vertical layout (dots should appear above note)
-            if (showOctaveDots) {
-              mods.forEach((mod) => {
-                if (mod.constructor.name === 'OctaveDotsModifier') {
+            // Handle octave dots based on query parameter
+            mods.forEach((mod) => {
+              if (mod.constructor.name === 'OctaveDotsModifier') {
+                if (showOctaveDots) {
+                  // Position dots above the note
                   mod
                     .setDotRadius(4) // Visible size
                     .setColor('#000') // Black
                     .setOffset(0, -25); // Position above the note
+                } else {
+                  // Hide dots by setting radius to 0
+                  mod.setDotRadius(0);
                 }
-              });
-            }
+              }
+            });
           });
 
           // Create SVG renderer - fit to viewport

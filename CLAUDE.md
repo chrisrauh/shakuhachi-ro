@@ -5,7 +5,39 @@
 
 ## Software engineering principles
 
-- KISS (Keep It Simple, Stupid)
+Adhere to these principles when writing code:
+
+- **Simplicity (KISS - Keep It Simple, Stupid)**
+  Prefer the simplest thing that works. Complexity is technical debt in disguise.
+
+- **Single Responsibility**
+  A module/function/class should have one reason to change. This is the fastest way to keep systems understandable.
+
+- **Separation of Concerns**
+  Don’t mix UI, business logic, data access, config, etc. Boundaries are what make systems evolvable.
+
+- **Abstraction with Intent**
+  Abstract _why_, not _how_. Bad abstractions are worse than duplication.
+
+- **DRY (with judgment)**
+  Eliminate _true_ duplication, not accidental similarity. Premature DRY creates tight coupling.
+
+- **Loose Coupling, High Cohesion**
+  Things that change together should live together; things that change independently shouldn’t know much about each other.
+
+- **Make Change Cheap**
+  Optimize for iteration, not initial elegance. The best design is the one that’s easy to modify.
+
+- **Explicit Over Implicit**
+  Readability beats cleverness. Code is read far more than it’s written.
+
+- **Fail Fast, Fail Loud**
+  Errors should surface immediately and clearly. Silent failure is a bug factory.
+
+- **Test What Matters**
+  Tests are about confidence, not coverage. Test behavior and contracts, not implementation details.
+
+Single meta-principle: **optimize for humans, not machines**. Everything else flows from that.
 
 ## Dev Workflow
 
@@ -25,6 +57,7 @@
 
 - Unit tests (Vitest): Logic, validation, transformations
 - Visual tests (Browser): Rendering, layout
+- **Always test visual changes with screenshots** - Take screenshots before/after to verify rendering
 - Run tests after each task
 - Run tests before pushing
 

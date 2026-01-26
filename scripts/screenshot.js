@@ -6,7 +6,7 @@ async function takeScreenshot() {
 
   try {
     // Navigate to the dev server
-    await page.goto('http://localhost:3002?debug=true', {
+    await page.goto('http://localhost:3002', {
       waitUntil: 'networkidle',
     });
 
@@ -16,7 +16,29 @@ async function takeScreenshot() {
       fullPage: true,
     });
 
-    console.log('Screenshot saved to screenshots/current.png');
+    // Navigate to the dev server
+    await page.goto('http://localhost:3002?debug=true', {
+      waitUntil: 'networkidle',
+    });
+
+    // Take screenshot
+    await page.screenshot({
+      path: 'screenshots/current-debug.png',
+      fullPage: true,
+    });
+
+    // Navigate with octave dots disabled
+    await page.goto('http://localhost:3002?octaveDots=false', {
+      waitUntil: 'networkidle',
+    });
+
+    // Take screenshot
+    await page.screenshot({
+      path: 'screenshots/current-no-octave-dots.png',
+      fullPage: true,
+    });
+
+    console.log('Screenshots saved to screenshots/');
   } catch (error) {
     console.error('Error taking screenshot:', error.message);
     process.exit(1);
