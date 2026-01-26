@@ -10,8 +10,8 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ### Tasks
 
-- [ ] Style score page to match example
-- [ ] Make sure all notes are rendering according to the example
+- [x] In debug mode, add a border to the svg container
+- [x] The svg container should fill the size of the browser viewport, accounting for the header
 - [ ] Responsive layout considerations
 - [ ] Proper margins and spacing
 - [ ] Traditional shakuhachi aesthetic
