@@ -2,91 +2,64 @@
 
 This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the workflow defined in `CLAUDE.md`.
 
-## Current Sprint: Perfect First Column Rendering
-
-**Goal:** Perfectly render the first column (rightmost column) of Akatombo matching `examples/scores-pictures/akatombo-kinko-score.png`
-
+**Goal:** Render the Akatombo score matching the reference image.
 **Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
 
-### Tasks
+## Current Tasks
 
-- [ ] Style score page to match example
-- [ ] Make sure all notes are rendering according to the example
+**Layout & Styling**
+- [ ] Proper margins and spacing to match reference
+- [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
-- [ ] Proper margins and spacing
-- [ ] Traditional shakuhachi aesthetic
-- [ ] Add score selector
-- [ ] Dropdown or navigation to switch between scores
+
+**Octave Dots & Modifiers**
+- [ ] Fix octave dots to render visibly (currently not showing)
+- [ ] Verify meri/kari marks render correctly
+- [ ] Verify atari marks render correctly
+- [ ] Test all modifier combinations
+
+**Rendering Accuracy**
+- [ ] Verify all note symbols match reference
+- [ ] Match vertical spacing from reference image
+- [ ] Visual comparison: rendered vs reference screenshot
+- [ ] Adjust positioning/spacing as needed
+
+## Multi-Column Layout
+
+- [ ] Implement column breaking logic
+- [ ] Render multiple columns right-to-left
+- [ ] Add column separator lines
+- [ ] Verify 4-column layout matches reference
+
+## UI Enhancements
+
+- [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
-- [ ] Remove octave dots
-- [ ] Clean up the code to remove any code related to octave dots
-- [ ] Identify all notes in first column of example image
-- [ ] Transcribe exact sequence from top to bottom
-- [ ] Document all modifiers (octave dots, meri marks, etc.)
-- [ ] Create test data for first column only
-- [ ] Match exact notes from example image
-- [ ] Include all modifiers
-- [ ] Render first column vertically
-- [ ] Use VerticalSystem.renderSingleColumn()
-- [ ] Match vertical spacing from example
-- [ ] Ensure proper rotation and positioning
-- [ ] Visual validation
-- [ ] Screenshot comparison with example image
-- [ ] Verify all symbols match
-- [ ] Verify all modifiers match
-- [ ] Check spacing and alignment
-- [ ] Wire parser to renderer
-- [ ] Load score data file
-- [ ] Parse into ShakuNote objects
-- [ ] Pass to VerticalSystem renderer
-- [ ] Display on page
-- [ ] Create Akatombo score data file
-- [ ] Transcribe example image to new format
-- [ ] Verify all notation elements captured
-- [ ] Test rendering matches example
-- [ ] Visual validation
-- [ ] Compare rendered output to example image
-- [ ] Verify column layout (4 columns, right-to-left)
-- [ ] Check note spacing and alignment
-- [ ] Verify all modifiers render correctly
-- [ ] Add score metadata display
-- [ ] Title, composer, tempo, key
-- [ ] Display above score
-- [ ] Error handling
-- [ ] Graceful degradation if score file missing
+- [ ] Display score metadata (title, composer, tempo)
+- [ ] Error handling for missing files
 - [ ] User-friendly error messages
-- [ ] Fallback to demo if data unavailable
-- [ ] Documentation
-- [ ] Update README.md with score format info
-- [ ] Add examples/scores/ directory with sample files
-- [ ] Document how to create new scores
-- [ ] Add comprehensive JSDoc comments to all public APIs
-- [ ] SVGRenderer class and methods
-- [ ] Formatter class and methods
-- [ ] VerticalSystem class and methods
-- [ ] ShakuNote class and methods
-- [ ] All Modifier classes
-- [ ] ScoreParser class and methods
+
+## Documentation
+
+- [ ] Add JSDoc comments to public APIs
 - [ ] Write usage guide in examples/README.md
-- [ ] Basic usage examples
-- [ ] Code samples for each modifier type
-- [ ] Common patterns and best practices
-- [ ] Score data format documentation
-- [ ] Cross-browser testing
-- [ ] Test in Chrome
-- [ ] Test in Firefox
-- [ ] Test in Safari
-- [ ] Document any browser-specific issues
-- [ ] Add Tozan-ryū support
+- [ ] Update README.md with project overview
+- [ ] Document score data format
+- [ ] Cross-browser testing notes
+
+## Future Enhancements
+
+**Tozan-ryū Support**
 - [ ] Implement numeric symbol rendering
 - [ ] Add Tozan-specific modifiers
-- [ ] Create Tozan examples
-- [ ] Additional technique modifiers
+
+**Additional Modifiers**
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
 - [ ] OriModifier (pitch bend)
-- [ ] Performance optimizations
+
+**Performance**
 - [ ] Profile rendering performance
 - [ ] Optimize frequent operations
 - [ ] Add caching where appropriate
@@ -105,11 +78,10 @@ These are for the future score-sharing platform (post-renderer completion):
 
 ## Backlog / Ideas
 
-- [ ] Multiple score input formats (import from MusicXML, ABC, etc.)
-- [ ] Pagination heuristics (symbols per column, page breaks)
-- [ ] MIDI playback mapping (optional)
-- [ ] Western staff intermixing (future consideration)
-- [ ] Custom font support for traditional shakuhachi glyphs
+- [ ] Multiple score input formats (import from ABC, etc.)
+- [ ] MIDI playback mapping
+- [ ] Western staff intermixing
+- [ ] Custom font support for traditional glyphs
 - [ ] Export to PDF/PNG
 - [ ] Print stylesheet optimization
 - [ ] Score transposition tool

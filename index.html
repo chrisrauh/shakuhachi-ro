@@ -18,7 +18,15 @@
       body {
         font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
         background: white;
-        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      header {
+        flex-shrink: 0;
+        padding: 20px 40px;
       }
 
       h1 {
@@ -29,15 +37,19 @@
 
       .subtitle {
         color: #666;
-        margin-bottom: 30px;
         font-size: 0.9rem;
       }
 
       #display {
+        flex: 1;
         display: flex;
         justify-content: center;
-        padding: 40px;
-        min-height: 600px;
+        align-items: flex-start;
+        overflow: auto;
+      }
+
+      #display.debug svg {
+        border: 2px solid #e74c3c;
       }
 
       .error {
@@ -47,11 +59,13 @@
     </style>
   </head>
   <body>
-    <h1>Akatombo - Full Score (Single Column)</h1>
-    <p class="subtitle">
-      All notes from MusicXML rendered vertically
-      <span id="debug-indicator"></span>
-    </p>
+    <header>
+      <h1>Akatombo - Full Score (Single Column)</h1>
+      <p class="subtitle">
+        All notes from MusicXML rendered vertically
+        <span id="debug-indicator"></span>
+      </p>
+    </header>
 
     <div id="display"></div>
 
@@ -72,6 +86,7 @@
         console.log('Debug mode: Romanji labels enabled');
         document.getElementById('debug-indicator').innerHTML =
           '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
+        display.classList.add('debug');
       }
 
       async function renderFirstColumn() {
@@ -114,14 +129,17 @@
             });
           });
 
-          // Create SVG renderer - very tall for all notes
-          const renderer = new SVGRenderer(display, 400, 3000);
-          console.log('Renderer created');
+          // Create SVG renderer - fit to viewport
+          const displayRect = display.getBoundingClientRect();
+          const svgWidth = displayRect.width;
+          const svgHeight = displayRect.height;
+          const renderer = new SVGRenderer(display, svgWidth, svgHeight);
+          console.log(`SVG size: ${svgWidth}x${svgHeight}`);
 
-          // Render notes vertically (top to bottom) without rotation
+          // Render notes vertically (top to bottom) at proper size
           const startX = 150; // X position for the column
           const startY = 100; // Top margin
-          const verticalSpacing = 60; // Spacing between notes (slightly tighter for many notes)
+          const verticalSpacing = 60; // Fixed spacing between notes
 
           firstColumnNotes.forEach((note, index) => {
             const y = startY + index * verticalSpacing;
