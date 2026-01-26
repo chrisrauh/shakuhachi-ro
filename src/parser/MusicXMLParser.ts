@@ -96,6 +96,10 @@ export class MusicXMLParser {
       const durationElement = noteElement.querySelector('duration')?.textContent || '1';
       const duration = parseInt(durationElement, 10);
 
+      // Check if note is dotted
+      const dotElement = noteElement.querySelector('dot');
+      const isDotted = dotElement !== null;
+
       // Simple duration mapping (can be refined)
       // 1 = eighth, 2 = quarter, 3 = dotted quarter, 4 = half
       let shakuDuration = 1;
@@ -119,6 +123,11 @@ export class MusicXMLParser {
       // Add meri modifier if needed
       if (shakuPitch.meri) {
         note.meri = true;
+      }
+
+      // Add dotted flag if needed
+      if (isDotted) {
+        note.dotted = true;
       }
 
       notes.push(note);

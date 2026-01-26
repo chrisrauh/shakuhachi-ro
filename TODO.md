@@ -4,6 +4,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Goal:** Render the Akatombo score matching the reference image.
 **Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
+**Secondary Reference Image comparing western and kinko notation:** `examples/scores-pictures/akatombo-kinko-western-score.png`
 
 ## Current Tasks
 
@@ -18,8 +19,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
 
-**Octave Dots & Modifiers**
+**Octave Modifiers**
 
+- [ ] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations

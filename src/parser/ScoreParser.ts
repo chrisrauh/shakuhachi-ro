@@ -8,8 +8,9 @@
  */
 
 import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
-import { OctaveDotsModifier } from '../modifiers/OctaveDotsModifier';
+import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
+import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 
 /**
@@ -78,10 +79,10 @@ export class ScoreParser {
       duration: mapDuration(note.duration)
     });
 
-    // Add octave dots if needed
+    // Add octave marks if needed
     if (note.pitch.octave > 0) {
       const count = note.pitch.octave as 1 | 2;
-      const octaveModifier = new OctaveDotsModifier(count, 'above');
+      const octaveModifier = new OctaveMarksModifier(count, 'above');
       shakuNote.addModifier(octaveModifier);
     }
 
@@ -89,6 +90,12 @@ export class ScoreParser {
     if (note.meri) {
       const meriModifier = new MeriKariModifier('meri');
       shakuNote.addModifier(meriModifier);
+    }
+
+    // Add duration dot if needed
+    if (note.dotted) {
+      const durationDot = new DurationDotModifier('below'); // 'below' for vertical layout
+      shakuNote.addModifier(durationDot);
     }
 
     return shakuNote;

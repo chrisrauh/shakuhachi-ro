@@ -44,6 +44,9 @@ export interface ScoreNote {
 
   /** Optional meri pitch alteration (slightly flat) */
   meri?: boolean;
+
+  /** Dotted duration indicator (extends duration by half) */
+  dotted?: boolean;
 }
 
 /**
