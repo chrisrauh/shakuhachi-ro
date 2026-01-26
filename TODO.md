@@ -8,11 +8,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-**Rest**
-
-[x] implement rests
-[x] rest symbols should be placed horizontally centered in the column, and consequentely also centered with the notes
-
 **Layout & Styling**
 
 - [ ] Proper margins and spacing to match reference
