@@ -9,10 +9,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint ./",
-    "test": "vitest",
+    "test": "npm run lint && vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test:run": "npm run lint && vitest run",
+    "test:coverage": "npm run lint && vitest run --coverage",
     "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
