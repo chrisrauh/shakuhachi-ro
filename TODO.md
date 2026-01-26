@@ -7,18 +7,25 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
+**Rest**
+
+[ ] implement rests
+
 **Layout & Styling**
+
 - [ ] Proper margins and spacing to match reference
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
 
 **Octave Dots & Modifiers**
+
 - [ ] Fix octave dots to render visibly (currently not showing)
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
 
 **Rendering Accuracy**
+
 - [ ] Verify all note symbols match reference
 - [ ] Match vertical spacing from reference image
 - [ ] Visual comparison: rendered vs reference screenshot
@@ -26,10 +33,17 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Multi-Column Layout
 
-- [ ] Implement column breaking logic
-- [ ] Render multiple columns right-to-left
-- [ ] Add column separator lines
-- [ ] Verify 4-column layout matches reference
+- [x] Implement column breaking logic
+- [x] Render multiple columns right-to-left
+- [x] Verify layout matches reference, create tasks for any discrepancies
+
+**Discrepancies found:**
+- [ ] Octave dots not rendering (showing as "(kan)" debug text instead of visible dots)
+- [ ] Column spacing too wide - reduce to match reference
+- [ ] Vertical note spacing may need adjustment
+- [ ] Notes per column distribution differs from reference
+- [ ] Top/side margins need adjustment to match reference
+- [ ] Note font size may need adjustment
 
 ## UI Enhancements
 
@@ -50,16 +64,19 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ## Future Enhancements
 
 **Tozan-ryū Support**
+
 - [ ] Implement numeric symbol rendering
 - [ ] Add Tozan-specific modifiers
 
 **Additional Modifiers**
+
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
 - [ ] OriModifier (pitch bend)
 
 **Performance**
+
 - [ ] Profile rendering performance
 - [ ] Optimize frequent operations
 - [ ] Add caching where appropriate
