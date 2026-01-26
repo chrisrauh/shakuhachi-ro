@@ -7,6 +7,11 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
+**Octave dots**
+
+- [x] Octave dots rendering on top of the note
+- [x] Octave dots are not needed in kinko, make their rendering optional through a query para.
+
 **Rest**
 
 [ ] implement rests
@@ -33,7 +38,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Multi-Column Layout Discrepancies**
 
-- [ ] Octave dots not rendering (showing as "(kan)" debug text instead of visible dots)
 - [ ] Column spacing too wide - reduce to match reference
 - [ ] Vertical note spacing may need adjustment
 - [ ] Notes per column distribution differs from reference
