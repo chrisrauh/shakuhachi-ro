@@ -68,7 +68,7 @@ testGroup.setAttribute('transform', 'rotate(15 65 280)');
 
 // === Test 7: Nested Groups ===
 console.log('Test 7: Nested groups');
-const outerGroup = renderer.openGroup('outer-group');
+renderer.openGroup('outer-group');
 renderer.drawRect(150, 240, 100, 80, '#E8F5E9', '#4CAF50', 2);
 
 const innerGroup = renderer.openGroup('inner-group');
@@ -80,7 +80,7 @@ renderer.closeGroup();
 
 // === Test 8: Multiple Kana with Modifiers Simulation ===
 console.log('Test 8: Kana with modifier simulation');
-const kanaGroup = renderer.openGroup('kana-with-modifiers');
+renderer.openGroup('kana-with-modifiers');
 
 // Note "レ" with dots above (octave marker simulation)
 renderer.drawText('レ', 300, 285, 40, 'Noto Sans JP', '#333');
