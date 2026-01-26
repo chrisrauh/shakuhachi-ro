@@ -58,6 +58,7 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 - Unit tests (Vitest): Logic, validation, transformations
 - Visual tests (Browser): Rendering, layout
 - **Always test visual changes with screenshots** - Take screenshots before/after to verify rendering
+- **When you find an error during development, implement a unit test that would have caught that error**
 - Run tests after each task
 - Run tests before pushing
 

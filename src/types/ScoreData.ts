@@ -33,14 +33,20 @@ export interface Pitch {
  * Individual note within a score
  */
 export interface ScoreNote {
-  /** Pitch information */
-  pitch: Pitch;
+  /** Pitch information (undefined for rests) */
+  pitch?: Pitch;
 
   /** Duration (relative timing units) */
   duration: number;
 
+  /** Rest indicator (mutually exclusive with pitch) */
+  rest?: boolean;
+
   /** Optional meri pitch alteration (slightly flat) */
   meri?: boolean;
+
+  /** Dotted duration indicator (extends duration by half) */
+  dotted?: boolean;
 }
 
 /**
