@@ -1,145 +1,164 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akatombo - Full Score</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akatombo - Full Score</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      background: white;
-      padding: 40px;
-    }
+      body {
+        font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
+        background: white;
+        padding: 40px;
+      }
 
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      font-weight: 300;
-    }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        font-weight: 300;
+      }
 
-    .subtitle {
-      color: #666;
-      margin-bottom: 30px;
-      font-size: 0.9rem;
-    }
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 0.9rem;
+      }
 
-    #display {
-      display: flex;
-      justify-content: center;
-      padding: 40px;
-      min-height: 600px;
-    }
+      #display {
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+        min-height: 600px;
+      }
 
-    .error {
-      color: #e74c3c;
-      padding: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Akatombo - Full Score (Single Column)</h1>
-  <p class="subtitle">All notes from MusicXML rendered vertically <span id="debug-indicator"></span></p>
+      .error {
+        color: #e74c3c;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Akatombo - Full Score (Single Column)</h1>
+    <p class="subtitle">
+      All notes from MusicXML rendered vertically
+      <span id="debug-indicator"></span>
+    </p>
 
-  <div id="display"></div>
+    <div id="display"></div>
 
-  <script type="module">
-    import { MusicXMLParser } from '/src/parser/MusicXMLParser';
-    import { ScoreParser } from '/src/parser/ScoreParser';
-    import { SVGRenderer } from '/src/renderer/SVGRenderer';
+    <script type="module">
+      import { MusicXMLParser } from '/src/parser/MusicXMLParser';
+      import { ScoreParser } from '/src/parser/ScoreParser';
+      import { SVGRenderer } from '/src/renderer/SVGRenderer';
 
-    const display = document.getElementById('display');
+      const display = document.getElementById('display');
 
-    // Check for debug query parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const showRomanji = urlParams.get('debug') === 'true' || urlParams.get('romanji') === 'true';
+      // Check for debug query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const showRomanji =
+        urlParams.get('debug') === 'true' ||
+        urlParams.get('romanji') === 'true';
 
-    if (showRomanji) {
-      console.log('Debug mode: Romanji labels enabled');
-      document.getElementById('debug-indicator').innerHTML = '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
-    }
+      if (showRomanji) {
+        console.log('Debug mode: Romanji labels enabled');
+        document.getElementById('debug-indicator').innerHTML =
+          '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
+      }
 
-    async function renderFirstColumn() {
-      try {
-        console.log('Loading Akatombo from MusicXML...');
+      async function renderFirstColumn() {
+        try {
+          console.log('Loading Akatombo from MusicXML...');
 
-        // Parse MusicXML file
-        const scoreData = await MusicXMLParser.parseFromURL('/data/Akatombo.musicxml');
-        console.log('Parsed MusicXML:', scoreData);
-        console.log('Total notes:', scoreData.notes.length);
+          // Parse MusicXML file
+          const scoreData = await MusicXMLParser.parseFromURL(
+            '/data/Akatombo.musicxml'
+          );
+          console.log('Parsed MusicXML:', scoreData);
+          console.log('Total notes:', scoreData.notes.length);
 
-        // Convert to ShakuNote objects using ScoreParser
-        const allNotes = ScoreParser.parse(scoreData);
-        console.log(`Converted to ${allNotes.length} ShakuNote objects`);
+          // Convert to ShakuNote objects using ScoreParser
+          const allNotes = ScoreParser.parse(scoreData);
+          console.log(`Converted to ${allNotes.length} ShakuNote objects`);
 
-        // Render ALL notes in a single column
-        const firstColumnNotes = allNotes;
-        console.log('Rendering all notes:', firstColumnNotes.length);
+          // Render ALL notes in a single column
+          const firstColumnNotes = allNotes;
+          console.log('Rendering all notes:', firstColumnNotes.length);
 
-        // Debug: log each note's modifiers
-        firstColumnNotes.forEach((note, i) => {
-          const mods = note.getModifiers();
-          console.log(`Note ${i} (${note.getKana()}):`, mods.length, 'modifiers', mods);
+          // Debug: log each note's modifiers
+          firstColumnNotes.forEach((note, i) => {
+            const mods = note.getModifiers();
+            console.log(
+              `Note ${i} (${note.getKana()}):`,
+              mods.length,
+              'modifiers',
+              mods
+            );
 
-          // Adjust octave dots for vertical layout (dots should appear to the right)
-          mods.forEach(mod => {
-            if (mod.constructor.name === 'OctaveDotsModifier') {
-              mod.setDotRadius(4) // Visible size
-                 .setColor('#000')  // Black
-                 .setOffset(20, 0); // Position to the right at same vertical level
+            // Adjust octave dots for vertical layout (dots should appear to the right)
+            mods.forEach((mod) => {
+              if (mod.constructor.name === 'OctaveDotsModifier') {
+                mod
+                  .setDotRadius(4) // Visible size
+                  .setColor('#000') // Black
+                  .setOffset(20, 0); // Position to the right at same vertical level
+              }
+            });
+          });
+
+          // Create SVG renderer - very tall for all notes
+          const renderer = new SVGRenderer(display, 400, 3000);
+          console.log('Renderer created');
+
+          // Render notes vertically (top to bottom) without rotation
+          const startX = 150; // X position for the column
+          const startY = 100; // Top margin
+          const verticalSpacing = 60; // Spacing between notes (slightly tighter for many notes)
+
+          firstColumnNotes.forEach((note, index) => {
+            const y = startY + index * verticalSpacing;
+            note.setPosition(startX, y);
+            note.render(renderer);
+
+            // Debug: render romanji label and note number to the right
+            if (showRomanji) {
+              const symbolInfo = note.getSymbolInfo();
+              const romanji = symbolInfo?.romaji || 'unknown';
+              const octave = note
+                .getModifiers()
+                .some((m) => m.constructor.name === 'OctaveDotsModifier')
+                ? '(kan)'
+                : '';
+              const label = `#${index + 1} ${romanji} ${octave}`.trim();
+
+              renderer.drawText(
+                label,
+                startX + 40, // Position to the right of the note
+                y + 5, // Slightly below baseline
+                12, // Small font size
+                'monospace', // Monospace font for alignment
+                '#999' // Gray color
+              );
             }
           });
-        });
 
-        // Create SVG renderer - very tall for all notes
-        const renderer = new SVGRenderer(display, 400, 3000);
-        console.log('Renderer created');
-
-        // Render notes vertically (top to bottom) without rotation
-        const startX = 150; // X position for the column
-        const startY = 100; // Top margin
-        const verticalSpacing = 60; // Spacing between notes (slightly tighter for many notes)
-
-        firstColumnNotes.forEach((note, index) => {
-          const y = startY + (index * verticalSpacing);
-          note.setPosition(startX, y);
-          note.render(renderer);
-
-          // Debug: render romanji label and note number to the right
-          if (showRomanji) {
-            const symbolInfo = note.getSymbolInfo();
-            const romanji = symbolInfo?.romaji || 'unknown';
-            const octave = note.getModifiers().some(m => m.constructor.name === 'OctaveDotsModifier') ?
-              '(kan)' : '';
-            const label = `#${index + 1} ${romanji} ${octave}`.trim();
-
-            renderer.drawText(
-              label,
-              startX + 40, // Position to the right of the note
-              y + 5,       // Slightly below baseline
-              12,          // Small font size
-              'monospace', // Monospace font for alignment
-              '#999'       // Gray color
-            );
-          }
-        });
-
-        console.log('First column rendered vertically from MusicXML!');
-
-      } catch (error) {
-        console.error('Error:', error);
-        display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
+          console.log('First column rendered vertically from MusicXML!');
+        } catch (error) {
+          console.error('Error:', error);
+          display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
+        }
       }
-    }
 
-    // Render when page loads
-    renderFirstColumn();
-  </script>
-</body>
+      // Render when page loads
+      renderFirstColumn();
+    </script>
+  </body>
 </html>
