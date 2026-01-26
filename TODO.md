@@ -1,6 +1,6 @@
 # TODO - Shakuhachi Score Renderer
 
-This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the workflow defined in `CLAUDE.md`.
+This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
 **Goal:** Render the Akatombo score matching the reference image.
 **Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
@@ -9,7 +9,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Rest**
 
-[ ] implement rests
+[x] implement rests
 
 **Layout & Styling**
 
