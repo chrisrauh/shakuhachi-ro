@@ -46,7 +46,6 @@
         justify-content: center;
         align-items: flex-start;
         overflow: auto;
-        padding: 20px;
       }
 
       #display.debug svg {
@@ -130,18 +129,17 @@
             });
           });
 
-          // Create SVG renderer - tall enough for all notes
+          // Create SVG renderer - fit to viewport
           const displayRect = display.getBoundingClientRect();
-          const svgWidth = 400;
-          const svgHeight = firstColumnNotes.length * 60 + 200;
+          const svgWidth = displayRect.width;
+          const svgHeight = displayRect.height;
           const renderer = new SVGRenderer(display, svgWidth, svgHeight);
-          console.log('Renderer created');
           console.log(`SVG size: ${svgWidth}x${svgHeight}`);
 
-          // Render notes vertically (top to bottom) without rotation
+          // Render notes vertically (top to bottom) at proper size
           const startX = 150; // X position for the column
           const startY = 100; // Top margin
-          const verticalSpacing = 60; // Spacing between notes (slightly tighter for many notes)
+          const verticalSpacing = 60; // Fixed spacing between notes
 
           firstColumnNotes.forEach((note, index) => {
             const y = startY + index * verticalSpacing;
