@@ -7,11 +7,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-**Octave dots**
-
-- [x] Octave dots rendering on top of the note
-- [x] Octave dots are not needed in kinko, make their rendering optional through a query para.
-
 **Rest**
 
 [ ] implement rests
@@ -24,7 +19,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Octave Dots & Modifiers**
 
-- [ ] Fix octave dots to render visibly (currently not showing)
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
