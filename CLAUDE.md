@@ -1,17 +1,28 @@
 # Claude Code Instructions
 
-- KISS (Keep It Simple, Stupid)
 - Tasks: [TODO.md](./TODO.md)
 - Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+## Software engineering principles
+
+- KISS (Keep It Simple, Stupid)
 
 ## Dev Workflow
 
 1. Create feature branch
-2. Make changes and commit
-3. Create PR with `gh pr create`
-4. **Ask user to review and merge** (DO NOT merge automatically)
-5. Wait for user confirmation that PR is merged
-6. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
+2. Make changes and test
+3. Commit
+4. Create PR with `gh pr create`
+5. **Ask user to review and merge** (DO NOT merge automatically)
+6. Wait for user confirmation that PR is merged
+7. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
+
+**Testing**
+
+- Unit tests (Vitest): Logic, validation, transformations
+- Visual tests (Browser): Rendering, layout
+- Run tests after each task
+- Run tests before pushing
 
 ## Key Learnings
 
@@ -31,10 +42,3 @@
 
 - Co-locate related files (test HTML + JS together)
 - Unit tests next to source (`*.test.ts` next to `*.ts`)
-
-**Testing**
-
-- Unit tests (Vitest): Logic, validation, transformations
-- Visual tests (Browser): Rendering, layout
-- Run tests after each task
-- Run tests before pushing
