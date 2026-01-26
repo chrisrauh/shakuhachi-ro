@@ -130,13 +130,10 @@
             });
           });
 
-          // Create SVG renderer - size to fit viewport
+          // Create SVG renderer - tall enough for all notes
           const displayRect = display.getBoundingClientRect();
-          const svgWidth = Math.max(400, displayRect.width - 40);
-          const svgHeight = Math.max(
-            firstColumnNotes.length * 60 + 200,
-            displayRect.height
-          );
+          const svgWidth = 400;
+          const svgHeight = firstColumnNotes.length * 60 + 200;
           const renderer = new SVGRenderer(display, svgWidth, svgHeight);
           console.log('Renderer created');
           console.log(`SVG size: ${svgWidth}x${svgHeight}`);
