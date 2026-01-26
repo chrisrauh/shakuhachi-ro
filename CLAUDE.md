@@ -12,10 +12,11 @@
 1. Create feature branch
 2. Make changes and test
 3. Commit
-4. **Ask user** if you should create PR with `gh pr create`
-5. **Ask user to review and merge** (DO NOT merge automatically)
-6. Wait for user confirmation that PR is merged
-7. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
+4. **Mark completed tasks in TODO.md** with [x]
+5. **Ask user** if you should create PR with `gh pr create`
+6. **Ask user to review and merge** (DO NOT merge automatically)
+7. Wait for user confirmation that PR is merged
+8. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
 
 **Testing**
 
