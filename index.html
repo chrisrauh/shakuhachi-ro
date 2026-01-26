@@ -164,9 +164,9 @@
             `Rendering ${firstColumnNotes.length} notes in ${totalColumns} columns`
           );
 
-          // Calculate starting X position (rightmost column)
-          const totalWidth = totalColumns * (columnWidth + columnSpacing);
-          const startX = svgWidth - totalWidth + columnWidth / 2;
+          // Calculate starting X position (center the score horizontally)
+          const actualTotalWidth = totalColumns * columnWidth + (totalColumns - 1) * columnSpacing;
+          const startX = (svgWidth - actualTotalWidth) / 2 + columnWidth / 2;
 
           // Render each column from right to left
           for (let col = 0; col < totalColumns; col++) {
