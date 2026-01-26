@@ -127,6 +127,68 @@ describe('ScoreParser', () => {
       expect(notes[5].getKana()).toBe('ウ');
       expect(notes[6].getKana()).toBe('ヒ');
     });
+
+    it('should parse notes with dotted duration modifier', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1, dotted: true },
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1, dotted: false }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(2);
+
+      // First note should have DurationDotModifier
+      const firstNoteModifiers = notes[0].getModifiers();
+      const hasDurationDot = firstNoteModifiers.some(
+        (m) => m.constructor.name === 'DurationDotModifier'
+      );
+      expect(hasDurationDot).toBe(true);
+
+      // Second note should NOT have DurationDotModifier
+      const secondNoteModifiers = notes[1].getModifiers();
+      const hasNoDurationDot = secondNoteModifiers.every(
+        (m) => m.constructor.name !== 'DurationDotModifier'
+      );
+      expect(hasNoDurationDot).toBe(true);
+    });
+
+    it('should parse rest notes correctly', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { rest: true, duration: 2 },
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(2);
+      // First note is a rest, second is a regular note
+      expect(notes[1].getKana()).toBe('ロ');
+    });
+
+    it('should parse notes with multiple modifiers including duration dot', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'chi', octave: 1 }, duration: 1, meri: true, dotted: true }
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(1);
+      // Should have octave, meri, and duration dot modifiers
+      expect(notes[0].getModifiers()).toHaveLength(3);
+    });
   });
 
   describe('validate()', () => {
@@ -266,6 +328,32 @@ describe('ScoreParser', () => {
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow('Note at index 0 has invalid duration: -1');
+    });
+
+    it('should throw error if rest note is missing duration', () => {
+      const scoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { rest: true }
+        ]
+      } as any;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow('Rest at index 0 is missing duration');
+    });
+
+    it('should allow rest notes without pitch', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { rest: true, duration: 2 }
+        ]
+      };
+
+      // Should not throw
+      const notes = ScoreParser.parse(scoreData);
+      expect(notes).toHaveLength(1);
     });
   });
 

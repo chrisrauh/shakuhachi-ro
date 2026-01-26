@@ -150,10 +150,11 @@
 
           // Multi-column layout configuration
           const columnWidth = 100; // Width for each column
-          const columnSpacing = 80; // Space between columns
+          const columnSpacing = 55; // Space between columns (reduced to match reference)
           const notesPerColumn = 10; // Notes per column
-          const startY = 100; // Top margin
-          const verticalSpacing = 60; // Fixed spacing between notes
+          const startY = 70; // Top margin (reduced to match reference)
+          const verticalSpacing = 48; // Fixed spacing between notes (reduced to match reference)
+          const fontSize = 28; // Font size for notes (reduced to match reference)
 
           // Calculate number of columns needed
           const totalColumns = Math.ceil(
@@ -163,9 +164,9 @@
             `Rendering ${firstColumnNotes.length} notes in ${totalColumns} columns`
           );
 
-          // Calculate starting X position (rightmost column)
-          const totalWidth = totalColumns * (columnWidth + columnSpacing);
-          const startX = svgWidth - totalWidth + columnWidth / 2;
+          // Calculate starting X position (center the score horizontally)
+          const actualTotalWidth = totalColumns * columnWidth + (totalColumns - 1) * columnSpacing;
+          const startX = (svgWidth - actualTotalWidth) / 2 + columnWidth / 2;
 
           // Render each column from right to left
           for (let col = 0; col < totalColumns; col++) {
@@ -186,10 +187,23 @@
             );
 
             // Render notes in this column
+            let currentY = startY;
             columnNotes.forEach((note, index) => {
-              const y = startY + index * verticalSpacing;
-              note.setPosition(columnX, y);
+              const noteY = currentY; // Save Y position for this note
+              note.setFontSize(fontSize); // Apply consistent font size
+              note.setPosition(columnX, noteY);
               note.render(renderer);
+
+              // Check if this note has a duration dot modifier
+              const hasDurationDot = note
+                .getModifiers()
+                .some((m) => m.constructor.name === 'DurationDotModifier');
+
+              // Calculate spacing to next note
+              // If this note has a duration dot (positioned 12px below note),
+              // add extra spacing so visual gap remains consistent
+              const extraSpacing = hasDurationDot ? 12 : 0;
+              currentY += verticalSpacing + extraSpacing;
 
               // Debug: render romanji label and note number to the right
               if (showRomanji) {
@@ -206,7 +220,7 @@
                 renderer.drawText(
                   label,
                   columnX + 40, // Position to the right of the note
-                  y + 5, // Slightly below baseline
+                  noteY + 5, // Slightly below baseline
                   12, // Small font size
                   'monospace', // Monospace font for alignment
                   '#999' // Gray color
