@@ -57,9 +57,21 @@ export class MusicXMLParser {
     const noteElements = xmlDoc.querySelectorAll('note');
 
     noteElements.forEach(noteElement => {
-      // Skip rests
+      // Check for rests
       const restElement = noteElement.querySelector('rest');
       if (restElement) {
+        // Extract duration for rest
+        const durationElement = noteElement.querySelector('duration')?.textContent || '1';
+        const duration = parseInt(durationElement, 10);
+
+        // Create rest note
+        notes.push({
+          pitch: {
+            step: 'rest',
+            octave: 0,
+          },
+          duration,
+        });
         return;
       }
 

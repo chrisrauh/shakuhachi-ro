@@ -58,6 +58,14 @@ export class ScoreParser {
    * @returns ShakuNote object with modifiers
    */
   private static parseNote(note: ScoreNote): ShakuNote {
+    // Handle rests
+    if (note.pitch.step === 'rest') {
+      return new ShakuNote({
+        symbol: '・', // Middle dot for rest
+        duration: mapDuration(note.duration)
+      });
+    }
+
     // Create the base note
     const shakuNote = new ShakuNote({
       symbol: note.pitch.step,

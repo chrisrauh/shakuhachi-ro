@@ -9,9 +9,9 @@
  */
 
 /**
- * Valid shakuhachi pitch steps (Kinko-ryū fingerings)
+ * Valid shakuhachi pitch steps (Kinko-ryū fingerings) plus rest
  */
-export type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';
+export type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi' | 'rest';
 
 /**
  * Notation style
