@@ -81,6 +81,7 @@
       const showRomanji =
         urlParams.get('debug') === 'true' ||
         urlParams.get('romanji') === 'true';
+      const showOctaveDots = urlParams.get('octaveDots') !== 'false'; // Show by default
 
       if (showRomanji) {
         console.log('Debug mode: Romanji labels enabled');
@@ -88,6 +89,8 @@
           '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
         display.classList.add('debug');
       }
+
+      console.log(`Octave dots: ${showOctaveDots ? 'enabled' : 'disabled'}`);
 
       async function renderFirstColumn() {
         try {
@@ -118,15 +121,24 @@
               mods
             );
 
-            // Adjust octave dots for vertical layout (dots should appear to the right)
-            mods.forEach((mod) => {
-              if (mod.constructor.name === 'OctaveDotsModifier') {
-                mod
-                  .setDotRadius(4) // Visible size
-                  .setColor('#000') // Black
-                  .setOffset(20, 0); // Position to the right at same vertical level
-              }
-            });
+            // Remove octave dots if disabled, otherwise position them
+            if (!showOctaveDots) {
+              // Remove octave dot modifiers from the note
+              const nonOctaveModifiers = mods.filter(
+                (mod) => mod.constructor.name !== 'OctaveDotsModifier'
+              );
+              note.modifiers = nonOctaveModifiers;
+            } else {
+              // Position dots above the note
+              mods.forEach((mod) => {
+                if (mod.constructor.name === 'OctaveDotsModifier') {
+                  mod
+                    .setDotRadius(4) // Visible size
+                    .setColor('#000') // Black
+                    .setOffset(0, -25); // Position above the note
+                }
+              });
+            }
           });
 
           // Create SVG renderer - fit to viewport
