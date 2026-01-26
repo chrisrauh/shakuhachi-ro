@@ -60,7 +60,7 @@
   </head>
   <body>
     <header>
-      <h1>Akatombo - Full Score (Single Column)</h1>
+      <h1>Akatombo - Full Score</h1>
       <p class="subtitle">
         All notes from MusicXML rendered vertically
         <span id="debug-indicator"></span>
@@ -136,39 +136,72 @@
           const renderer = new SVGRenderer(display, svgWidth, svgHeight);
           console.log(`SVG size: ${svgWidth}x${svgHeight}`);
 
-          // Render notes vertically (top to bottom) at proper size
-          const startX = 150; // X position for the column
+          // Multi-column layout configuration
+          const columnWidth = 100; // Width for each column
+          const columnSpacing = 80; // Space between columns
+          const notesPerColumn = 10; // Notes per column
           const startY = 100; // Top margin
           const verticalSpacing = 60; // Fixed spacing between notes
 
-          firstColumnNotes.forEach((note, index) => {
-            const y = startY + index * verticalSpacing;
-            note.setPosition(startX, y);
-            note.render(renderer);
+          // Calculate number of columns needed
+          const totalColumns = Math.ceil(
+            firstColumnNotes.length / notesPerColumn
+          );
+          console.log(
+            `Rendering ${firstColumnNotes.length} notes in ${totalColumns} columns`
+          );
 
-            // Debug: render romanji label and note number to the right
-            if (showRomanji) {
-              const symbolInfo = note.getSymbolInfo();
-              const romanji = symbolInfo?.romaji || 'unknown';
-              const octave = note
-                .getModifiers()
-                .some((m) => m.constructor.name === 'OctaveDotsModifier')
-                ? '(kan)'
-                : '';
-              const label = `#${index + 1} ${romanji} ${octave}`.trim();
+          // Calculate starting X position (rightmost column)
+          const totalWidth = totalColumns * (columnWidth + columnSpacing);
+          const startX = svgWidth - totalWidth + columnWidth / 2;
 
-              renderer.drawText(
-                label,
-                startX + 40, // Position to the right of the note
-                y + 5, // Slightly below baseline
-                12, // Small font size
-                'monospace', // Monospace font for alignment
-                '#999' // Gray color
-              );
-            }
-          });
+          // Render each column from right to left
+          for (let col = 0; col < totalColumns; col++) {
+            // Reverse column order: first column (col=0) is rightmost
+            const columnX =
+              startX + (totalColumns - 1 - col) * (columnWidth + columnSpacing);
+            const startIndex = col * notesPerColumn;
+            const endIndex = Math.min(
+              startIndex + notesPerColumn,
+              firstColumnNotes.length
+            );
+            const columnNotes = firstColumnNotes.slice(startIndex, endIndex);
 
-          console.log('First column rendered vertically from MusicXML!');
+            console.log(
+              `Column ${col + 1}: notes ${startIndex + 1}-${endIndex} at x=${columnX}`
+            );
+
+            // Render notes in this column
+            columnNotes.forEach((note, index) => {
+              const y = startY + index * verticalSpacing;
+              note.setPosition(columnX, y);
+              note.render(renderer);
+
+              // Debug: render romanji label and note number to the right
+              if (showRomanji) {
+                const symbolInfo = note.getSymbolInfo();
+                const romanji = symbolInfo?.romaji || 'unknown';
+                const octave = note
+                  .getModifiers()
+                  .some((m) => m.constructor.name === 'OctaveDotsModifier')
+                  ? '(kan)'
+                  : '';
+                const globalIndex = startIndex + index;
+                const label = `#${globalIndex + 1} ${romanji} ${octave}`.trim();
+
+                renderer.drawText(
+                  label,
+                  columnX + 40, // Position to the right of the note
+                  y + 5, // Slightly below baseline
+                  12, // Small font size
+                  'monospace', // Monospace font for alignment
+                  '#999' // Gray color
+                );
+              }
+            });
+          }
+
+          console.log('Multi-column layout rendered from MusicXML!');
         } catch (error) {
           console.error('Error:', error);
           display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
