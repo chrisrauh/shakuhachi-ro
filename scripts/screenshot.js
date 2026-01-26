@@ -6,12 +6,14 @@ async function takeScreenshot() {
 
   try {
     // Navigate to the dev server
-    await page.goto('http://localhost:3002?debug=true', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:3002?debug=true', {
+      waitUntil: 'networkidle',
+    });
 
     // Take screenshot
     await page.screenshot({
       path: 'screenshots/current.png',
-      fullPage: true
+      fullPage: true,
     });
 
     console.log('Screenshot saved to screenshots/current.png');
