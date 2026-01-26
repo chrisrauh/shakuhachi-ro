@@ -150,10 +150,11 @@
 
           // Multi-column layout configuration
           const columnWidth = 100; // Width for each column
-          const columnSpacing = 80; // Space between columns
+          const columnSpacing = 55; // Space between columns (reduced to match reference)
           const notesPerColumn = 10; // Notes per column
-          const startY = 100; // Top margin
-          const verticalSpacing = 60; // Fixed spacing between notes
+          const startY = 70; // Top margin (reduced to match reference)
+          const verticalSpacing = 48; // Fixed spacing between notes (reduced to match reference)
+          const fontSize = 28; // Font size for notes (reduced to match reference)
 
           // Calculate number of columns needed
           const totalColumns = Math.ceil(
@@ -188,6 +189,7 @@
             // Render notes in this column
             columnNotes.forEach((note, index) => {
               const y = startY + index * verticalSpacing;
+              note.setFontSize(fontSize); // Apply consistent font size
               note.setPosition(columnX, y);
               note.render(renderer);
 
