@@ -12,7 +12,7 @@
 1. Create feature branch
 2. Make changes and test
 3. Commit
-4. Create PR with `gh pr create`
+4. **Ask user** if you should create PR with `gh pr create`
 5. **Ask user to review and merge** (DO NOT merge automatically)
 6. Wait for user confirmation that PR is merged
 7. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
@@ -23,6 +23,14 @@
 - Visual tests (Browser): Rendering, layout
 - Run tests after each task
 - Run tests before pushing
+
+**Dev Server Management**
+
+- Start dev server ONCE when beginning work on a feature
+- Leave it running while iterating and testing
+- Only stop it when completely done with the PR/task
+- DO NOT start and stop the server repeatedly for each screenshot or test
+- If server is already running, reuse it
 
 ## Key Learnings
 
