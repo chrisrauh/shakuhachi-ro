@@ -121,21 +121,24 @@
               mods
             );
 
-            // Handle octave dots based on query parameter
-            mods.forEach((mod) => {
-              if (mod.constructor.name === 'OctaveDotsModifier') {
-                if (showOctaveDots) {
-                  // Position dots above the note
+            // Remove octave dots if disabled, otherwise position them
+            if (!showOctaveDots) {
+              // Remove octave dot modifiers from the note
+              const nonOctaveModifiers = mods.filter(
+                (mod) => mod.constructor.name !== 'OctaveDotsModifier'
+              );
+              note.modifiers = nonOctaveModifiers;
+            } else {
+              // Position dots above the note
+              mods.forEach((mod) => {
+                if (mod.constructor.name === 'OctaveDotsModifier') {
                   mod
                     .setDotRadius(4) // Visible size
                     .setColor('#000') // Black
                     .setOffset(0, -25); // Position above the note
-                } else {
-                  // Hide dots by setting radius to 0
-                  mod.setDotRadius(0);
                 }
-              }
-            });
+              });
+            }
           });
 
           // Create SVG renderer - fit to viewport
