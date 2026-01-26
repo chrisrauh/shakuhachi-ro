@@ -18,6 +18,8 @@
 7. **Ask user to review and merge** (DO NOT merge automatically)
 8. Wait for user confirmation that PR is merged
 9. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
+10. **Remove completed tasks from TODO.md** (tasks marked with [x])
+11. **Look for next task in TODO.md** and ask user if you should work on it
 
 **Testing**
 
