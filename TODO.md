@@ -31,13 +31,8 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Visual comparison: rendered vs reference screenshot
 - [ ] Adjust positioning/spacing as needed
 
-## Multi-Column Layout
+**Multi-Column Layout Discrepancies**
 
-- [x] Implement column breaking logic
-- [x] Render multiple columns right-to-left
-- [x] Verify layout matches reference, create tasks for any discrepancies
-
-**Discrepancies found:**
 - [ ] Octave dots not rendering (showing as "(kan)" debug text instead of visible dots)
 - [ ] Column spacing too wide - reduce to match reference
 - [ ] Vertical note spacing may need adjustment
