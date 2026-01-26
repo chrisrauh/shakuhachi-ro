@@ -8,8 +8,9 @@
  */
 
 import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
-import { OctaveDotsModifier } from '../modifiers/OctaveDotsModifier';
+import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
+import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 
 /**
@@ -58,16 +59,30 @@ export class ScoreParser {
    * @returns ShakuNote object with modifiers
    */
   private static parseNote(note: ScoreNote): ShakuNote {
+    // Handle rests (ma 間 - space/pause in Kinko notation)
+    if (note.rest) {
+      return new ShakuNote({
+        symbol: 'rest', // Symbol doesn't matter for rests
+        duration: mapDuration(note.duration),
+        isRest: true
+      });
+    }
+
+    // Ensure pitch exists for non-rest notes
+    if (!note.pitch) {
+      throw new Error('Note must have pitch when rest is not set');
+    }
+
     // Create the base note
     const shakuNote = new ShakuNote({
       symbol: note.pitch.step,
       duration: mapDuration(note.duration)
     });
 
-    // Add octave dots if needed
+    // Add octave marks if needed
     if (note.pitch.octave > 0) {
       const count = note.pitch.octave as 1 | 2;
-      const octaveModifier = new OctaveDotsModifier(count, 'above');
+      const octaveModifier = new OctaveMarksModifier(count, 'above');
       shakuNote.addModifier(octaveModifier);
     }
 
@@ -75,6 +90,12 @@ export class ScoreParser {
     if (note.meri) {
       const meriModifier = new MeriKariModifier('meri');
       shakuNote.addModifier(meriModifier);
+    }
+
+    // Add duration dot if needed
+    if (note.dotted) {
+      const durationDot = new DurationDotModifier('below'); // 'below' for vertical layout
+      shakuNote.addModifier(durationDot);
     }
 
     return shakuNote;
@@ -109,6 +130,15 @@ export class ScoreParser {
 
     // Validate each note
     scoreData.notes.forEach((note, index) => {
+      // Rest notes don't need pitch
+      if (note.rest) {
+        if (!note.duration) {
+          throw new Error(`Rest at index ${index} is missing duration`);
+        }
+        return;
+      }
+
+      // Regular notes need pitch
       if (!note.pitch) {
         throw new Error(`Note at index ${index} is missing pitch`);
       }

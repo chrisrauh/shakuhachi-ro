@@ -23,11 +23,12 @@ export type { ShakuNoteOptions, NoteDuration, BoundingBox } from './notes/ShakuN
 export { Modifier } from './modifiers/Modifier';
 export type { ModifierPosition } from './modifiers/Modifier';
 export { TestModifier } from './modifiers/TestModifier';
-export { OctaveDotsModifier } from './modifiers/OctaveDotsModifier';
+export { OctaveMarksModifier } from './modifiers/OctaveMarksModifier';
 export { MeriKariModifier } from './modifiers/MeriKariModifier';
 export type { MeriKariType } from './modifiers/MeriKariModifier';
 export { AtariModifier } from './modifiers/AtariModifier';
 export type { AtariStyle } from './modifiers/AtariModifier';
+export { DurationDotModifier } from './modifiers/DurationDotModifier';
 
 // Data exports
 export {

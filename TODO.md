@@ -1,15 +1,17 @@
 # TODO - Shakuhachi Score Renderer
 
-This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the workflow defined in `CLAUDE.md`.
+This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
 **Goal:** Render the Akatombo score matching the reference image.
 **Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
+**Secondary Reference Image comparing western and kinko notation:** `examples/scores-pictures/akatombo-kinko-western-score.png`
 
 ## Current Tasks
 
 **Rest**
 
-[ ] implement rests
+[x] implement rests
+[x] rest symbols should be placed horizontally centered in the column, and consequentely also centered with the notes
 
 **Layout & Styling**
 
@@ -17,8 +19,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
 
-**Octave Dots & Modifiers**
+**Octave Modifiers**
 
+- [ ] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations

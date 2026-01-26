@@ -81,16 +81,16 @@
       const showRomanji =
         urlParams.get('debug') === 'true' ||
         urlParams.get('romanji') === 'true';
-      const showOctaveDots = urlParams.get('octaveDots') !== 'false'; // Show by default
+      const showOctaveMarks = urlParams.get('octaveMarks') !== 'false'; // Show by default
 
       if (showRomanji) {
         console.log('Debug mode: Romanji labels enabled');
         document.getElementById('debug-indicator').innerHTML =
-          '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
+          'Debug: ON - ?debug=true found in URL';
         display.classList.add('debug');
       }
 
-      console.log(`Octave dots: ${showOctaveDots ? 'enabled' : 'disabled'}`);
+      console.log(`Octave marks: ${showOctaveMarks ? 'enabled' : 'disabled'}`);
 
       async function renderFirstColumn() {
         try {
@@ -121,21 +121,21 @@
               mods
             );
 
-            // Remove octave dots if disabled, otherwise position them
-            if (!showOctaveDots) {
-              // Remove octave dot modifiers from the note
+            // Remove octave marks if disabled, otherwise configure them
+            if (!showOctaveMarks) {
+              // Remove octave mark modifiers from the note
               const nonOctaveModifiers = mods.filter(
-                (mod) => mod.constructor.name !== 'OctaveDotsModifier'
+                (mod) => mod.constructor.name !== 'OctaveMarksModifier'
               );
               note.modifiers = nonOctaveModifiers;
             } else {
-              // Position dots above the note
+              // Configure octave stroke marks
               mods.forEach((mod) => {
-                if (mod.constructor.name === 'OctaveDotsModifier') {
+                if (mod.constructor.name === 'OctaveMarksModifier') {
                   mod
-                    .setDotRadius(4) // Visible size
-                    .setColor('#000') // Black
-                    .setOffset(0, -25); // Position above the note
+                    .setStrokeLength(6) // Length of stroke mark
+                    .setStrokeWidth(1.5) // Stroke thickness
+                    .setColor('#000'); // Black
                 }
               });
             }
@@ -180,7 +180,9 @@
             const columnNotes = firstColumnNotes.slice(startIndex, endIndex);
 
             console.log(
-              `Column ${col + 1}: notes ${startIndex + 1}-${endIndex} at x=${columnX}`
+              `Column ${col + 1}: notes ${
+                startIndex + 1
+              }-${endIndex} at x=${columnX}`
             );
 
             // Render notes in this column
@@ -195,7 +197,7 @@
                 const romanji = symbolInfo?.romaji || 'unknown';
                 const octave = note
                   .getModifiers()
-                  .some((m) => m.constructor.name === 'OctaveDotsModifier')
+                  .some((m) => m.constructor.name === 'OctaveMarksModifier')
                   ? '(kan)'
                   : '';
                 const globalIndex = startIndex + index;

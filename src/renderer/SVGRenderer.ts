@@ -90,6 +90,7 @@ export class SVGRenderer {
     textEl.setAttribute('font-size', String(fontSize));
     textEl.setAttribute('font-family', fontFamily);
     textEl.setAttribute('fill', fill);
+    textEl.setAttribute('text-anchor', 'middle'); // Center text horizontally
     textEl.textContent = text;
 
     this.add(textEl);
