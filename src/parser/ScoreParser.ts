@@ -58,12 +58,18 @@ export class ScoreParser {
    * @returns ShakuNote object with modifiers
    */
   private static parseNote(note: ScoreNote): ShakuNote {
-    // Handle rests
-    if (note.pitch.step === 'rest') {
+    // Handle rests (ma 間 - space/pause in Kinko notation)
+    if (note.rest) {
       return new ShakuNote({
-        symbol: '・', // Middle dot for rest
-        duration: mapDuration(note.duration)
+        symbol: 'rest', // Symbol doesn't matter for rests
+        duration: mapDuration(note.duration),
+        isRest: true
       });
+    }
+
+    // Ensure pitch exists for non-rest notes
+    if (!note.pitch) {
+      throw new Error('Note must have pitch when rest is not set');
     }
 
     // Create the base note
@@ -117,6 +123,15 @@ export class ScoreParser {
 
     // Validate each note
     scoreData.notes.forEach((note, index) => {
+      // Rest notes don't need pitch
+      if (note.rest) {
+        if (!note.duration) {
+          throw new Error(`Rest at index ${index} is missing duration`);
+        }
+        return;
+      }
+
+      // Regular notes need pitch
       if (!note.pitch) {
         throw new Error(`Note at index ${index} is missing pitch`);
       }

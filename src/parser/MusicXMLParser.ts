@@ -64,12 +64,9 @@ export class MusicXMLParser {
         const durationElement = noteElement.querySelector('duration')?.textContent || '1';
         const duration = parseInt(durationElement, 10);
 
-        // Create rest note
+        // Create rest note (following MusicXML structure)
         notes.push({
-          pitch: {
-            step: 'rest',
-            octave: 0,
-          },
+          rest: true,
           duration,
         });
         return;

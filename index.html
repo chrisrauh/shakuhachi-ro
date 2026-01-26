@@ -86,7 +86,7 @@
       if (showRomanji) {
         console.log('Debug mode: Romanji labels enabled');
         document.getElementById('debug-indicator').innerHTML =
-          '<strong style="color: #e74c3c;">(Debug: Romanji labels ON - add ?debug=true to URL)</strong>';
+          'Debug: ON - ?debug=true found in URL';
         display.classList.add('debug');
       }
 
@@ -180,7 +180,9 @@
             const columnNotes = firstColumnNotes.slice(startIndex, endIndex);
 
             console.log(
-              `Column ${col + 1}: notes ${startIndex + 1}-${endIndex} at x=${columnX}`
+              `Column ${col + 1}: notes ${
+                startIndex + 1
+              }-${endIndex} at x=${columnX}`
             );
 
             // Render notes in this column

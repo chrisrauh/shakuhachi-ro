@@ -45,6 +45,9 @@ export interface ShakuNoteOptions {
 
   /** Array of modifiers to attach */
   modifiers?: Modifier[];
+
+  /** Whether this note is a rest */
+  isRest?: boolean;
 }
 
 /**
@@ -88,6 +91,9 @@ export class ShakuNote {
   /** Cached bounding box */
   private bbox: BoundingBox | null = null;
 
+  /** Whether this note is a rest */
+  private isRest: boolean;
+
   /**
    * Creates a new shakuhachi note
    */
@@ -104,6 +110,7 @@ export class ShakuNote {
     this.fontSize = options.fontSize ?? 32;
     this.fontFamily = options.fontFamily ?? 'Noto Sans JP, sans-serif';
     this.color = options.color ?? '#000';
+    this.isRest = options.isRest ?? false;
 
     if (options.modifiers) {
       this.modifiers = [...options.modifiers];
@@ -116,15 +123,35 @@ export class ShakuNote {
    * @param renderer - SVGRenderer instance
    */
   render(renderer: SVGRenderer): void {
-    // Draw the kana symbol
-    renderer.drawText(
-      this.kana,
-      this.x,
-      this.y,
-      this.fontSize,
-      this.fontFamily,
-      this.color
-    );
+    if (this.isRest) {
+      // Draw rest as a small hollow circle
+      // Radius is about 1/8 of fontSize (for fontSize 32, radius ~4px)
+      const radius = this.fontSize / 8;
+      // Stroke width proportional to the circle size
+      const strokeWidth = Math.max(1.5, radius / 1.9);
+      // Center circle vertically with the note characters
+      // Japanese characters are typically centered around y - fontSize * 0.4
+      const circleY = this.y - this.fontSize * 0.4;
+
+      renderer.drawCircle(
+        this.x,
+        circleY,
+        radius,
+        undefined, // no fill
+        this.color, // stroke color
+        strokeWidth
+      );
+    } else {
+      // Draw the kana symbol
+      renderer.drawText(
+        this.kana,
+        this.x,
+        this.y,
+        this.fontSize,
+        this.fontFamily,
+        this.color
+      );
+    }
 
     // Render all modifiers
     this.modifiers.forEach(modifier => {
