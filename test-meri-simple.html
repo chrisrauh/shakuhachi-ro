@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meri Degrees - Simple Test</title>
+    <style>
+      body {
+        font-family: 'Noto Sans JP', sans-serif;
+        padding: 40px;
+        background: white;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+      #display {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎵 Meri Degrees Test - Simple</h1>
+    <p>Testing: メ (meri), 中 (chu meri), 大 (dai meri)</p>
+
+    <div id="display"></div>
+
+    <script type="module">
+      import { ShakuNote } from '/src/notes/ShakuNote';
+      import { MeriKariModifier } from '/src/modifiers/MeriKariModifier';
+      import { SVGRenderer } from '/src/renderer/SVGRenderer';
+
+      const display = document.getElementById('display');
+
+      // Create simple test score
+      const notes = [
+        // Regular ro
+        new ShakuNote({ symbol: 'ro', duration: 'q' }),
+        // Ro with full meri (メ)
+        (() => {
+          const note = new ShakuNote({ symbol: 'ro', duration: 'q' });
+          note.addModifier(new MeriKariModifier('meri'));
+          return note;
+        })(),
+        // Ro with chu meri (中)
+        (() => {
+          const note = new ShakuNote({ symbol: 'ro', duration: 'q' });
+          note.addModifier(new MeriKariModifier('chu-meri'));
+          return note;
+        })(),
+        // Chi with dai meri (大)
+        (() => {
+          const note = new ShakuNote({ symbol: 'chi', duration: 'q' });
+          note.addModifier(new MeriKariModifier('dai-meri'));
+          return note;
+        })(),
+      ];
+
+      // Create renderer
+      const displayRect = display.getBoundingClientRect();
+      const svgWidth = displayRect.width;
+      const svgHeight = displayRect.height;
+      const renderer = new SVGRenderer(display, svgWidth, svgHeight);
+
+      // Render notes in a single vertical column
+      const startX = svgWidth / 2;
+      const startY = 70;
+      const verticalSpacing = 60;
+      const fontSize = 28;
+
+      let currentY = startY;
+      notes.forEach((note) => {
+        note.setFontSize(fontSize);
+        note.setPosition(startX, currentY);
+        note.render(renderer);
+        currentY += verticalSpacing;
+      });
+
+      console.log('Simple meri test rendered!');
+    </script>
+  </body>
+</html>

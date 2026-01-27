@@ -1,0 +1,130 @@
+{
+  "title": "Modifier Combinations Test",
+  "style": "kinko",
+  "composer": "Test - All modifier combinations",
+  "notes": [
+    {
+      "_comment": "=== MERI + OCTAVE MARKS ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Start in otsu: ro (no mark)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Jump to kan with meri: ri kan (甲) + meri (メ)",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Back to otsu with chu meri: ro (乙) + chu meri (中)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "chu_meri": true
+    },
+    {
+      "_comment": "Jump to kan with dai meri: chi kan (甲) + dai meri (大)",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1,
+      "dai_meri": true
+    },
+    {
+      "_comment": "=== MERI + DURATION DOTS ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro with dotted duration",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "dotted": true
+    },
+    {
+      "_comment": "ro meri (メ) with dotted duration",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "tsu chu meri (中) with dotted duration",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1,
+      "chu_meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "chi dai meri (大) with dotted duration",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1,
+      "dai_meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "=== ALL MODIFIERS TOGETHER ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Start in otsu for clear context",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri kan (甲) with meri (メ) and dotted",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1,
+      "meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "Back to otsu: tsu (乙) with chu meri (中) and dotted",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1,
+      "chu_meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "Jump to kan: chi kan (甲) with dai meri (大) and dotted",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1,
+      "dai_meri": true,
+      "dotted": true
+    },
+    {
+      "_comment": "=== EDGE CASES ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "First note in kan - should have octave mark",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "First note in kan with meri - octave mark + meri",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Rest to reset context",
+      "rest": true,
+      "duration": 1
+    },
+    {
+      "_comment": "First note after rest - otsu (no mark)",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Same note with chu meri",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1,
+      "chu_meri": true
+    }
+  ]
+}
