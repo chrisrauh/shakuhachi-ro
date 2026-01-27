@@ -74,14 +74,41 @@ Base class for marks that attach to notes (dots, slashes, arrows)
 **Specific Modifiers:**
 
 - `MeriKariModifier` - Pitch-bend marks (◁ for meri, ▷ for kari)
-- `OctaveDotsModifier` - Dots above (daikan/high) or below (otsu/low)
+- `OctaveMarksModifier` - Octave register marks using kanji characters (乙 for otsu, 甲 for kan)
 - `AtariModifier` - Finger-pop technique mark (>)
+
+**Octave Marking - Closest Note Principle:**
+
+Octave marks in Kinko notation are **contextual and relative**, not absolute indicators. They follow the "closest note principle":
+
+- **Default behavior:** When notes follow each other in sequence, the next note is assumed to be the **closest instance** of that pitch to the previous note (no mark needed)
+- **When marks are used:** Marks are ONLY added when the actual note **violates** the closest note principle
+- **First note:** Defaults to otsu register; mark if in kan or daikan
+- **Rests:** Do NOT reset octave context; rests carry the octave context through
+
+**Examples:**
+- `ri (otsu) → ro`: Closest ro to ri (otsu) is ro (kan), so no mark needed
+- `ri (otsu) → ro (otsu)`: Needs octave mark on ro because it violates the closest-note assumption
+- `ro (otsu) → rest → tsu`: The tsu still references ro (otsu) as the previous pitch
+
+**Visual Representation:**
+- Small kanji characters: **乙 (otsu)** or **甲 (kan)**
+- NOT diagonal strokes or dots
+- Position: Top-left of note character (initially; will support 8-position system later)
+
+**Implementation:**
+The ScoreParser implements a closest-note algorithm that:
+1. Calculates chromatic distance between consecutive pitches
+2. Determines which octave of the next note is "closest" to the previous
+3. Only adds OctaveMarksModifier when actual octave ≠ expected octave
 
 **Positioning:**
 
 - Position themselves relative to parent note's bounding box
 - Properties: `offsetX`, `offsetY` for positioning relative to note
 - Method: `render(renderer, x, y)` - Draw the modifier
+- **8-Position System:** Notes have 8 potential modifier positions around them (top-left, top-center, top-right, right-center, bottom-right, bottom-center, bottom-left, left-center)
+- Multiple modifiers need smart positioning to avoid overlap (future enhancement)
 
 ### 3. SVGRenderer
 
