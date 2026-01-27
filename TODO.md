@@ -3,8 +3,8 @@
 This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
 **Goal:** Render the Akatombo score matching the reference image.
-**Reference Image:** `examples/scores-pictures/akatombo-kinko-score.png`
-**Secondary Reference Image comparing western and kinko notation:** `examples/scores-pictures/akatombo-kinko-western-score.png`
+**Reference Image:** `references/scores-pictures/akatombo-kinko-score.png`
+**Secondary Reference Image comparing western and kinko notation:** `references/scores-pictures/akatombo-kinko-western-score.jpg`
 
 ## Current Tasks
 
@@ -48,7 +48,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ## Documentation
 
 - [ ] Add JSDoc comments to public APIs
-- [ ] Write usage guide in examples/README.md
+- [ ] Write usage guide in references/README.md
 - [ ] Update README.md with project overview
 - [ ] Document score data format
 - [ ] Cross-browser testing notes

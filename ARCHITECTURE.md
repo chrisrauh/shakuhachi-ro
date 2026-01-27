@@ -279,7 +279,7 @@ src/
   │   └── mappings.ts             # Kinko/Tozan symbol maps
   └── index.ts                    # Main exports
 
-examples/
+references/
   ├── basic-kinko.html            # Simple Kinko example
   └── README.md                   # Usage documentation
 
@@ -454,6 +454,7 @@ Before implementing new features, produce a short markdown research brief (2-3 p
 - [Neptune, Shakuhachi: A Tozan Playing Guide](https://www.shakuhachi.com/PG-Neptune.html) - Tozan notation
 - [Shakuhachi Notes - Josen Shakuhachi](https://josenshakuhachi.com/shakuhachi-guides/shakuhachi-note-charts) - Basic note charts
 - [Kinko Rules - Araki Kodo VI](https://www.arakikodo.com/blog/kinko-rules) - Traditional Kinko-ryū rules
+- [Komuso.com - Shakuhachi Schools and Repertoire](https://www.komuso.com/top/index.pl) - Comprehensive database of shakuhachi schools, honkyoku repertoire, and historical information
 
 ### Techniques
 

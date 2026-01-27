@@ -1,60 +1,167 @@
 {
-  "title": "Meri/Kari Mark Test",
+  "title": "Complete Shakuhachi Note Reference",
   "style": "kinko",
-  "composer": "Test",
+  "composer": "Reference",
   "notes": [
     {
-      "_comment": "Test 1: Regular ro note (no meri)",
+      "_comment": "=== OTSU (Lower Register) ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (otsu) - all holes covered",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "Test 2: ro with meri",
+      "_comment": "ro meri",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "Test 3: tsu (no meri)",
+      "_comment": "tsu (otsu) - 5th hole open",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "Test 4: tsu with meri",
+      "_comment": "tsu meri",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "Test 5: re (no meri)",
+      "_comment": "re (otsu) - 4th and 5th holes open",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "Test 6: re with meri",
+      "_comment": "re meri",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "Test 7: chi (no meri)",
+      "_comment": "chi (otsu) - 3rd, 4th, 5th holes open",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "Test 8: chi with meri",
+      "_comment": "chi meri",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "Test 9: ri (no meri)",
+      "_comment": "Separator",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ri (otsu) - front 3 holes and back hole open",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "Test 10: ri with meri",
+      "_comment": "ri meri",
       "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "u (otsu) - unique fingering, inherently meri",
+      "pitch": { "step": "u", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (otsu) - all front holes open",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi meri",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "=== KAN (Upper Register) ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (kan) - all holes covered, upper octave",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "ro (kan) meri",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "tsu (kan)",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "tsu (kan) meri",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "re (kan)",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "re (kan) meri",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Separator",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "chi (kan)",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "chi (kan) meri",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "ri (kan)",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri (kan) meri",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "u (kan)",
+      "pitch": { "step": "u", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (kan)",
+      "pitch": { "step": "hi", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (kan) meri",
+      "pitch": { "step": "hi", "octave": 1 },
       "duration": 1,
       "meri": true
     }
