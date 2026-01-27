@@ -218,9 +218,44 @@ Looking at `akatombo-kinko-score.png`:
 - This confirms the contextual principle - marks only where needed
 - Most octave transitions follow the closest note rule naturally
 
+### Additional Context Rules
+
+**First note:**
+- Default assumption: otsu register
+- If first note is kan or daikan → needs octave mark
+- If first note is otsu → no mark
+
+**Rests:**
+- Rests do NOT reset octave context
+- Rests carry the octave context through
+- Example: ro (otsu) → rest → tsu → tsu still references ro (otsu) as previous pitch
+- The closest-note principle continues across rests
+
 ### Visual Representation
 
-**Also discovered:** Traditional scores may use small dots (like handakuten ゜) positioned upper-right of characters, NOT diagonal strokes. However, this varies by school/tradition.
+**Correct representation (from teacher):**
+- Octave marks use **small kanji characters**: **乙 (otsu)** and **甲 (kan)**
+- NOT diagonal strokes or dots
+- These appear as small text positioned around the main note character
+
+**Modifier Positioning System:**
+- Notes have **8 potential modifier positions** (like compass points around the character):
+  1. Top-left
+  2. Top-center
+  3. Top-right
+  4. Right-center
+  5. Bottom-right
+  6. Bottom-center
+  7. Bottom-left
+  8. Left-center
+
+**Default positions:**
+- **Primary position for octave marks:** Top-right
+- **Fallback position:** Left side (when top-right occupied by other modifiers)
+
+**For initial implementation:**
+- Use **top-left** position (fixed)
+- Multiple modifier conflict resolution: future work
 
 ## Conclusion
 
