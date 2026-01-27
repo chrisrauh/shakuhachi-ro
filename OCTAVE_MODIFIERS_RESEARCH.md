@@ -161,13 +161,77 @@ Web research conducted on 2026-01-27:
 - [Shakuhachi Fingering Chart - Kinko notation](https://dokanshakuhachi.files.wordpress.com/2012/01/fingerchart.pdf)
 - [How to produce 'kan' (upper octave) - Riley Lee](https://rileylee.com/blog/how-to-produce-kan-upper-octave)
 
+## CRITICAL UPDATE (2026-01-27): Contextual Octave Marking
+
+### The Closest Note Principle
+
+**Important discovery from shakuhachi teacher:**
+
+Octave marks in Kinko notation are **CONTEXTUAL and RELATIVE**, not absolute indicators.
+
+**Default Rule:**
+When notes follow each other in sequence, the next note is assumed to be the **closest instance** of that pitch to the previous note. No octave mark is needed in this case.
+
+**When Octave Marks Are Used:**
+Octave marks are ONLY added when the actual note **violates** the closest note principle.
+
+### Examples
+
+**Example 1: No mark needed**
+- Sequence: ri (otsu) → ro
+- ri (otsu) is near the top of otsu register
+- Closest ro to ri (otsu) is ro (kan) - in the next octave up
+- Player naturally interprets this as ri (otsu) → ro (kan)
+- **No mark needed** - this follows the closest note principle
+
+**Example 2: Mark IS needed**
+- Sequence: ri (otsu) → ro (otsu)
+- Without a mark, player would assume ri (otsu) → ro (kan) by closest note principle
+- Since we want ro (otsu) instead, we need an **octave mark on ro**
+- The mark says "stay in otsu register" (break the default assumption)
+
+### Implementation Implications
+
+**Current Implementation is WRONG:**
+- Currently marking ALL kan notes with octave marks
+- Should only mark notes that violate the closest note principle
+
+**Required Changes:**
+1. Implement algorithm to calculate "expected" octave based on previous note
+2. Calculate chromatic distance between pitches to determine "closest"
+3. Only add octave marks when actual octave ≠ expected octave
+4. This is a sequential/stateful calculation - each note depends on previous
+
+**Algorithm Needed:**
+```
+For each note in sequence:
+  - Get previous note's pitch and octave
+  - Calculate which octave of current note is closest to previous
+  - If actual octave == expected octave: no mark
+  - If actual octave != expected octave: add octave mark
+```
+
+### Reference Analysis Revisited
+
+Looking at `akatombo-kinko-score.png`:
+- The score does NOT use octave marks throughout
+- This confirms the contextual principle - marks only where needed
+- Most octave transitions follow the closest note rule naturally
+
+### Visual Representation
+
+**Also discovered:** Traditional scores may use small dots (like handakuten ゜) positioned upper-right of characters, NOT diagonal strokes. However, this varies by school/tradition.
+
 ## Conclusion
 
-The current implementation of octave modifiers follows established Kinko notation conventions:
-- Small diagonal strokes to indicate upper octave registers
-- Positioned to the upper-left of note characters
-- Count-based system (1 mark = kan, 2 marks = daikan)
+The current implementation fundamentally misunderstands Kinko octave notation:
+- ❌ Currently: Absolute marking system (mark all kan/daikan notes)
+- ✅ Should be: Contextual marking system (mark only violations of closest-note principle)
 
-The implementation is functionally complete but requires visual verification against traditional scores to ensure authenticity and readability. The code is well-structured, following the Modifier pattern from VexFlow, and is easily configurable for future adjustments.
+This is a perfect example of domain knowledge that cannot be learned from documentation alone - it requires instruction from a practitioner.
 
-**Next Steps:** Visual comparison testing and potential refinement of stroke positioning/sizing based on reference image analysis.
+**Next Steps:**
+1. Implement closest-note calculation algorithm
+2. Modify ScoreParser to apply marks contextually
+3. Test with known sequences (ri→ro cases)
+4. Verify against reference scores
