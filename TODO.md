@@ -23,6 +23,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Modify ScoreParser to only add marks when violating closest-note principle
 - [x] Test with known sequences (ri→ro, first note, rests)
 - [x] Verify meri/kari marks render correctly
+- [ ] Research the fingering references and update the PITCH_MAP to include all notes show in the charts
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
 
