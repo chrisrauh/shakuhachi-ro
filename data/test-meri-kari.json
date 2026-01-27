@@ -1,0 +1,194 @@
+{
+  "title": "Complete Shakuhachi Fingering Chart Reference",
+  "style": "kinko",
+  "composer": "Reference - Based on Traditional Fingering Chart",
+  "notes": [
+    {
+      "_comment": "=== OTSU (Lower Register) - D4 to A5 ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (D4) - all holes covered",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ro meri (C#4/Db4)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "tsu (F4) - 5th hole open",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "tsu meri (E4)",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "re (G4) - 4th and 5th holes open",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "re meri (F#4/Gb4)",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "chi (A4) - 3rd, 4th, 5th holes open",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "chi meri (G#4/Ab4)",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Separator",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ri (C5) - front 3 holes and back hole open",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri meri (B4)",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "u (C5) - unique fingering, inherently meri",
+      "pitch": { "step": "u", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (A5) - all front holes open",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi meri (G#5/Ab5)",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "=== KAN (Upper Register) - D5 to A6 ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (D5) - all holes covered, upper octave",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "ro (kan) meri (C#5/Db5)",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "tsu (F5)",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "tsu (kan) meri (E5)",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "re (G5)",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "re (kan) meri (F#5/Gb5)",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Separator",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "chi (A5)",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "chi (kan) meri (G#5/Ab5)",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "ri (C6)",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri (kan) meri (B5)",
+      "pitch": { "step": "ri", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "u (C6) - kan register",
+      "pitch": { "step": "u", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (A6)",
+      "pitch": { "step": "hi", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi (kan) meri (G#6/Ab6)",
+      "pitch": { "step": "hi", "octave": 1 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "=== DAIKAN (Highest Register) - Limited notes ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (D6) - daikan, rarely used",
+      "pitch": { "step": "ro", "octave": 2 },
+      "duration": 1
+    },
+    {
+      "_comment": "tsu (F6) - daikan",
+      "pitch": { "step": "tsu", "octave": 2 },
+      "duration": 1
+    },
+    {
+      "_comment": "re (G6) - daikan",
+      "pitch": { "step": "re", "octave": 2 },
+      "duration": 1
+    },
+    {
+      "_comment": "chi (A6) - daikan",
+      "pitch": { "step": "chi", "octave": 2 },
+      "duration": 1
+    }
+  ]
+}

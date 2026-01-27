@@ -1,6 +1,6 @@
 # Shakuhachi Score Notation Analysis
 
-Analysis of: `examples/scores-pictures/akatombo-kinko-score.png`
+Analysis of: `references/scores-pictures/akatombo-kinko-score.png`
 
 ## Overview
 
@@ -148,4 +148,4 @@ Considerations:
 
 **Analysis Date**: 2026-01-25
 **Analyzed By**: Claude Code
-**Source**: examples/scores-pictures/akatombo-kinko-score.png
+**Source**: references/scores-pictures/akatombo-kinko-score.png
