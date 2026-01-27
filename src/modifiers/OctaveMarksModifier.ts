@@ -9,7 +9,7 @@
  * - 乙 (otsu) - indicates note is in base register (when unexpected)
  * - 甲 (kan) - indicates note is in upper register (when unexpected)
  *
- * Position: Top-left of note character (initially; 8-position system planned)
+ * Position: Top-right of note character (initially; 8-position system planned)
  *
  * Following VexFlow's Modifier pattern - positions itself relative to note.
  */
@@ -45,18 +45,18 @@ export class OctaveMarksModifier extends Modifier {
    * @param register - Octave register: 'otsu', 'kan', or 'daikan'
    */
   constructor(register: OctaveRegister = 'kan') {
-    // Position at top-left for now (future: smart positioning in 8-position system)
+    // Position at top-right for now (future: smart positioning in 8-position system)
     super('above');
     this.register = register;
     this.setDefaultOffsets();
   }
 
   /**
-   * Set default offsets for top-left position
+   * Set default offsets for top-right position
    */
   private setDefaultOffsets(): void {
-    // Top-left position
-    this.offsetX = -18; // To the left of note
+    // Top-right position
+    this.offsetX = 18; // To the right of note
     this.offsetY = -22; // Above the note
   }
 
