@@ -247,5 +247,48 @@ export const octaveDots: Record<Octave, { above: number; below: number }> = {
   'daikan': { above: 2, below: 0 }
 };
 
+/**
+ * Converts a Western pitch notation (e.g., "D4", "G4") to MIDI note number
+ *
+ * @param pitch - Western pitch notation (e.g., "C4", "D#5", "Bb3")
+ * @returns MIDI note number (C4 = 60)
+ */
+export function pitchToMidi(pitch: string): number {
+  const pitchClassMap: Record<string, number> = {
+    'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11
+  };
+
+  const match = pitch.match(/^([A-G])(#|b)?(\d+)$/);
+  if (!match) {
+    throw new Error(`Invalid pitch notation: ${pitch}`);
+  }
+
+  const [, note, accidental, octaveStr] = match;
+  const pitchClass = pitchClassMap[note];
+  const accidentalOffset = accidental === '#' ? 1 : accidental === 'b' ? -1 : 0;
+  const octave = parseInt(octaveStr, 10);
+
+  // MIDI note number: (octave + 1) * 12 + pitchClass + accidentalOffset
+  // C4 = 60, so C0 = 12
+  return (octave + 1) * 12 + pitchClass + accidentalOffset;
+}
+
+/**
+ * Gets the MIDI note number for a shakuhachi note (romaji) in a specific octave
+ *
+ * @param romaji - Note name (e.g., "ro", "tsu", "re")
+ * @param octave - Octave number (0=otsu, 1=kan, 2=daikan)
+ * @returns MIDI note number
+ */
+export function getNoteMidi(romaji: string, octave: number): number {
+  const symbol = getSymbolByRomaji(romaji);
+  if (!symbol) {
+    throw new Error(`Unknown note: ${romaji}`);
+  }
+
+  const baseMidi = pitchToMidi(symbol.pitch);
+  return baseMidi + (octave * 12);
+}
+
 // TODO: Add Tozan notation mappings when needed
 // export const tozanMap: Record<string, TozanSymbol> = { ... };
