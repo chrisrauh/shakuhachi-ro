@@ -30,10 +30,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Multi-Column Layout Discrepancies**
 
-[x] Column spacing too wide - reduce to match reference
-[x] Vertical note spacing may need adjustment
-[x] Top/side margins need adjustment to match reference
-[x] Note font size may need adjustment
 - [ ] Notes per column distribution differs from reference
 
 ## UI Enhancements
