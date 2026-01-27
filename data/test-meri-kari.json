@@ -1,0 +1,62 @@
+{
+  "title": "Meri/Kari Mark Test",
+  "style": "kinko",
+  "composer": "Test",
+  "notes": [
+    {
+      "_comment": "Test 1: Regular ro note (no meri)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 2: ro with meri",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Test 3: tsu (no meri)",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 4: tsu with meri",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Test 5: re (no meri)",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 6: re with meri",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Test 7: chi (no meri)",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 8: chi with meri",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    },
+    {
+      "_comment": "Test 9: ri (no meri)",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 10: ri with meri",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1,
+      "meri": true
+    }
+  ]
+}

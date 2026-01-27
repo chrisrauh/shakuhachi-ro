@@ -219,11 +219,16 @@ export const alterationSemitones: Record<string, number> = {
 
 /**
  * Visual symbols for meri/kari pitch alterations
+ *
+ * Traditional Kinko notation uses katakana/kanji characters:
+ * - Meri: メ (katakana "me")
+ * - Dai-meri: 大 (kanji "dai" meaning big/great)
+ * - Kari: カ (katakana "ka")
  */
 export const meriKariSymbols: Record<string, string> = {
-  'meri': '◁',       // Left-pointing triangle
-  'dai-meri': '◀',   // Filled left-pointing triangle
-  'kari': '▷'        // Right-pointing triangle
+  'meri': 'メ',       // Katakana "me"
+  'dai-meri': '大',   // Kanji "dai" (big/great)
+  'kari': 'カ'        // Katakana "ka"
 };
 
 /**
