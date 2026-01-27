@@ -1,0 +1,107 @@
+{
+  "title": "Octave Marking Test Suite",
+  "style": "kinko",
+  "composer": "Test",
+  "notes": [
+    {
+      "_comment": "Test 1: First note in otsu (no mark expected)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 2: Natural progression ro→tsu in otsu (no mark)",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Separator rest",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Test 3: First note after rest in kan (NEEDS MARK - not otsu default)",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 4: Natural progression ro(kan)→tsu(kan) (no mark)",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "Separator rest",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Test 5: ri (otsu) - highest note in otsu register",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 6: ro (kan) after ri (otsu) - no mark (ro-kan is closest to ri-otsu)",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "Separator rest",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Test 7: ri (otsu) again",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 8: ro (otsu) after ri (otsu) - NEEDS MARK (violates closest-note rule)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Separator rest",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Test 9: chi (otsu) before rest",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 10: Rest carries context",
+      "rest": true,
+      "duration": 1
+    },
+    {
+      "_comment": "Test 11: re (otsu) after rest - context from chi (otsu), re is closest (no mark)",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Separator rest",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "Test 12: ro (otsu) - lowest note",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 13: ri (otsu) - highest in register",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 14: ro (kan) after ri (otsu) - no mark (closest)",
+      "pitch": { "step": "ro", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "Test 15: tsu (kan) - natural progression (no mark)",
+      "pitch": { "step": "tsu", "octave": 1 },
+      "duration": 1
+    }
+  ]
+}
