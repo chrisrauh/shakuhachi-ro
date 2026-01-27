@@ -165,7 +165,7 @@ src/
   ├── modifiers/        # Modifier system
   └── data/             # Symbol mappings
 
-examples/               # Usage examples
+references/             # Reference materials (scores, fingering charts)
 tests/                  # Test files
 ```
 
