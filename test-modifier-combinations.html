@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meri Degrees Test</title>
+    <title>Modifier Combinations Test</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
@@ -46,14 +46,14 @@
       .test-info {
         margin-top: 10px;
         padding: 10px;
-        background: #e3f2fd;
-        border: 1px solid #2196f3;
+        background: #e8f5e9;
+        border: 1px solid #4caf50;
         border-radius: 4px;
         font-size: 0.85rem;
       }
 
       .test-info strong {
-        color: #1565c0;
+        color: #2e7d32;
       }
 
       #display {
@@ -77,14 +77,16 @@
   </head>
   <body>
     <header>
-      <h1>🎵 Meri Degrees Test</h1>
+      <h1>🎵 Modifier Combinations Test</h1>
       <p class="subtitle">
-        Verifying meri pitch alteration marks render correctly
+        Testing all combinations of modifiers: octave marks (乙/甲), meri degrees (メ/中/大), and duration dots
       </p>
       <div class="test-info">
-        <strong>Test pattern:</strong> Notes with meri (メ - full), chu meri (中 - middle), and dai meri (大 - great)<br>
-        <strong>Expected:</strong> Meri marks should appear to the left of modified notes<br>
-        <strong>メ (me)</strong> = full meri, <strong>中 (chu)</strong> = middle meri, <strong>大 (dai)</strong> = great meri
+        <strong>Test coverage:</strong><br>
+        • Meri + Octave marks<br>
+        • Meri + Duration dots<br>
+        • All modifiers together (meri + octave + dot)<br>
+        • Edge cases (first note, rests, context changes)
       </div>
     </header>
 
@@ -106,10 +108,10 @@
 
       async function renderTestScore() {
         try {
-          console.log('Loading meri degrees test suite...');
+          console.log('Loading modifier combinations test...');
 
           // Load test score
-          const response = await fetch('/data/test-meri-kari.json');
+          const response = await fetch('/data/test-modifier-combinations.json');
           if (!response.ok) {
             throw new Error(`Failed to load: ${response.statusText}`);
           }
@@ -123,19 +125,11 @@
           // Debug: log each note's modifiers
           allNotes.forEach((note, i) => {
             const mods = note.getModifiers();
-            const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
-            let modType = '';
-            if (meriKariMod) {
-              const type = meriKariMod.getType();
-              if (type === 'meri') modType = 'MERI (メ)';
-              else if (type === 'chu-meri') modType = 'CHU MERI (中)';
-              else if (type === 'dai-meri') modType = 'DAI MERI (大)';
-            }
+            const modNames = mods.map(m => m.constructor.name).join(', ');
             console.log(
               `Note ${i + 1}:`,
               note.getKana(),
-              meriKariMod ? `[${modType}]` : '[no meri]',
-              mods
+              `[${modNames || 'no modifiers'}]`
             );
           });
 
@@ -149,7 +143,7 @@
           // Single column layout for easy reading
           const columnWidth = 100;
           const startY = 70;
-          const verticalSpacing = 50;
+          const verticalSpacing = 55;
           const fontSize = 28;
           const startX = svgWidth / 2;
 
@@ -165,31 +159,37 @@
               const symbolInfo = note.getSymbolInfo();
               const romaji = symbolInfo?.romaji || 'rest';
               const mods = note.getModifiers();
-              const hasMeriKariMark = mods.some(m => m.constructor.name === 'MeriKariModifier');
-              const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
-              let markType = '';
-              if (meriKariMod) {
-                const type = meriKariMod.getType();
-                if (type === 'meri') markType = 'メ';
-                else if (type === 'chu-meri') markType = '中';
-                else if (type === 'dai-meri') markType = '大';
-              }
-              const label = `#${index + 1} ${romaji} ${hasMeriKariMark ? `⚠️ ${markType}` : ''}`.trim();
+              const modLabels = [];
+
+              mods.forEach(m => {
+                if (m.constructor.name === 'OctaveMarksModifier') {
+                  modLabels.push('甲');
+                } else if (m.constructor.name === 'MeriKariModifier') {
+                  const type = m.getType();
+                  if (type === 'meri') modLabels.push('メ');
+                  else if (type === 'chu-meri') modLabels.push('中');
+                  else if (type === 'dai-meri') modLabels.push('大');
+                } else if (m.constructor.name === 'DurationDotModifier') {
+                  modLabels.push('•');
+                }
+              });
+
+              const label = `#${index + 1} ${romaji} ${modLabels.length ? `[${modLabels.join(' ')}]` : ''}`.trim();
 
               renderer.drawText(
                 label,
-                startX + 40,
+                startX + 50,
                 currentY + 5,
                 12,
                 'monospace',
-                hasMeriKariMark ? '#e91e63' : '#999'
+                modLabels.length ? '#1976d2' : '#999'
               );
             }
 
             currentY += verticalSpacing;
           });
 
-          console.log('Test suite rendered!');
+          console.log('Modifier combinations test rendered!');
         } catch (error) {
           console.error('Error:', error);
           display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;

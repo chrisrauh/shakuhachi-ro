@@ -42,8 +42,14 @@ export interface ScoreNote {
   /** Rest indicator (mutually exclusive with pitch) */
   rest?: boolean;
 
-  /** Optional meri pitch alteration (slightly flat) */
+  /** Optional meri pitch alteration (lowers pitch ~half step) - full meri */
   meri?: boolean;
+
+  /** Optional chu-meri pitch alteration (middle/half meri - between normal and full) */
+  chu_meri?: boolean;
+
+  /** Optional dai-meri pitch alteration (lowers pitch ~whole step) - great meri */
+  dai_meri?: boolean;
 
   /** Dotted duration indicator (extends duration by half) */
   dotted?: boolean;
