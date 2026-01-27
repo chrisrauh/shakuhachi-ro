@@ -1,130 +1,105 @@
 /**
  * OctaveMarksModifier - Octave indicator for shakuhachi notation
  *
- * In Kinko shakuhachi notation, octave changes are indicated by small stroke marks:
- * - No mark: otsu (base octave)
- * - 1 small stroke to upper-left: kan (first overtone, +1 octave)
- * - 2 small strokes to upper-left: daikan (second overtone, +2 octaves)
+ * In Kinko shakuhachi notation, octave marks are **contextual** and follow
+ * the "closest-note principle". They are only added when a note violates
+ * the expectation that it would be in the closest octave to the previous note.
+ *
+ * Visual representation:
+ * - 乙 (otsu) - indicates note is in base register (when unexpected)
+ * - 甲 (kan) - indicates note is in upper register (when unexpected)
+ *
+ * Position: Top-left of note character (initially; 8-position system planned)
  *
  * Following VexFlow's Modifier pattern - positions itself relative to note.
  */
 
-import { Modifier, type ModifierPosition } from './Modifier';
+import { Modifier } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 
+export type OctaveRegister = 'otsu' | 'kan' | 'daikan';
+
 export class OctaveMarksModifier extends Modifier {
-  /** Number of marks to render (1 or 2) */
-  private count: 1 | 2;
+  /** Octave register indicator */
+  private register: OctaveRegister;
 
-  /** Length of each stroke mark */
-  private strokeLength: number = 6;
+  /** Font size for the octave mark (smaller than main note) */
+  private fontSize: number = 12;
 
-  /** Spacing between strokes (when count = 2) */
-  private strokeSpacing: number = 6;
+  /** Font family */
+  private fontFamily: string = 'Noto Sans JP, sans-serif';
 
-  /** Color of the strokes */
+  /** Color of the mark */
   private color: string = '#000';
 
-  /** Stroke width */
-  private strokeWidth: number = 1.5;
+  /** Kanji characters for each register */
+  private static readonly registerSymbols: Record<OctaveRegister, string> = {
+    'otsu': '乙',
+    'kan': '甲',
+    'daikan': '大甲' // Future: daikan support
+  };
 
   /**
    * Creates an octave marks modifier
    *
-   * @param count - Number of stroke marks (1 or 2)
-   * @param position - 'above' for higher octaves, 'below' for lower octave
+   * @param register - Octave register: 'otsu', 'kan', or 'daikan'
    */
-  constructor(count: 1 | 2 = 1, position: 'above' | 'below' = 'above') {
-    super(position);
-    this.count = count;
+  constructor(register: OctaveRegister = 'kan') {
+    // Position at top-left for now (future: smart positioning in 8-position system)
+    super('above');
+    this.register = register;
     this.setDefaultOffsets();
   }
 
   /**
-   * Set default offsets based on position
+   * Set default offsets for top-left position
    */
   private setDefaultOffsets(): void {
-    if (this.position === 'above') {
-      // Position to the left and above the note (traditional Kinko style)
-      if (this.count === 1) {
-        this.offsetX = -12; // Left of character
-        this.offsetY = -20; // Single mark above
-      } else {
-        this.offsetX = -12; // Left of character
-        this.offsetY = -25; // Two marks, start higher
-      }
-    } else {
-      // Position below the note
-      this.offsetX = -12;
-      this.offsetY = 12; // Below the note
-    }
+    // Top-left position
+    this.offsetX = -18; // To the left of note
+    this.offsetY = -22; // Above the note
   }
 
   /**
-   * Renders the octave mark(s) as short diagonal strokes
+   * Renders the octave mark as a small kanji character
    *
    * @param renderer - SVGRenderer instance
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
   render(renderer: SVGRenderer, noteX: number, noteY: number): void {
-    if (this.count === 1) {
-      // Single diagonal stroke to upper-left
-      const x = noteX + this.offsetX;
-      const y = noteY + this.offsetY;
-      renderer.drawLine(
-        x, y,
-        x + this.strokeLength, y - this.strokeLength,
-        this.color,
-        this.strokeWidth
-      );
-    } else {
-      // Two diagonal strokes (stacked vertically)
-      const x = noteX + this.offsetX;
-      const y1 = noteY + this.offsetY;
-      const y2 = y1 + this.strokeSpacing;
+    const x = noteX + this.offsetX;
+    const y = noteY + this.offsetY;
+    const symbol = OctaveMarksModifier.registerSymbols[this.register];
 
-      renderer.drawLine(
-        x, y1,
-        x + this.strokeLength, y1 - this.strokeLength,
-        this.color,
-        this.strokeWidth
-      );
-      renderer.drawLine(
-        x, y2,
-        x + this.strokeLength, y2 - this.strokeLength,
-        this.color,
-        this.strokeWidth
-      );
-    }
+    renderer.drawText(
+      symbol,
+      x,
+      y,
+      this.fontSize,
+      this.fontFamily,
+      this.color
+    );
   }
 
   /**
-   * Sets the stroke length
+   * Sets the font size
    */
-  setStrokeLength(length: number): this {
-    this.strokeLength = length;
+  setFontSize(size: number): this {
+    this.fontSize = size;
     return this;
   }
 
   /**
-   * Sets the spacing between strokes (for 2-stroke variant)
+   * Sets the font family
    */
-  setStrokeSpacing(spacing: number): this {
-    this.strokeSpacing = spacing;
+  setFontFamily(family: string): this {
+    this.fontFamily = family;
     return this;
   }
 
   /**
-   * Sets the stroke width
-   */
-  setStrokeWidth(width: number): this {
-    this.strokeWidth = width;
-    return this;
-  }
-
-  /**
-   * Sets the color of the strokes
+   * Sets the color of the mark
    */
   setColor(color: string): this {
     this.color = color;
@@ -132,27 +107,24 @@ export class OctaveMarksModifier extends Modifier {
   }
 
   /**
+   * Gets the octave register
+   */
+  getRegister(): OctaveRegister {
+    return this.register;
+  }
+
+  /**
    * Gets the width occupied by this modifier
+   * Approximate based on font size
    */
   getWidth(): number {
-    return this.strokeLength;
+    return this.fontSize * 0.8;
   }
 
   /**
    * Gets the height occupied by this modifier
    */
   getHeight(): number {
-    if (this.count === 1) {
-      return this.strokeLength;
-    } else {
-      return this.strokeLength + this.strokeSpacing;
-    }
-  }
-
-  /**
-   * Gets the number of strokes
-   */
-  getCount(): number {
-    return this.count;
+    return this.fontSize;
   }
 }

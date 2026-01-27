@@ -129,12 +129,11 @@
               );
               note.modifiers = nonOctaveModifiers;
             } else {
-              // Configure octave stroke marks
+              // Configure octave kanji marks
               mods.forEach((mod) => {
                 if (mod.constructor.name === 'OctaveMarksModifier') {
                   mod
-                    .setStrokeLength(6) // Length of stroke mark
-                    .setStrokeWidth(1.5) // Stroke thickness
+                    .setFontSize(12) // Small font for octave marks
                     .setColor('#000'); // Black
                 }
               });

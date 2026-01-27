@@ -16,7 +16,12 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Octave Modifiers**
 
-- [ ] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
+- [x] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
+- [ ] Implement closest-note algorithm for contextual octave marking
+- [ ] Change octave marks from strokes to 乙/甲 characters
+- [ ] Update OctaveMarksModifier to render kanji characters at top-left position
+- [ ] Modify ScoreParser to only add marks when violating closest-note principle
+- [ ] Test with known sequences (ri→ro, first note, rests)
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
