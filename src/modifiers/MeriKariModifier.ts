@@ -6,12 +6,12 @@
  * - Dai-meri (大メリ): Lowering pitch further (~whole step)
  * - Kari (カリ): Raising pitch by tilting head upward (~half step)
  *
- * These are typically shown as marks to the left of the note.
+ * Visual representation in Kinko notation:
+ * - Meri: メ (katakana "me") to the left of note
+ * - Dai-meri: 大 (kanji "dai" meaning "big/great") to the left of note
+ * - Kari: カ (katakana "ka") to the left of note
  *
- * Visual representations:
- * - Meri: Single slash or arrow pointing down (/)
- * - Dai-meri: Double slash (//)
- * - Kari: Single slash or arrow pointing up (\)
+ * Position: Left of note character
  *
  * Following VexFlow's Modifier pattern.
  */
@@ -25,17 +25,21 @@ export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
   private type: MeriKariType;
 
-  /** Length of the mark */
-  private markLength: number = 20;
+  /** Font size for the meri/kari mark (slightly smaller than main note) */
+  private fontSize: number = 16;
 
-  /** Width/thickness of the mark */
-  private strokeWidth: number = 2;
+  /** Font family */
+  private fontFamily: string = 'Noto Sans JP, sans-serif';
 
   /** Color of the mark */
-  private color: string = '#E91E63'; // Pink to stand out
+  private color: string = '#000'; // Black, like traditional notation
 
-  /** Spacing between double marks (for dai-meri) */
-  private doubleSpacing: number = 5;
+  /** Katakana/Kanji characters for each alteration type */
+  private static readonly symbols: Record<MeriKariType, string> = {
+    'meri': 'メ',      // Katakana "me"
+    'dai-meri': '大',  // Kanji "dai" (big/great)
+    'kari': 'カ'       // Katakana "ka"
+  };
 
   /**
    * Creates a meri/kari modifier
@@ -50,15 +54,15 @@ export class MeriKariModifier extends Modifier {
   }
 
   /**
-   * Set default offsets based on position
+   * Set default offsets for left position
    */
   private setDefaultOffsets(): void {
     if (this.position === 'left') {
-      this.offsetX = -15; // To the left of note
-      this.offsetY = -10; // Centered vertically
+      this.offsetX = -22; // To the left of note
+      this.offsetY = 0;   // Centered vertically with note
     } else if (this.position === 'right') {
-      this.offsetX = 15; // To the right of note
-      this.offsetY = -10;
+      this.offsetX = 22; // To the right of note
+      this.offsetY = 0;
     } else {
       // Above or below
       this.offsetX = 0;
@@ -67,7 +71,7 @@ export class MeriKariModifier extends Modifier {
   }
 
   /**
-   * Renders the meri/kari mark
+   * Renders the meri/kari mark as katakana/kanji character
    *
    * @param renderer - SVGRenderer instance
    * @param noteX - X coordinate of the note center
@@ -76,79 +80,31 @@ export class MeriKariModifier extends Modifier {
   render(renderer: SVGRenderer, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
+    const symbol = MeriKariModifier.symbols[this.type];
 
-    switch (this.type) {
-      case 'meri':
-        this.renderMeri(renderer, x, y);
-        break;
-      case 'dai-meri':
-        this.renderDaiMeri(renderer, x, y);
-        break;
-      case 'kari':
-        this.renderKari(renderer, x, y);
-        break;
-    }
+    renderer.drawText(
+      symbol,
+      x,
+      y,
+      this.fontSize,
+      this.fontFamily,
+      this.color
+    );
   }
 
   /**
-   * Renders a meri mark (single slash downward)
-   * Visual: /
+   * Sets the font size
    */
-  private renderMeri(renderer: SVGRenderer, x: number, y: number): void {
-    // Single diagonal line (top-left to bottom-right)
-    const x1 = x;
-    const y1 = y;
-    const x2 = x + 6;
-    const y2 = y + this.markLength;
-
-    renderer.drawLine(x1, y1, x2, y2, this.color, this.strokeWidth);
-  }
-
-  /**
-   * Renders a dai-meri mark (double slash downward)
-   * Visual: //
-   */
-  private renderDaiMeri(renderer: SVGRenderer, x: number, y: number): void {
-    // Two parallel diagonal lines
-    const x1a = x - this.doubleSpacing / 2;
-    const y1 = y;
-    const x2a = x1a + 6;
-    const y2 = y + this.markLength;
-
-    const x1b = x + this.doubleSpacing / 2;
-    const x2b = x1b + 6;
-
-    renderer.drawLine(x1a, y1, x2a, y2, this.color, this.strokeWidth);
-    renderer.drawLine(x1b, y1, x2b, y2, this.color, this.strokeWidth);
-  }
-
-  /**
-   * Renders a kari mark (single slash upward)
-   * Visual: \
-   */
-  private renderKari(renderer: SVGRenderer, x: number, y: number): void {
-    // Single diagonal line (top-right to bottom-left)
-    const x1 = x + 6;
-    const y1 = y;
-    const x2 = x;
-    const y2 = y + this.markLength;
-
-    renderer.drawLine(x1, y1, x2, y2, this.color, this.strokeWidth);
-  }
-
-  /**
-   * Sets the mark length
-   */
-  setMarkLength(length: number): this {
-    this.markLength = length;
+  setFontSize(size: number): this {
+    this.fontSize = size;
     return this;
   }
 
   /**
-   * Sets the stroke width
+   * Sets the font family
    */
-  setStrokeWidth(width: number): this {
-    this.strokeWidth = width;
+  setFontFamily(family: string): this {
+    this.fontFamily = family;
     return this;
   }
 
@@ -161,14 +117,6 @@ export class MeriKariModifier extends Modifier {
   }
 
   /**
-   * Sets the spacing for double marks (dai-meri)
-   */
-  setDoubleSpacing(spacing: number): this {
-    this.doubleSpacing = spacing;
-    return this;
-  }
-
-  /**
    * Gets the type of alteration
    */
   getType(): MeriKariType {
@@ -177,18 +125,16 @@ export class MeriKariModifier extends Modifier {
 
   /**
    * Gets the width occupied by this modifier
+   * Approximate based on font size
    */
   getWidth(): number {
-    if (this.type === 'dai-meri') {
-      return this.doubleSpacing + 6;
-    }
-    return 6;
+    return this.fontSize * 0.8;
   }
 
   /**
    * Gets the height occupied by this modifier
    */
   getHeight(): number {
-    return this.markLength;
+    return this.fontSize;
   }
 }
