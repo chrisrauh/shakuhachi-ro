@@ -11,14 +11,14 @@ import type { ScoreData, ScoreNote } from '../types/ScoreData';
  * Pitch mapping for D shakuhachi (Kinko-ryū)
  * Maps Western pitch names to shakuhachi fingerings
  */
-const PITCH_MAP: Record<string, { step: string; octave: number; meri?: boolean }> = {
+const PITCH_MAP: Record<string, { step: string; octave: number; meri?: boolean; chu_meri?: boolean; dai_meri?: boolean }> = {
   // Base octave (otsu 乙)
   'D4': { step: 'ro', octave: 0 },
   'E4': { step: 'ro', octave: 0, meri: true }, // ro-meri
   'F4': { step: 'tsu', octave: 0 },
   'G4': { step: 're', octave: 0 },
   'A4': { step: 'chi', octave: 0 },
-  'B4': { step: 'ri', octave: 0 },
+  'B4': { step: 'ri', octave: 0, chu_meri: true }, // ri chu-meri
   'C5': { step: 'ri', octave: 0 }, // ri-kari or upper ri
 
   // First octave (kan 甲)
@@ -123,6 +123,16 @@ export class MusicXMLParser {
       // Add meri modifier if needed
       if (shakuPitch.meri) {
         note.meri = true;
+      }
+
+      // Add chu-meri modifier if needed
+      if (shakuPitch.chu_meri) {
+        note.chu_meri = true;
+      }
+
+      // Add dai-meri modifier if needed
+      if (shakuPitch.dai_meri) {
+        note.dai_meri = true;
       }
 
       // Add dotted flag if needed
