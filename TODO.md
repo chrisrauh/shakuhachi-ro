@@ -16,7 +16,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Octave Modifiers**
 
-- [ ] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
+- [x] Research deeply, including analyzing score pictures, how octave modifiers are represented in kinko
 - [ ] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
