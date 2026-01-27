@@ -1,194 +1,213 @@
 {
-  "title": "Complete Shakuhachi Fingering Chart Reference",
+  "title": "Complete Shakuhachi Meri/Kari Reference",
   "style": "kinko",
-  "composer": "Reference - Based on Traditional Fingering Chart",
+  "composer": "Reference - Meri (メ) and Kari (カ) Examples",
   "notes": [
     {
-      "_comment": "=== OTSU (Lower Register) - D4 to A5 ===",
+      "_comment": "=== MERI EXAMPLES (Lowering Pitch) ===",
       "rest": true,
       "duration": 2
     },
     {
-      "_comment": "ro (D4) - all holes covered",
+      "_comment": "ro (D4)",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "ro meri (C#4/Db4)",
+      "_comment": "ro meri (C#4/Db4) - メ",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "tsu (F4) - 5th hole open",
+      "_comment": "tsu (F4)",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "tsu meri (E4)",
+      "_comment": "tsu meri (E4) - メ",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "re (G4) - 4th and 5th holes open",
+      "_comment": "re (G4)",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "re meri (F#4/Gb4)",
+      "_comment": "re meri (F#4/Gb4) - メ",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "chi (A4) - 3rd, 4th, 5th holes open",
+      "_comment": "=== KARI EXAMPLES (Raising Pitch) ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (D4)",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ro kari (D#4/Eb4) - カ",
+      "pitch": { "step": "ro", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "tsu (F4)",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "tsu kari (F#4/Gb4) - カ",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "re (G4)",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "re kari (G#4/Ab4) - カ",
+      "pitch": { "step": "re", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "=== MORE MERI EXAMPLES ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "chi (A4)",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "chi meri (G#4/Ab4)",
+      "_comment": "chi meri (G#4/Ab4) - メ",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "Separator",
-      "rest": true,
-      "duration": 2
-    },
-    {
-      "_comment": "ri (C5) - front 3 holes and back hole open",
+      "_comment": "ri (C5)",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "ri meri (B4)",
+      "_comment": "ri meri (B4) - メ",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "u (C5) - unique fingering, inherently meri",
-      "pitch": { "step": "u", "octave": 0 },
-      "duration": 1
-    },
-    {
-      "_comment": "hi (A5) - all front holes open",
+      "_comment": "hi (A5)",
       "pitch": { "step": "hi", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "hi meri (G#5/Ab5)",
+      "_comment": "hi meri (G#5/Ab5) - メ",
       "pitch": { "step": "hi", "octave": 0 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "=== KAN (Upper Register) - D5 to A6 ===",
+      "_comment": "=== MORE KARI EXAMPLES ===",
       "rest": true,
       "duration": 2
     },
     {
-      "_comment": "ro (D5) - all holes covered, upper octave",
+      "_comment": "chi (A4)",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "chi kari (A#4/Bb4) - カ",
+      "pitch": { "step": "chi", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "ri (C5)",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri kari (C#5/Db5) - カ",
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "hi (A5)",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "hi kari (A#5/Bb5) - カ",
+      "pitch": { "step": "hi", "octave": 0 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "=== KAN REGISTER WITH MERI ===",
+      "rest": true,
+      "duration": 2
+    },
+    {
+      "_comment": "ro (kan) - D5",
       "pitch": { "step": "ro", "octave": 1 },
       "duration": 1
     },
     {
-      "_comment": "ro (kan) meri (C#5/Db5)",
+      "_comment": "ro (kan) meri (C#5/Db5) - メ",
       "pitch": { "step": "ro", "octave": 1 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "tsu (F5)",
+      "_comment": "tsu (kan) - F5",
       "pitch": { "step": "tsu", "octave": 1 },
       "duration": 1
     },
     {
-      "_comment": "tsu (kan) meri (E5)",
+      "_comment": "tsu (kan) meri (E5) - メ",
       "pitch": { "step": "tsu", "octave": 1 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "re (G5)",
-      "pitch": { "step": "re", "octave": 1 },
-      "duration": 1
-    },
-    {
-      "_comment": "re (kan) meri (F#5/Gb5)",
-      "pitch": { "step": "re", "octave": 1 },
-      "duration": 1,
-      "meri": true
-    },
-    {
-      "_comment": "Separator",
+      "_comment": "=== KAN REGISTER WITH KARI ===",
       "rest": true,
       "duration": 2
     },
     {
-      "_comment": "chi (A5)",
+      "_comment": "re (kan) - G5",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1
+    },
+    {
+      "_comment": "re (kan) kari (G#5/Ab5) - カ",
+      "pitch": { "step": "re", "octave": 1 },
+      "duration": 1,
+      "kari": true
+    },
+    {
+      "_comment": "chi (kan) - A5",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1
     },
     {
-      "_comment": "chi (kan) meri (G#5/Ab5)",
+      "_comment": "chi (kan) kari (A#5/Bb5) - カ",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1,
-      "meri": true
-    },
-    {
-      "_comment": "ri (C6)",
-      "pitch": { "step": "ri", "octave": 1 },
-      "duration": 1
-    },
-    {
-      "_comment": "ri (kan) meri (B5)",
-      "pitch": { "step": "ri", "octave": 1 },
-      "duration": 1,
-      "meri": true
-    },
-    {
-      "_comment": "u (C6) - kan register",
-      "pitch": { "step": "u", "octave": 1 },
-      "duration": 1
-    },
-    {
-      "_comment": "hi (A6)",
-      "pitch": { "step": "hi", "octave": 1 },
-      "duration": 1
-    },
-    {
-      "_comment": "hi (kan) meri (G#6/Ab6)",
-      "pitch": { "step": "hi", "octave": 1 },
-      "duration": 1,
-      "meri": true
-    },
-    {
-      "_comment": "=== DAIKAN (Highest Register) - Limited notes ===",
-      "rest": true,
-      "duration": 2
-    },
-    {
-      "_comment": "ro (D6) - daikan, rarely used",
-      "pitch": { "step": "ro", "octave": 2 },
-      "duration": 1
-    },
-    {
-      "_comment": "tsu (F6) - daikan",
-      "pitch": { "step": "tsu", "octave": 2 },
-      "duration": 1
-    },
-    {
-      "_comment": "re (G6) - daikan",
-      "pitch": { "step": "re", "octave": 2 },
-      "duration": 1
-    },
-    {
-      "_comment": "chi (A6) - daikan",
-      "pitch": { "step": "chi", "octave": 2 },
-      "duration": 1
+      "kari": true
     }
   ]
 }
