@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Octave Marking Test Suite</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Noto Sans JP', 'Noto Sans', sans-serif;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      header {
+        flex-shrink: 0;
+        padding: 20px 40px;
+        background: #f5f5f5;
+        border-bottom: 1px solid #ddd;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        font-weight: 300;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .test-info {
+        margin-top: 10px;
+        padding: 10px;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        font-size: 0.85rem;
+      }
+
+      .test-info strong {
+        color: #856404;
+      }
+
+      #display {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        overflow: auto;
+        padding: 20px;
+      }
+
+      #display.debug svg {
+        border: 2px solid #e74c3c;
+      }
+
+      .error {
+        color: #e74c3c;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>🧪 Octave Marking Test Suite</h1>
+      <p class="subtitle">
+        Test cases for contextual octave marking (closest-note principle)
+      </p>
+      <div class="test-info">
+        <strong>Expected octave marks:</strong><br>
+        • Note #4 (ro kan) - first note after rest not in otsu<br>
+        • Note #11 (ro otsu) - violates closest-note rule after ri (otsu)<br>
+        <br>
+        <strong>No marks expected on other notes</strong> (follow closest-note principle)
+      </div>
+    </header>
+
+    <div id="display"></div>
+
+    <script type="module">
+      import { ScoreParser } from '/src/parser/ScoreParser';
+      import { SVGRenderer } from '/src/renderer/SVGRenderer';
+
+      const display = document.getElementById('display');
+
+      // Check for debug query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const showDebug = urlParams.get('debug') === 'true';
+
+      if (showDebug) {
+        display.classList.add('debug');
+      }
+
+      async function renderTestScore() {
+        try {
+          console.log('Loading octave marking test suite...');
+
+          // Load test score
+          const response = await fetch('/data/test-octave-marks.json');
+          if (!response.ok) {
+            throw new Error(`Failed to load: ${response.statusText}`);
+          }
+          const scoreData = await response.json();
+          console.log('Loaded test score:', scoreData);
+
+          // Convert to ShakuNote objects using ScoreParser
+          const allNotes = ScoreParser.parse(scoreData);
+          console.log(`Converted to ${allNotes.length} ShakuNote objects`);
+
+          // Debug: log each note's modifiers
+          allNotes.forEach((note, i) => {
+            const mods = note.getModifiers();
+            const octaveMod = mods.find(m => m.constructor.name === 'OctaveMarksModifier');
+            console.log(
+              `Note ${i + 1}:`,
+              note.getKana(),
+              octaveMod ? `[OCTAVE MARK: ${octaveMod.getCount()}]` : '[no octave mark]',
+              mods
+            );
+          });
+
+          // Create SVG renderer
+          const displayRect = display.getBoundingClientRect();
+          const svgWidth = displayRect.width;
+          const svgHeight = displayRect.height;
+          const renderer = new SVGRenderer(display, svgWidth, svgHeight);
+          console.log(`SVG size: ${svgWidth}x${svgHeight}`);
+
+          // Single column layout for easy reading
+          const columnWidth = 100;
+          const startY = 70;
+          const verticalSpacing = 48;
+          const fontSize = 28;
+          const startX = svgWidth / 2;
+
+          // Render notes in a single vertical column
+          let currentY = startY;
+          allNotes.forEach((note, index) => {
+            note.setFontSize(fontSize);
+            note.setPosition(startX, currentY);
+            note.render(renderer);
+
+            // Debug labels
+            if (showDebug) {
+              const symbolInfo = note.getSymbolInfo();
+              const romaji = symbolInfo?.romaji || 'rest';
+              const mods = note.getModifiers();
+              const hasOctaveMark = mods.some(m => m.constructor.name === 'OctaveMarksModifier');
+              const label = `#${index + 1} ${romaji} ${hasOctaveMark ? '⚠️ MARK' : ''}`.trim();
+
+              renderer.drawText(
+                label,
+                startX + 40,
+                currentY + 5,
+                12,
+                'monospace',
+                hasOctaveMark ? '#ff0000' : '#999'
+              );
+            }
+
+            currentY += verticalSpacing;
+          });
+
+          console.log('Test suite rendered!');
+        } catch (error) {
+          console.error('Error:', error);
+          display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
+        }
+      }
+
+      // Render when page loads
+      renderTestScore();
+    </script>
+  </body>
+</html>
