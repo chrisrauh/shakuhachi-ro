@@ -22,7 +22,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Update OctaveMarksModifier to render kanji characters at top-right position
 - [x] Modify ScoreParser to only add marks when violating closest-note principle
 - [x] Test with known sequences (ri→ro, first note, rests)
-- [ ] Verify meri/kari marks render correctly
+- [x] Verify meri/kari marks render correctly
 - [ ] Verify atari marks render correctly
 - [ ] Test all modifier combinations
 
