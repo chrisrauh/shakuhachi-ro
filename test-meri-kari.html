@@ -79,11 +79,12 @@
     <header>
       <h1>🎵 Meri/Kari Mark Test</h1>
       <p class="subtitle">
-        Verifying meri/kari pitch alteration marks render correctly
+        Verifying meri (メ) and kari (カ) pitch alteration marks render correctly
       </p>
       <div class="test-info">
-        <strong>Test pattern:</strong> Alternating regular notes and notes with meri marks<br>
-        <strong>Expected:</strong> Meri marks should appear to the left of modified notes
+        <strong>Test pattern:</strong> Notes with meri (メ - lowers pitch) and kari (カ - raises pitch) marks<br>
+        <strong>Expected:</strong> Meri/kari marks should appear to the left of modified notes<br>
+        <strong>メ (me)</strong> = meri (lower ~half step), <strong>カ (ka)</strong> = kari (raise ~half step)
       </div>
     </header>
 
@@ -122,11 +123,15 @@
           // Debug: log each note's modifiers
           allNotes.forEach((note, i) => {
             const mods = note.getModifiers();
-            const meriMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
+            const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
+            let modType = '';
+            if (meriKariMod) {
+              modType = meriKariMod.getType() === 'meri' ? 'MERI (メ)' : 'KARI (カ)';
+            }
             console.log(
               `Note ${i + 1}:`,
               note.getKana(),
-              meriMod ? `[MERI MARK]` : '[no meri]',
+              meriKariMod ? `[${modType}]` : '[no meri/kari]',
               mods
             );
           });
@@ -157,8 +162,13 @@
               const symbolInfo = note.getSymbolInfo();
               const romaji = symbolInfo?.romaji || 'rest';
               const mods = note.getModifiers();
-              const hasMeriMark = mods.some(m => m.constructor.name === 'MeriKariModifier');
-              const label = `#${index + 1} ${romaji} ${hasMeriMark ? '⚠️ MERI' : ''}`.trim();
+              const hasMeriKariMark = mods.some(m => m.constructor.name === 'MeriKariModifier');
+              const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
+              let markType = '';
+              if (meriKariMod) {
+                markType = meriKariMod.getType() === 'meri' ? 'メ' : 'カ';
+              }
+              const label = `#${index + 1} ${romaji} ${hasMeriKariMark ? `⚠️ ${markType}` : ''}`.trim();
 
               renderer.drawText(
                 label,
@@ -166,7 +176,7 @@
                 currentY + 5,
                 12,
                 'monospace',
-                hasMeriMark ? '#e91e63' : '#999'
+                hasMeriKariMark ? '#e91e63' : '#999'
               );
             }
 
