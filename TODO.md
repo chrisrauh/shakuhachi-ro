@@ -10,6 +10,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Layout & Styling**
 
+- [ ] Add Noto Sans and Noto Sans JP fonts for variable style
 - [ ] Proper margins and spacing to match reference
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
