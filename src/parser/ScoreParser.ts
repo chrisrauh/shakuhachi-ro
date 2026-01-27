@@ -105,10 +105,16 @@ export class ScoreParser {
         shakuNote.addModifier(meriModifier);
       }
 
-      // Add kari modifier if needed
-      if (note.kari) {
-        const kariModifier = new MeriKariModifier('kari');
-        shakuNote.addModifier(kariModifier);
+      // Add chu-meri modifier if needed
+      if (note.chu_meri) {
+        const chuMeriModifier = new MeriKariModifier('chu-meri');
+        shakuNote.addModifier(chuMeriModifier);
+      }
+
+      // Add dai-meri modifier if needed
+      if (note.dai_meri) {
+        const daiMeriModifier = new MeriKariModifier('dai-meri');
+        shakuNote.addModifier(daiMeriModifier);
       }
 
       // Add duration dot if needed

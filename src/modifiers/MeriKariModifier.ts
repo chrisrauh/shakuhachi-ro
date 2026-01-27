@@ -1,15 +1,17 @@
 /**
  * MeriKariModifier - Pitch alteration marks for shakuhachi notation
  *
- * In shakuhachi notation, meri/kari indicate pitch alterations:
+ * In shakuhachi notation, meri indicates pitch lowering through embouchure:
  * - Meri (メリ): Lowering pitch by tilting head downward (~half step)
- * - Dai-meri (大メリ): Lowering pitch further (~whole step)
- * - Kari (カリ): Raising pitch by tilting head upward (~half step)
+ * - Chu-meri (中メリ): Middle/half meri - halfway between normal and full meri
+ * - Dai-meri (大メリ): Great/big meri - lowering pitch further (~whole step)
+ *
+ * Note: Kari (raising pitch) is rarely notated as it's the default/normal playing state.
  *
  * Visual representation in Kinko notation:
  * - Meri: メ (katakana "me") to the left of note
+ * - Chu-meri: 中 (kanji "chu" meaning "middle") to the left of note
  * - Dai-meri: 大 (kanji "dai" meaning "big/great") to the left of note
- * - Kari: カ (katakana "ka") to the left of note
  *
  * Position: Left of note character
  *
@@ -19,7 +21,7 @@
 import { Modifier, type ModifierPosition } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 
-export type MeriKariType = 'meri' | 'dai-meri' | 'kari';
+export type MeriKariType = 'meri' | 'chu-meri' | 'dai-meri';
 
 export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
@@ -36,15 +38,15 @@ export class MeriKariModifier extends Modifier {
 
   /** Katakana/Kanji characters for each alteration type */
   private static readonly symbols: Record<MeriKariType, string> = {
-    'meri': 'メ',      // Katakana "me"
-    'dai-meri': '大',  // Kanji "dai" (big/great)
-    'kari': 'カ'       // Katakana "ka"
+    'meri': 'メ',      // Katakana "me" - full meri
+    'chu-meri': '中',  // Kanji "chu" (middle) - half meri
+    'dai-meri': '大'   // Kanji "dai" (big/great) - great meri
   };
 
   /**
-   * Creates a meri/kari modifier
+   * Creates a meri modifier
    *
-   * @param type - Type of alteration: 'meri', 'dai-meri', or 'kari'
+   * @param type - Type of alteration: 'meri', 'chu-meri', or 'dai-meri'
    * @param position - Where to position relative to note (default: 'left')
    */
   constructor(type: MeriKariType = 'meri', position: ModifierPosition = 'left') {

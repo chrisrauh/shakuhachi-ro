@@ -1,12 +1,16 @@
 import { chromium } from 'playwright';
 
 async function takeScreenshot() {
+  // Get port from command-line argument, default to 3002
+  const port = process.argv[2] || '3002';
+  const baseUrl = `http://localhost:${port}`;
+
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
   try {
     // Navigate to the dev server
-    await page.goto('http://localhost:3002', {
+    await page.goto(baseUrl, {
       waitUntil: 'networkidle',
     });
 
@@ -17,7 +21,7 @@ async function takeScreenshot() {
     });
 
     // Navigate to the dev server
-    await page.goto('http://localhost:3002?debug=true', {
+    await page.goto(`${baseUrl}?debug=true`, {
       waitUntil: 'networkidle',
     });
 
@@ -28,7 +32,7 @@ async function takeScreenshot() {
     });
 
     // Navigate with octave dots disabled
-    await page.goto('http://localhost:3002?octaveDots=false', {
+    await page.goto(`${baseUrl}?octaveDots=false`, {
       waitUntil: 'networkidle',
     });
 
