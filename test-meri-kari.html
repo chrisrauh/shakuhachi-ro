@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meri/Kari Mark Test</title>
+    <title>Meri Degrees Test</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
@@ -77,14 +77,14 @@
   </head>
   <body>
     <header>
-      <h1>🎵 Meri/Kari Mark Test</h1>
+      <h1>🎵 Meri Degrees Test</h1>
       <p class="subtitle">
-        Verifying meri (メ) and kari (カ) pitch alteration marks render correctly
+        Verifying meri pitch alteration marks render correctly
       </p>
       <div class="test-info">
-        <strong>Test pattern:</strong> Notes with meri (メ - lowers pitch) and kari (カ - raises pitch) marks<br>
-        <strong>Expected:</strong> Meri/kari marks should appear to the left of modified notes<br>
-        <strong>メ (me)</strong> = meri (lower ~half step), <strong>カ (ka)</strong> = kari (raise ~half step)
+        <strong>Test pattern:</strong> Notes with meri (メ - full), chu meri (中 - middle), and dai meri (大 - great)<br>
+        <strong>Expected:</strong> Meri marks should appear to the left of modified notes<br>
+        <strong>メ (me)</strong> = full meri, <strong>中 (chu)</strong> = middle meri, <strong>大 (dai)</strong> = great meri
       </div>
     </header>
 
@@ -106,7 +106,7 @@
 
       async function renderTestScore() {
         try {
-          console.log('Loading meri/kari test suite...');
+          console.log('Loading meri degrees test suite...');
 
           // Load test score
           const response = await fetch('/data/test-meri-kari.json');
@@ -126,12 +126,15 @@
             const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
             let modType = '';
             if (meriKariMod) {
-              modType = meriKariMod.getType() === 'meri' ? 'MERI (メ)' : 'KARI (カ)';
+              const type = meriKariMod.getType();
+              if (type === 'meri') modType = 'MERI (メ)';
+              else if (type === 'chu-meri') modType = 'CHU MERI (中)';
+              else if (type === 'dai-meri') modType = 'DAI MERI (大)';
             }
             console.log(
               `Note ${i + 1}:`,
               note.getKana(),
-              meriKariMod ? `[${modType}]` : '[no meri/kari]',
+              meriKariMod ? `[${modType}]` : '[no meri]',
               mods
             );
           });
@@ -166,7 +169,10 @@
               const meriKariMod = mods.find(m => m.constructor.name === 'MeriKariModifier');
               let markType = '';
               if (meriKariMod) {
-                markType = meriKariMod.getType() === 'meri' ? 'メ' : 'カ';
+                const type = meriKariMod.getType();
+                if (type === 'meri') markType = 'メ';
+                else if (type === 'chu-meri') markType = '中';
+                else if (type === 'dai-meri') markType = '大';
               }
               const label = `#${index + 1} ${romaji} ${hasMeriKariMark ? `⚠️ ${markType}` : ''}`.trim();
 
