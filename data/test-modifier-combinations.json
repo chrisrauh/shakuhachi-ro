@@ -9,21 +9,27 @@
       "duration": 2
     },
     {
-      "_comment": "ro kan (甲) - octave mark only",
-      "pitch": { "step": "ro", "octave": 1 },
+      "_comment": "Start in otsu: ro (no mark)",
+      "pitch": { "step": "ro", "octave": 0 },
       "duration": 1
     },
     {
-      "_comment": "ro kan (甲) with meri (メ)",
-      "pitch": { "step": "ro", "octave": 1 },
+      "_comment": "Jump to kan with meri: ri kan (甲) + meri (メ)",
+      "pitch": { "step": "ri", "octave": 1 },
       "duration": 1,
       "meri": true
     },
     {
-      "_comment": "tsu kan (甲) with chu meri (中)",
-      "pitch": { "step": "tsu", "octave": 1 },
+      "_comment": "Back to otsu with chu meri: ro (乙) + chu meri (中)",
+      "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
       "chu_meri": true
+    },
+    {
+      "_comment": "Jump to kan with dai meri: chi kan (甲) + dai meri (大)",
+      "pitch": { "step": "chi", "octave": 1 },
+      "duration": 1,
+      "dai_meri": true
     },
     {
       "_comment": "=== MERI + DURATION DOTS ===",
@@ -63,21 +69,26 @@
       "duration": 2
     },
     {
-      "_comment": "ro kan (甲) with meri (メ) and dotted",
-      "pitch": { "step": "ro", "octave": 1 },
+      "_comment": "Start in otsu for clear context",
+      "pitch": { "step": "tsu", "octave": 0 },
+      "duration": 1
+    },
+    {
+      "_comment": "ri kan (甲) with meri (メ) and dotted",
+      "pitch": { "step": "ri", "octave": 1 },
       "duration": 1,
       "meri": true,
       "dotted": true
     },
     {
-      "_comment": "tsu kan (甲) with chu meri (中) and dotted",
-      "pitch": { "step": "tsu", "octave": 1 },
+      "_comment": "Back to otsu: tsu (乙) with chu meri (中) and dotted",
+      "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
       "chu_meri": true,
       "dotted": true
     },
     {
-      "_comment": "chi kan (甲) with dai meri (大) and dotted",
+      "_comment": "Jump to kan: chi kan (甲) with dai meri (大) and dotted",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1,
       "dai_meri": true,
