@@ -68,11 +68,11 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Test pages use SVGRenderer directly for custom layouts and debugging
 
 ### Phase 9: Documentation
-- [ ] Create `docs/ARCHITECTURE.md` explaining component design
-- [ ] Create `docs/API.md` with ScoreRenderer API reference
-- [ ] Update `README.md` with usage examples
-- [ ] Add migration guide for existing code
-- [ ] Document VexFlow-inspired patterns
+- [x] Create `docs/ARCHITECTURE.md` explaining component design
+- [x] Create `docs/API.md` with ScoreRenderer API reference
+- [x] Update `README.md` with usage examples
+- [x] Add migration guide for existing code
+- [x] Document VexFlow-inspired patterns
 
 ### Phase 10: Cleanup and Polish
 - [ ] Review and remove any unused code from old implementation
