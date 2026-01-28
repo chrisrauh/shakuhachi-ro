@@ -78,6 +78,14 @@
       import { MusicXMLParser } from '/src/parser/MusicXMLParser';
       import { ScoreParser } from '/src/parser/ScoreParser';
       import { SVGRenderer } from '/src/renderer/SVGRenderer';
+      import {
+        OCTAVE_MARK,
+        NOTE,
+        DURATION_DOT,
+        COLUMN,
+        MIN_TOP_MARGIN,
+        DEBUG_LABEL,
+      } from '/src/constants/layout-constants';
 
       const display = document.getElementById('display');
 
@@ -159,7 +167,7 @@
               mods.forEach((mod) => {
                 if (mod.constructor.name === 'OctaveMarksModifier') {
                   mod
-                    .setFontSize(12) // Small font for octave marks
+                    .setFontSize(OCTAVE_MARK.fontSize)
                     .setColor('#000'); // Black
                 }
               });
@@ -174,12 +182,12 @@
           console.log(`SVG size: ${svgWidth}x${svgHeight}`);
 
           // Multi-column layout configuration
-          const columnWidth = 100; // Width for each column
-          const columnSpacing = 35; // Space between columns (matches reference tightness)
-          const notesPerColumn = 10; // Notes per column
-          const startY = 30; // Top margin (matches reference)
-          const verticalSpacing = 44; // Fixed spacing between notes (reduced to match reference)
-          const fontSize = 28; // Font size for notes
+          const columnWidth = COLUMN.width;
+          const columnSpacing = COLUMN.spacing;
+          const notesPerColumn = COLUMN.notesPerColumn;
+          const startY = MIN_TOP_MARGIN; // Computed minimum to prevent octave mark clipping
+          const verticalSpacing = NOTE.verticalSpacing;
+          const fontSize = NOTE.fontSize;
 
           // Calculate number of columns needed
           const totalColumns = Math.ceil(
@@ -225,30 +233,44 @@
                 .some((m) => m.constructor.name === 'DurationDotModifier');
 
               // Calculate spacing to next note
-              // If this note has a duration dot (positioned 12px below note),
-              // add extra spacing so visual gap remains consistent
-              const extraSpacing = hasDurationDot ? 12 : 0;
+              // If this note has a duration dot, add extra spacing
+              // so visual gap remains consistent
+              const extraSpacing = hasDurationDot ? DURATION_DOT.extraSpacing : 0;
               currentY += verticalSpacing + extraSpacing;
 
               // Debug: render romanji label and note number to the right
               if (showRomanji) {
                 const symbolInfo = note.getSymbolInfo();
-                const romanji = symbolInfo?.romaji || 'unknown';
-                const octave = note
+                const isRest = !symbolInfo; // Rests don't have symbolInfo
+                const romanji = isRest ? 'rest' : symbolInfo?.romaji || 'unknown';
+
+                // Check for octave modifier
+                const octaveModifier = note
                   .getModifiers()
-                  .some((m) => m.constructor.name === 'OctaveMarksModifier')
-                  ? '(kan)'
-                  : '';
+                  .find((m) => m.constructor.name === 'OctaveMarksModifier');
+                const octave = octaveModifier ? '(kan)' : '';
+
+                // Check for meri modifier
+                const meriModifier = note
+                  .getModifiers()
+                  .find((m) => m.constructor.name === 'MeriKariModifier');
+                let meriInfo = '';
+                if (meriModifier) {
+                  const meriType = meriModifier.getType();
+                  meriInfo = meriType;
+                }
+
                 const globalIndex = startIndex + index;
-                const label = `#${globalIndex + 1} ${romanji} ${octave}`.trim();
+                const label = `${globalIndex + 1} ${romanji} ${octave} ${meriInfo}`.trim();
 
                 renderer.drawText(
                   label,
-                  columnX + 40, // Position to the right of the note
-                  noteY + 5, // Slightly below baseline
-                  12, // Small font size
-                  'monospace', // Monospace font for alignment
-                  '#999' // Gray color
+                  columnX + DEBUG_LABEL.offsetX,
+                  noteY + DEBUG_LABEL.offsetY,
+                  DEBUG_LABEL.fontSize,
+                  DEBUG_LABEL.fontFamily,
+                  DEBUG_LABEL.color,
+                  'start' // Left-aligned text
                 );
               }
             });

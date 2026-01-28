@@ -36,7 +36,6 @@ export class SVGRenderer {
     this.svg.setAttribute('width', String(width));
     this.svg.setAttribute('height', String(height));
     this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    this.svg.style.overflow = 'visible'; // Allow octave marks and modifiers to extend beyond bounds
 
     // Set initial parent to root SVG
     this.currentParent = this.svg;
@@ -76,6 +75,7 @@ export class SVGRenderer {
    * @param fontSize - Font size in pixels (default: 24)
    * @param fontFamily - Font family (default: 'Noto Sans JP, sans-serif')
    * @param fill - Fill color (default: '#000')
+   * @param textAnchor - Text anchor (default: 'middle')
    */
   drawText(
     text: string,
@@ -83,7 +83,8 @@ export class SVGRenderer {
     y: number,
     fontSize: number = 24,
     fontFamily: string = 'Noto Sans JP, sans-serif',
-    fill: string = '#000'
+    fill: string = '#000',
+    textAnchor: 'start' | 'middle' | 'end' = 'middle'
   ): SVGTextElement {
     const textEl = this.create('text');
     textEl.setAttribute('x', String(this.round(x)));
@@ -91,7 +92,7 @@ export class SVGRenderer {
     textEl.setAttribute('font-size', String(fontSize));
     textEl.setAttribute('font-family', fontFamily);
     textEl.setAttribute('fill', fill);
-    textEl.setAttribute('text-anchor', 'middle'); // Center text horizontally
+    textEl.setAttribute('text-anchor', textAnchor);
     textEl.textContent = text;
 
     this.add(textEl);
