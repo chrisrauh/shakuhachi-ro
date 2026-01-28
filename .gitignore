@@ -6,6 +6,12 @@
 # Testing
 /coverage
 
+# Playwright
+/tests/visual/reports
+/test-results
+/playwright-report
+/.playwright
+
 # Build output
 /dist
 /build
