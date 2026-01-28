@@ -6,7 +6,77 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 **Reference Image:** `references/scores-pictures/akatombo-kinko-score.png`
 **Secondary Reference Image comparing western and kinko notation:** `references/scores-pictures/akatombo-kinko-western-score.jpg`
 
-## Current Tasks
+## Current Focus: ScoreRenderer Architecture Refactoring
+
+**Goal:** Extract rendering logic from index.html into a reusable, VexFlow-inspired ScoreRenderer module.
+**Reference:** See `docs/REFACTORING_PLAN.md` for detailed architecture and principles.
+
+### Phase 1: Foundation - Render Options Interface
+- [ ] Create `src/renderer/RenderOptions.ts` with type-safe configuration interface
+- [ ] Define all display, layout, typography, and modifier options
+- [ ] Write unit tests for default value merging
+- [ ] Document options in JSDoc comments
+
+### Phase 2: Extract Modifier Configuration
+- [ ] Create `src/renderer/ModifierConfigurator.ts`
+- [ ] Extract modifier configuration logic from index.html (lines 158-183)
+- [ ] Implement static `configureModifiers()` method
+- [ ] Write unit tests for various option combinations
+- [ ] Verify octave mark and meri mark configuration works
+
+### Phase 3: Extract Layout Calculation
+- [ ] Create `src/renderer/ColumnLayoutCalculator.ts`
+- [ ] Define `ColumnLayout` and `ColumnInfo` interfaces
+- [ ] Extract column layout logic from index.html (lines 192-248)
+- [ ] Implement `calculateLayout()` method
+- [ ] Implement note positioning calculation
+- [ ] Write unit tests for column breaking, positioning, centering
+- [ ] Test with various note counts and viewport sizes
+
+### Phase 4: Create High-Level ScoreRenderer
+- [ ] Create `src/renderer/ScoreRenderer.ts`
+- [ ] Implement constructor with container and options
+- [ ] Implement `renderFromURL()` method
+- [ ] Implement `renderFromScoreData()` method
+- [ ] Implement `renderNotes()` method
+- [ ] Implement rendering pipeline (parse → configure → layout → render)
+- [ ] Implement `refresh()`, `setOptions()`, `resize()` methods
+- [ ] Extract and implement debug label rendering
+- [ ] Write integration tests for rendering pipeline
+
+### Phase 5: Add Convenience Layer
+- [ ] Add `renderScoreFromURL()` factory function
+- [ ] Add `renderScore()` factory function
+- [ ] Write tests for factory functions
+
+### Phase 6: Simplify index.html
+- [ ] Rewrite index.html to use ScoreRenderer
+- [ ] Reduce from 200+ lines to ~10 lines
+- [ ] Take before/after screenshots for visual comparison
+- [ ] Verify no visual regressions
+- [ ] Test debug mode, octave marks toggle
+
+### Phase 7: Update Module Exports
+- [ ] Update `src/index.ts` with ScoreRenderer exports
+- [ ] Export RenderOptions type
+- [ ] Export ModifierConfigurator, ColumnLayoutCalculator
+- [ ] Export ColumnLayout and ColumnInfo types
+
+### Phase 8: Update Test Pages
+- [ ] Update test HTML files to use ScoreRenderer
+- [ ] Verify all test pages work correctly
+- [ ] Ensure reusability across different contexts
+
+### Phase 9: Documentation
+- [ ] Create `docs/ARCHITECTURE.md` explaining component design
+- [ ] Create `docs/API.md` with ScoreRenderer API reference
+- [ ] Update `README.md` with usage examples
+- [ ] Add migration guide for existing code
+- [ ] Document VexFlow-inspired patterns
+
+---
+
+## Deferred Tasks (After Refactoring)
 
 **Rendering & Layout**
 
