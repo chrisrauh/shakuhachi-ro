@@ -45,9 +45,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Write integration tests for rendering pipeline
 
 ### Phase 5: Add Convenience Layer
-- [ ] Add `renderScoreFromURL()` factory function
-- [ ] Add `renderScore()` factory function
-- [ ] Write tests for factory functions
+- [x] Add `renderScoreFromURL()` factory function
+- [x] Add `renderScore()` factory function
+- [x] Write tests for factory functions
 
 ### Phase 6: Simplify index.html
 - [ ] Rewrite index.html to use ScoreRenderer
