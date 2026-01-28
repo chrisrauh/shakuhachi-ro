@@ -116,6 +116,10 @@ export class MusicXMLParser {
     const titleElement = xmlDoc.querySelector('work-title');
     const title = titleElement?.textContent || 'Untitled';
 
+    // Extract composer
+    const composerElement = xmlDoc.querySelector('creator[type="composer"]');
+    const composer = composerElement?.textContent || undefined;
+
     // Extract all notes from all measures
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
@@ -211,6 +215,7 @@ export class MusicXMLParser {
       title,
       style: 'kinko',
       notes,
+      composer,
     };
   }
 
