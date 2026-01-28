@@ -24,7 +24,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Write unit tests for various option combinations
 - [x] Verify octave mark and meri mark configuration works
 
-### Phase 3: Extract Layout Calculation
+### Phase 3: Extract Layout Calculation ✅ COMPLETE
 - [x] Create `src/renderer/ColumnLayoutCalculator.ts`
 - [x] Define `ColumnLayout` and `ColumnInfo` interfaces
 - [x] Extract column layout logic from index.html (lines 192-248)
