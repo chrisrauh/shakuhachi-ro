@@ -4,11 +4,13 @@ A standalone shakuhachi notation renderer built with vanilla TypeScript and SVG.
 
 ## Features
 
+- **Simple API** - Render scores with one line of code
 - **SVG Rendering** - Clean, scalable vector graphics
 - **Vertical Layout** - Traditional Japanese vertical columns (縦書き) reading right-to-left
 - **Kinko Notation** - Support for ロ (ro), ツ (tsu), レ (re), チ (chi), リ (ri), etc.
-- **Modifiers** - Octave dots, meri/kari pitch marks, atari technique marks
-- **Duration Spacing** - Automatic spacing based on note duration
+- **Modifiers** - Octave marks (乙甲), meri/kari pitch marks, atari technique marks
+- **MusicXML Import** - Load scores from MusicXML files
+- **Type-Safe** - Full TypeScript support with comprehensive type definitions
 - **Zero Framework Dependencies** - Pure vanilla TypeScript/JavaScript
 
 ## Quick Start
@@ -24,98 +26,163 @@ npm run dev
 npm run build
 ```
 
-Visit http://localhost:5173 (or port shown in terminal)
-
-## Testing
-
-This project uses both **unit tests** (Vitest) and **visual browser tests**.
-
-```bash
-# Run unit tests
-npm test
-
-# Run unit tests once
-npm run test:run
-
-# Run with coverage
-npm run test:coverage
-
-# Visual tests - start dev server and visit test/ files in browser
-npm run dev
-# Then navigate to: http://localhost:3000/test/test-parser.html
-```
-
-See [test/README.md](test/README.md) for detailed testing guide.
-
-## Demos
-
-Open these files in your browser after starting the dev server:
-
-- **demo.html** - Polished example with Akatombo (Red Dragonfly)
-- **test-vertical.html** - Vertical layout demo
-- **test-formatter.html** - Duration spacing demo
-- **test-shakunote.html** - Notes with modifiers
-- **index.html** - All component tests
+Visit http://localhost:3000 (or port shown in terminal)
 
 ## Usage
 
-### Basic Example
+### Simple One-Line Rendering
 
 ```javascript
-import { SVGRenderer } from './src/renderer/SVGRenderer.js';
-import { VerticalSystem } from './src/renderer/VerticalSystem.js';
-import { ShakuNote } from './src/notes/ShakuNote.js';
-import { OctaveDotsModifier } from './src/modifiers/OctaveDotsModifier.js';
+import { renderScoreFromURL } from 'shakuhachi-ro';
 
-// Create renderer
-const container = document.getElementById('score');
-const renderer = new SVGRenderer(container, 800, 600);
+// Render a score from MusicXML
+await renderScoreFromURL(
+  document.getElementById('container'),
+  '/data/Akatombo.musicxml'
+);
+```
 
-// Create notes
-const notes = [
-  new ShakuNote({ symbol: 'ro', duration: 'q' }),
-  new ShakuNote({ symbol: 'tsu', duration: 'q' })
-    .addModifier(new OctaveDotsModifier(1, 'above')),
-  new ShakuNote({ symbol: 're', duration: 'h' })
-];
+### With Options
 
-// Render in vertical columns
-const system = new VerticalSystem({
-  notesPerColumn: 5,
-  columnSpacing: 120
+```javascript
+import { renderScoreFromURL } from 'shakuhachi-ro';
+
+await renderScoreFromURL(container, '/score.musicxml', {
+  showOctaveMarks: false,    // Hide octave marks
+  notesPerColumn: 8,          // 8 notes per column
+  showDebugLabels: true       // Show note names
+});
+```
+
+### Class-Based API
+
+```javascript
+import { ScoreRenderer } from 'shakuhachi-ro';
+
+const renderer = new ScoreRenderer(container, {
+  notesPerColumn: 10,
+  showOctaveMarks: true
 });
 
-system.renderColumns(notes, renderer);
+await renderer.renderFromURL('/score.musicxml');
+
+// Dynamic updates
+renderer.setOptions({ showDebugLabels: true });
+renderer.resize(1200, 800);
 ```
 
-### Creating Notes
+### From ScoreData
 
-**Basic note:**
 ```javascript
-new ShakuNote({ symbol: 'ro', duration: 'q' })
+import { renderScore } from 'shakuhachi-ro';
+
+const scoreData = {
+  title: 'My Score',
+  style: 'kinko',
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
+    { pitch: { step: 'chi', octave: 1 }, duration: 2 }
+  ]
+};
+
+await renderScore(container, scoreData);
 ```
 
-**With octave dots (high):**
-```javascript
-new ShakuNote({ symbol: 'tsu', duration: 'q' })
-  .addModifier(new OctaveDotsModifier(1, 'above'))
+## Configuration Options
+
+Full list of available options:
+
+```typescript
+{
+  // Display
+  showOctaveMarks: true,      // Show octave marks (乙, 甲)
+  showDebugLabels: false,     // Show romanji labels
+
+  // Layout
+  notesPerColumn: 10,         // Notes per column before breaking
+  columnSpacing: 35,          // Space between columns
+  columnWidth: 100,           // Width allocated per column
+
+  // Typography
+  noteFontSize: 28,           // Note character size
+  noteFontWeight: 400,        // Note font weight
+  noteVerticalSpacing: 44,    // Vertical space between notes
+
+  // Modifiers
+  octaveMarkFontSize: 12,     // Octave mark size
+  meriKariFontSize: 14,       // Meri/kari mark size
+
+  // Viewport
+  width: 800,                 // SVG width (auto-detect if not specified)
+  height: 600                 // SVG height (auto-detect if not specified)
+}
 ```
 
-**With pitch alteration (meri - lower pitch):**
-```javascript
-new ShakuNote({ symbol: 'chi', duration: 'h' })
-  .addModifier(new MeriKariModifier('meri'))
+See [docs/API.md](./docs/API.md) for complete API reference.
+
+## Testing
+
+### Unit Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests once
+npm run test:run
+
+# With coverage
+npm run test:coverage
 ```
 
-**With technique mark (atari - finger pop):**
-```javascript
-new ShakuNote({ symbol: 're', duration: 'q' })
-  .addModifier(new AtariModifier('chevron'))
+### Visual Tests
+
+```bash
+# Start dev server
+npm run dev
+
+# Visit test pages:
+# http://localhost:3000/test-octave-marks.html
+# http://localhost:3000/test-meri-kari.html
 ```
 
-### API Reference
+### Visual Regression Tests
 
-**Note Symbols (Kinko-ryū):**
+```bash
+# Run Playwright visual tests
+npm run test:visual
+```
+
+## Documentation
+
+- **[API.md](./docs/API.md)** - Complete API reference with examples
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[TODO.md](./TODO.md)** - Project roadmap and active tasks
+- **[CLAUDE.md](./CLAUDE.md)** - Development workflow and coding standards
+
+## API Reference (Quick Overview)
+
+### High-Level API
+
+```typescript
+// Convenience functions (recommended)
+renderScoreFromURL(container, url, options?): Promise<ScoreRenderer>
+renderScore(container, scoreData, options?): Promise<ScoreRenderer>
+
+// Class-based (for more control)
+new ScoreRenderer(container, options?)
+  .renderFromURL(url): Promise<void>
+  .renderFromScoreData(scoreData): Promise<void>
+  .renderNotes(notes): void
+  .setOptions(options, autoRefresh?): void
+  .refresh(): void
+  .resize(width, height): void
+  .clear(): void
+```
+
+### Note Symbols (Kinko-ryū)
+
 - `'ro'` (ロ) - Lowest note
 - `'tsu'` (ツ)
 - `'re'` (レ)
@@ -124,50 +191,106 @@ new ShakuNote({ symbol: 're', duration: 'q' })
 - `'u'` (ウ)
 - `'hi'` (ヒ) - Highest basic note
 
-**Durations:**
-- `'q'` - Quarter note
-- `'h'` - Half note
-- `'w'` - Whole note
-- `'e'` - Eighth note
-- `'s'` - Sixteenth note
+### Modifiers
 
-**Modifiers:**
-- `OctaveDotsModifier(count, position)` - Octave indicators
-  - `count`: 1 or 2 dots
-  - `position`: 'above' (daikan/high) or 'below' (otsu/low)
-- `MeriKariModifier(type)` - Pitch alterations
-  - `type`: 'meri' (lower) or 'kari' (raise)
-- `AtariModifier(style)` - Technique mark
-  - `style`: 'chevron' for finger pop
+- **Octave marks** (乙, 甲) - Indicate register changes
+- **Meri/Kari** (メ, 中, 大) - Pitch alterations
+- **Duration dots** - Extended note duration
+- **Atari** - Technique marks
 
 ## Architecture
 
-Inspired by VexFlow's proven patterns but built from scratch for shakuhachi:
+VexFlow-inspired design with clear separation of concerns:
 
-- **SVGRenderer** - Low-level drawing primitives (text, lines, circles, paths)
-- **Formatter** - Automatic spacing based on note duration
-- **VerticalSystem** - Traditional vertical layout manager with right-to-left columns
-- **ShakuNote** - Note class with modifier support
-- **Modifiers** - Composable decorations (octave dots, meri/kari, atari)
+```
+ScoreRenderer (High-level API)
+    ↓
+RenderOptions (Configuration)
+    ↓
+ModifierConfigurator (Modifier setup)
+    ↓
+ColumnLayoutCalculator (Layout calculation)
+    ↓
+SVGRenderer (Drawing primitives)
+```
 
-## Documentation
+Key principles:
+- **Separation of Concerns** - Each component has one responsibility
+- **Data vs Presentation** - Score data is separate from rendering
+- **Type Safety** - Full TypeScript support
+- **VexFlow Patterns** - Constructor + options, fluent API, explicit render()
 
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture, design patterns, and implementation details
-- **[TODO.md](./TODO.md)** - Active tasks and project roadmap
-- **[CLAUDE.md](./CLAUDE.md)** - Development workflow and coding standards (for Claude Code)
+See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for details.
 
 ## Project Structure
 
 ```
 src/
-  ├── renderer/         # Core rendering system
+  ├── renderer/         # Rendering system
+  │   ├── ScoreRenderer.ts           # High-level API
+  │   ├── convenience.ts             # Factory functions
+  │   ├── RenderOptions.ts           # Configuration
+  │   ├── ModifierConfigurator.ts    # Modifier configuration
+  │   ├── ColumnLayoutCalculator.ts  # Layout calculation
+  │   └── SVGRenderer.ts             # SVG drawing primitives
+  ├── parser/           # Score parsing
+  │   ├── MusicXMLParser.ts          # MusicXML import
+  │   └── ScoreParser.ts             # Score data conversion
   ├── notes/            # Note classes
+  │   └── ShakuNote.ts               # Shakuhachi note
   ├── modifiers/        # Modifier system
-  └── data/             # Symbol mappings
+  │   ├── OctaveMarksModifier.ts     # Octave marks (乙甲)
+  │   ├── MeriKariModifier.ts        # Meri/kari marks
+  │   ├── DurationDotModifier.ts     # Duration dots
+  │   └── AtariModifier.ts           # Technique marks
+  ├── data/             # Symbol mappings and constants
+  └── types/            # TypeScript type definitions
 
-references/             # Reference materials (scores, fingering charts)
+docs/                   # Documentation
 tests/                  # Test files
+references/             # Reference materials (scores, fingering charts)
 ```
+
+## Examples
+
+See `index.html` for a complete working example:
+
+```html
+<div id="score-container"></div>
+
+<script type="module">
+  import { renderScoreFromURL } from '/src/renderer/convenience';
+
+  await renderScoreFromURL(
+    document.getElementById('score-container'),
+    '/data/Akatombo.musicxml',
+    { showOctaveMarks: true }
+  );
+</script>
+```
+
+## Migration from Old API
+
+### Before (Low-level API)
+
+```javascript
+// ~200 lines of manual rendering code
+const scoreData = await MusicXMLParser.parseFromURL(url);
+const notes = ScoreParser.parse(scoreData);
+const renderer = new SVGRenderer(container, width, height);
+// ... manual modifier configuration
+// ... manual layout calculation
+// ... manual rendering loops
+```
+
+### After (ScoreRenderer API)
+
+```javascript
+// One line
+await renderScoreFromURL(container, url);
+```
+
+**Result**: 95% code reduction while maintaining full functionality.
 
 ## Contributing
 
