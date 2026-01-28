@@ -10,11 +10,11 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Layout & Styling**
 
-- [ ] Proper margins and spacing to match reference
+- [x] Proper margins and spacing to match reference
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
 
-**Octave Modifiers**
+** Modifiers**
 
 - [ ] Verify atari marks render correctly
 
@@ -24,6 +24,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Match vertical spacing from reference image
 - [ ] Visual comparison: rendered vs reference screenshot
 - [ ] Adjust positioning/spacing as needed
+- [ ] Adjust score font weight so that the large and smaller characters are balanced visually. Smaller characters might need additional weight to match the larger ones. Check with user until it is visually correct.
 
 **Multi-Column Layout Discrepancies**
 
