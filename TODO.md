@@ -50,11 +50,11 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Write tests for factory functions
 
 ### Phase 6: Simplify index.html
-- [ ] Rewrite index.html to use ScoreRenderer
-- [ ] Reduce from 200+ lines to ~10 lines
+- [x] Rewrite index.html to use ScoreRenderer
+- [x] Reduce from 200+ lines to ~10 lines
 - [ ] Take before/after screenshots for visual comparison
 - [ ] Verify no visual regressions
-- [ ] Test debug mode, octave marks toggle
+- [x] Test debug mode, octave marks toggle
 
 ### Phase 7: Update Module Exports
 - [ ] Update `src/index.ts` with ScoreRenderer exports
