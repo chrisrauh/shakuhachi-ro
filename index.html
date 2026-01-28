@@ -81,6 +81,7 @@
       import {
         OCTAVE_MARK,
         NOTE,
+        MERI_KARI,
         DURATION_DOT,
         COLUMN,
         MIN_TOP_MARGIN,
@@ -168,6 +169,13 @@
                 if (mod.constructor.name === 'OctaveMarksModifier') {
                   mod
                     .setFontSize(OCTAVE_MARK.fontSize)
+                    .setFontWeight(OCTAVE_MARK.fontWeight)
+                    .setColor('#000'); // Black
+                }
+                if (mod.constructor.name === 'MeriKariModifier') {
+                  mod
+                    .setFontSize(MERI_KARI.fontSize)
+                    .setFontWeight(MERI_KARI.fontWeight)
                     .setColor('#000'); // Black
                 }
               });
@@ -224,6 +232,7 @@
             columnNotes.forEach((note, index) => {
               const noteY = currentY; // Save Y position for this note
               note.setFontSize(fontSize); // Apply consistent font size
+              note.setFontWeight(NOTE.fontWeight); // Apply consistent font weight
               note.setPosition(columnX, noteY);
               note.render(renderer);
 

@@ -37,6 +37,9 @@ export interface ShakuNoteOptions {
   /** Font size in pixels (default: 32) */
   fontSize?: number;
 
+  /** Font weight (default: 400) */
+  fontWeight?: number;
+
   /** Font family (default: 'Noto Sans JP, sans-serif') */
   fontFamily?: string;
 
@@ -79,6 +82,9 @@ export class ShakuNote {
   /** Font size */
   private fontSize: number;
 
+  /** Font weight */
+  private fontWeight: number;
+
   /** Font family */
   private fontFamily: string;
 
@@ -108,6 +114,7 @@ export class ShakuNote {
     this.y = options.y ?? 0;
     this.duration = options.duration ?? 'q';
     this.fontSize = options.fontSize ?? 32;
+    this.fontWeight = options.fontWeight ?? 400;
     this.fontFamily = options.fontFamily ?? 'Noto Sans JP, sans-serif';
     this.color = options.color ?? '#000';
     this.isRest = options.isRest ?? false;
@@ -149,7 +156,9 @@ export class ShakuNote {
         this.y,
         this.fontSize,
         this.fontFamily,
-        this.color
+        this.color,
+        'middle',
+        this.fontWeight
       );
     }
 
@@ -303,6 +312,16 @@ export class ShakuNote {
    */
   setFontSize(size: number): this {
     this.fontSize = size;
+    this.bbox = null;
+    return this;
+  }
+
+  /**
+   * Sets the font weight
+   * @returns this for chaining
+   */
+  setFontWeight(weight: number): this {
+    this.fontWeight = weight;
     this.bbox = null;
     return this;
   }
