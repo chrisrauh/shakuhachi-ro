@@ -10,7 +10,7 @@ import type { ScoreData } from '../types/ScoreData';
 // Mock MusicXMLParser to avoid actual file loading
 vi.mock('../parser/MusicXMLParser', () => ({
   MusicXMLParser: {
-    parseFromURL: vi.fn(async (url: string) => ({
+    parseFromURL: vi.fn(async (_url: string) => ({
       title: 'Test Score',
       composer: 'Test Composer',
       style: 'kinko' as const,
@@ -237,7 +237,7 @@ describe('Convenience Functions', () => {
       // Clear and render from ScoreData
       renderer1.clear();
       const scoreData = createTestScoreData();
-      const renderer2 = await renderScore(container, scoreData);
+      await renderScore(container, scoreData);
       const svg2 = container.querySelector('svg');
       expect(svg2).toBeTruthy();
     });

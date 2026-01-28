@@ -2,7 +2,7 @@
  * Unit tests for ModifierConfigurator
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { ModifierConfigurator } from './ModifierConfigurator';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';

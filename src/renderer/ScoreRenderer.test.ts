@@ -2,7 +2,7 @@
  * Integration tests for ScoreRenderer
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ScoreRenderer } from './ScoreRenderer';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';

@@ -55,7 +55,7 @@ export class MusicXMLParser {
 
       const step = pitchElement.querySelector('step')?.textContent || '';
       const octave = pitchElement.querySelector('octave')?.textContent || '4';
-      const alter = pitchElement.querySelector('alter')?.textContent || '0';
+      // const alter = pitchElement.querySelector('alter')?.textContent || '0'; // TODO: Use for accidentals
 
       // Build pitch name (e.g., "D4", "G5")
       const pitchName = `${step}${octave}`;
