@@ -63,9 +63,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Export ColumnLayout and ColumnInfo types
 
 ### Phase 8: Update Test Pages
-- [ ] Update test HTML files to use ScoreRenderer
-- [ ] Verify all test pages work correctly
-- [ ] Ensure reusability across different contexts
+- [x] Review test HTML files for ScoreRenderer compatibility
+- [x] Decision: Keep test pages as-is (they test low-level components)
+- [x] Test pages use SVGRenderer directly for custom layouts and debugging
 
 ### Phase 9: Documentation
 - [ ] Create `docs/ARCHITECTURE.md` explaining component design
