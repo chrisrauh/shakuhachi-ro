@@ -18,11 +18,11 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Document options in JSDoc comments
 
 ### Phase 2: Extract Modifier Configuration
-- [ ] Create `src/renderer/ModifierConfigurator.ts`
-- [ ] Extract modifier configuration logic from index.html (lines 158-183)
-- [ ] Implement static `configureModifiers()` method
-- [ ] Write unit tests for various option combinations
-- [ ] Verify octave mark and meri mark configuration works
+- [x] Create `src/renderer/ModifierConfigurator.ts`
+- [x] Extract modifier configuration logic from index.html (lines 158-183)
+- [x] Implement static `configureModifiers()` method
+- [x] Write unit tests for various option combinations
+- [x] Verify octave mark and meri mark configuration works
 
 ### Phase 3: Extract Layout Calculation
 - [ ] Create `src/renderer/ColumnLayoutCalculator.ts`
