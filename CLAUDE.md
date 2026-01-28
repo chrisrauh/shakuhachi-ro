@@ -6,7 +6,7 @@
 ## Software engineering principles
 
 - **Simplicity (KISS)** - Prefer the simplest thing that works. Complexity is technical debt.
-- **Single Responsibility** - A module/function/class should have one reason to change.
+- **Single Responsibility** - A module/function/class should have one reason to change (one actor). Prevents coupling changes from different sources.
 - **Separation of Concerns** - Don't mix UI, business logic, data access, config, etc. Boundaries make systems evolvable.
 - **Abstraction with Intent** - Abstract _why_, not _how_. Bad abstractions are worse than duplication.
 - **DRY (with judgment)** - Eliminate _true_ duplication, not accidental similarity. Premature DRY creates tight coupling.
@@ -33,6 +33,7 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 11. Look for next task in TODO.md and ask user if you should work on it
 
 **CRITICAL PR RULES:**
+
 - ⛔ NEVER merge PRs automatically. ALWAYS wait for explicit user approval ("merged", "merge", etc.)
 - If implementing multiple phases, create PR for EACH phase and wait for approval before continuing
 
@@ -48,6 +49,7 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 **Visual Testing (for UI changes)**
 
 Verify all aspects before considering visual changes complete:
+
 - **Symbols**: All base symbols render correctly (ロ,ツ,レ,チ,リ,ウ,ヒ); no clipping or cut-off
 - **Modifiers**: Meri (メ中大) left of notes, octave (乙甲) at top, duration dots at bottom - all visible, no overlap
 - **Layout**: Consistent spacing, adequate margins (top for octave, bottom for dots), no unexpected overflow
@@ -66,7 +68,7 @@ Verify all aspects before considering visual changes complete:
 
 **Dev Server Management**
 
-- Start dev server ONCE per feature, leave running throughout
+- Start dev server ONCE per session, leave running throughout
 - DO NOT restart repeatedly for screenshots/tests
 
 ## Key Learnings
