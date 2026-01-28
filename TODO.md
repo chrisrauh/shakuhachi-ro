@@ -34,15 +34,15 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Test with various note counts and viewport sizes
 
 ### Phase 4: Create High-Level ScoreRenderer
-- [ ] Create `src/renderer/ScoreRenderer.ts`
-- [ ] Implement constructor with container and options
-- [ ] Implement `renderFromURL()` method
-- [ ] Implement `renderFromScoreData()` method
-- [ ] Implement `renderNotes()` method
-- [ ] Implement rendering pipeline (parse → configure → layout → render)
-- [ ] Implement `refresh()`, `setOptions()`, `resize()` methods
-- [ ] Extract and implement debug label rendering
-- [ ] Write integration tests for rendering pipeline
+- [x] Create `src/renderer/ScoreRenderer.ts`
+- [x] Implement constructor with container and options
+- [x] Implement `renderFromURL()` method
+- [x] Implement `renderFromScoreData()` method
+- [x] Implement `renderNotes()` method
+- [x] Implement rendering pipeline (parse → configure → layout → render)
+- [x] Implement `refresh()`, `setOptions()`, `resize()` methods
+- [x] Extract and implement debug label rendering
+- [x] Write integration tests for rendering pipeline
 
 ### Phase 5: Add Convenience Layer
 - [ ] Add `renderScoreFromURL()` factory function
