@@ -30,6 +30,9 @@ export class MeriKariModifier extends Modifier {
   /** Font size for the meri/kari mark (slightly smaller than main note) */
   private fontSize: number = 16;
 
+  /** Font weight for the meri/kari mark */
+  private fontWeight: number = 400;
+
   /** Font family */
   private fontFamily: string = 'Noto Sans JP, sans-serif';
 
@@ -90,7 +93,9 @@ export class MeriKariModifier extends Modifier {
       y,
       this.fontSize,
       this.fontFamily,
-      this.color
+      this.color,
+      'middle',
+      this.fontWeight
     );
   }
 
@@ -99,6 +104,14 @@ export class MeriKariModifier extends Modifier {
    */
   setFontSize(size: number): this {
     this.fontSize = size;
+    return this;
+  }
+
+  /**
+   * Sets the font weight
+   */
+  setFontWeight(weight: number): this {
+    this.fontWeight = weight;
     return this;
   }
 
