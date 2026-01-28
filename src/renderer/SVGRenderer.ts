@@ -36,6 +36,7 @@ export class SVGRenderer {
     this.svg.setAttribute('width', String(width));
     this.svg.setAttribute('height', String(height));
     this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    this.svg.style.overflow = 'visible'; // Allow octave marks and modifiers to extend beyond bounds
 
     // Set initial parent to root SVG
     this.currentParent = this.svg;
