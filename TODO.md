@@ -13,7 +13,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Verify all note symbols match reference
 - [x] Match vertical spacing from reference image
 - [x] Visual comparison: rendered vs reference screenshot
-- [ ] Adjust positioning/spacing as needed
+- [x] Adjust positioning/spacing as needed
 - [ ] Adjust score font weight so that the large and smaller characters are balanced visually. Smaller characters might need additional weight to match the larger ones. Check with user until it is visually correct.
 
 **Layout & Styling**
