@@ -8,14 +8,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-**Layout & Styling**
-
-- [ ] Traditional shakuhachi aesthetic (clean, minimal)
-- [ ] Responsive layout considerations
-
-** Modifiers**
-
-- [ ] Verify atari marks render correctly
+- [x] Display score metadata (title, composer) from data, not hardcoded on page
 
 **Rendering Accuracy**
 
@@ -25,6 +18,14 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Adjust positioning/spacing as needed
 - [ ] Adjust score font weight so that the large and smaller characters are balanced visually. Smaller characters might need additional weight to match the larger ones. Check with user until it is visually correct.
 
+**Layout & Styling**
+
+- [ ] Responsive layout considerations
+
+** Modifiers**
+
+- [ ] Verify atari marks render correctly
+
 **Multi-Column Layout Discrepancies**
 
 - [ ] Notes per column distribution differs from reference
@@ -33,7 +34,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
-- [ ] Display score metadata (title, composer, tempo)
 - [ ] Error handling for missing files
 - [ ] User-friendly error messages
 
@@ -46,11 +46,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Cross-browser testing notes
 
 ## Future Enhancements
-
-**Tozan-ryū Support**
-
-- [ ] Implement numeric symbol rendering
-- [ ] Add Tozan-specific modifiers
 
 **Additional Modifiers**
 
