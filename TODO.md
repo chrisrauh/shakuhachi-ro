@@ -10,7 +10,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Rendering Accuracy**
 
-- [ ] Verify all note symbols match reference
+- [x] Verify all note symbols match reference
 - [ ] Match vertical spacing from reference image
 - [ ] Visual comparison: rendered vs reference screenshot
 - [ ] Adjust positioning/spacing as needed
