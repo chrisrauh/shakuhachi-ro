@@ -233,22 +233,36 @@
               // Debug: render romanji label and note number to the right
               if (showRomanji) {
                 const symbolInfo = note.getSymbolInfo();
-                const romanji = symbolInfo?.romaji || 'unknown';
-                const octave = note
+                const isRest = !symbolInfo; // Rests don't have symbolInfo
+                const romanji = isRest ? 'rest' : symbolInfo?.romaji || 'unknown';
+
+                // Check for octave modifier
+                const octaveModifier = note
                   .getModifiers()
-                  .some((m) => m.constructor.name === 'OctaveMarksModifier')
-                  ? '(kan)'
-                  : '';
+                  .find((m) => m.constructor.name === 'OctaveMarksModifier');
+                const octave = octaveModifier ? '(kan)' : '';
+
+                // Check for meri modifier
+                const meriModifier = note
+                  .getModifiers()
+                  .find((m) => m.constructor.name === 'MeriKariModifier');
+                let meriInfo = '';
+                if (meriModifier) {
+                  const meriType = meriModifier.getType();
+                  meriInfo = meriType;
+                }
+
                 const globalIndex = startIndex + index;
-                const label = `#${globalIndex + 1} ${romanji} ${octave}`.trim();
+                const label = `${globalIndex + 1} ${romanji} ${octave} ${meriInfo}`.trim();
 
                 renderer.drawText(
                   label,
-                  columnX + 40, // Position to the right of the note
-                  noteY + 5, // Slightly below baseline
-                  12, // Small font size
+                  columnX + 25, // Position closer to note, with margin for modifiers
+                  noteY - 6, // Vertically centered with note (adjusted from baseline)
+                  7, // Smaller font size
                   'monospace', // Monospace font for alignment
-                  '#999' // Gray color
+                  '#999', // Gray color
+                  'start' // Left-aligned text
                 );
               }
             });
