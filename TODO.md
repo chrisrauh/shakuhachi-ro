@@ -74,6 +74,18 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Add migration guide for existing code
 - [ ] Document VexFlow-inspired patterns
 
+### Phase 10: Cleanup and Polish
+- [ ] Review and remove any unused code from old implementation
+- [ ] Clean up temporary test files and artifacts
+- [ ] Remove or update deprecated patterns
+- [ ] Remove inline comments referencing old implementation
+- [ ] Verify all old rendering logic has been properly extracted
+- [ ] Clean up screenshots/ directory if needed
+- [ ] Remove any TODO comments added during refactoring
+- [ ] Final code review for consistency and style
+- [ ] Verify all tests pass
+- [ ] Take final screenshots for documentation
+
 ---
 
 ## Deferred Tasks (After Refactoring)
