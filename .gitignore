@@ -20,6 +20,9 @@
 # Screenshots
 /screenshots
 
+# Temporary files
+/tmp
+
 # Debug logs
 npm-debug.log*
 yarn-debug.log*
