@@ -75,225 +75,52 @@
     <div id="display"></div>
 
     <script type="module">
-      import { MusicXMLParser } from '/src/parser/MusicXMLParser';
-      import { ScoreParser } from '/src/parser/ScoreParser';
-      import { SVGRenderer } from '/src/renderer/SVGRenderer';
-      import {
-        OCTAVE_MARK,
-        NOTE,
-        MERI_KARI,
-        DURATION_DOT,
-        COLUMN,
-        MIN_TOP_MARGIN,
-        DEBUG_LABEL,
-      } from '/src/constants/layout-constants';
+      import { renderScoreFromURL } from '/src/renderer/convenience';
 
       const display = document.getElementById('display');
 
-      // Check for debug query parameter
+      // Parse URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const showRomanji =
+      const showDebugLabels =
         urlParams.get('debug') === 'true' ||
         urlParams.get('romanji') === 'true';
-      const showOctaveMarks = urlParams.get('octaveMarks') !== 'false'; // Show by default
+      const showOctaveMarks = urlParams.get('octaveMarks') !== 'false';
 
-      if (showRomanji) {
-        console.log('Debug mode: Romanji labels enabled');
+      // Update debug indicator
+      if (showDebugLabels) {
         document.getElementById('debug-indicator').innerHTML =
           'Debug: ON - ?debug=true found in URL';
         display.classList.add('debug');
       }
 
-      console.log(`Octave marks: ${showOctaveMarks ? 'enabled' : 'disabled'}`);
-
-      async function renderFirstColumn() {
+      // Render score
+      (async () => {
         try {
-          console.log('Loading Akatombo from MusicXML...');
-
-          // Parse MusicXML file
-          const scoreData = await MusicXMLParser.parseFromURL(
-            '/data/Akatombo.musicxml'
-          );
-          console.log('Parsed MusicXML:', scoreData);
-          console.log('Total notes:', scoreData.notes.length);
-
-          // Update page title and metadata
-          const titleElement = document.getElementById('score-title');
-          const subtitleElement = document.getElementById('score-subtitle');
-
-          if (titleElement) {
-            titleElement.textContent = scoreData.title;
-          }
-
-          if (subtitleElement) {
-            let subtitleText = '';
-            if (scoreData.composer) {
-              subtitleText = scoreData.composer;
+          const renderer = await renderScoreFromURL(
+            display,
+            '/data/Akatombo.musicxml',
+            {
+              showOctaveMarks,
+              showDebugLabels,
             }
-            // Keep debug indicator if it exists
+          );
+
+          // Update page metadata from score data
+          const scoreData = renderer.getScoreData();
+          if (scoreData) {
+            document.getElementById('score-title').textContent = scoreData.title;
+            const subtitleElement = document.getElementById('score-subtitle');
             const debugIndicator = document.getElementById('debug-indicator');
-            subtitleElement.textContent = subtitleText;
+            subtitleElement.textContent = scoreData.composer || '';
             if (debugIndicator) {
               subtitleElement.appendChild(debugIndicator);
             }
           }
-
-          // Convert to ShakuNote objects using ScoreParser
-          const allNotes = ScoreParser.parse(scoreData);
-          console.log(`Converted to ${allNotes.length} ShakuNote objects`);
-
-          // Render ALL notes in a single column
-          const firstColumnNotes = allNotes;
-          console.log('Rendering all notes:', firstColumnNotes.length);
-
-          // Debug: log each note's modifiers
-          firstColumnNotes.forEach((note, i) => {
-            const mods = note.getModifiers();
-            console.log(
-              `Note ${i} (${note.getKana()}):`,
-              mods.length,
-              'modifiers',
-              mods
-            );
-
-            // Remove octave marks if disabled, otherwise configure them
-            if (!showOctaveMarks) {
-              // Remove octave mark modifiers from the note
-              const nonOctaveModifiers = mods.filter(
-                (mod) => mod.constructor.name !== 'OctaveMarksModifier'
-              );
-              note.modifiers = nonOctaveModifiers;
-            } else {
-              // Configure octave kanji marks
-              mods.forEach((mod) => {
-                if (mod.constructor.name === 'OctaveMarksModifier') {
-                  mod
-                    .setFontSize(OCTAVE_MARK.fontSize)
-                    .setFontWeight(OCTAVE_MARK.fontWeight)
-                    .setColor('#000'); // Black
-                }
-                if (mod.constructor.name === 'MeriKariModifier') {
-                  mod
-                    .setFontSize(MERI_KARI.fontSize)
-                    .setFontWeight(MERI_KARI.fontWeight)
-                    .setColor('#000'); // Black
-                }
-              });
-            }
-          });
-
-          // Create SVG renderer - fit to viewport
-          const displayRect = display.getBoundingClientRect();
-          const svgWidth = displayRect.width;
-          const svgHeight = displayRect.height;
-          const renderer = new SVGRenderer(display, svgWidth, svgHeight);
-          console.log(`SVG size: ${svgWidth}x${svgHeight}`);
-
-          // Multi-column layout configuration
-          const columnWidth = COLUMN.width;
-          const columnSpacing = COLUMN.spacing;
-          const notesPerColumn = COLUMN.notesPerColumn;
-          const startY = MIN_TOP_MARGIN; // Computed minimum to prevent octave mark clipping
-          const verticalSpacing = NOTE.verticalSpacing;
-          const fontSize = NOTE.fontSize;
-
-          // Calculate number of columns needed
-          const totalColumns = Math.ceil(
-            firstColumnNotes.length / notesPerColumn
-          );
-          console.log(
-            `Rendering ${firstColumnNotes.length} notes in ${totalColumns} columns`
-          );
-
-          // Calculate starting X position (center the score horizontally)
-          const actualTotalWidth = totalColumns * columnWidth + (totalColumns - 1) * columnSpacing;
-          const startX = (svgWidth - actualTotalWidth) / 2 + columnWidth / 2;
-
-          // Render each column from right to left
-          for (let col = 0; col < totalColumns; col++) {
-            // Reverse column order: first column (col=0) is rightmost
-            const columnX =
-              startX + (totalColumns - 1 - col) * (columnWidth + columnSpacing);
-            const startIndex = col * notesPerColumn;
-            const endIndex = Math.min(
-              startIndex + notesPerColumn,
-              firstColumnNotes.length
-            );
-            const columnNotes = firstColumnNotes.slice(startIndex, endIndex);
-
-            console.log(
-              `Column ${col + 1}: notes ${
-                startIndex + 1
-              }-${endIndex} at x=${columnX}`
-            );
-
-            // Render notes in this column
-            let currentY = startY;
-            columnNotes.forEach((note, index) => {
-              const noteY = currentY; // Save Y position for this note
-              note.setFontSize(fontSize); // Apply consistent font size
-              note.setFontWeight(NOTE.fontWeight); // Apply consistent font weight
-              note.setPosition(columnX, noteY);
-              note.render(renderer);
-
-              // Check if this note has a duration dot modifier
-              const hasDurationDot = note
-                .getModifiers()
-                .some((m) => m.constructor.name === 'DurationDotModifier');
-
-              // Calculate spacing to next note
-              // If this note has a duration dot, add extra spacing
-              // so visual gap remains consistent
-              const extraSpacing = hasDurationDot ? DURATION_DOT.extraSpacing : 0;
-              currentY += verticalSpacing + extraSpacing;
-
-              // Debug: render romanji label and note number to the right
-              if (showRomanji) {
-                const symbolInfo = note.getSymbolInfo();
-                const isRest = !symbolInfo; // Rests don't have symbolInfo
-                const romanji = isRest ? 'rest' : symbolInfo?.romaji || 'unknown';
-
-                // Check for octave modifier
-                const octaveModifier = note
-                  .getModifiers()
-                  .find((m) => m.constructor.name === 'OctaveMarksModifier');
-                const octave = octaveModifier ? '(kan)' : '';
-
-                // Check for meri modifier
-                const meriModifier = note
-                  .getModifiers()
-                  .find((m) => m.constructor.name === 'MeriKariModifier');
-                let meriInfo = '';
-                if (meriModifier) {
-                  const meriType = meriModifier.getType();
-                  meriInfo = meriType;
-                }
-
-                const globalIndex = startIndex + index;
-                const label = `${globalIndex + 1} ${romanji} ${octave} ${meriInfo}`.trim();
-
-                renderer.drawText(
-                  label,
-                  columnX + DEBUG_LABEL.offsetX,
-                  noteY + DEBUG_LABEL.offsetY,
-                  DEBUG_LABEL.fontSize,
-                  DEBUG_LABEL.fontFamily,
-                  DEBUG_LABEL.color,
-                  'start' // Left-aligned text
-                );
-              }
-            });
-          }
-
-          console.log('Multi-column layout rendered from MusicXML!');
         } catch (error) {
           console.error('Error:', error);
-          display.innerHTML = `<div class="error">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
+          display.innerHTML = `<div class="error">Error: ${error.message}</div>`;
         }
-      }
-
-      // Render when page loads
-      renderFirstColumn();
+      })();
     </script>
   </body>
 </html>
