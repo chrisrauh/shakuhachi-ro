@@ -6,122 +6,34 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 **Reference Image:** `references/scores-pictures/akatombo-kinko-score.png`
 **Secondary Reference Image comparing western and kinko notation:** `references/scores-pictures/akatombo-kinko-western-score.jpg`
 
-## Current Focus: ScoreRenderer Architecture Refactoring
+## Current Tasks
 
-**Goal:** Extract rendering logic from index.html into a reusable, VexFlow-inspired ScoreRenderer module.
-**Reference:** See `docs/REFACTORING_PLAN.md` for detailed architecture and principles.
-
-### Phase 1: Foundation - Render Options Interface ✅ COMPLETE
-- [x] Create `src/renderer/RenderOptions.ts` with type-safe configuration interface
-- [x] Define all display, layout, typography, and modifier options
-- [x] Write unit tests for default value merging
-- [x] Document options in JSDoc comments
-
-### Phase 2: Extract Modifier Configuration ✅ COMPLETE
-- [x] Create `src/renderer/ModifierConfigurator.ts`
-- [x] Extract modifier configuration logic from index.html (lines 158-183)
-- [x] Implement static `configureModifiers()` method
-- [x] Write unit tests for various option combinations
-- [x] Verify octave mark and meri mark configuration works
-
-### Phase 3: Extract Layout Calculation ✅ COMPLETE
-- [x] Create `src/renderer/ColumnLayoutCalculator.ts`
-- [x] Define `ColumnLayout` and `ColumnInfo` interfaces
-- [x] Extract column layout logic from index.html (lines 192-248)
-- [x] Implement `calculateLayout()` method
-- [x] Implement note positioning calculation
-- [x] Write unit tests for column breaking, positioning, centering
-- [x] Test with various note counts and viewport sizes
-
-### Phase 4: Create High-Level ScoreRenderer ✅ COMPLETE
-- [x] Create `src/renderer/ScoreRenderer.ts`
-- [x] Implement constructor with container and options
-- [x] Implement `renderFromURL()` method
-- [x] Implement `renderFromScoreData()` method
-- [x] Implement `renderNotes()` method
-- [x] Implement rendering pipeline (parse → configure → layout → render)
-- [x] Implement `refresh()`, `setOptions()`, `resize()` methods
-- [x] Extract and implement debug label rendering
-- [x] Write integration tests for rendering pipeline
-
-### Phase 5: Add Convenience Layer
-- [x] Add `renderScoreFromURL()` factory function
-- [x] Add `renderScore()` factory function
-- [x] Write tests for factory functions
-
-### Phase 6: Simplify index.html
-- [x] Rewrite index.html to use ScoreRenderer
-- [x] Reduce from 200+ lines to ~10 lines
-- [x] Take before/after screenshots for visual comparison
-- [x] Verify no visual regressions
-- [x] Test debug mode, octave marks toggle
-
-### Phase 7: Update Module Exports
-- [x] Update `src/index.ts` with ScoreRenderer exports
-- [x] Export RenderOptions type
-- [x] Export ModifierConfigurator, ColumnLayoutCalculator
-- [x] Export ColumnLayout and ColumnInfo types
-
-### Phase 8: Update Test Pages
-- [x] Review test HTML files for ScoreRenderer compatibility
-- [x] Decision: Keep test pages as-is (they test low-level components)
-- [x] Test pages use SVGRenderer directly for custom layouts and debugging
-
-### Phase 9: Documentation
-- [x] Create `docs/ARCHITECTURE.md` explaining component design
-- [x] Create `docs/API.md` with ScoreRenderer API reference
-- [x] Update `README.md` with usage examples
-- [x] Add migration guide for existing code
-- [x] Document VexFlow-inspired patterns
-
-### Phase 10: Cleanup and Polish ✅ COMPLETE
-- [x] Review and remove any unused code from old implementation
-- [x] Clean up temporary test files and artifacts
-- [x] Remove or update deprecated patterns
-- [x] Remove inline comments referencing old implementation
-- [x] Verify all old rendering logic has been properly extracted
-- [x] Clean up screenshots/ directory if needed
-- [x] Remove any TODO comments added during refactoring
-- [x] Final code review for consistency and style
-- [x] Verify all tests pass
-- [x] Take final screenshots for documentation
-
----
-
-## Deferred Tasks (After Refactoring)
-
-**Rendering & Layout**
-
+### Rendering & Layout
 - [ ] Verify atari marks render correctly
 - [ ] Notes per column distribution differs from reference
 - [ ] Responsive layout considerations
 
-## Next Phase: Polish & Documentation
-
-**UI Enhancements**
+### UI Enhancements
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Error handling for missing files
 - [ ] User-friendly error messages
 
-**Documentation**
+### Documentation
 - [ ] Add JSDoc comments to public APIs
 - [ ] Write usage guide in references/README.md
-- [ ] Update README.md with project overview
 - [ ] Document score data format
 - [ ] Cross-browser testing notes
 
 ## Future Enhancements
 
-**Additional Modifiers**
-
+### Additional Modifiers
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
 - [ ] OriModifier (pitch bend)
 
-**Performance**
-
+### Performance
 - [ ] Profile rendering performance
 - [ ] Optimize frequent operations
 - [ ] Add caching where appropriate

@@ -119,7 +119,7 @@ Full list of available options:
 }
 ```
 
-See [docs/API.md](./docs/API.md) for complete API reference.
+See [docs/api.md](./docs/api.md) for complete API reference.
 
 ## Testing
 
@@ -156,8 +156,8 @@ npm run test:visual
 
 ## Documentation
 
-- **[API.md](./docs/API.md)** - Complete API reference with examples
-- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[api.md](./docs/api.md)** - Complete API reference with examples
+- **[architecture.md](./docs/architecture.md)** - Technical architecture and design patterns
 - **[TODO.md](./TODO.md)** - Project roadmap and active tasks
 - **[CLAUDE.md](./CLAUDE.md)** - Development workflow and coding standards
 
@@ -220,7 +220,7 @@ Key principles:
 - **Type Safety** - Full TypeScript support
 - **VexFlow Patterns** - Constructor + options, fluent API, explicit render()
 
-See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for details.
+See [docs/architecture.md](./docs/architecture.md) for details.
 
 ## Project Structure
 
