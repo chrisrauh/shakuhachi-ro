@@ -66,9 +66,8 @@
   </head>
   <body>
     <header>
-      <h1>Akatombo - Full Score</h1>
-      <p class="subtitle">
-        All notes from MusicXML rendered vertically
+      <h1 id="score-title">Loading...</h1>
+      <p class="subtitle" id="score-subtitle">
         <span id="debug-indicator"></span>
       </p>
     </header>
@@ -108,6 +107,27 @@
           );
           console.log('Parsed MusicXML:', scoreData);
           console.log('Total notes:', scoreData.notes.length);
+
+          // Update page title and metadata
+          const titleElement = document.getElementById('score-title');
+          const subtitleElement = document.getElementById('score-subtitle');
+
+          if (titleElement) {
+            titleElement.textContent = scoreData.title;
+          }
+
+          if (subtitleElement) {
+            let subtitleText = '';
+            if (scoreData.composer) {
+              subtitleText = scoreData.composer;
+            }
+            // Keep debug indicator if it exists
+            const debugIndicator = document.getElementById('debug-indicator');
+            subtitleElement.textContent = subtitleText;
+            if (debugIndicator) {
+              subtitleElement.appendChild(debugIndicator);
+            }
+          }
 
           // Convert to ShakuNote objects using ScoreParser
           const allNotes = ScoreParser.parse(scoreData);
