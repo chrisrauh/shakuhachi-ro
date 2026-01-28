@@ -7,7 +7,7 @@ import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
 import { ShakuNote } from '../notes/ShakuNote';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
-import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
+import { mergeWithDefaults } from './RenderOptions';
 
 describe('ColumnLayoutCalculator', () => {
   describe('calculateLayout', () => {
@@ -47,7 +47,7 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should calculate layout for multiple columns', () => {
       // Create 25 notes (should result in 3 columns with 10 notes each)
-      const notes = Array.from({ length: 25 }, (_, i) =>
+      const notes = Array.from({ length: 25 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -80,7 +80,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should position columns right-to-left', () => {
-      const notes = Array.from({ length: 15 }, (_, i) =>
+      const notes = Array.from({ length: 15 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -114,7 +114,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should center columns horizontally', () => {
-      const notes = Array.from({ length: 5 }, (_, i) =>
+      const notes = Array.from({ length: 5 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -207,7 +207,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle exact multiple of notesPerColumn', () => {
-      const notes = Array.from({ length: 20 }, (_, i) =>
+      const notes = Array.from({ length: 20 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -272,7 +272,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should preserve noteIndex in positions', () => {
-      const notes = Array.from({ length: 15 }, (_, i) =>
+      const notes = Array.from({ length: 15 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -299,7 +299,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should use custom column width and spacing', () => {
-      const notes = Array.from({ length: 20 }, (_, i) =>
+      const notes = Array.from({ length: 20 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -325,7 +325,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle different viewport widths', () => {
-      const notes = Array.from({ length: 5 }, (_, i) =>
+      const notes = Array.from({ length: 5 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 
@@ -409,7 +409,7 @@ describe('ColumnLayoutCalculator', () => {
       ];
 
       testCases.forEach(({ noteCount, notesPerColumn, expectedColumns }) => {
-        const notes = Array.from({ length: noteCount }, (_, i) =>
+        const notes = Array.from({ length: noteCount }, () =>
           new ShakuNote({ symbol: 'ro' })
         );
 
@@ -427,7 +427,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle large number of columns', () => {
-      const notes = Array.from({ length: 100 }, (_, i) =>
+      const notes = Array.from({ length: 100 }, () =>
         new ShakuNote({ symbol: 'ro' })
       );
 

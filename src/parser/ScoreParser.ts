@@ -11,7 +11,7 @@ import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
-import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import type { ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../data/mappings';
 
 /**
@@ -182,56 +182,6 @@ export class ScoreParser {
     }
 
     return closestOctave;
-  }
-
-  /**
-   * Parses a single note from score data
-   *
-   * @deprecated Use parse() instead which handles contextual octave marking
-   * @param note - Score note data
-   * @returns ShakuNote object with modifiers
-   */
-  private static parseNote(note: ScoreNote): ShakuNote {
-    // Handle rests (ma 間 - space/pause in Kinko notation)
-    if (note.rest) {
-      return new ShakuNote({
-        symbol: 'rest', // Symbol doesn't matter for rests
-        duration: mapDuration(note.duration),
-        isRest: true
-      });
-    }
-
-    // Ensure pitch exists for non-rest notes
-    if (!note.pitch) {
-      throw new Error('Note must have pitch when rest is not set');
-    }
-
-    // Create the base note
-    const shakuNote = new ShakuNote({
-      symbol: note.pitch.step,
-      duration: mapDuration(note.duration)
-    });
-
-    // Add octave marks if needed
-    if (note.pitch.octave > 0) {
-      const count = note.pitch.octave as 1 | 2;
-      const octaveModifier = new OctaveMarksModifier(count, 'above');
-      shakuNote.addModifier(octaveModifier);
-    }
-
-    // Add meri modifier if needed
-    if (note.meri) {
-      const meriModifier = new MeriKariModifier('meri');
-      shakuNote.addModifier(meriModifier);
-    }
-
-    // Add duration dot if needed
-    if (note.dotted) {
-      const durationDot = new DurationDotModifier('below'); // 'below' for vertical layout
-      shakuNote.addModifier(durationDot);
-    }
-
-    return shakuNote;
   }
 
   /**

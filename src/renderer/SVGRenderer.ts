@@ -7,13 +7,7 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 export class SVGRenderer {
-  private element: HTMLElement;
   private svg: SVGSVGElement;
   private width: number;
   private height: number;
@@ -27,7 +21,6 @@ export class SVGRenderer {
    * @param height - SVG height
    */
   constructor(element: HTMLElement, width: number = 800, height: number = 600) {
-    this.element = element;
     this.width = width;
     this.height = height;
 
