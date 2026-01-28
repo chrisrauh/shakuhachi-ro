@@ -76,6 +76,7 @@ export class SVGRenderer {
    * @param fontFamily - Font family (default: 'Noto Sans JP, sans-serif')
    * @param fill - Fill color (default: '#000')
    * @param textAnchor - Text anchor (default: 'middle')
+   * @param fontWeight - Font weight (default: 400)
    */
   drawText(
     text: string,
@@ -84,13 +85,15 @@ export class SVGRenderer {
     fontSize: number = 24,
     fontFamily: string = 'Noto Sans JP, sans-serif',
     fill: string = '#000',
-    textAnchor: 'start' | 'middle' | 'end' = 'middle'
+    textAnchor: 'start' | 'middle' | 'end' = 'middle',
+    fontWeight: number | string = 400
   ): SVGTextElement {
     const textEl = this.create('text');
     textEl.setAttribute('x', String(this.round(x)));
     textEl.setAttribute('y', String(this.round(y)));
     textEl.setAttribute('font-size', String(fontSize));
     textEl.setAttribute('font-family', fontFamily);
+    textEl.setAttribute('font-weight', String(fontWeight));
     textEl.setAttribute('fill', fill);
     textEl.setAttribute('text-anchor', textAnchor);
     textEl.textContent = text;

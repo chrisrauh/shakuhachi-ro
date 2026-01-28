@@ -26,6 +26,9 @@ export class OctaveMarksModifier extends Modifier {
   /** Font size for the octave mark (smaller than main note) */
   private fontSize: number = 12;
 
+  /** Font weight for the octave mark */
+  private fontWeight: number = 400;
+
   /** Font family */
   private fontFamily: string = 'Noto Sans JP, sans-serif';
 
@@ -78,7 +81,9 @@ export class OctaveMarksModifier extends Modifier {
       y,
       this.fontSize,
       this.fontFamily,
-      this.color
+      this.color,
+      'middle',
+      this.fontWeight
     );
   }
 
@@ -87,6 +92,14 @@ export class OctaveMarksModifier extends Modifier {
    */
   setFontSize(size: number): this {
     this.fontSize = size;
+    return this;
+  }
+
+  /**
+   * Sets the font weight
+   */
+  setFontWeight(weight: number): this {
+    this.fontWeight = weight;
     return this;
   }
 

@@ -16,6 +16,8 @@ export const OCTAVE_MARK = {
   offsetY: -22,
   /** Horizontal offset from note center */
   offsetX: 18,
+  /** Font weight (heavier than notes to maintain stroke proportion) */
+  fontWeight: 500,
 } as const;
 
 /**
@@ -23,9 +25,21 @@ export const OCTAVE_MARK = {
  */
 export const NOTE = {
   /** Font size for note characters */
-  fontSize: 28,
+  fontSize: 32,
   /** Vertical spacing between notes (baseline to baseline) */
   verticalSpacing: 44,
+  /** Font weight for main note characters */
+  fontWeight: 400,
+} as const;
+
+/**
+ * Meri/Kari mark configuration
+ */
+export const MERI_KARI = {
+  /** Font size for meri/kari marks */
+  fontSize: 14,
+  /** Font weight (heavier to maintain stroke proportion) */
+  fontWeight: 500,
 } as const;
 
 /**
@@ -58,7 +72,8 @@ export const COLUMN = {
  *
  * This ensures octave marks on the first note never get clipped.
  */
-export const MIN_TOP_MARGIN = Math.abs(OCTAVE_MARK.offsetY) + OCTAVE_MARK.fontSize;
+export const MIN_TOP_MARGIN =
+  Math.abs(OCTAVE_MARK.offsetY) + OCTAVE_MARK.fontSize;
 
 /**
  * Debug label configuration (when romanji debug mode is enabled)
