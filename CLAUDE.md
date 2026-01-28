@@ -62,6 +62,14 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 - Run tests after each task
 - Run tests before pushing
 
+**Screenshot Management**
+
+- Use standard names: `current.png`, `before.png`, `after.png`
+- Overwrite existing screenshots - do not create timestamped versions
+- Keep only the most recent screenshot(s) needed for current work
+- Location: `screenshots/` directory (gitignored)
+- Clean up old screenshots when starting new visual tasks
+
 **Dev Server Management**
 
 - Start dev server ONCE when beginning work on a feature
