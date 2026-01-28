@@ -1,7 +1,7 @@
 # Claude Code Instructions
 
 - Tasks: [TODO.md](./TODO.md)
-- Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md)
+- Architecture: [docs/architecture.md](./docs/architecture.md)
 
 ## Software engineering principles
 
