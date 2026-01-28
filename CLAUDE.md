@@ -5,37 +5,16 @@
 
 ## Software engineering principles
 
-Adhere to these principles when writing code:
-
-- **Simplicity (KISS - Keep It Simple, Stupid)**
-  Prefer the simplest thing that works. Complexity is technical debt in disguise.
-
-- **Single Responsibility**
-  A module/function/class should have one reason to change. This is the fastest way to keep systems understandable.
-
-- **Separation of Concerns**
-  Don’t mix UI, business logic, data access, config, etc. Boundaries are what make systems evolvable.
-
-- **Abstraction with Intent**
-  Abstract _why_, not _how_. Bad abstractions are worse than duplication.
-
-- **DRY (with judgment)**
-  Eliminate _true_ duplication, not accidental similarity. Premature DRY creates tight coupling.
-
-- **Loose Coupling, High Cohesion**
-  Things that change together should live together; things that change independently shouldn’t know much about each other.
-
-- **Make Change Cheap**
-  Optimize for iteration, not initial elegance. The best design is the one that’s easy to modify.
-
-- **Explicit Over Implicit**
-  Readability beats cleverness. Code is read far more than it’s written.
-
-- **Fail Fast, Fail Loud**
-  Errors should surface immediately and clearly. Silent failure is a bug factory.
-
-- **Test What Matters**
-  Tests are about confidence, not coverage. Test behavior and contracts, not implementation details.
+- **Simplicity (KISS)** - Prefer the simplest thing that works. Complexity is technical debt.
+- **Single Responsibility** - A module/function/class should have one reason to change.
+- **Separation of Concerns** - Don't mix UI, business logic, data access, config, etc. Boundaries make systems evolvable.
+- **Abstraction with Intent** - Abstract _why_, not _how_. Bad abstractions are worse than duplication.
+- **DRY (with judgment)** - Eliminate _true_ duplication, not accidental similarity. Premature DRY creates tight coupling.
+- **Loose Coupling, High Cohesion** - Things that change together live together; things that change independently shouldn't know much about each other.
+- **Make Change Cheap** - Optimize for iteration, not initial elegance. Make code easy to modify.
+- **Explicit Over Implicit** - Readability beats cleverness. Code is read far more than it's written.
+- **Fail Fast, Fail Loud** - Errors should surface immediately and clearly. Silent failure is a bug factory.
+- **Test What Matters** - Tests are about confidence, not coverage. Test behavior, not implementation.
 
 Single meta-principle: **optimize for humans, not machines**. Everything else flows from that.
 
@@ -54,10 +33,7 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 11. Look for next task in TODO.md and ask user if you should work on it
 
 **CRITICAL PR RULES:**
-- NEVER run `gh pr merge` without explicit user approval
-- NEVER use `--auto` flag on any gh pr command
-- NEVER assume a PR should be auto-merged, even for simple changes
-- ALWAYS wait for user to say "merged", "merge", or give explicit approval
+- ⛔ NEVER merge PRs automatically. ALWAYS wait for explicit user approval ("merged", "merge", etc.)
 - If implementing multiple phases, create PR for EACH phase and wait for approval before continuing
 
 **Testing**
@@ -69,6 +45,17 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 - Run tests after each task
 - Run tests before pushing
 
+**Visual Testing (for UI changes)**
+
+Verify all aspects before considering visual changes complete:
+- **Symbols**: All base symbols render correctly (ロ,ツ,レ,チ,リ,ウ,ヒ); no clipping or cut-off
+- **Modifiers**: Meri (メ中大) left of notes, octave (乙甲) at top, duration dots at bottom - all visible, no overlap
+- **Layout**: Consistent spacing, adequate margins (top for octave, bottom for dots), no unexpected overflow
+- **SVG**: `overflow: visible` set to prevent clipping of modifiers extending beyond boundaries
+- **Modes**: Debug and non-debug render identically
+- **Edge cases**: First/last notes in columns, multiple modifiers, rests
+- **Process**: Take before/after screenshots, run `npm run test:visual`
+
 **Screenshot Management**
 
 - Use standard names: `current.png`, `before.png`, `after.png`
@@ -79,11 +66,8 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 **Dev Server Management**
 
-- Start dev server ONCE when beginning work on a feature
-- Leave it running while iterating and testing
-- Only stop it when completely done with the PR/task
-- DO NOT start and stop the server repeatedly for each screenshot or test
-- If server is already running, reuse it
+- Start dev server ONCE per feature, leave running throughout
+- DO NOT restart repeatedly for screenshots/tests
 
 ## Key Learnings
 
