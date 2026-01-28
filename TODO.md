@@ -52,8 +52,8 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ### Phase 6: Simplify index.html
 - [x] Rewrite index.html to use ScoreRenderer
 - [x] Reduce from 200+ lines to ~10 lines
-- [ ] Take before/after screenshots for visual comparison
-- [ ] Verify no visual regressions
+- [x] Take before/after screenshots for visual comparison
+- [x] Verify no visual regressions
 - [x] Test debug mode, octave marks toggle
 
 ### Phase 7: Update Module Exports
