@@ -8,35 +8,21 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-**Rendering Accuracy**
-
-- [x] Verify all note symbols match reference
-- [x] Match vertical spacing from reference image
-- [x] Visual comparison: rendered vs reference screenshot
-- [x] Adjust positioning/spacing as needed
-- [x] Adjust score font weight so that the large and smaller characters are balanced visually. Smaller characters might need additional weight to match the larger ones. Check with user until it is visually correct.
-
-**Layout & Styling**
-
-- [ ] Responsive layout considerations
-
-** Modifiers**
+**Rendering & Layout**
 
 - [ ] Verify atari marks render correctly
-
-**Multi-Column Layout Discrepancies**
-
 - [ ] Notes per column distribution differs from reference
+- [ ] Responsive layout considerations
 
-## UI Enhancements
+## Next Phase: Polish & Documentation
 
+**UI Enhancements**
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Error handling for missing files
 - [ ] User-friendly error messages
 
-## Documentation
-
+**Documentation**
 - [ ] Add JSDoc comments to public APIs
 - [ ] Write usage guide in references/README.md
 - [ ] Update README.md with project overview
