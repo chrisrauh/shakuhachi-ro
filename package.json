@@ -20,6 +20,7 @@
     "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@vitest/ui": "^4.0.17",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
