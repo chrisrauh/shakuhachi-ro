@@ -10,7 +10,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 **Layout & Styling**
 
-- [x] Proper margins and spacing to match reference
 - [ ] Traditional shakuhachi aesthetic (clean, minimal)
 - [ ] Responsive layout considerations
 
