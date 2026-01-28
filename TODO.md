@@ -8,8 +8,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-- [x] Display score metadata (title, composer) from data, not hardcoded on page
-
 **Rendering Accuracy**
 
 - [ ] Verify all note symbols match reference
