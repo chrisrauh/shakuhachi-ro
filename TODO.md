@@ -25,13 +25,13 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Verify octave mark and meri mark configuration works
 
 ### Phase 3: Extract Layout Calculation
-- [ ] Create `src/renderer/ColumnLayoutCalculator.ts`
-- [ ] Define `ColumnLayout` and `ColumnInfo` interfaces
-- [ ] Extract column layout logic from index.html (lines 192-248)
-- [ ] Implement `calculateLayout()` method
-- [ ] Implement note positioning calculation
-- [ ] Write unit tests for column breaking, positioning, centering
-- [ ] Test with various note counts and viewport sizes
+- [x] Create `src/renderer/ColumnLayoutCalculator.ts`
+- [x] Define `ColumnLayout` and `ColumnInfo` interfaces
+- [x] Extract column layout logic from index.html (lines 192-248)
+- [x] Implement `calculateLayout()` method
+- [x] Implement note positioning calculation
+- [x] Write unit tests for column breaking, positioning, centering
+- [x] Test with various note counts and viewport sizes
 
 ### Phase 4: Create High-Level ScoreRenderer
 - [ ] Create `src/renderer/ScoreRenderer.ts`
