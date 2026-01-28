@@ -5,7 +5,18 @@
  * Supports traditional Kinko-ryū and Tozan notation.
  */
 
-// Renderer exports
+// Core Renderer API (Phases 1-5)
+export { ScoreRenderer } from './renderer/ScoreRenderer';
+export { renderScoreFromURL, renderScore } from './renderer/convenience';
+export type { RenderOptions } from './renderer/RenderOptions';
+export { mergeWithDefaults, DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+
+// Layout Components
+export { ModifierConfigurator } from './renderer/ModifierConfigurator';
+export { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
+export type { ColumnLayout, ColumnInfo, NotePosition } from './renderer/ColumnLayoutCalculator';
+
+// Low-level Renderer exports
 export { SVGRenderer } from './renderer/SVGRenderer';
 export { Formatter } from './renderer/Formatter';
 export type { FormatterOptions } from './renderer/Formatter';
