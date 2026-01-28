@@ -81,7 +81,7 @@ export class ColumnLayoutCalculator {
   static calculateLayout(
     notes: ShakuNote[],
     svgWidth: number,
-    svgHeight: number,
+    _svgHeight: number, // Reserved for future vertical centering
     options: Required<RenderOptions>
   ): ColumnLayout {
     // Extract layout parameters from options

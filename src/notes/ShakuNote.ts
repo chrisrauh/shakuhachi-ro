@@ -10,7 +10,7 @@
 
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 import type { Modifier } from '../modifiers/Modifier';
-import { getSymbolByRomaji, type KinkoSymbol, type Octave } from '../data/mappings';
+import { getSymbolByRomaji, type KinkoSymbol } from '../data/mappings';
 
 /**
  * Duration for spacing calculations
@@ -196,6 +196,15 @@ export class ShakuNote {
    */
   getModifiers(): Modifier[] {
     return [...this.modifiers];
+  }
+
+  /**
+   * Sets the modifiers for this note
+   *
+   * @param modifiers - Array of modifiers to set
+   */
+  setModifiers(modifiers: Modifier[]): void {
+    this.modifiers = modifiers;
   }
 
   /**

@@ -42,8 +42,7 @@ export class ModifierConfigurator {
         const nonOctaveModifiers = modifiers.filter(
           (mod) => !(mod instanceof OctaveMarksModifier)
         );
-        // Direct assignment to note.modifiers (public property)
-        note.modifiers = nonOctaveModifiers;
+        note.setModifiers(nonOctaveModifiers);
       } else {
         // Configure octave marks and meri/kari marks
         modifiers.forEach((mod) => {

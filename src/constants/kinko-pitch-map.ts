@@ -10,8 +10,10 @@
  * This mapping provides approximate equivalents for standard MusicXML conversion.
  */
 
+import type { PitchStep } from '../types/ScoreData';
+
 export interface PitchMapping {
-  step: string;
+  step: PitchStep;
   octave: number;
   meri?: boolean;
   chu_meri?: boolean;
