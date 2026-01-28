@@ -57,10 +57,10 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [x] Test debug mode, octave marks toggle
 
 ### Phase 7: Update Module Exports
-- [ ] Update `src/index.ts` with ScoreRenderer exports
-- [ ] Export RenderOptions type
-- [ ] Export ModifierConfigurator, ColumnLayoutCalculator
-- [ ] Export ColumnLayout and ColumnInfo types
+- [x] Update `src/index.ts` with ScoreRenderer exports
+- [x] Export RenderOptions type
+- [x] Export ModifierConfigurator, ColumnLayoutCalculator
+- [x] Export ColumnLayout and ColumnInfo types
 
 ### Phase 8: Update Test Pages
 - [ ] Update test HTML files to use ScoreRenderer
