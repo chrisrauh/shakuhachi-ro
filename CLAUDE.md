@@ -47,11 +47,18 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 4. Mark completed tasks in TODO.md with [x]
 5. Ask user if you should create PR
 6. When creating PR: push branch to remote and use `gh pr create` (DO NOT add "🤖 Generated with Claude Code" to PR descriptions)
-7. Ask user to review and merge (DO NOT merge automatically)
-8. Wait for user confirmation that PR is merged
-9. Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
+7. **STOP and ask user to review and merge** (DO NOT merge automatically, DO NOT use --auto flag, DO NOT use gh pr merge)
+8. **WAIT for user's explicit confirmation** (user must say "merged", "merge", or similar)
+9. **ONLY AFTER user confirms**: Delete feature branch (local + remote) with `git branch -d <branch> && git push origin --delete <branch>`
 10. Remove completed tasks from TODO.md (tasks marked with [x])
 11. Look for next task in TODO.md and ask user if you should work on it
+
+**CRITICAL PR RULES:**
+- NEVER run `gh pr merge` without explicit user approval
+- NEVER use `--auto` flag on any gh pr command
+- NEVER assume a PR should be auto-merged, even for simple changes
+- ALWAYS wait for user to say "merged", "merge", or give explicit approval
+- If implementing multiple phases, create PR for EACH phase and wait for approval before continuing
 
 **Testing**
 
