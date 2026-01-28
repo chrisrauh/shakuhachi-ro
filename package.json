@@ -13,6 +13,10 @@
     "test:ui": "vitest --ui",
     "test:run": "npm run lint && vitest run",
     "test:coverage": "npm run lint && vitest run --coverage",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:report": "playwright show-report tests/visual/reports",
+    "test:visual:debug": "playwright test --debug",
     "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
