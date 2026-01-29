@@ -9,38 +9,50 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ## Current Tasks
 
 ### Rendering & Layout
+
 - [x] Notes per column distribution differs from reference
 - [ ] Responsive layout considerations
 
 ### UI Enhancements
+
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Error handling for missing files
 - [ ] User-friendly error messages
 
 ### Documentation
+
 - [ ] Add JSDoc comments to public APIs
 - [ ] Write usage guide in references/README.md
 - [ ] Document score data format
 - [ ] Cross-browser testing notes
 
-## Future Enhancements
+## Backlog
 
 ### Rendering & Layout
+
 - [ ] Verify atari marks render correctly
 
 ### Additional Modifiers
+
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
 - [ ] OriModifier (pitch bend)
 
-### Performance
+### Performance & Optimization
+
 - [ ] Profile rendering performance
 - [ ] Optimize frequent operations
 - [ ] Add caching where appropriate
+- [ ] Revisit column breaking with TeX-inspired badness algorithm
+  - [ ] Implement badness metric for column height variance
+  - [ ] Add demerits for orphans (single notes in columns)
+  - [ ] Add penalties for breaking at certain notation points
+  - [ ] Implement global optimization across score (Knuth-Plass approach)
+  - Prerequisites: Complete all modifiers and annotations first
 
-## Future Platform Features
+### Platform Features
 
 These are for the future score-sharing platform (post-renderer completion):
 
@@ -52,7 +64,7 @@ These are for the future score-sharing platform (post-renderer completion):
 - [ ] User authentication system
 - [ ] Score search and discovery
 
-## Backlog / Ideas
+## Future Ideas
 
 - [ ] Multiple score input formats (import from ABC, etc.)
 - [ ] MIDI playback mapping
