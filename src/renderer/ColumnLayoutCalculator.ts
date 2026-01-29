@@ -55,6 +55,16 @@ export interface ColumnLayout {
 }
 
 /**
+ * Column break information
+ */
+interface ColumnBreak {
+  /** Index of first note in column (inclusive) */
+  startIndex: number;
+  /** Index after last note in column (exclusive) */
+  endIndex: number;
+}
+
+/**
  * ColumnLayoutCalculator handles column layout and note positioning
  * calculations based on render options.
  *
@@ -66,11 +76,14 @@ export class ColumnLayoutCalculator {
    * Calculates complete column layout for a score
    *
    * This method:
-   * 1. Determines how many columns are needed
+   * 1. Determines how many columns are needed based on available height
    * 2. Calculates horizontal centering (startX)
    * 3. Calculates column positions (right-to-left layout)
    * 4. Calculates vertical positions for each note
    * 5. Handles extra spacing for duration dots
+   *
+   * Columns break automatically when vertical space runs out,
+   * similar to how Japanese text flows top-to-bottom, right-to-left.
    *
    * @param notes - Array of ShakuNote objects to lay out
    * @param svgWidth - Width of SVG viewport
@@ -81,18 +94,25 @@ export class ColumnLayoutCalculator {
   static calculateLayout(
     notes: ShakuNote[],
     svgWidth: number,
-    _svgHeight: number, // Reserved for future vertical centering
+    svgHeight: number,
     options: Required<RenderOptions>
   ): ColumnLayout {
     // Extract layout parameters from options
     const columnWidth = options.columnWidth;
     const columnSpacing = options.columnSpacing;
-    const notesPerColumn = options.notesPerColumn;
     const startY = options.topMargin;
     const verticalSpacing = options.noteVerticalSpacing;
 
-    // Calculate number of columns needed
-    const totalColumns = Math.ceil(notes.length / notesPerColumn);
+    // Calculate column breaks based on available height
+    const columnBreaks = this.calculateColumnBreaks(
+      notes,
+      svgHeight,
+      startY,
+      verticalSpacing,
+      options
+    );
+
+    const totalColumns = columnBreaks.length;
 
     // Calculate starting X position (center the score horizontally)
     const actualTotalWidth =
@@ -102,6 +122,9 @@ export class ColumnLayoutCalculator {
     // Calculate layout for each column
     const columns: ColumnInfo[] = [];
     for (let col = 0; col < totalColumns; col++) {
+      const noteStartIndex = columnBreaks[col].startIndex;
+      const noteEndIndex = columnBreaks[col].endIndex;
+
       columns.push(
         this.calculateColumnLayout(
           col,
@@ -110,7 +133,8 @@ export class ColumnLayoutCalculator {
           startY,
           columnWidth,
           columnSpacing,
-          notesPerColumn,
+          noteStartIndex,
+          noteEndIndex,
           verticalSpacing,
           notes,
           options
@@ -129,6 +153,71 @@ export class ColumnLayoutCalculator {
   }
 
   /**
+   * Calculates where columns should break based on available vertical space
+   *
+   * Simulates filling columns top-to-bottom. When adding the next note would
+   * exceed available height, starts a new column (like text wrapping).
+   *
+   * @param notes - Array of all notes to distribute
+   * @param svgHeight - Available vertical space
+   * @param startY - Starting Y position (top margin)
+   * @param verticalSpacing - Base vertical spacing between notes
+   * @param options - Render options (for duration dot spacing)
+   * @returns Array of column break points
+   */
+  private static calculateColumnBreaks(
+    notes: ShakuNote[],
+    svgHeight: number,
+    startY: number,
+    verticalSpacing: number,
+    options: Required<RenderOptions>
+  ): ColumnBreak[] {
+    // Handle empty notes array
+    if (notes.length === 0) {
+      return [];
+    }
+
+    const columnBreaks: ColumnBreak[] = [];
+    let currentColumnStart = 0;
+    let currentY = startY;
+
+    for (let i = 0; i < notes.length; i++) {
+      const note = notes[i];
+
+      // Check if this note has a duration dot (requires extra spacing)
+      const hasDurationDot = note
+        .getModifiers()
+        .some((mod) => mod instanceof DurationDotModifier);
+
+      const extraSpacing = hasDurationDot ? options.durationDotExtraSpacing : 0;
+      const noteHeight = verticalSpacing + extraSpacing;
+
+      // Check if adding this note would exceed available height
+      // (but always allow at least one note per column)
+      if (i > currentColumnStart && currentY + noteHeight > svgHeight) {
+        // Start a new column
+        columnBreaks.push({
+          startIndex: currentColumnStart,
+          endIndex: i,
+        });
+        currentColumnStart = i;
+        currentY = startY + noteHeight;
+      } else {
+        // Add note to current column
+        currentY += noteHeight;
+      }
+    }
+
+    // Add the final column
+    columnBreaks.push({
+      startIndex: currentColumnStart,
+      endIndex: notes.length,
+    });
+
+    return columnBreaks;
+  }
+
+  /**
    * Calculates layout for a single column
    *
    * @param col - Zero-based column index
@@ -137,7 +226,8 @@ export class ColumnLayoutCalculator {
    * @param startY - Starting Y position (top margin)
    * @param columnWidth - Width of each column
    * @param columnSpacing - Spacing between columns
-   * @param notesPerColumn - Maximum notes per column
+   * @param noteStartIndex - Index of first note in this column (inclusive)
+   * @param noteEndIndex - Index after last note in this column (exclusive)
    * @param verticalSpacing - Vertical spacing between notes
    * @param notes - All notes in the score
    * @param options - Render options
@@ -150,7 +240,8 @@ export class ColumnLayoutCalculator {
     startY: number,
     columnWidth: number,
     columnSpacing: number,
-    notesPerColumn: number,
+    noteStartIndex: number,
+    noteEndIndex: number,
     verticalSpacing: number,
     notes: ShakuNote[],
     options: Required<RenderOptions>
@@ -158,10 +249,6 @@ export class ColumnLayoutCalculator {
     // Calculate column X position (reverse order: rightmost is first)
     const xPosition =
       startX + (totalColumns - 1 - col) * (columnWidth + columnSpacing);
-
-    // Calculate note range for this column
-    const noteStartIndex = col * notesPerColumn;
-    const noteEndIndex = Math.min(noteStartIndex + notesPerColumn, notes.length);
 
     // Calculate Y positions for each note in this column
     const notePositions = this.calculateNotePositions(
