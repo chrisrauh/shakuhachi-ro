@@ -9,8 +9,7 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 ## Current Tasks
 
 ### Rendering & Layout
-- [ ] Verify atari marks render correctly
-- [ ] Notes per column distribution differs from reference
+- [x] Notes per column distribution differs from reference
 - [ ] Responsive layout considerations
 
 ### UI Enhancements
@@ -26,6 +25,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 - [ ] Cross-browser testing notes
 
 ## Future Enhancements
+
+### Rendering & Layout
+- [ ] Verify atari marks render correctly
 
 ### Additional Modifiers
 - [ ] YuriModifier (vibrato)
