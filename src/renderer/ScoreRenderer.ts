@@ -36,6 +36,7 @@ export class ScoreRenderer {
   private renderer: SVGRenderer | null = null;
   private currentNotes: ShakuNote[] = [];
   private currentScoreData: ScoreData | null = null;
+  private resizeObserver?: ResizeObserver;
 
   /**
    * Creates a new ScoreRenderer
@@ -46,6 +47,11 @@ export class ScoreRenderer {
   constructor(container: HTMLElement, options: RenderOptions = {}) {
     this.container = container;
     this.options = mergeWithDefaults(options);
+
+    // Set up ResizeObserver if autoResize is enabled
+    if (this.options.autoResize) {
+      this.setupResizeObserver();
+    }
   }
 
   /**
@@ -272,5 +278,46 @@ export class ScoreRenderer {
     this.renderer = null;
     this.currentNotes = [];
     this.currentScoreData = null;
+  }
+
+  /**
+   * Sets up ResizeObserver to monitor container size changes
+   * @private
+   */
+  private setupResizeObserver(): void {
+    // Check if ResizeObserver is available (not available in some test environments)
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        this.handleResize(entry.contentRect.width, entry.contentRect.height);
+      }
+    });
+
+    this.resizeObserver.observe(this.container);
+  }
+
+  /**
+   * Handles resize events by triggering re-render
+   * @param _width - New container width (unused, dimensions re-read from container)
+   * @param _height - New container height (unused, dimensions re-read from container)
+   * @private
+   */
+  private handleResize(_width: number, _height: number): void {
+    if (this.currentNotes.length > 0) {
+      this.renderNotes(this.currentNotes);
+    }
+  }
+
+  /**
+   * Cleans up resources (ResizeObserver)
+   * Call this when disposing of the ScoreRenderer
+   */
+  destroy(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 }
