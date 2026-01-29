@@ -56,7 +56,7 @@ describe('RenderOptions', () => {
     });
 
     it('should have correct viewport option defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.autoResize).toBe(false);
+      expect(DEFAULT_RENDER_OPTIONS.autoResize).toBe(true);
     });
   });
 

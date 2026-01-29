@@ -203,8 +203,9 @@ export interface RenderOptions {
   height?: number;
 
   /**
-   * Whether to automatically resize when container dimensions change
-   * @default false
+   * Automatically re-render when container size changes.
+   * Uses ResizeObserver to detect viewport changes and trigger re-rendering.
+   * @default true
    */
   autoResize?: boolean;
 }
@@ -254,7 +255,7 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
   // Viewport options
   width: undefined as any, // Will be auto-detected
   height: undefined as any, // Will be auto-detected
-  autoResize: false,
+  autoResize: true,
 };
 
 /**
