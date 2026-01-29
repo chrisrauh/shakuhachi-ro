@@ -10,7 +10,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ### Rendering & Layout
 
-- [x] Notes per column distribution differs from reference
 - [ ] Responsive layout considerations
 
 ### UI Enhancements
