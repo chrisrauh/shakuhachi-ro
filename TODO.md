@@ -17,21 +17,17 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [ ] Add Love Story to the database (blocked by parsing task)
 - [ ] the landign page should be the library page
 
-### Phase 6: Fork/Remix Functionality
+### Phase 6: Fork/Remix Functionality ✅ COMPLETE
 
-- [ ] Implement forkScore(scoreId) in src/api/scores.ts
-- [ ] Copy score data to new score
-- [ ] Set user_id to current user
-- [ ] Set forked_from to original score ID
-- [ ] Increment fork_count on parent score
-- [ ] Add "(Fork)" or "(Remix)" to title
-- [ ] Create ForkButton component
-- [ ] Show "Fork" button on score view (disabled if user owns score)
-- [ ] On click: fork score, redirect to editor with forked copy
-- [ ] Show fork count
-- [ ] Display fork attribution on score view
-- [ ] Show fork icon in library if score is a fork
-- [ ] Test: Fork score, edit fork, verify independence
+- [x] Implement forkScore(scoreId) in src/api/scores.ts
+- [x] Copy score data to new score
+- [x] Set user_id to current user
+- [x] Set forked_from to original score ID
+- [x] Increment fork_count on parent score
+- [x] Wire up Fork button on score detail page
+- [x] On click: fork score, redirect to editor with forked copy
+- [x] Show fork icon in library if score is a fork
+- [x] Test: Fork score, edit fork, verify independence
 
 ### Phase 7: User Profile
 
