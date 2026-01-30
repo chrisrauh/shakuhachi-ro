@@ -421,20 +421,9 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       };
     }
 
-    // Check if user is trying to fork their own score
-    if (originalScore.user_id === user.id) {
-      return {
-        score: null,
-        error: new Error('Cannot fork your own score')
-      };
-    }
-
-    // Create forked title
-    const forkedTitle = `${originalScore.title} (Fork)`;
-
-    // Create the forked score
+    // Create the forked score (keep original title, no "(Fork)" suffix)
     const forkResult = await createScore({
-      title: forkedTitle,
+      title: originalScore.title,
       composer: originalScore.composer || undefined,
       difficulty: originalScore.difficulty || undefined,
       tags: originalScore.tags,
