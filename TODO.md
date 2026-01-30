@@ -8,9 +8,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-### Rendering & Layout
+### Deployment
 
-- [x] Responsive layout considerations
+- [x] Set up GitHub Pages deployment with GitHub Actions
 
 ### UI Enhancements
 
@@ -28,12 +28,9 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Backlog
 
-### Rendering & Layout
-
-- [ ] Verify atari marks render correctly
-
 ### Additional Modifiers
 
+- [ ] Atari marks
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
