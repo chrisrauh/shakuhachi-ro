@@ -392,3 +392,76 @@ export async function incrementViewCount(id: string): Promise<{ error: Error | n
     };
   }
 }
+
+/**
+ * Fork a score - create a copy owned by the current user
+ */
+export async function forkScore(scoreId: string): Promise<ScoreResult> {
+  try {
+    const { user } = await getCurrentUser();
+
+    if (!user) {
+      return {
+        score: null,
+        error: new Error('User must be logged in to fork scores')
+      };
+    }
+
+    // Get the original score
+    const { data: originalScore, error: fetchError } = await supabase
+      .from('scores')
+      .select('*')
+      .eq('id', scoreId)
+      .single();
+
+    if (fetchError || !originalScore) {
+      return {
+        score: null,
+        error: new Error('Failed to fetch score to fork')
+      };
+    }
+
+    // Check if user is trying to fork their own score
+    if (originalScore.user_id === user.id) {
+      return {
+        score: null,
+        error: new Error('Cannot fork your own score')
+      };
+    }
+
+    // Create forked title
+    const forkedTitle = `${originalScore.title} (Fork)`;
+
+    // Create the forked score
+    const forkResult = await createScore({
+      title: forkedTitle,
+      composer: originalScore.composer || undefined,
+      difficulty: originalScore.difficulty || undefined,
+      tags: originalScore.tags,
+      description: originalScore.description || undefined,
+      data_format: originalScore.data_format,
+      data: originalScore.data,
+      forked_from: scoreId
+    });
+
+    if (forkResult.error) {
+      return forkResult;
+    }
+
+    // Increment fork count on parent score
+    await supabase
+      .from('scores')
+      .update({ fork_count: originalScore.fork_count + 1 })
+      .eq('id', scoreId);
+
+    return forkResult;
+  } catch (error) {
+    return {
+      score: null,
+      error:
+        error instanceof Error
+          ? error
+          : new Error('Unknown error forking score')
+    };
+  }
+}

@@ -1,4 +1,4 @@
-import { getScoreBySlug, getScore, incrementViewCount } from '../api/scores';
+import { getScoreBySlug, getScore, incrementViewCount, forkScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { renderIcon, initIcons } from '../utils/icons';
@@ -191,7 +191,28 @@ export class ScoreDetail {
   }
 
   private async handleFork(): Promise<void> {
-    alert('Fork functionality will be implemented in Phase 6');
+    if (!this.score) return;
+
+    // Disable the fork button to prevent double-clicks
+    const forkBtn = this.container.querySelector('#fork-btn') as HTMLButtonElement;
+    if (forkBtn) {
+      forkBtn.disabled = true;
+      forkBtn.textContent = 'Forking...';
+    }
+
+    const result = await forkScore(this.score.id);
+
+    if (result.error) {
+      alert(`Error forking score: ${result.error.message}`);
+      if (forkBtn) {
+        forkBtn.disabled = false;
+        forkBtn.textContent = 'Fork Score';
+      }
+      return;
+    }
+
+    // Redirect to editor with the forked score
+    window.location.href = `/editor.html?id=${result.score!.id}`;
   }
 
   private escapeHtml(text: string): string {
