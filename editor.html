@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shakuhachi Score Library</title>
+    <title>Score Editor - Shakuhachi Score Library</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -78,7 +78,7 @@
       }
 
       main {
-        padding: 20px 0;
+        padding: 0;
       }
 
       @media (max-width: 768px) {
@@ -104,23 +104,22 @@
       <div class="header-left">
         <a href="/" class="logo">🪈 Shakuhachi Score Library</a>
         <nav>
-          <a href="/library.html" class="active">Browse</a>
-          <a href="/editor.html">Create Score</a>
+          <a href="/library.html">Browse</a>
+          <a href="/editor.html" class="active">Create</a>
           <a href="/index.html">Renderer Demo</a>
-          <a href="/test-crud.html">API Tests</a>
         </nav>
       </div>
       <div id="auth-widget"></div>
     </header>
 
     <main>
-      <div id="score-library"></div>
+      <div id="score-editor"></div>
     </main>
 
     <script type="module">
       import { AuthWidget } from './src/components/AuthComponents';
       import { authState } from './src/api/authState';
-      import { ScoreLibrary } from './src/components/ScoreLibrary';
+      import { ScoreEditor } from './src/components/ScoreEditor';
 
       // Initialize auth widget
       const authWidget = new AuthWidget('auth-widget');
@@ -134,8 +133,12 @@
         }
       });
 
-      // Initialize score library
-      const scoreLibrary = new ScoreLibrary('score-library');
+      // Get score ID from URL if editing
+      const urlParams = new URLSearchParams(window.location.search);
+      const scoreId = urlParams.get('id');
+
+      // Initialize score editor
+      const scoreEditor = new ScoreEditor('score-editor', scoreId || undefined);
     </script>
   </body>
 </html>
