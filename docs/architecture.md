@@ -178,6 +178,63 @@ note.addModifier(new OctaveMarksModifier('kan'));
 note.addModifier(new MeriKariModifier('meri'));
 ```
 
+## UI Guidelines
+
+### Icons
+
+**Use Lucide Icons for all UI elements.**
+
+**Implementation**:
+```typescript
+// src/utils/icons.ts
+import { createIcons, GitFork, Eye, AlertCircle, Calendar } from 'lucide';
+
+// Initialize icons (call once when component mounts)
+export function initIcons(): void {
+  createIcons({
+    icons: {
+      GitFork,
+      Eye,
+      AlertCircle,
+      Calendar
+    }
+  });
+}
+
+// Render icon placeholder in HTML
+export function renderIcon(name: string, className: string = ''): string {
+  return `<i data-lucide="${name}" class="${className}"></i>`;
+}
+```
+
+**Usage in Components**:
+```typescript
+import { renderIcon, initIcons } from '../utils/icons';
+
+// In render method
+this.container.innerHTML = `
+  <span class="icon-label">
+    ${renderIcon('git-fork')} Fork count: ${count}
+  </span>
+`;
+
+// After rendering HTML
+initIcons();
+```
+
+**Available Icons**:
+- `git-fork` - Fork/remix actions
+- `eye` - View count
+- `calendar` - Dates
+- `alert-circle` - Errors/warnings
+
+**Adding New Icons**:
+1. Import from `lucide` package
+2. Add to `createIcons()` object
+3. Use via `renderIcon()`
+
+**Branding Exception**: Keep the 🎐 (flute) emoji for branding/logo purposes.
+
 ## Extension Points
 
 ### Adding New Options

@@ -7,27 +7,27 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-### score in databases
+### Scores in Database
 
-- [] create unique urls for the scores. Each score page would have a unique slug based on its name. So for akatombo, the url would be shaskuhachi.com/score/akatombo
-- [ ] storea akatombo in the database
-- [ ] parse the "Love Story.jpg" image and generate a score data
-- [ ] add Love Story to the database
-- [ ] clearnup test entries from the database
+- [x] Create unique URLs for scores (slug-based: /score.html?slug=akatombo)
+- [x] Store Akatombo in the database
+- [ ] Parse the "Love Story.jpg" image and generate score data (requires OCR or manual transcription)
+- [ ] Add Love Story to the database (blocked by parsing task)
+- [x] Cleanup test entries from the database (tool created in seed-database.html)
 
 ### Phase 5: Score Detail View
 
-- [ ] Create score.html page (URL: /score.html?id=<uuid>)
-- [ ] Display score with ScoreRenderer
-- [ ] Show metadata (title, composer, difficulty, description)
-- [ ] Show "Fork" button
-- [ ] Show "Edit" button (if owner)
+- [x] Create score.html page (URL: /score.html?slug=<slug>)
+- [x] Display score with ScoreRenderer
+- [x] Show metadata (title, composer, difficulty, description)
+- [x] Show "Fork" button
+- [x] Show "Edit" button (if owner)
 - [ ] Show attribution if forked ("Forked from...")
 - [ ] Link to creator's profile
-- [ ] Fetch score from Supabase by ID
-- [ ] Increment view count on load
-- [ ] Handle missing scores (404-like error)
-- [ ] Test: View score, fork, edit (if owner)
+- [x] Fetch score from Supabase by slug
+- [x] Increment view count on load
+- [x] Handle missing scores (404-like error)
+- [x] Test: View score, fork, edit (if owner)
 
 ### Phase 6: Fork/Remix Functionality
 
