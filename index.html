@@ -33,6 +33,13 @@
       header {
         flex-shrink: 0;
         padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-left {
+        flex: 1;
       }
 
       h1 {
@@ -44,6 +51,10 @@
       .subtitle {
         color: #666;
         font-size: 0.8rem;
+      }
+
+      #auth-widget {
+        flex-shrink: 0;
       }
 
       #display {
@@ -66,18 +77,37 @@
   </head>
   <body>
     <header>
-      <h1 id="score-title">Loading...</h1>
-      <p class="subtitle" id="score-subtitle">
-        <span id="debug-indicator"></span>
-      </p>
+      <div class="header-left">
+        <h1 id="score-title">Loading...</h1>
+        <p class="subtitle" id="score-subtitle">
+          <span id="debug-indicator"></span>
+        </p>
+      </div>
+      <div id="auth-widget"></div>
     </header>
 
     <div id="display"></div>
 
     <script type="module">
       import { renderScoreFromURL } from './src/renderer/convenience';
+      import { AuthWidget } from './src/components/AuthComponents';
+      import { authState } from './src/api/authState';
 
       const display = document.getElementById('display');
+
+      // Initialize auth widget
+      const authWidget = new AuthWidget('auth-widget');
+
+      // Subscribe to auth state changes
+      authState.subscribe((user) => {
+        if (user) {
+          console.log('User logged in:', user.email);
+          authWidget.setUser(user);
+        } else {
+          console.log('User logged out');
+          authWidget.setUser(null);
+        }
+      });
 
       // Parse URL parameters
       const urlParams = new URLSearchParams(window.location.search);

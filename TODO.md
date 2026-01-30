@@ -1,32 +1,129 @@
-# TODO - Shakuhachi Score Renderer
+# TODO - Shakuhachi Score Library Platform
 
-This file tracks active tasks for completing the shakuhachi score renderer project. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
+This file tracks active tasks for the shakuhachi score library platform. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
-**Goal:** Render the Akatombo score matching the reference image.
-**Reference Image:** `references/scores-pictures/akatombo-kinko-score.png`
-**Secondary Reference Image comparing western and kinko notation:** `references/scores-pictures/akatombo-kinko-western-score.jpg`
+**Goal:** Transform shakuhachi-ro into a collaborative platform where users can create, share, and fork shakuhachi scores.
+**Plan:** See implementation plan in session transcript
 
-## Current Tasks
+## Platform MVP - Current Tasks
 
-### UI Enhancements
+### Phase 1: Supabase Setup & Authentication ✓
+
+- [x] Create Supabase project at supabase.com
+- [x] Configure authentication providers (email + GitHub OAuth)
+- [x] Deploy database schema (scores table + RLS policies)
+- [x] Create .env.local with Supabase credentials
+- [x] Install Supabase client dependencies
+- [x] Implement Supabase client in src/api/supabase.ts
+- [x] Implement auth helpers in src/api/auth.ts
+- [x] Create auth UI components (login/signup forms)
+- [x] Add auth state management (logged in user, session)
+- [x] Test: Sign up, log in, log out
+
+### Phase 2: Score CRUD Operations
+
+- [ ] Implement createScore(scoreData) in src/api/scores.ts
+- [ ] Implement updateScore(id, updates) in src/api/scores.ts
+- [ ] Implement deleteScore(id) in src/api/scores.ts
+- [ ] Implement getScore(id) in src/api/scores.ts
+- [ ] Implement getUserScores(userId) in src/api/scores.ts
+- [ ] Implement getAllScores() in src/api/scores.ts
+- [ ] Implement searchScores(query) in src/api/scores.ts
+- [ ] Add error handling for missing files and network errors
+- [ ] Test CRUD operations in browser console
+- [ ] Verify RLS policies work (can't edit others' scores)
+
+### Phase 3: Score Library Browser
+
+- [ ] Create ScoreLibrary component (grid/list view)
+- [ ] Display title, composer, difficulty, fork count
+- [ ] Implement click to view score details
+- [ ] Add search bar (filter by title/composer)
+- [ ] Add filter by difficulty/tags
+- [ ] Update index.html to use ScoreLibrary
+- [ ] Implement responsive layout (mobile-friendly)
+- [ ] Add loading states and error messages
+- [ ] Test with multiple scores in database
+
+### Phase 4: Score Editor with Live Preview
+
+- [ ] Create ScoreEditor component (textarea for JSON/MusicXML)
+- [ ] Add live preview pane using ScoreRenderer
+- [ ] Implement JSON/MusicXML validation on change
+- [ ] Show validation errors inline
+- [ ] Add auto-save to localStorage (prevent data loss)
+- [ ] Add save to database button
+- [ ] Create editor.html page (two-column layout)
+- [ ] Add toggle between JSON and MusicXML formats
+- [ ] Add import existing score for editing
+- [ ] Add metadata fields (title, composer, etc.)
+- [ ] Implement format validation (parse JSON, parse MusicXML)
+- [ ] Show helpful error messages
+- [ ] Test: Create new score, edit existing, save
+
+### Phase 5: Score Detail View
+
+- [ ] Create score.html page (URL: /score.html?id=<uuid>)
+- [ ] Display score with ScoreRenderer
+- [ ] Show metadata (title, composer, difficulty, description)
+- [ ] Show "Fork" button
+- [ ] Show "Edit" button (if owner)
+- [ ] Show attribution if forked ("Forked from...")
+- [ ] Link to creator's profile
+- [ ] Fetch score from Supabase by ID
+- [ ] Increment view count on load
+- [ ] Handle missing scores (404-like error)
+- [ ] Test: View score, fork, edit (if owner)
+
+### Phase 6: Fork/Remix Functionality
+
+- [ ] Implement forkScore(scoreId) in src/api/scores.ts
+- [ ] Copy score data to new score
+- [ ] Set user_id to current user
+- [ ] Set forked_from to original score ID
+- [ ] Increment fork_count on parent score
+- [ ] Add "(Fork)" or "(Remix)" to title
+- [ ] Create ForkButton component
+- [ ] Show "Fork" button on score view (disabled if user owns score)
+- [ ] On click: fork score, redirect to editor with forked copy
+- [ ] Show fork count
+- [ ] Display fork attribution on score view
+- [ ] Show fork icon in library if score is a fork
+- [ ] Test: Fork score, edit fork, verify independence
+
+### Phase 7: User Profile
+
+- [ ] Create profile.html page (URL: /profile.html?id=<user-id>)
+- [ ] Display user's scores in grid
+- [ ] Show username/email
+- [ ] Link to each score
+- [ ] Add edit/delete buttons (if own profile)
+- [ ] Implement getUserScores(userId) query
+- [ ] Add "My Scores" link in navigation
+- [ ] Test: View own profile, view other user's profile
+
+### Phase 8: Navigation & UI Polish
+
+- [ ] Create site header component (logo, navigation)
+- [ ] Add navigation links: Home | Create Score | My Scores | Profile
+- [ ] Add auth UI: Login/Signup or Username/Logout
+- [ ] Create footer with attribution
+- [ ] Add consistent styling (CSS framework or custom)
+- [ ] Implement responsive design (mobile, tablet, desktop)
+- [ ] Add loading spinners and error states
+- [ ] Polish form validation and error messages
+- [ ] Test across browsers (Chrome, Firefox, Safari)
+
+## Renderer Enhancements (Future)
 
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
-- [ ] Error handling for missing files
-- [ ] User-friendly error messages
-
-### Documentation
-
 - [ ] Add JSDoc comments to public APIs
 - [ ] Write usage guide in references/README.md
 - [ ] Document score data format
-- [ ] Cross-browser testing notes
-
-## Backlog
 
 ### Additional Modifiers
 
-- [ ] Atari marks
 - [ ] YuriModifier (vibrato)
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
@@ -42,27 +139,21 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
   - [ ] Add demerits for orphans (single notes in columns)
   - [ ] Add penalties for breaking at certain notation points
   - [ ] Implement global optimization across score (Knuth-Plass approach)
-  - Prerequisites: Complete all modifiers and annotations first
 
-### Platform Features
+### Advanced Features (Post-MVP)
 
-These are for the future score-sharing platform (post-renderer completion):
-
-- [ ] Score editor web component
-- [ ] Database integration for storing scores
-- [ ] Fork/share functionality
-- [ ] Comments on scores
-- [ ] Audio recording uploads
-- [ ] User authentication system
-- [ ] Score search and discovery
-
-## Future Ideas
-
+- [ ] Visual score editor (point-and-click note entry)
+- [ ] OCR tool (scan physical scores to MusicXML/JSON)
+- [ ] Collections (curated score groups)
+- [ ] Version history (track edits over time)
+- [ ] Comments/discussions on scores
+- [ ] Pull request workflow (suggest changes to others' scores)
+- [ ] Private scores (unlisted or private visibility)
+- [ ] Export/download scores as files
+- [ ] Print optimization (CSS for clean printouts)
+- [ ] Advanced search (filter by tags, difficulty, date ranges)
 - [ ] Multiple score input formats (import from ABC, etc.)
 - [ ] MIDI playback mapping
 - [ ] Western staff intermixing
 - [ ] Custom font support for traditional glyphs
-- [ ] Export to PDF/PNG
-- [ ] Print stylesheet optimization
 - [ ] Score transposition tool
-- [ ] Automatic column breaking algorithm
