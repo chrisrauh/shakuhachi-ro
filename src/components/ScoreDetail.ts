@@ -1,4 +1,4 @@
-import { getScoreBySlug, incrementViewCount } from '../api/scores';
+import { getScoreBySlug, getScore, incrementViewCount } from '../api/scores';
 import { authState } from '../api/authState';
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { renderIcon, initIcons } from '../utils/icons';
@@ -8,6 +8,7 @@ export class ScoreDetail {
   private container: HTMLElement;
   private slug: string;
   private score: Score | null = null;
+  private parentScore: Score | null = null;
   private renderer: ScoreRenderer | null = null;
   private isLoading: boolean = true;
   private error: Error | null = null;
@@ -39,6 +40,14 @@ export class ScoreDetail {
     }
 
     this.score = result.score;
+
+    // Load parent score if this is a fork
+    if (this.score.forked_from) {
+      const parentResult = await getScore(this.score.forked_from);
+      if (!parentResult.error && parentResult.score) {
+        this.parentScore = parentResult.score;
+      }
+    }
 
     // Increment view count (fire and forget)
     incrementViewCount(this.score.id);
@@ -124,6 +133,16 @@ export class ScoreDetail {
             ${this.score.composer ? `
               <p class="score-composer">By ${this.escapeHtml(this.score.composer)}</p>
             ` : ''}
+
+            ${this.parentScore ? `
+              <div class="fork-attribution">
+                ${renderIcon('git-fork')} Forked from <a href="/score.html?slug=${this.parentScore.slug}">${this.escapeHtml(this.parentScore.title)}</a>
+              </div>
+            ` : ''}
+
+            <div class="score-creator">
+              <a href="/profile.html?id=${this.score.user_id}">View creator's profile</a>
+            </div>
 
             <div class="score-meta-tags">
               ${this.score.difficulty ? `
@@ -227,6 +246,49 @@ export class ScoreDetail {
         color: #666;
         font-style: italic;
         margin-bottom: 20px;
+      }
+
+      .fork-attribution {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 15px;
+        background: #f5f5f5;
+        border-left: 3px solid #2196f3;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .fork-attribution svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      .fork-attribution a {
+        color: #2196f3;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .fork-attribution a:hover {
+        text-decoration: underline;
+      }
+
+      .score-creator {
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+      }
+
+      .score-creator a {
+        color: #2196f3;
+        text-decoration: none;
+      }
+
+      .score-creator a:hover {
+        text-decoration: underline;
       }
 
       .score-meta-tags {
