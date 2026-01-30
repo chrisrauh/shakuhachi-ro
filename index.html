@@ -75,7 +75,7 @@
     <div id="display"></div>
 
     <script type="module">
-      import { renderScoreFromURL } from '/src/renderer/convenience';
+      import { renderScoreFromURL } from './src/renderer/convenience';
 
       const display = document.getElementById('display');
 
@@ -98,7 +98,7 @@
         try {
           const renderer = await renderScoreFromURL(
             display,
-            '/data/Akatombo.musicxml',
+            `${import.meta.env.BASE_URL}data/Akatombo.musicxml`,
             {
               showOctaveMarks,
               showDebugLabels,
