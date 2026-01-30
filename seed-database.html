@@ -157,16 +157,24 @@
         log.scrollTop = log.scrollHeight;
       }
 
-      // Check auth status
-      const currentUser = authState.getUser();
-      if (!currentUser) {
-        addLog('❌ Not logged in. Please log in first.', 'error');
-        document.querySelectorAll('button:not([disabled])').forEach(btn => {
-          btn.disabled = true;
-        });
-      } else {
-        addLog(`✓ Logged in as: ${currentUser.email}`, 'success');
-      }
+      addLog('Initializing...', 'info');
+
+      // Wait for auth to initialize by subscribing to auth state
+      authState.subscribe((user) => {
+        if (!user) {
+          addLog('❌ Not logged in. Please log in first.', 'error');
+          addLog('   Go to /library.html or /editor.html to log in', 'info');
+          document.querySelectorAll('button:not([disabled])').forEach(btn => {
+            btn.disabled = true;
+          });
+        } else {
+          addLog(`✓ Logged in as: ${user.email}`, 'success');
+          // Enable buttons
+          document.querySelectorAll('button[id]').forEach(btn => {
+            btn.disabled = false;
+          });
+        }
+      });
 
       // Seed Akatombo
       document.getElementById('seed-akatombo').addEventListener('click', async () => {
