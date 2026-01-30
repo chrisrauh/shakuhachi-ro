@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: './',
-  base: '/shakuhachi-ro/',
+  base: mode === 'production' ? '/shakuhachi-ro/' : '/',
   server: {
     port: 3000,
     open: true,
@@ -12,7 +12,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
+        testMeriKari: './test-meri-kari.html',
+        testMeriSimple: './test-meri-simple.html',
+        testModifierCombinations: './test-modifier-combinations.html',
+        testOctaveMarks: './test-octave-marks.html',
       },
     },
   },
-});
+}));
