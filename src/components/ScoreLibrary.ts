@@ -82,15 +82,9 @@ export class ScoreLibrary {
     this.applyFilters();
   }
 
-  private handleScoreClick(scoreId: string): void {
-    // TODO: Navigate to score detail page when implemented
-    console.log('Score clicked:', scoreId);
-    // For now, just log
-    const score = this.scores.find((s) => s.id === scoreId);
-    if (score) {
-      console.log('Score details:', score);
-      alert(`Score: ${score.title}\nComposer: ${score.composer || 'Unknown'}\n\nScore detail page coming in Phase 5!`);
-    }
+  private handleScoreClick(scoreSlug: string): void {
+    // Navigate to score detail page
+    window.location.href = `/score.html?slug=${scoreSlug}`;
   }
 
   private getDifficultyBadgeColor(difficulty: ScoreDifficulty | null): string {
@@ -233,9 +227,9 @@ export class ScoreLibrary {
     const scoreCards = gridElement.querySelectorAll('.score-card');
     scoreCards.forEach((card) => {
       card.addEventListener('click', () => {
-        const scoreId = card.getAttribute('data-score-id');
-        if (scoreId) {
-          this.handleScoreClick(scoreId);
+        const scoreSlug = card.getAttribute('data-score-slug');
+        if (scoreSlug) {
+          this.handleScoreClick(scoreSlug);
         }
       });
     });
@@ -260,7 +254,7 @@ export class ScoreLibrary {
     const difficultyColor = this.getDifficultyBadgeColor(score.difficulty);
 
     return `
-      <div class="score-card" data-score-id="${score.id}">
+      <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
           <h3 class="score-title">${this.escapeHtml(score.title)}</h3>
           ${score.difficulty ? `
@@ -326,9 +320,9 @@ export class ScoreLibrary {
     const scoreCards = this.container.querySelectorAll('.score-card');
     scoreCards.forEach((card) => {
       card.addEventListener('click', () => {
-        const scoreId = card.getAttribute('data-score-id');
-        if (scoreId) {
-          this.handleScoreClick(scoreId);
+        const scoreSlug = card.getAttribute('data-score-slug');
+        if (scoreSlug) {
+          this.handleScoreClick(scoreSlug);
         }
       });
     });
