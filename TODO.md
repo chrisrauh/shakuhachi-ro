@@ -10,8 +10,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 ## Remaining Tasks
 
 - [ ] Make library.html the landing page (redirect / to /library.html)
-- [x] Parse the "Love Story.jpg" image and generate score data
-- [x] Add Love Story to the database (via seed-database.html)
 
 ### Phase 7: User Profile
 

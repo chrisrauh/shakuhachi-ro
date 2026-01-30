@@ -1,6 +1,7 @@
 import { getScoreBySlug, getScore, incrementViewCount, forkScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
+import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { renderIcon, initIcons } from '../utils/icons';
 import type { Score } from '../api/scores';
 
@@ -63,16 +64,20 @@ export class ScoreDetail {
     if (!scoreContainer) return;
 
     try {
+      this.renderer = new ScoreRenderer(scoreContainer as HTMLElement, {
+        showDebugLabels: false
+      });
+
       if (this.score.data_format === 'json') {
-        this.renderer = new ScoreRenderer(scoreContainer as HTMLElement, {
-          showDebugLabels: false
-        });
         await this.renderer.renderFromScoreData(this.score.data);
+      } else if (this.score.data_format === 'musicxml') {
+        // Parse MusicXML string to ScoreData
+        const scoreData = MusicXMLParser.parse(this.score.data);
+        await this.renderer.renderFromScoreData(scoreData);
       } else {
-        // MusicXML rendering placeholder
         scoreContainer.innerHTML = `
           <div style="text-align: center; padding: 40px;">
-            <p>MusicXML rendering will be implemented soon</p>
+            <p>Unsupported format: ${this.score.data_format}</p>
           </div>
         `;
       }
