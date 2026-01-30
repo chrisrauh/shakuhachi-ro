@@ -99,8 +99,8 @@
     <div id="display"></div>
 
     <script type="module">
-      import { ScoreParser } from '/src/parser/ScoreParser';
-      import { SVGRenderer } from '/src/renderer/SVGRenderer';
+      import { ScoreParser } from './src/parser/ScoreParser';
+      import { SVGRenderer } from './src/renderer/SVGRenderer';
 
       const display = document.getElementById('display');
 
@@ -117,7 +117,7 @@
           console.log('Loading modifier combinations test...');
 
           // Load test score
-          const response = await fetch('/data/test-modifier-combinations.json');
+          const response = await fetch(`${import.meta.env.BASE_URL}data/test-modifier-combinations.json`);
           if (!response.ok) {
             throw new Error(`Failed to load: ${response.statusText}`);
           }
