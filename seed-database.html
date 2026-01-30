@@ -128,9 +128,10 @@
 
       <div class="score-item">
         <h3>📜 Love Story</h3>
-        <p><strong>Status:</strong> Needs to be parsed from image first</p>
-        <p><strong>Note:</strong> The Love Story score will need OCR or manual transcription from the JPG image.</p>
-        <button disabled>Parse & Add Love Story (Coming Soon)</button>
+        <p><strong>Composer:</strong> Unknown</p>
+        <p><strong>Difficulty:</strong> Intermediate</p>
+        <p><strong>Description:</strong> Transcribed from handwritten shakuhachi notation. Features octave marks, meri modifiers, and accidentals.</p>
+        <button id="seed-love-story">Add Love Story to Database</button>
       </div>
 
       <div class="score-item">
@@ -216,6 +217,49 @@
         } finally {
           btn.disabled = false;
           btn.textContent = 'Add Akatombo to Database';
+        }
+      });
+
+      // Seed Love Story
+      document.getElementById('seed-love-story').addEventListener('click', async () => {
+        const btn = document.getElementById('seed-love-story');
+        btn.disabled = true;
+        btn.textContent = 'Adding...';
+
+        addLog('Fetching Love Story JSON file...', 'info');
+
+        try {
+          const response = await fetch('/data/love-story.json');
+          if (!response.ok) {
+            throw new Error('Failed to fetch love-story.json');
+          }
+
+          const loveStoryData = await response.json();
+          addLog('✓ love-story.json loaded', 'success');
+
+          addLog('Creating score in database...', 'info');
+          const result = await createScore({
+            title: 'Love Story',
+            composer: 'Unknown',
+            difficulty: 'intermediate',
+            tags: ['transcribed', 'handwritten', 'romantic'],
+            description: 'Transcribed from handwritten shakuhachi notation. Features octave marks, meri modifiers, and accidentals for expressive performance.',
+            data_format: 'json',
+            data: loveStoryData
+          });
+
+          if (result.error) {
+            addLog(`❌ Error: ${result.error.message}`, 'error');
+          } else {
+            addLog(`✓ Love Story added successfully!`, 'success');
+            addLog(`   Slug: ${result.score.slug}`, 'info');
+            addLog(`   URL: /score.html?slug=${result.score.slug}`, 'info');
+          }
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Add Love Story to Database';
         }
       });
 
