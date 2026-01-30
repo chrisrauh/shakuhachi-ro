@@ -7,27 +7,11 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-## score page
+## Remaining Tasks
 
-- [ ] score should render on the page
-
-### Scores in Database
-
+- [ ] Make library.html the landing page (redirect / to /library.html)
 - [ ] Parse the "Love Story.jpg" image and generate score data (requires OCR or manual transcription)
 - [ ] Add Love Story to the database (blocked by parsing task)
-- [ ] the landign page should be the library page
-
-### Phase 6: Fork/Remix Functionality ✅ COMPLETE
-
-- [x] Implement forkScore(scoreId) in src/api/scores.ts
-- [x] Copy score data to new score
-- [x] Set user_id to current user
-- [x] Set forked_from to original score ID
-- [x] Increment fork_count on parent score
-- [x] Wire up Fork button on score detail page
-- [x] On click: fork score, redirect to editor with forked copy
-- [x] Show fork icon in library if score is a fork
-- [x] Test: Fork score, edit fork, verify independence
 
 ### Phase 7: User Profile
 
