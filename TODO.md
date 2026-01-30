@@ -7,18 +7,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-### Phase 3: Score Library Browser ✓
-
-- [x] Create ScoreLibrary component (grid/list view)
-- [x] Display title, composer, difficulty, fork count
-- [x] Implement click to view score details
-- [x] Add search bar (filter by title/composer)
-- [x] Add filter by difficulty/tags
-- [x] Update index.html to use ScoreLibrary
-- [x] Implement responsive layout (mobile-friendly)
-- [x] Add loading states and error messages
-- [x] Test with multiple scores in database
-
 ### Phase 4: Score Editor with Live Preview
 
 - [ ] Create ScoreEditor component (textarea for JSON/MusicXML)
