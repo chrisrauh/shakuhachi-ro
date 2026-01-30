@@ -1,5 +1,6 @@
 import { getAllScores, searchScores } from '../api/scores';
 import type { Score, ScoreDifficulty } from '../api/scores';
+import { renderIcon, icons } from '../utils/icons';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -282,9 +283,9 @@ export class ScoreLibrary {
         </div>
 
         <div class="score-card-footer">
-          <span class="score-stat" title="Fork count">🍴 ${score.fork_count}</span>
-          <span class="score-stat" title="View count">👁 ${score.view_count}</span>
-          <span class="score-stat" title="Created date">${this.formatDate(score.created_at)}</span>
+          <span class="score-stat" title="Fork count">${renderIcon(icons.fork, 14)} ${score.fork_count}</span>
+          <span class="score-stat" title="View count">${renderIcon(icons.eye, 14)} ${score.view_count}</span>
+          <span class="score-stat" title="Created date">${renderIcon(icons.calendar, 14)} ${this.formatDate(score.created_at)}</span>
         </div>
       </div>
     `;
@@ -546,6 +547,10 @@ export class ScoreLibrary {
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+
+      .score-stat svg {
+        flex-shrink: 0;
       }
 
       .no-scores {

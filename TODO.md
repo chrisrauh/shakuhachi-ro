@@ -7,6 +7,8 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
+- [ ] Use lucide icons instead of emojis (keep flute emoji as site logo and favicon)
+
 ### Phase 5: Score Detail View
 
 - [ ] Create score.html page (URL: /score.html?id=<uuid>)
