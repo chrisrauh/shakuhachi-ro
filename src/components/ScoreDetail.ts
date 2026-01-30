@@ -167,9 +167,8 @@ export class ScoreDetail {
           <div class="score-detail-actions">
             ${isOwner ? `
               <a href="/editor.html?id=${this.score.id}" class="btn btn-primary">Edit Score</a>
-            ` : `
-              <button id="fork-btn" class="btn btn-primary">Fork Score</button>
-            `}
+            ` : ''}
+            <button id="fork-btn" class="btn ${isOwner ? 'btn-secondary' : 'btn-primary'}">Fork Score</button>
             <a href="/library.html" class="btn btn-secondary">Back to Library</a>
           </div>
         </div>
