@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seed Database - Shakuhachi Score Library</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #fafafa;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .warning {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+        color: #856404;
+      }
+
+      .score-item {
+        border: 1px solid #e0e0e0;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+
+      .score-item h3 {
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .score-item p {
+        color: #666;
+        line-height: 1.6;
+        margin: 5px 0;
+      }
+
+      button {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background: #1976d2;
+      }
+
+      button:disabled {
+        background: #bdbdbd;
+        cursor: not-allowed;
+      }
+
+      .log {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 0.9rem;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .log-entry {
+        margin: 5px 0;
+        padding: 5px;
+      }
+
+      .log-success {
+        color: #4caf50;
+      }
+
+      .log-error {
+        color: #f44336;
+      }
+
+      .log-info {
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌱 Seed Database</h1>
+      <p style="color: #666; margin-bottom: 20px;">
+        Add initial scores to the database
+      </p>
+
+      <div class="warning">
+        <strong>⚠️ Important:</strong> You must be logged in to seed scores. Make sure you've run the database migration for the slug field first.
+      </div>
+
+      <div class="score-item">
+        <h3>📜 Akatombo (赤とんぼ)</h3>
+        <p><strong>Composer:</strong> Traditional</p>
+        <p><strong>Difficulty:</strong> Beginner</p>
+        <p><strong>Description:</strong> A beloved Japanese folk song about red dragonflies. Perfect for beginners learning shakuhachi notation.</p>
+        <button id="seed-akatombo">Add Akatombo to Database</button>
+      </div>
+
+      <div class="score-item">
+        <h3>📜 Love Story</h3>
+        <p><strong>Status:</strong> Needs to be parsed from image first</p>
+        <p><strong>Note:</strong> The Love Story score will need OCR or manual transcription from the JPG image.</p>
+        <button disabled>Parse & Add Love Story (Coming Soon)</button>
+      </div>
+
+      <div class="score-item">
+        <h3>🧹 Database Cleanup</h3>
+        <p>Remove test entries from the database</p>
+        <button id="cleanup-db">Clean Up Test Entries</button>
+      </div>
+
+      <h2 style="margin-top: 40px; margin-bottom: 10px;">Log</h2>
+      <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+      import { createScore, getAllScores, deleteScore } from './src/api/scores';
+      import { authState } from './src/api/authState';
+
+      const log = document.getElementById('log');
+
+      function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        log.appendChild(entry);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      // Check auth status
+      const currentUser = authState.getCurrentUser();
+      if (!currentUser) {
+        addLog('❌ Not logged in. Please log in first.', 'error');
+        document.querySelectorAll('button:not([disabled])').forEach(btn => {
+          btn.disabled = true;
+        });
+      } else {
+        addLog(`✓ Logged in as: ${currentUser.email}`, 'success');
+      }
+
+      // Seed Akatombo
+      document.getElementById('seed-akatombo').addEventListener('click', async () => {
+        const btn = document.getElementById('seed-akatombo');
+        btn.disabled = true;
+        btn.textContent = 'Adding...';
+
+        addLog('Fetching Akatombo MusicXML file...', 'info');
+
+        try {
+          const response = await fetch('/data/Akatombo.musicxml');
+          if (!response.ok) {
+            throw new Error('Failed to fetch Akatombo.musicxml');
+          }
+
+          const akatomboXML = await response.text();
+          addLog('✓ Akatombo.musicxml loaded', 'success');
+
+          addLog('Creating score in database...', 'info');
+          const result = await createScore({
+            title: 'Akatombo',
+            composer: 'Traditional',
+            difficulty: 'beginner',
+            tags: ['traditional', 'folk', 'beginner-friendly', 'japanese'],
+            description: 'A beloved Japanese folk song about red dragonflies (赤とんぼ). This piece is perfect for beginners learning shakuhachi notation and features a simple, memorable melody.',
+            data_format: 'musicxml',
+            data: akatomboXML
+          });
+
+          if (result.error) {
+            addLog(`❌ Error: ${result.error.message}`, 'error');
+          } else {
+            addLog(`✓ Akatombo added successfully!`, 'success');
+            addLog(`   Slug: ${result.score.slug}`, 'info');
+            addLog(`   URL: /score.html?slug=${result.score.slug}`, 'info');
+          }
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Add Akatombo to Database';
+        }
+      });
+
+      // Cleanup database
+      document.getElementById('cleanup-db').addEventListener('click', async () => {
+        const btn = document.getElementById('cleanup-db');
+        btn.disabled = true;
+        btn.textContent = 'Cleaning...';
+
+        addLog('Fetching all scores...', 'info');
+
+        try {
+          const result = await getAllScores();
+
+          if (result.error) {
+            addLog(`❌ Error fetching scores: ${result.error.message}`, 'error');
+            return;
+          }
+
+          const scores = result.scores;
+          addLog(`Found ${scores.length} scores`, 'info');
+
+          // Filter for test scores (you can adjust the logic here)
+          const testScores = scores.filter(score =>
+            score.title.toLowerCase().includes('test') ||
+            score.title.toLowerCase().includes('example') ||
+            score.title.toLowerCase().includes('sample')
+          );
+
+          if (testScores.length === 0) {
+            addLog('No test entries found', 'info');
+            return;
+          }
+
+          addLog(`Found ${testScores.length} test entries to delete`, 'info');
+
+          for (const score of testScores) {
+            addLog(`Deleting: ${score.title} (${score.slug})...`, 'info');
+            const deleteResult = await deleteScore(score.id);
+
+            if (deleteResult.error) {
+              addLog(`❌ Failed to delete ${score.title}: ${deleteResult.error.message}`, 'error');
+            } else {
+              addLog(`✓ Deleted: ${score.title}`, 'success');
+            }
+          }
+
+          addLog('✓ Cleanup complete!', 'success');
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Clean Up Test Entries';
+        }
+      });
+    </script>
+  </body>
+</html>

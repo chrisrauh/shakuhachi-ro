@@ -7,7 +7,13 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
+### score in databases
+
 - [] create unique urls for the scores. Each score page would have a unique slug based on its name. So for akatombo, the url would be shaskuhachi.com/score/akatombo
+- [ ] storea akatombo in the database
+- [ ] parse the "Love Story.jpg" image and generate a score data
+- [ ] add Love Story to the database
+- [ ] clearnup test entries from the database
 
 ### Phase 5: Score Detail View
 
