@@ -1,6 +1,7 @@
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
 import { authState } from '../api/authState';
+import { renderIcon, initIcons } from '../utils/icons';
 import type { Score, ScoreDifficulty, ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -415,8 +416,9 @@ export class ScoreEditor {
     const validationDiv = this.container.querySelector('#validation-error');
     if (validationDiv) {
       if (this.validationError) {
-        validationDiv.textContent = `⚠️ ${this.validationError}`;
+        validationDiv.innerHTML = `${renderIcon('alert-circle')} ${this.validationError}`;
         validationDiv.classList.add('show');
+        initIcons();
       } else {
         validationDiv.textContent = '';
         validationDiv.classList.remove('show');
@@ -654,8 +656,17 @@ export class ScoreEditor {
       }
 
       .validation-error.show {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         padding: 10px 20px;
         max-height: 100px;
+      }
+
+      .validation-error svg {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
       }
 
       #score-data-input {

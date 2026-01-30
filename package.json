@@ -21,7 +21,8 @@
     "screenshot": "node scripts/screenshot.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "lucide": "^0.562.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
