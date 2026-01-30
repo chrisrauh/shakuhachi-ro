@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { getCurrentUser } from './auth';
+import { generateSlug, ensureUniqueSlug } from '../utils/slug';
 
 export type ScoreDifficulty = 'beginner' | 'intermediate' | 'advanced';
 export type ScoreDataFormat = 'musicxml' | 'json';
@@ -8,6 +9,7 @@ export interface Score {
   id: string;
   user_id: string;
   title: string;
+  slug: string;
   composer: string | null;
   difficulty: ScoreDifficulty | null;
   tags: string[];
@@ -68,11 +70,24 @@ export async function createScore(
       };
     }
 
+    // Generate slug from title
+    const baseSlug = generateSlug(scoreData.title);
+
+    // Get existing slugs to ensure uniqueness
+    const { data: existingScores } = await supabase
+      .from('scores')
+      .select('slug')
+      .ilike('slug', `${baseSlug}%`);
+
+    const existingSlugs = existingScores?.map((s) => s.slug) || [];
+    const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+
     const { data, error } = await supabase
       .from('scores')
       .insert({
         user_id: user.id,
         title: scoreData.title,
+        slug: uniqueSlug,
         composer: scoreData.composer || null,
         difficulty: scoreData.difficulty || null,
         tags: scoreData.tags || [],
@@ -198,6 +213,40 @@ export async function getScore(id: string): Promise<ScoreResult> {
       .from('scores')
       .select('*')
       .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return {
+          score: null,
+          error: new Error('Score not found')
+        };
+      }
+      return {
+        score: null,
+        error: new Error(`Failed to fetch score: ${error.message}`)
+      };
+    }
+
+    return { score: data, error: null };
+  } catch (error) {
+    return {
+      score: null,
+      error:
+        error instanceof Error ? error : new Error('Unknown error fetching score')
+    };
+  }
+}
+
+/**
+ * Get a single score by slug
+ */
+export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
+  try {
+    const { data, error } = await supabase
+      .from('scores')
+      .select('*')
+      .eq('slug', slug)
       .single();
 
     if (error) {

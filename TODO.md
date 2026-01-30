@@ -7,6 +7,8 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
+- [] create unique urls for the scores. Each score page would have a unique slug based on its name. So for akatombo, the url would be shaskuhachi.com/score/akatombo
+
 ### Phase 5: Score Detail View
 
 - [ ] Create score.html page (URL: /score.html?id=<uuid>)
