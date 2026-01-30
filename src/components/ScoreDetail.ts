@@ -113,7 +113,7 @@ export class ScoreDetail {
       return;
     }
 
-    const currentUser = authState.getCurrentUser();
+    const currentUser = authState.getUser();
     const isOwner = currentUser && currentUser.id === this.score.user_id;
 
     this.container.innerHTML = `

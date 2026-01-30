@@ -158,7 +158,7 @@
       }
 
       // Check auth status
-      const currentUser = authState.getCurrentUser();
+      const currentUser = authState.getUser();
       if (!currentUser) {
         addLog('❌ Not logged in. Please log in first.', 'error');
         document.querySelectorAll('button:not([disabled])').forEach(btn => {
