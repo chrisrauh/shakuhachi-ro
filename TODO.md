@@ -7,18 +7,18 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-### Phase 2: Score CRUD Operations
+### Phase 2: Score CRUD Operations ✓
 
-- [ ] Implement createScore(scoreData) in src/api/scores.ts
-- [ ] Implement updateScore(id, updates) in src/api/scores.ts
-- [ ] Implement deleteScore(id) in src/api/scores.ts
-- [ ] Implement getScore(id) in src/api/scores.ts
-- [ ] Implement getUserScores(userId) in src/api/scores.ts
-- [ ] Implement getAllScores() in src/api/scores.ts
-- [ ] Implement searchScores(query) in src/api/scores.ts
-- [ ] Add error handling for missing files and network errors
-- [ ] Test CRUD operations in browser console
-- [ ] Verify RLS policies work (can't edit others' scores)
+- [x] Implement createScore(scoreData) in src/api/scores.ts
+- [x] Implement updateScore(id, updates) in src/api/scores.ts
+- [x] Implement deleteScore(id) in src/api/scores.ts
+- [x] Implement getScore(id) in src/api/scores.ts
+- [x] Implement getUserScores(userId) in src/api/scores.ts
+- [x] Implement getAllScores() in src/api/scores.ts
+- [x] Implement searchScores(query) in src/api/scores.ts
+- [x] Add error handling for missing files and network errors
+- [x] Test CRUD operations in browser console
+- [x] Verify RLS policies work (can't edit others' scores)
 
 ### Phase 3: Score Library Browser
 
