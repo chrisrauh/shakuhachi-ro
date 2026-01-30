@@ -1,5 +1,6 @@
 import { getAllScores, searchScores } from '../api/scores';
 import type { Score, ScoreDifficulty } from '../api/scores';
+import { renderIcon, initIcons } from '../utils/icons';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -199,6 +200,7 @@ export class ScoreLibrary {
 
     this.addStyles();
     this.attachEventListeners();
+    initIcons();
   }
 
   private renderGrid(): void {
@@ -223,6 +225,9 @@ export class ScoreLibrary {
         ` : ''}
       </div>
     ` : this.filteredScores.map((score) => this.renderScoreCard(score)).join('');
+
+    // Initialize icons
+    initIcons();
 
     // Reattach score card listeners
     const scoreCards = gridElement.querySelectorAll('.score-card');
@@ -282,9 +287,9 @@ export class ScoreLibrary {
         </div>
 
         <div class="score-card-footer">
-          <span class="score-stat" title="Fork count">🍴 ${score.fork_count}</span>
-          <span class="score-stat" title="View count">👁 ${score.view_count}</span>
-          <span class="score-stat" title="Created date">${this.formatDate(score.created_at)}</span>
+          <span class="score-stat" title="Fork count">${renderIcon('git-fork')} ${score.fork_count}</span>
+          <span class="score-stat" title="View count">${renderIcon('eye')} ${score.view_count}</span>
+          <span class="score-stat" title="Created date">${renderIcon('calendar')} ${this.formatDate(score.created_at)}</span>
         </div>
       </div>
     `;
@@ -546,6 +551,12 @@ export class ScoreLibrary {
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+
+      .score-stat svg {
+        flex-shrink: 0;
+        width: 14px;
+        height: 14px;
       }
 
       .no-scores {
