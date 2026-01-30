@@ -15,15 +15,15 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [ ] Add Love Story to the database (blocked by parsing task)
 - [x] Cleanup test entries from the database (tool created in seed-database.html)
 
-### Phase 5: Score Detail View
+### Phase 5: Score Detail View ✅ COMPLETE
 
 - [x] Create score.html page (URL: /score.html?slug=<slug>)
 - [x] Display score with ScoreRenderer
 - [x] Show metadata (title, composer, difficulty, description)
 - [x] Show "Fork" button
 - [x] Show "Edit" button (if owner)
-- [ ] Show attribution if forked ("Forked from...")
-- [ ] Link to creator's profile
+- [x] Show attribution if forked ("Forked from...")
+- [x] Link to creator's profile
 - [x] Fetch score from Supabase by slug
 - [x] Increment view count on load
 - [x] Handle missing scores (404-like error)
