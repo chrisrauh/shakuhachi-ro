@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => ({
   root: './',
-  base: mode === 'production' ? '/shakuhachi-ro/' : '/',
+  base: '/',
   server: {
     port: 3000,
     open: true,
