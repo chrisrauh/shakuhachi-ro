@@ -8,10 +8,6 @@ This file tracks active tasks for completing the shakuhachi score renderer proje
 
 ## Current Tasks
 
-### Deployment
-
-- [x] Set up GitHub Pages deployment with GitHub Actions
-
 ### UI Enhancements
 
 - [ ] Add score selector dropdown
