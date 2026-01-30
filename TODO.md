@@ -7,19 +7,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-### Phase 1: Supabase Setup & Authentication ✓
-
-- [x] Create Supabase project at supabase.com
-- [x] Configure authentication providers (email + GitHub OAuth)
-- [x] Deploy database schema (scores table + RLS policies)
-- [x] Create .env.local with Supabase credentials
-- [x] Install Supabase client dependencies
-- [x] Implement Supabase client in src/api/supabase.ts
-- [x] Implement auth helpers in src/api/auth.ts
-- [x] Create auth UI components (login/signup forms)
-- [x] Add auth state management (logged in user, session)
-- [x] Test: Sign up, log in, log out
-
 ### Phase 2: Score CRUD Operations
 
 - [ ] Implement createScore(scoreData) in src/api/scores.ts
