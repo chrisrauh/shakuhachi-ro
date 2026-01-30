@@ -256,7 +256,10 @@ export class ScoreLibrary {
     return `
       <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
-          <h3 class="score-title">${this.escapeHtml(score.title)}</h3>
+          <h3 class="score-title">
+            ${score.forked_from ? `<span class="forked-indicator" title="This is a forked score">${renderIcon('git-fork')}</span>` : ''}
+            ${this.escapeHtml(score.title)}
+          </h3>
           ${score.difficulty ? `
             <span class="difficulty-badge" style="background-color: ${difficultyColor}">
               ${score.difficulty}
@@ -484,6 +487,20 @@ export class ScoreLibrary {
         margin: 0;
         color: #333;
         flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .forked-indicator {
+        display: inline-flex;
+        align-items: center;
+        color: #2196f3;
+      }
+
+      .forked-indicator svg {
+        width: 16px;
+        height: 16px;
       }
 
       .difficulty-badge {
