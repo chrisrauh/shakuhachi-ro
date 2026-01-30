@@ -12,6 +12,11 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       input: {
         main: './index.html',
+        library: './library.html',
+        editor: './editor.html',
+        score: './score.html',
+        seedDatabase: './seed-database.html',
+        testCrud: './test-crud.html',
         testMeriKari: './test-meri-kari.html',
         testMeriSimple: './test-meri-simple.html',
         testModifierCombinations: './test-modifier-combinations.html',
