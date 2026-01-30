@@ -7,22 +7,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
-### Phase 4: Score Editor with Live Preview
-
-- [x] Create ScoreEditor component (textarea for JSON/MusicXML)
-- [x] Add live preview pane using ScoreRenderer
-- [x] Implement JSON/MusicXML validation on change
-- [x] Show validation errors inline
-- [x] Add auto-save to localStorage (prevent data loss)
-- [x] Add save to database button
-- [x] Create editor.html page (two-column layout)
-- [x] Add toggle between JSON and MusicXML formats
-- [x] Add import existing score for editing
-- [x] Add metadata fields (title, composer, etc.)
-- [x] Implement format validation (parse JSON, parse MusicXML)
-- [x] Show helpful error messages
-- [ ] Test: Create new score, edit existing, save
-
 ### Phase 5: Score Detail View
 
 - [ ] Create score.html page (URL: /score.html?id=<uuid>)
