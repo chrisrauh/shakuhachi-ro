@@ -56,7 +56,7 @@ export class ScoreDetail {
     this.renderScore();
   }
 
-  private renderScore(): void {
+  private async renderScore(): Promise<void> {
     if (!this.score) return;
 
     const scoreContainer = this.container.querySelector('#score-renderer');
@@ -67,7 +67,7 @@ export class ScoreDetail {
         this.renderer = new ScoreRenderer(scoreContainer as HTMLElement, {
           showDebugLabels: false
         });
-        this.renderer.renderFromData(this.score.data);
+        await this.renderer.renderFromScoreData(this.score.data);
       } else {
         // MusicXML rendering placeholder
         scoreContainer.innerHTML = `
