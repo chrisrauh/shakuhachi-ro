@@ -7,10 +7,15 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Platform MVP - Current Tasks
 
+## score page
+
+- [ ] score should render on the page
+
 ### Scores in Database
 
 - [ ] Parse the "Love Story.jpg" image and generate score data (requires OCR or manual transcription)
 - [ ] Add Love Story to the database (blocked by parsing task)
+- [ ] the landign page should be the library page
 
 ### Phase 6: Fork/Remix Functionality
 

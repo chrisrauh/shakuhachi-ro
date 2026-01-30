@@ -2,7 +2,7 @@ import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { renderIcon, initIcons } from '../utils/icons';
-import type { Score, ScoreDifficulty, ScoreDataFormat } from '../api/scores';
+import type { ScoreDifficulty, ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
   title: string;
@@ -23,7 +23,6 @@ export class ScoreEditor {
     tags: [],
     description: ''
   };
-  private renderer: ScoreRenderer | null = null;
   private validationError: string | null = null;
   private isEditing: boolean = false;
   private editingScoreId: string | null = null;
@@ -190,7 +189,7 @@ export class ScoreEditor {
 
       if (this.dataFormat === 'json') {
         const data = JSON.parse(this.scoreData);
-        this.renderer = new ScoreRenderer(scorePreview, data);
+        new ScoreRenderer(scorePreview, data);
       } else {
         // For MusicXML, we'd need to parse it properly
         // For now, show a placeholder
@@ -402,14 +401,6 @@ export class ScoreEditor {
         </div>
       </div>
     `;
-  }
-
-  private renderMetadata(): void {
-    const metadataContainer = this.container.querySelector('#editor-metadata');
-    if (metadataContainer) {
-      metadataContainer.innerHTML = this.renderMetadataHTML();
-      this.attachMetadataListeners();
-    }
   }
 
   private renderValidation(): void {

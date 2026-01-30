@@ -1,4 +1,4 @@
-import { getAllScores, searchScores } from '../api/scores';
+import { getAllScores } from '../api/scores';
 import type { Score, ScoreDifficulty } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
 
