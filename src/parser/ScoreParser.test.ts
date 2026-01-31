@@ -32,9 +32,9 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-          { pitch: { step: 'tsu', octave: 1 }, duration: 1 },
-          { pitch: { step: 'tsu', octave: 2 }, duration: 1 }
+          { pitch: { step: 'tsu', octave: 0 }, duration: 4 },  // Use whole notes (no duration lines)
+          { pitch: { step: 'tsu', octave: 1 }, duration: 4 },
+          { pitch: { step: 'tsu', octave: 2 }, duration: 4 }
         ]
       };
 
@@ -42,7 +42,7 @@ describe('ScoreParser', () => {
 
       expect(notes).toHaveLength(3);
 
-      // Otsu - no modifiers
+      // Otsu - no modifiers (whole notes don't get duration lines)
       expect(notes[0].getModifiers()).toHaveLength(0);
 
       // Kan - 1 octave dot
@@ -57,7 +57,7 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: 1, meri: true }
+          { pitch: { step: 'ro', octave: 0 }, duration: 4, meri: true }  // Use whole note
         ]
       };
 
@@ -72,7 +72,7 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'chi', octave: 1 }, duration: 1, meri: true }
+          { pitch: { step: 'chi', octave: 1 }, duration: 4, meri: true }  // Use whole note
         ]
       };
 
@@ -179,14 +179,14 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'chi', octave: 1 }, duration: 1, meri: true, dotted: true }
+          { pitch: { step: 'chi', octave: 1 }, duration: 4, meri: true, dotted: true }  // Use whole note
         ]
       };
 
       const notes = ScoreParser.parse(scoreData);
 
       expect(notes).toHaveLength(1);
-      // Should have octave, meri, and duration dot modifiers
+      // Should have octave, meri, and duration dot modifiers (no duration lines for whole notes)
       expect(notes[0].getModifiers()).toHaveLength(3);
     });
   });
@@ -354,6 +354,74 @@ describe('ScoreParser', () => {
       // Should not throw
       const notes = ScoreParser.parse(scoreData);
       expect(notes).toHaveLength(1);
+    });
+  });
+
+  describe('duration line modifiers', () => {
+    it('should add duration lines based on note duration', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 4 },  // Whole note: 0 lines
+          { pitch: { step: 'tsu', octave: 0 }, duration: 2 }, // Half note: 1 line
+          { pitch: { step: 're', octave: 0 }, duration: 1 },  // Quarter note: 2 lines
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(3);
+
+      // Whole note should have NO duration lines
+      const wholeNoteModifiers = notes[0].getModifiers();
+      const wholeDurationLines = wholeNoteModifiers.filter(
+        (m) => m.constructor.name === 'DurationLineModifier'
+      );
+      expect(wholeDurationLines).toHaveLength(0);
+
+      // Half note should have 1 duration line
+      const halfNoteModifiers = notes[1].getModifiers();
+      const halfDurationLines = halfNoteModifiers.filter(
+        (m) => m.constructor.name === 'DurationLineModifier'
+      );
+      expect(halfDurationLines).toHaveLength(1);
+
+      // Quarter note should have 1 duration line modifier with 2 lines
+      const quarterNoteModifiers = notes[2].getModifiers();
+      const quarterDurationLines = quarterNoteModifiers.filter(
+        (m) => m.constructor.name === 'DurationLineModifier'
+      );
+      expect(quarterDurationLines).toHaveLength(1);
+    });
+
+    it('should add duration lines to rest notes', () => {
+      const scoreData: ScoreData = {
+        title: 'Test Score',
+        style: 'kinko',
+        notes: [
+          { rest: true, duration: 2 },  // Half rest: 1 line
+          { rest: true, duration: 1 },  // Quarter rest: 2 lines
+        ]
+      };
+
+      const notes = ScoreParser.parse(scoreData);
+
+      expect(notes).toHaveLength(2);
+
+      // Half rest should have duration lines
+      const halfRestModifiers = notes[0].getModifiers();
+      const halfDurationLines = halfRestModifiers.filter(
+        (m) => m.constructor.name === 'DurationLineModifier'
+      );
+      expect(halfDurationLines).toHaveLength(1);
+
+      // Quarter rest should have duration lines
+      const quarterRestModifiers = notes[1].getModifiers();
+      const quarterDurationLines = quarterRestModifiers.filter(
+        (m) => m.constructor.name === 'DurationLineModifier'
+      );
+      expect(quarterDurationLines).toHaveLength(1);
     });
   });
 
