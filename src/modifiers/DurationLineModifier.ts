@@ -1,5 +1,5 @@
 /**
- * DurationLineModifier - Horizontal duration lines for shakuhachi notation
+ * DurationLineModifier - Vertical duration lines for shakuhachi notation
  *
  * In Kinko shakuhachi notation, short vertical lines positioned to the right
  * of notes indicate note duration:
@@ -59,7 +59,7 @@ export class DurationLineModifier extends Modifier {
   }
 
   /**
-   * Renders the duration lines
+   * Renders the duration lines (vertical lines to the right of notes)
    *
    * @param renderer - SVGRenderer instance
    * @param noteX - X coordinate of the note center
@@ -69,14 +69,14 @@ export class DurationLineModifier extends Modifier {
     const startX = noteX + this.offsetX;
     const startY = noteY + this.offsetY;
 
-    // Draw each line
+    // Draw each vertical line, spaced horizontally
     for (let i = 0; i < this.lineCount; i++) {
-      const lineY = startY + (i * this.lineSpacing);
+      const lineX = startX + (i * this.lineSpacing);
       renderer.drawLine(
-        startX,
-        lineY,
-        startX + this.lineLength,
-        lineY,
+        lineX,
+        startY,
+        lineX,
+        startY + this.lineLength,
         this.color,
         this.lineWidth
       );
@@ -119,15 +119,15 @@ export class DurationLineModifier extends Modifier {
    * Gets the width occupied by this modifier
    */
   getWidth(): number {
-    return this.lineLength;
+    if (this.lineCount === 0) return 0;
+    return this.lineWidth + ((this.lineCount - 1) * this.lineSpacing);
   }
 
   /**
    * Gets the height occupied by this modifier
    */
   getHeight(): number {
-    if (this.lineCount === 0) return 0;
-    return this.lineWidth + ((this.lineCount - 1) * this.lineSpacing);
+    return this.lineLength;
   }
 
   /**
