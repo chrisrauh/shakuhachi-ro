@@ -55,7 +55,7 @@ After running the migration, add the Akatombo score to the database.
 ## Step 3: Verify Everything Works
 
 1. **Test the library page**
-   - Go to `/library.html`
+   - Go to `/` (or `/index.html`)
    - You should see Akatombo listed
 
 2. **Test the score detail page**

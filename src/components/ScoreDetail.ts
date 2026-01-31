@@ -120,7 +120,7 @@ export class ScoreDetail {
         <div class="score-detail-error">
           <h2>Score Not Found</h2>
           <p>${this.error?.message || 'The score you are looking for does not exist.'}</p>
-          <a href="/library.html" class="btn btn-primary">Browse All Scores</a>
+          <a href="/" class="btn btn-primary">Browse All Scores</a>
         </div>
       `;
       this.addStyles();
@@ -174,7 +174,7 @@ export class ScoreDetail {
               <a href="/editor.html?id=${this.score.id}" class="btn btn-primary">Edit Score</a>
             ` : ''}
             <button id="fork-btn" class="btn ${isOwner ? 'btn-secondary' : 'btn-primary'}">Fork Score</button>
-            <a href="/library.html" class="btn btn-secondary">Back to Library</a>
+            <a href="/" class="btn btn-secondary">Back to Library</a>
           </div>
         </div>
 
