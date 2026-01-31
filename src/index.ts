@@ -40,6 +40,7 @@ export type { MeriKariType } from './modifiers/MeriKariModifier';
 export { AtariModifier } from './modifiers/AtariModifier';
 export type { AtariStyle } from './modifiers/AtariModifier';
 export { DurationDotModifier } from './modifiers/DurationDotModifier';
+export { DurationLineModifier } from './modifiers/DurationLineModifier';
 
 // Data exports
 export {

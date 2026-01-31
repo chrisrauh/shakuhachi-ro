@@ -11,6 +11,7 @@ import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import type { ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../data/mappings';
 
@@ -33,6 +34,23 @@ function mapDuration(duration: number): NoteDuration {
     default:
       return 'q'; // Default to quarter note
   }
+}
+
+/**
+ * Maps numeric duration to number of horizontal duration lines
+ *
+ * In shakuhachi notation, shorter notes have more lines:
+ * - Whole note (4): 0 lines
+ * - Half note (2): 1 line
+ * - Quarter note (1): 2 lines
+ * - Eighth note (0.5): 3 lines
+ */
+function getDurationLineCount(duration: number): number {
+  if (duration >= 4) return 0;  // Whole note or longer
+  if (duration >= 2) return 1;  // Half note
+  if (duration >= 1) return 2;  // Quarter note
+  if (duration >= 0.5) return 3; // Eighth note
+  return 4; // Sixteenth or shorter (very rare)
 }
 
 /**
@@ -64,11 +82,20 @@ export class ScoreParser {
 
       // Handle rests - they maintain context but don't change previousNoteMidi
       if (note.rest) {
-        shakuNotes.push(new ShakuNote({
+        const restNote = new ShakuNote({
           symbol: 'rest',
           duration: mapDuration(note.duration),
           isRest: true
-        }));
+        });
+
+        // Add duration lines to rests as well
+        const lineCount = getDurationLineCount(note.duration);
+        if (lineCount > 0) {
+          const durationLines = new DurationLineModifier(lineCount, 'right');
+          restNote.addModifier(durationLines);
+        }
+
+        shakuNotes.push(restNote);
         // Don't update previousNoteMidi - rests carry context through
         continue;
       }
@@ -121,6 +148,13 @@ export class ScoreParser {
       if (note.dotted) {
         const durationDot = new DurationDotModifier('below');
         shakuNote.addModifier(durationDot);
+      }
+
+      // Add duration lines based on note duration
+      const lineCount = getDurationLineCount(note.duration);
+      if (lineCount > 0) {
+        const durationLines = new DurationLineModifier(lineCount, 'right');
+        shakuNote.addModifier(durationLines);
       }
 
       shakuNotes.push(shakuNote);
