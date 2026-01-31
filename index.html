@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Akatombo - Full Score</title>
+    <title>Shakuhachi Score Library</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,91 +22,104 @@
       }
 
       body {
-        font-family: 'Noto Sans JP', sans-serif;
-        background: white;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow: hidden;
+        font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #fafafa;
+        min-height: 100vh;
       }
 
       header {
-        flex-shrink: 0;
-        padding: 10px 20px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 15px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
 
       .header-left {
-        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 30px;
       }
 
-      h1 {
-        font-size: 1.2rem;
-        margin-bottom: 5px;
+      .logo {
+        font-size: 1.5rem;
         font-weight: 300;
-      }
-
-      .subtitle {
-        color: #666;
-        font-size: 0.8rem;
-      }
-
-      .nav-link {
-        display: inline-block;
-        margin-top: 8px;
-        color: #2196f3;
+        color: #333;
         text-decoration: none;
-        font-size: 0.85rem;
       }
 
-      .nav-link:hover {
-        text-decoration: underline;
+      nav {
+        display: flex;
+        gap: 20px;
+      }
+
+      nav a {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.95rem;
+        padding: 5px 0;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: #2196f3;
+        border-bottom-color: #2196f3;
       }
 
       #auth-widget {
         flex-shrink: 0;
       }
 
-      #display {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        overflow: auto;
+      main {
+        padding: 20px 0;
       }
 
-      #display.debug svg {
-        border: 2px solid #e74c3c;
-      }
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          gap: 15px;
+          align-items: stretch;
+        }
 
-      .error {
-        color: #e74c3c;
-        padding: 20px;
+        .header-left {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        nav {
+          justify-content: center;
+        }
       }
     </style>
   </head>
   <body>
     <header>
       <div class="header-left">
-        <h1 id="score-title">Loading...</h1>
-        <p class="subtitle" id="score-subtitle">
-          <span id="debug-indicator"></span>
-        </p>
-        <a href="/library.html" class="nav-link">← Browse Score Library</a>
+        <a href="/" class="logo">🪈 Shakuhachi Score Library</a>
+        <nav>
+          <a href="/" class="active">Browse</a>
+          <a href="/editor.html">Create Score</a>
+          <a href="/test-crud.html">API Tests</a>
+        </nav>
       </div>
       <div id="auth-widget"></div>
     </header>
 
-    <div id="display"></div>
+    <main>
+      <div id="score-library"></div>
+    </main>
 
     <script type="module">
-      import { renderScoreFromURL } from './src/renderer/convenience';
       import { AuthWidget } from './src/components/AuthComponents';
       import { authState } from './src/api/authState';
-
-      const display = document.getElementById('display');
+      import { ScoreLibrary } from './src/components/ScoreLibrary';
 
       // Initialize auth widget
       const authWidget = new AuthWidget('auth-widget');
@@ -114,57 +127,14 @@
       // Subscribe to auth state changes
       authState.subscribe((user) => {
         if (user) {
-          console.log('User logged in:', user.email);
           authWidget.setUser(user);
         } else {
-          console.log('User logged out');
           authWidget.setUser(null);
         }
       });
 
-      // Parse URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const showDebugLabels =
-        urlParams.get('debug') === 'true' ||
-        urlParams.get('romanji') === 'true';
-      const showOctaveMarks = urlParams.get('octaveMarks') !== 'false';
-
-      // Update debug indicator
-      if (showDebugLabels) {
-        document.getElementById('debug-indicator').innerHTML =
-          'Debug: ON - ?debug=true found in URL';
-        display.classList.add('debug');
-      }
-
-      // Render score
-      (async () => {
-        try {
-          const renderer = await renderScoreFromURL(
-            display,
-            `${import.meta.env.BASE_URL}data/Akatombo.musicxml`,
-            {
-              showOctaveMarks,
-              showDebugLabels,
-              autoResize: true, // Enable responsive layout
-            }
-          );
-
-          // Update page metadata from score data
-          const scoreData = renderer.getScoreData();
-          if (scoreData) {
-            document.getElementById('score-title').textContent = scoreData.title;
-            const subtitleElement = document.getElementById('score-subtitle');
-            const debugIndicator = document.getElementById('debug-indicator');
-            subtitleElement.textContent = scoreData.composer || '';
-            if (debugIndicator) {
-              subtitleElement.appendChild(debugIndicator);
-            }
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          display.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        }
-      })();
+      // Initialize score library
+      const scoreLibrary = new ScoreLibrary('score-library');
     </script>
   </body>
 </html>
