@@ -291,7 +291,7 @@ export class ScoreEditor {
             <button id="save-btn" class="btn btn-primary">
               ${this.isEditing ? 'Update Score' : 'Save Score'}
             </button>
-            <a href="/library.html" class="btn btn-secondary">Cancel</a>
+            <a href="/" class="btn btn-secondary">Cancel</a>
           </div>
         </div>
 
