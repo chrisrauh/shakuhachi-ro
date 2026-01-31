@@ -9,8 +9,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
-- [ ] Make library.html the landing page (redirect / to /library.html)
-
 ### Phase 7: User Profile
 
 - [ ] Create profile.html page (URL: /profile.html?id=<user-id>)
