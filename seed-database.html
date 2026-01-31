@@ -164,7 +164,7 @@
       authState.subscribe((user) => {
         if (!user) {
           addLog('❌ Not logged in. Please log in first.', 'error');
-          addLog('   Go to /library.html or /editor.html to log in', 'info');
+          addLog('   Go to the home page or /editor.html to log in', 'info');
           document.querySelectorAll('button:not([disabled])').forEach(btn => {
             btn.disabled = true;
           });

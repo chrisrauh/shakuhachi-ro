@@ -268,7 +268,7 @@ export class ScoreEditor {
         );
 
         // Redirect to library
-        window.location.href = '/library.html';
+        window.location.href = '/';
       }
     } catch (error) {
       alert(

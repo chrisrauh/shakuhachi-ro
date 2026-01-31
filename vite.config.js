@@ -12,7 +12,6 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       input: {
         main: './index.html',
-        library: './library.html',
         editor: './editor.html',
         score: './score.html',
         seedDatabase: './seed-database.html',
