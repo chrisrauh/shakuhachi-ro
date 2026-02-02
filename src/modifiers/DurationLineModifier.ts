@@ -21,9 +21,6 @@ export class DurationLineModifier extends Modifier {
   /** Number of lines to render */
   private lineCount: number;
 
-  /** Whether this is the last note in a continuous duration line sequence */
-  private isLastInSequence: boolean;
-
   /**
    * Length of line extending downward.
    * - For last note in sequence: ends at middle of current note
@@ -50,7 +47,6 @@ export class DurationLineModifier extends Modifier {
   constructor(lineCount: number, isLastInSequence: boolean = false, position: 'right' | 'below' = 'right') {
     super(position);
     this.lineCount = lineCount;
-    this.isLastInSequence = isLastInSequence;
 
     // Calculate line length based on position in sequence
     // For Japanese characters with fontSize=32, the vertical center is
