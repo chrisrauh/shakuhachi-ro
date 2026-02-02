@@ -9,6 +9,12 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
+## Remove feature bloat
+
+- [ ] Remove tagging feature
+- [ ] Remove views feature
+- [ ] Remove creator's profile feature
+
 ### Phase 7: User Profile
 
 - [ ] Create profile.html page (URL: /profile.html?id=<user-id>)

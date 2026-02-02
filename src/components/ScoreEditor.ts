@@ -8,7 +8,6 @@ interface ScoreMetadata {
   title: string;
   composer: string;
   difficulty: ScoreDifficulty | '';
-  tags: string[];
   description: string;
 }
 
@@ -20,7 +19,6 @@ export class ScoreEditor {
     title: '',
     composer: '',
     difficulty: '',
-    tags: [],
     description: ''
   };
   private validationError: string | null = null;
@@ -61,7 +59,6 @@ export class ScoreEditor {
       title: score.title,
       composer: score.composer || '',
       difficulty: score.difficulty || '',
-      tags: score.tags,
       description: score.description || ''
     };
 
@@ -244,7 +241,6 @@ export class ScoreEditor {
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         difficulty: this.metadata.difficulty || undefined,
-        tags: this.metadata.tags,
         description: this.metadata.description || undefined,
         data_format: this.dataFormat,
         data: data
@@ -381,16 +377,6 @@ export class ScoreEditor {
           </select>
         </div>
 
-        <div class="metadata-field">
-          <label for="tags-input">Tags (comma-separated)</label>
-          <input
-            type="text"
-            id="tags-input"
-            value="${this.metadata.tags.join(', ')}"
-            placeholder="e.g., traditional, honkyoku"
-          />
-        </div>
-
         <div class="metadata-field metadata-field-full">
           <label for="description-input">Description</label>
           <textarea
@@ -462,16 +448,6 @@ export class ScoreEditor {
     this.container.querySelector('#difficulty-input')
       ?.addEventListener('change', (e) => {
         this.handleMetadataChange('difficulty', (e.target as HTMLSelectElement).value);
-      });
-
-    // Tags
-    this.container.querySelector('#tags-input')
-      ?.addEventListener('input', (e) => {
-        const tags = (e.target as HTMLInputElement).value
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0);
-        this.handleMetadataChange('tags', tags);
       });
 
     // Description
