@@ -1,14 +1,15 @@
 /**
- * DurationLineModifier - Vertical duration lines for shakuhachi notation
+ * DurationLineModifier - Horizontal duration lines for shakuhachi notation
  *
- * In Kinko shakuhachi notation, short vertical lines positioned to the right
+ * In Kinko shakuhachi notation, horizontal lines positioned to the right
  * of notes indicate note duration:
  * - Whole note (duration=4): 0 lines
- * - Half note (duration=2): 1 line
- * - Quarter note (duration=1): 2 lines
- * - Eighth note (duration=0.5): 3 lines
+ * - Half note (duration=2): 0 lines
+ * - Quarter note (duration=1): 1 line
+ * - Eighth note (duration=0.5): 2 lines
  *
- * The shorter the note value, the more lines appear.
+ * The lines are horizontal, span the full height of the note, and connect
+ * to adjacent notes that also have lines.
  * Following VexFlow's Modifier pattern - positions itself relative to note.
  */
 
@@ -19,11 +20,11 @@ export class DurationLineModifier extends Modifier {
   /** Number of lines to render */
   private lineCount: number;
 
-  /** Length of each line */
-  private lineLength: number = 15;
+  /** Length of line extending downward to middle of note */
+  private lineLength: number = 44;
 
-  /** Spacing between lines */
-  private lineSpacing: number = 3;
+  /** Horizontal spacing between multiple lines (when lineCount > 1) */
+  private lineSpacing: number = 8;
 
   /** Line width/thickness */
   private lineWidth: number = 1.5;
@@ -48,11 +49,12 @@ export class DurationLineModifier extends Modifier {
    */
   private setDefaultOffsets(): void {
     if (this.position === 'right') {
-      // Position to the right of the note (horizontal layout)
-      this.offsetX = 12;
-      this.offsetY = 0;
+      // Position to the right of the note, with small margin past modifiers
+      // (modifiers at offsetX=22, so duration line at 26 for 4px margin)
+      this.offsetX = 26;
+      this.offsetY = -22; // Start just above the note
     } else {
-      // Position below the note (vertical layout)
+      // Position below the note (horizontal layout - not typically used for duration lines)
       this.offsetX = 0;
       this.offsetY = 15;
     }
@@ -60,6 +62,9 @@ export class DurationLineModifier extends Modifier {
 
   /**
    * Renders the duration lines (vertical lines to the right of notes)
+   *
+   * Lines extend downward from each note and connect when consecutive
+   * notes both have duration lines.
    *
    * @param renderer - SVGRenderer instance
    * @param noteX - X coordinate of the note center
@@ -69,13 +74,16 @@ export class DurationLineModifier extends Modifier {
     const startX = noteX + this.offsetX;
     const startY = noteY + this.offsetY;
 
-    // Draw each vertical line, spaced horizontally
+    // Draw each line (multiple lines side-by-side for eighth notes, etc.)
     for (let i = 0; i < this.lineCount; i++) {
-      const lineX = startX + (i * this.lineSpacing);
+      // Horizontal offset for multiple lines
+      const lineXOffset = i * this.lineSpacing;
+
+      // Draw single vertical line extending downward
       renderer.drawLine(
-        lineX,
+        startX + lineXOffset,
         startY,
-        lineX,
+        startX + lineXOffset,
         startY + this.lineLength,
         this.color,
         this.lineWidth
@@ -84,7 +92,7 @@ export class DurationLineModifier extends Modifier {
   }
 
   /**
-   * Sets the length of each line
+   * Sets the length of the line extending downward
    */
   setLineLength(length: number): this {
     this.lineLength = length;
@@ -92,7 +100,7 @@ export class DurationLineModifier extends Modifier {
   }
 
   /**
-   * Sets the spacing between lines
+   * Sets the spacing between multiple lines (for eighth notes, etc.)
    */
   setLineSpacing(spacing: number): this {
     this.lineSpacing = spacing;
@@ -124,7 +132,7 @@ export class DurationLineModifier extends Modifier {
   }
 
   /**
-   * Gets the height occupied by this modifier
+   * Gets the height occupied by this modifier (length of vertical line)
    */
   getHeight(): number {
     return this.lineLength;

@@ -39,18 +39,17 @@ function mapDuration(duration: number): NoteDuration {
 /**
  * Maps numeric duration to number of horizontal duration lines
  *
- * In shakuhachi notation, shorter notes have more lines:
+ * In shakuhachi notation:
  * - Whole note (4): 0 lines
- * - Half note (2): 1 line
- * - Quarter note (1): 2 lines
- * - Eighth note (0.5): 3 lines
+ * - Half note (2): 0 lines
+ * - Quarter note (1): 1 line
+ * - Eighth note (0.5): 2 lines
  */
 function getDurationLineCount(duration: number): number {
-  if (duration >= 4) return 0;  // Whole note or longer
-  if (duration >= 2) return 1;  // Half note
-  if (duration >= 1) return 2;  // Quarter note
-  if (duration >= 0.5) return 3; // Eighth note
-  return 4; // Sixteenth or shorter (very rare)
+  if (duration >= 2) return 0;  // Half note or longer (no lines)
+  if (duration >= 1) return 1;  // Quarter note (1 line)
+  if (duration >= 0.5) return 2; // Eighth note (2 lines)
+  return 3; // Sixteenth or shorter (very rare)
 }
 
 /**

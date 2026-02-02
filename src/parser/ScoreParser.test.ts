@@ -380,14 +380,14 @@ describe('ScoreParser', () => {
       );
       expect(wholeDurationLines).toHaveLength(0);
 
-      // Half note should have 1 duration line
+      // Half note should have 0 duration lines
       const halfNoteModifiers = notes[1].getModifiers();
       const halfDurationLines = halfNoteModifiers.filter(
         (m) => m.constructor.name === 'DurationLineModifier'
       );
-      expect(halfDurationLines).toHaveLength(1);
+      expect(halfDurationLines).toHaveLength(0);
 
-      // Quarter note should have 1 duration line modifier with 2 lines
+      // Quarter note should have 1 duration line modifier with 1 line
       const quarterNoteModifiers = notes[2].getModifiers();
       const quarterDurationLines = quarterNoteModifiers.filter(
         (m) => m.constructor.name === 'DurationLineModifier'
@@ -400,8 +400,8 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { rest: true, duration: 2 },  // Half rest: 1 line
-          { rest: true, duration: 1 },  // Quarter rest: 2 lines
+          { rest: true, duration: 2 },  // Half rest: 0 lines
+          { rest: true, duration: 1 },  // Quarter rest: 1 line
         ]
       };
 
@@ -409,12 +409,12 @@ describe('ScoreParser', () => {
 
       expect(notes).toHaveLength(2);
 
-      // Half rest should have duration lines
+      // Half rest should have no duration lines
       const halfRestModifiers = notes[0].getModifiers();
       const halfDurationLines = halfRestModifiers.filter(
         (m) => m.constructor.name === 'DurationLineModifier'
       );
-      expect(halfDurationLines).toHaveLength(1);
+      expect(halfDurationLines).toHaveLength(0);
 
       // Quarter rest should have duration lines
       const quarterRestModifiers = notes[1].getModifiers();
