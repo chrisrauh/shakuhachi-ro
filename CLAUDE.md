@@ -43,8 +43,8 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 - Visual tests (Browser): Rendering, layout
 - **Always test visual changes with screenshots** - Take screenshots before/after to verify rendering
 - **When you find an error during development, implement a unit test that would have caught that error**
-- Run tests after each task
-- Run tests before pushing
+- **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
+- **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
 
 **Visual Testing (for UI changes)**
 
