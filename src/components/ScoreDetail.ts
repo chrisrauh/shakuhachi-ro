@@ -155,7 +155,6 @@ export class ScoreDetail {
                   ${this.score.difficulty}
                 </span>
               ` : ''}
-              ${this.score.tags.map(tag => `<span class="tag">${this.escapeHtml(tag)}</span>`).join('')}
             </div>
 
             ${this.score.description ? `
@@ -329,14 +328,6 @@ export class ScoreDetail {
         font-size: 0.85rem;
         color: white;
         text-transform: capitalize;
-      }
-
-      .tag {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 6px 12px;
-        border-radius: 12px;
-        font-size: 0.85rem;
       }
 
       .score-description {

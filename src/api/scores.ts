@@ -12,7 +12,6 @@ export interface Score {
   slug: string;
   composer: string | null;
   difficulty: ScoreDifficulty | null;
-  tags: string[];
   description: string | null;
   data_format: ScoreDataFormat;
   data: any;
@@ -27,7 +26,6 @@ export interface CreateScoreData {
   title: string;
   composer?: string;
   difficulty?: ScoreDifficulty;
-  tags?: string[];
   description?: string;
   data_format: ScoreDataFormat;
   data: any;
@@ -38,7 +36,6 @@ export interface UpdateScoreData {
   title?: string;
   composer?: string;
   difficulty?: ScoreDifficulty;
-  tags?: string[];
   description?: string;
   data_format?: ScoreDataFormat;
   data?: any;
@@ -90,7 +87,6 @@ export async function createScore(
         slug: uniqueSlug,
         composer: scoreData.composer || null,
         difficulty: scoreData.difficulty || null,
-        tags: scoreData.tags || [],
         description: scoreData.description || null,
         data_format: scoreData.data_format,
         data: scoreData.data,
@@ -426,7 +422,6 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       title: originalScore.title,
       composer: originalScore.composer || undefined,
       difficulty: originalScore.difficulty || undefined,
-      tags: originalScore.tags,
       description: originalScore.description || undefined,
       data_format: originalScore.data_format,
       data: originalScore.data,
