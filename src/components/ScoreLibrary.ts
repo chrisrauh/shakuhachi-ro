@@ -8,7 +8,6 @@ export class ScoreLibrary {
   private filteredScores: Score[] = [];
   private searchQuery: string = '';
   private difficultyFilter: ScoreDifficulty | 'all' = 'all';
-  private selectedTags: Set<string> = new Set();
   private isLoading: boolean = false;
   private error: Error | null = null;
 
@@ -61,13 +60,6 @@ export class ScoreLibrary {
       );
     }
 
-    // Apply tag filter
-    if (this.selectedTags.size > 0) {
-      filtered = filtered.filter((score) =>
-        Array.from(this.selectedTags).every((tag) => score.tags.includes(tag))
-      );
-    }
-
     this.filteredScores = filtered;
     this.renderGrid();
   }
@@ -100,14 +92,6 @@ export class ScoreLibrary {
     }
   }
 
-  private getAllTags(): string[] {
-    const tagsSet = new Set<string>();
-    this.scores.forEach((score) => {
-      score.tags.forEach((tag) => tagsSet.add(tag));
-    });
-    return Array.from(tagsSet).sort();
-  }
-
   private render(): void {
     if (this.isLoading) {
       this.container.innerHTML = `
@@ -135,8 +119,6 @@ export class ScoreLibrary {
       return;
     }
 
-    const allTags = this.getAllTags();
-
     this.container.innerHTML = `
       <div class="score-library">
         <div class="score-library-header">
@@ -163,27 +145,13 @@ export class ScoreLibrary {
               <option value="advanced" ${this.difficultyFilter === 'advanced' ? 'selected' : ''}>Advanced</option>
             </select>
           </div>
-
-          ${allTags.length > 0 ? `
-            <div class="filter-group">
-              <label>Tags:</label>
-              <div class="tag-filters">
-                ${allTags.map(tag => `
-                  <label class="tag-filter">
-                    <input type="checkbox" value="${tag}" ${this.selectedTags.has(tag) ? 'checked' : ''} />
-                    ${tag}
-                  </label>
-                `).join('')}
-              </div>
-            </div>
-          ` : ''}
         </div>
 
         <div class="score-library-grid" id="score-grid">
           ${this.filteredScores.length === 0 ? `
             <div class="no-scores">
               <p>No scores found</p>
-              ${this.searchQuery || this.difficultyFilter !== 'all' || this.selectedTags.size > 0 ? `
+              ${this.searchQuery || this.difficultyFilter !== 'all' ? `
                 <button id="clear-filters-btn">Clear Filters</button>
               ` : ''}
             </div>
@@ -214,7 +182,7 @@ export class ScoreLibrary {
     gridElement.innerHTML = this.filteredScores.length === 0 ? `
       <div class="no-scores">
         <p>No scores found</p>
-        ${this.searchQuery || this.difficultyFilter !== 'all' || this.selectedTags.size > 0 ? `
+        ${this.searchQuery || this.difficultyFilter !== 'all' ? `
           <button id="clear-filters-btn">Clear Filters</button>
         ` : ''}
       </div>
@@ -239,7 +207,6 @@ export class ScoreLibrary {
     clearFiltersBtn?.addEventListener('click', () => {
       this.searchQuery = '';
       this.difficultyFilter = 'all';
-      this.selectedTags.clear();
       this.applyFilters();
 
       // Update UI controls
@@ -275,12 +242,6 @@ export class ScoreLibrary {
           ${score.description ? `
             <p class="score-description">${this.escapeHtml(score.description)}</p>
           ` : ''}
-
-          ${score.tags.length > 0 ? `
-            <div class="score-tags">
-              ${score.tags.map(tag => `<span class="tag">${this.escapeHtml(tag)}</span>`).join('')}
-            </div>
-          ` : ''}
         </div>
 
         <div class="score-card-footer">
@@ -305,20 +266,6 @@ export class ScoreLibrary {
       this.handleDifficultyFilter((e.target as HTMLSelectElement).value as ScoreDifficulty | 'all');
     });
 
-    // Tag filters
-    const tagCheckboxes = this.container.querySelectorAll('.tag-filter input[type="checkbox"]');
-    tagCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        const tag = (e.target as HTMLInputElement).value;
-        if ((e.target as HTMLInputElement).checked) {
-          this.selectedTags.add(tag);
-        } else {
-          this.selectedTags.delete(tag);
-        }
-        this.applyFilters();
-      });
-    });
-
     // Score cards
     const scoreCards = this.container.querySelectorAll('.score-card');
     scoreCards.forEach((card) => {
@@ -335,7 +282,6 @@ export class ScoreLibrary {
     clearFiltersBtn?.addEventListener('click', () => {
       this.searchQuery = '';
       this.difficultyFilter = 'all';
-      this.selectedTags.clear();
       this.applyFilters();
     });
   }
@@ -428,32 +374,6 @@ export class ScoreLibrary {
         min-width: 200px;
       }
 
-      .tag-filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      .tag-filter {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        padding: 6px 12px;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: normal;
-      }
-
-      .tag-filter:hover {
-        background: #e3f2fd;
-      }
-
-      .tag-filter input {
-        cursor: pointer;
-      }
-
       .score-library-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -531,21 +451,6 @@ export class ScoreLibrary {
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
-      }
-
-      .score-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 10px;
-      }
-
-      .tag {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
       }
 
       .score-card-footer {
@@ -649,10 +554,6 @@ export class ScoreLibrary {
         .filter-group select {
           width: 100%;
           min-width: 0;
-        }
-
-        .tag-filters {
-          flex-direction: column;
         }
       }
     `;
