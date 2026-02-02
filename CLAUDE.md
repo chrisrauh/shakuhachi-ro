@@ -67,6 +67,25 @@ When Playwright visual regression tests fail:
 - This applies ONLY to Playwright visual regression tests (`npm run test:visual`)
 - Unit tests can be updated directly as they don't require visual approval
 
+**Task Tracking for Complex Work**
+
+For non-trivial tasks (anything requiring 3+ steps or touching multiple files):
+- Use TodoWrite at the start to break down the work into specific subtasks
+- Each subtask should be actionable and verifiable (not vague like "fix the issue")
+- Update status to in_progress BEFORE starting a subtask
+- Mark completed IMMEDIATELY after finishing each subtask (don't batch completions)
+- This gives visibility to progress and ensures systematic completion
+
+Examples of when to use:
+- Removing a feature (remove from types → API → UI → tests → docs)
+- Adding a feature (plan → implement → test → document)
+- Debugging complex issues (reproduce → identify root cause → fix → verify)
+
+Don't use for:
+- Single-file changes
+- Trivial updates
+- Simple bug fixes
+
 **Screenshot Management**
 
 - Use standard names: `current.png`, `before.png`, `after.png`
