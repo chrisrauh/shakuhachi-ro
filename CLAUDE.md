@@ -22,7 +22,7 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 1. Create feature branch
 2. Make changes and test
-3. Commit locally (do NOT push yet)
+3. Commit locally (do NOT push yet, do NOT add "Co-Authored-By" attribution)
 4. Mark completed tasks in TODO.md with [x]
 5. Ask user if you should create PR
 6. When creating PR: push branch to remote and use `gh pr create` (DO NOT add "🤖 Generated with Claude Code" to PR descriptions)
