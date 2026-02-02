@@ -15,13 +15,21 @@
 
 import { Modifier } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
+import { NOTE } from '../constants/layout-constants';
 
 export class DurationLineModifier extends Modifier {
   /** Number of lines to render */
   private lineCount: number;
 
-  /** Length of line extending downward to middle of note */
-  private lineLength: number = 44;
+  /** Whether this is the last note in a continuous duration line sequence */
+  private isLastInSequence: boolean;
+
+  /**
+   * Length of line extending downward.
+   * - For last note in sequence: ends at middle of current note
+   * - For non-last notes: extends to middle of next note to create continuous line
+   */
+  private lineLength: number;
 
   /** Horizontal spacing between multiple lines (when lineCount > 1) */
   private lineSpacing: number = 8;
@@ -36,11 +44,30 @@ export class DurationLineModifier extends Modifier {
    * Creates a duration line modifier
    *
    * @param lineCount - Number of lines to render
+   * @param isLastInSequence - Whether this is the last note in a continuous duration line sequence
    * @param position - 'right' for horizontal layout, 'below' for vertical layout
    */
-  constructor(lineCount: number, position: 'right' | 'below' = 'right') {
+  constructor(lineCount: number, isLastInSequence: boolean = false, position: 'right' | 'below' = 'right') {
     super(position);
     this.lineCount = lineCount;
+    this.isLastInSequence = isLastInSequence;
+
+    // Calculate line length based on position in sequence
+    // For Japanese characters with fontSize=32, the vertical center is
+    // approximately 25% above the baseline (around y=-8)
+    const verticalMiddleOfCurrentNote = -NOTE.fontSize * 0.25; // ≈ -8px
+    const startOffsetY = -22;
+
+    if (isLastInSequence) {
+      // Last note: line ends at middle of current note
+      this.lineLength = verticalMiddleOfCurrentNote - startOffsetY; // ≈ 14px
+    } else {
+      // Non-last note: line extends to middle of next note
+      // Next note is NOTE.verticalSpacing (44px) below
+      const verticalMiddleOfNextNote = NOTE.verticalSpacing + verticalMiddleOfCurrentNote; // ≈ 36px
+      this.lineLength = verticalMiddleOfNextNote - startOffsetY; // ≈ 58px
+    }
+
     this.setDefaultOffsets();
   }
 

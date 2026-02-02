@@ -90,7 +90,10 @@ export class ScoreParser {
         // Add duration lines to rests as well
         const lineCount = getDurationLineCount(note.duration);
         if (lineCount > 0) {
-          const durationLines = new DurationLineModifier(lineCount, 'right');
+          // Check if this is the last note in a continuous duration line sequence
+          const isLastInSequence = i === scoreData.notes.length - 1 ||
+                                   getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+          const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
           restNote.addModifier(durationLines);
         }
 
@@ -152,7 +155,11 @@ export class ScoreParser {
       // Add duration lines based on note duration
       const lineCount = getDurationLineCount(note.duration);
       if (lineCount > 0) {
-        const durationLines = new DurationLineModifier(lineCount, 'right');
+        // Check if this is the last note in a continuous duration line sequence
+        // by checking if the next note also has a duration line
+        const isLastInSequence = i === scoreData.notes.length - 1 ||
+                                 getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+        const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
         shakuNote.addModifier(durationLines);
       }
 
