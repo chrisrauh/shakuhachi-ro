@@ -58,6 +58,15 @@ Verify all aspects before considering visual changes complete:
 - **Edge cases**: First/last notes in columns, multiple modifiers, rests
 - **Process**: Take before/after screenshots, run `npm run test:visual`
 
+**Visual Regression Test Workflow**
+
+When Playwright visual regression tests fail:
+- Run `npx playwright show-report` to open the diff viewer
+- Ask user to review and approve changes
+- Only update baselines after user approval
+- This applies ONLY to Playwright visual regression tests (`npm run test:visual`)
+- Unit tests can be updated directly as they don't require visual approval
+
 **Screenshot Management**
 
 - Use standard names: `current.png`, `before.png`, `after.png`

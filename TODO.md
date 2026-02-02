@@ -46,6 +46,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [ ] MuraikiModifier (breathy tone)
 - [ ] SuriModifier (sliding)
 - [ ] OriModifier (pitch bend)
+- [ ] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
 
 ### Performance & Optimization
 

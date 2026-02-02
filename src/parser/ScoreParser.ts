@@ -11,6 +11,7 @@ import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import type { ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../data/mappings';
 
@@ -33,6 +34,22 @@ function mapDuration(duration: number): NoteDuration {
     default:
       return 'q'; // Default to quarter note
   }
+}
+
+/**
+ * Maps numeric duration to number of horizontal duration lines
+ *
+ * In shakuhachi notation:
+ * - Whole note (4): 0 lines
+ * - Half note (2): 0 lines
+ * - Quarter note (1): 1 line
+ * - Eighth note (0.5): 2 lines
+ */
+function getDurationLineCount(duration: number): number {
+  if (duration >= 2) return 0;  // Half note or longer (no lines)
+  if (duration >= 1) return 1;  // Quarter note (1 line)
+  if (duration >= 0.5) return 2; // Eighth note (2 lines)
+  return 3; // Sixteenth or shorter (very rare)
 }
 
 /**
@@ -64,11 +81,23 @@ export class ScoreParser {
 
       // Handle rests - they maintain context but don't change previousNoteMidi
       if (note.rest) {
-        shakuNotes.push(new ShakuNote({
+        const restNote = new ShakuNote({
           symbol: 'rest',
           duration: mapDuration(note.duration),
           isRest: true
-        }));
+        });
+
+        // Add duration lines to rests as well
+        const lineCount = getDurationLineCount(note.duration);
+        if (lineCount > 0) {
+          // Check if this is the last note in a continuous duration line sequence
+          const isLastInSequence = i === scoreData.notes.length - 1 ||
+                                   getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+          const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
+          restNote.addModifier(durationLines);
+        }
+
+        shakuNotes.push(restNote);
         // Don't update previousNoteMidi - rests carry context through
         continue;
       }
@@ -121,6 +150,17 @@ export class ScoreParser {
       if (note.dotted) {
         const durationDot = new DurationDotModifier('below');
         shakuNote.addModifier(durationDot);
+      }
+
+      // Add duration lines based on note duration
+      const lineCount = getDurationLineCount(note.duration);
+      if (lineCount > 0) {
+        // Check if this is the last note in a continuous duration line sequence
+        // by checking if the next note also has a duration line
+        const isLastInSequence = i === scoreData.notes.length - 1 ||
+                                 getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+        const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
+        shakuNote.addModifier(durationLines);
       }
 
       shakuNotes.push(shakuNote);
