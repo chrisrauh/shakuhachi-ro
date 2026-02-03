@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig(({ mode: _mode }) => ({
+export default defineConfig(() => ({
   root: './',
   base: '/',
   server: {
