@@ -121,7 +121,6 @@
       <div class="score-item">
         <h3>📜 Akatombo (赤とんぼ)</h3>
         <p><strong>Composer:</strong> Traditional</p>
-        <p><strong>Difficulty:</strong> Beginner</p>
         <p><strong>Description:</strong> A beloved Japanese folk song about red dragonflies. Perfect for beginners learning shakuhachi notation.</p>
         <button id="seed-akatombo">Add Akatombo to Database</button>
       </div>
@@ -129,7 +128,6 @@
       <div class="score-item">
         <h3>📜 Love Story</h3>
         <p><strong>Composer:</strong> Unknown</p>
-        <p><strong>Difficulty:</strong> Intermediate</p>
         <p><strong>Description:</strong> Transcribed from handwritten shakuhachi notation. Features octave marks, meri modifiers, and accidentals.</p>
         <button id="seed-love-story">Add Love Story to Database</button>
       </div>
@@ -198,7 +196,6 @@
           const result = await createScore({
             title: 'Akatombo',
             composer: 'Traditional',
-            difficulty: 'beginner',
             description: 'A beloved Japanese folk song about red dragonflies (赤とんぼ). This piece is perfect for beginners learning shakuhachi notation and features a simple, memorable melody.',
             data_format: 'musicxml',
             data: akatomboXML
@@ -240,7 +237,6 @@
           const result = await createScore({
             title: 'Love Story',
             composer: 'Unknown',
-            difficulty: 'intermediate',
             description: 'Transcribed from handwritten shakuhachi notation. Features octave marks, meri modifiers, and accidentals for expressive performance.',
             data_format: 'json',
             data: loveStoryData

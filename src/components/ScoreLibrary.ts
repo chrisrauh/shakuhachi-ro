@@ -1,5 +1,5 @@
 import { getAllScores } from '../api/scores';
-import type { Score, ScoreDifficulty } from '../api/scores';
+import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
 
 export class ScoreLibrary {
@@ -7,7 +7,6 @@ export class ScoreLibrary {
   private scores: Score[] = [];
   private filteredScores: Score[] = [];
   private searchQuery: string = '';
-  private difficultyFilter: ScoreDifficulty | 'all' = 'all';
   private isLoading: boolean = false;
   private error: Error | null = null;
 
@@ -53,13 +52,6 @@ export class ScoreLibrary {
       );
     }
 
-    // Apply difficulty filter
-    if (this.difficultyFilter !== 'all') {
-      filtered = filtered.filter(
-        (score) => score.difficulty === this.difficultyFilter
-      );
-    }
-
     this.filteredScores = filtered;
     this.renderGrid();
   }
@@ -69,27 +61,9 @@ export class ScoreLibrary {
     this.applyFilters();
   }
 
-  private handleDifficultyFilter(difficulty: ScoreDifficulty | 'all'): void {
-    this.difficultyFilter = difficulty;
-    this.applyFilters();
-  }
-
   private handleScoreClick(scoreSlug: string): void {
     // Navigate to score detail page
     window.location.href = `/score.html?slug=${scoreSlug}`;
-  }
-
-  private getDifficultyBadgeColor(difficulty: ScoreDifficulty | null): string {
-    switch (difficulty) {
-      case 'beginner':
-        return '#4caf50';
-      case 'intermediate':
-        return '#ff9800';
-      case 'advanced':
-        return '#f44336';
-      default:
-        return '#9e9e9e';
-    }
   }
 
   private render(): void {
@@ -135,23 +109,13 @@ export class ScoreLibrary {
               value="${this.searchQuery}"
             />
           </div>
-
-          <div class="filter-group">
-            <label>Difficulty:</label>
-            <select id="difficulty-filter">
-              <option value="all" ${this.difficultyFilter === 'all' ? 'selected' : ''}>All</option>
-              <option value="beginner" ${this.difficultyFilter === 'beginner' ? 'selected' : ''}>Beginner</option>
-              <option value="intermediate" ${this.difficultyFilter === 'intermediate' ? 'selected' : ''}>Intermediate</option>
-              <option value="advanced" ${this.difficultyFilter === 'advanced' ? 'selected' : ''}>Advanced</option>
-            </select>
-          </div>
         </div>
 
         <div class="score-library-grid" id="score-grid">
           ${this.filteredScores.length === 0 ? `
             <div class="no-scores">
               <p>No scores found</p>
-              ${this.searchQuery || this.difficultyFilter !== 'all' ? `
+              ${this.searchQuery ? `
                 <button id="clear-filters-btn">Clear Filters</button>
               ` : ''}
             </div>
@@ -182,7 +146,7 @@ export class ScoreLibrary {
     gridElement.innerHTML = this.filteredScores.length === 0 ? `
       <div class="no-scores">
         <p>No scores found</p>
-        ${this.searchQuery || this.difficultyFilter !== 'all' ? `
+        ${this.searchQuery ? `
           <button id="clear-filters-btn">Clear Filters</button>
         ` : ''}
       </div>
@@ -206,20 +170,15 @@ export class ScoreLibrary {
     const clearFiltersBtn = gridElement.querySelector('#clear-filters-btn');
     clearFiltersBtn?.addEventListener('click', () => {
       this.searchQuery = '';
-      this.difficultyFilter = 'all';
       this.applyFilters();
 
       // Update UI controls
       const searchInput = this.container.querySelector('#search-input') as HTMLInputElement;
-      const difficultyFilter = this.container.querySelector('#difficulty-filter') as HTMLSelectElement;
       if (searchInput) searchInput.value = '';
-      if (difficultyFilter) difficultyFilter.value = 'all';
     });
   }
 
   private renderScoreCard(score: Score): string {
-    const difficultyColor = this.getDifficultyBadgeColor(score.difficulty);
-
     return `
       <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
@@ -227,11 +186,6 @@ export class ScoreLibrary {
             ${score.forked_from ? `<span class="forked-indicator" title="This is a forked score">${renderIcon('git-fork')}</span>` : ''}
             ${this.escapeHtml(score.title)}
           </h3>
-          ${score.difficulty ? `
-            <span class="difficulty-badge" style="background-color: ${difficultyColor}">
-              ${score.difficulty}
-            </span>
-          ` : ''}
         </div>
 
         <div class="score-card-body">
@@ -260,12 +214,6 @@ export class ScoreLibrary {
       this.handleSearch((e.target as HTMLInputElement).value);
     });
 
-    // Difficulty filter
-    const difficultyFilter = this.container.querySelector('#difficulty-filter') as HTMLSelectElement;
-    difficultyFilter?.addEventListener('change', (e) => {
-      this.handleDifficultyFilter((e.target as HTMLSelectElement).value as ScoreDifficulty | 'all');
-    });
-
     // Score cards
     const scoreCards = this.container.querySelectorAll('.score-card');
     scoreCards.forEach((card) => {
@@ -281,7 +229,6 @@ export class ScoreLibrary {
     const clearFiltersBtn = this.container.querySelector('#clear-filters-btn');
     clearFiltersBtn?.addEventListener('click', () => {
       this.searchQuery = '';
-      this.difficultyFilter = 'all';
       this.applyFilters();
     });
   }
@@ -421,15 +368,6 @@ export class ScoreLibrary {
       .forked-indicator svg {
         width: 16px;
         height: 16px;
-      }
-
-      .difficulty-badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        color: white;
-        text-transform: capitalize;
-        white-space: nowrap;
       }
 
       .score-card-body {
