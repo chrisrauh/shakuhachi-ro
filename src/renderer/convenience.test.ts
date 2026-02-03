@@ -64,7 +64,7 @@ describe('Convenience Functions', () => {
     it('should render score from URL', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       expect(renderer).toBeInstanceOf(ScoreRenderer);
@@ -74,7 +74,7 @@ describe('Convenience Functions', () => {
     it('should render with default options', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       const options = renderer.getOptions();
@@ -90,7 +90,7 @@ describe('Convenience Functions', () => {
           showOctaveMarks: false,
           notesPerColumn: 5,
           showDebugLabels: true,
-        }
+        },
       );
 
       const options = renderer.getOptions();
@@ -102,7 +102,7 @@ describe('Convenience Functions', () => {
     it('should return ScoreRenderer instance', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       // Should be able to call renderer methods
@@ -114,7 +114,7 @@ describe('Convenience Functions', () => {
     it('should allow further manipulation of renderer', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       // Should be able to change options
@@ -125,7 +125,7 @@ describe('Convenience Functions', () => {
     it('should render notes from parsed URL', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       const notes = renderer.getNotes();
@@ -135,7 +135,7 @@ describe('Convenience Functions', () => {
     it('should store score data', async () => {
       const renderer = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
 
       const scoreData = renderer.getScoreData();
@@ -229,7 +229,7 @@ describe('Convenience Functions', () => {
       // Render from URL
       const renderer1 = await renderScoreFromURL(
         container,
-        '/data/test.musicxml'
+        '/data/test.musicxml',
       );
       const svg1 = container.querySelector('svg');
       expect(svg1).toBeTruthy();
@@ -250,7 +250,7 @@ describe('Convenience Functions', () => {
         const renderer1 = await renderScoreFromURL(
           container1,
           '/data/test1.musicxml',
-          { notesPerColumn: 5 }
+          { notesPerColumn: 5 },
         );
 
         const scoreData = createTestScoreData();

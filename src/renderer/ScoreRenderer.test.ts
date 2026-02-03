@@ -132,7 +132,10 @@ describe('ScoreRenderer', () => {
 
     it('should render multiple columns', () => {
       // Create 25 notes (should create 3 columns with 10 notes each)
-      const notes = Array.from({ length: 25 }, () => new ShakuNote({ symbol: 'ro' }));
+      const notes = Array.from(
+        { length: 25 },
+        () => new ShakuNote({ symbol: 'ro' }),
+      );
 
       const renderer = new ScoreRenderer(container, {
         notesPerColumn: 10,

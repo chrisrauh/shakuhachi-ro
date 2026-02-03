@@ -2,11 +2,6 @@
 
 This file tracks active tasks for the shakuhachi score library platform. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
-**Goal:** Transform shakuhachi-ro into a collaborative platform where users can create, share, and fork shakuhachi scores.
-**Plan:** See implementation plan in session transcript
-
-## Platform MVP - Current Tasks
-
 ## Remaining Tasks
 
 ## Remove feature bloat

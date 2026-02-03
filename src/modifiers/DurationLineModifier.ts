@@ -44,7 +44,11 @@ export class DurationLineModifier extends Modifier {
    * @param isLastInSequence - Whether this is the last note in a continuous duration line sequence
    * @param position - 'right' for horizontal layout, 'below' for vertical layout
    */
-  constructor(lineCount: number, isLastInSequence: boolean = false, position: 'right' | 'below' = 'right') {
+  constructor(
+    lineCount: number,
+    isLastInSequence: boolean = false,
+    position: 'right' | 'below' = 'right',
+  ) {
     super(position);
     this.lineCount = lineCount;
 
@@ -60,7 +64,8 @@ export class DurationLineModifier extends Modifier {
     } else {
       // Non-last note: line extends to middle of next note
       // Next note is NOTE.verticalSpacing (44px) below
-      const verticalMiddleOfNextNote = NOTE.verticalSpacing + verticalMiddleOfCurrentNote; // ≈ 36px
+      const verticalMiddleOfNextNote =
+        NOTE.verticalSpacing + verticalMiddleOfCurrentNote; // ≈ 36px
       this.lineLength = verticalMiddleOfNextNote - startOffsetY; // ≈ 58px
     }
 
@@ -109,7 +114,7 @@ export class DurationLineModifier extends Modifier {
         startX + lineXOffset,
         startY + this.lineLength,
         this.color,
-        this.lineWidth
+        this.lineWidth,
       );
     }
   }
@@ -151,7 +156,7 @@ export class DurationLineModifier extends Modifier {
    */
   getWidth(): number {
     if (this.lineCount === 0) return 0;
-    return this.lineWidth + ((this.lineCount - 1) * this.lineSpacing);
+    return this.lineWidth + (this.lineCount - 1) * this.lineSpacing;
   }
 
   /**

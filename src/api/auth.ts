@@ -12,17 +12,17 @@ export interface AuthResult {
  */
 export async function signUp(
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResult> {
   const { data, error } = await supabase.auth.signUp({
     email,
-    password
+    password,
   });
 
   return {
     user: data.user,
     session: data.session,
-    error
+    error,
   };
 }
 
@@ -31,17 +31,17 @@ export async function signUp(
  */
 export async function signIn(
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResult> {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
-    password
+    password,
   });
 
   return {
     user: data.user,
     session: data.session,
-    error
+    error,
   };
 }
 
@@ -63,7 +63,7 @@ export async function getCurrentSession(): Promise<{
   const { data, error } = await supabase.auth.getSession();
   return {
     session: data.session,
-    error
+    error,
   };
 }
 
@@ -76,7 +76,7 @@ export async function getCurrentUser(): Promise<{
 }> {
   const {
     data: { user },
-    error
+    error,
   } = await supabase.auth.getUser();
   return { user, error };
 }
@@ -85,10 +85,10 @@ export async function getCurrentUser(): Promise<{
  * Listen to auth state changes
  */
 export function onAuthStateChange(
-  callback: (user: User | null, session: Session | null) => void
+  callback: (user: User | null, session: Session | null) => void,
 ) {
   const {
-    data: { subscription }
+    data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ?? null, session);
   });

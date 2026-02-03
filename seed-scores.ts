@@ -13,11 +13,16 @@ async function seedScores() {
   console.log('Starting seed script...\n');
 
   // Check if user is authenticated
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   if (authError || !user) {
     console.error('❌ Error: You must be logged in to seed scores.');
-    console.error('Please log in through the web app first, then run this script.');
+    console.error(
+      'Please log in through the web app first, then run this script.',
+    );
     process.exit(1);
   }
 
@@ -25,14 +30,18 @@ async function seedScores() {
 
   // Seed Akatombo
   console.log('Adding Akatombo...');
-  const akatomboXML = fs.readFileSync('./public/data/Akatombo.musicxml', 'utf-8');
+  const akatomboXML = fs.readFileSync(
+    './public/data/Akatombo.musicxml',
+    'utf-8',
+  );
 
   const akatomboResult = await createScore({
     title: 'Akatombo',
     composer: 'Traditional',
-    description: 'A beloved Japanese folk song about red dragonflies. This piece is perfect for beginners learning shakuhachi notation.',
+    description:
+      'A beloved Japanese folk song about red dragonflies. This piece is perfect for beginners learning shakuhachi notation.',
     data_format: 'musicxml',
-    data: akatomboXML
+    data: akatomboXML,
   });
 
   if (akatomboResult.error) {

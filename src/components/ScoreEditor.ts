@@ -17,7 +17,7 @@ export class ScoreEditor {
   private metadata: ScoreMetadata = {
     title: '',
     composer: '',
-    description: ''
+    description: '',
   };
   private validationError: string | null = null;
   private isEditing: boolean = false;
@@ -45,7 +45,9 @@ export class ScoreEditor {
     const result = await getScore(scoreId);
 
     if (result.error || !result.score) {
-      alert(`Error loading score: ${result.error?.message || 'Score not found'}`);
+      alert(
+        `Error loading score: ${result.error?.message || 'Score not found'}`,
+      );
       return;
     }
 
@@ -56,7 +58,7 @@ export class ScoreEditor {
     this.metadata = {
       title: score.title,
       composer: score.composer || '',
-      description: score.description || ''
+      description: score.description || '',
     };
 
     // Convert data to string based on format
@@ -96,7 +98,7 @@ export class ScoreEditor {
       scoreData: this.scoreData,
       dataFormat: this.dataFormat,
       metadata: this.metadata,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     localStorage.setItem('shakuhachi-editor-autosave', JSON.stringify(data));
   }
@@ -143,7 +145,7 @@ export class ScoreEditor {
   private handleFormatChange(format: ScoreDataFormat): void {
     if (this.scoreData.trim() && this.dataFormat !== format) {
       const confirmChange = confirm(
-        'Switching formats will clear the current editor content. Continue?'
+        'Switching formats will clear the current editor content. Continue?',
       );
       if (!confirmChange) return;
       this.scoreData = '';
@@ -160,7 +162,7 @@ export class ScoreEditor {
 
   private updatePreview(): void {
     const previewContainer = this.container.querySelector(
-      '#preview-pane'
+      '#preview-pane',
     ) as HTMLElement;
 
     if (!previewContainer) return;
@@ -169,7 +171,9 @@ export class ScoreEditor {
       previewContainer.innerHTML = `
         <div class="preview-placeholder">
           <p>Preview will appear here</p>
-          <p class="preview-hint">Enter valid ${this.dataFormat === 'json' ? 'JSON' : 'MusicXML'} score data to see the preview</p>
+          <p class="preview-hint">Enter valid ${
+            this.dataFormat === 'json' ? 'JSON' : 'MusicXML'
+          } score data to see the preview</p>
         </div>
       `;
       return;
@@ -221,7 +225,7 @@ export class ScoreEditor {
     }
 
     const saveBtn = this.container.querySelector(
-      '#save-btn'
+      '#save-btn',
     ) as HTMLButtonElement;
     if (saveBtn) {
       saveBtn.disabled = true;
@@ -239,7 +243,7 @@ export class ScoreEditor {
         composer: this.metadata.composer || undefined,
         description: this.metadata.description || undefined,
         data_format: this.dataFormat,
-        data: data
+        data: data,
       };
 
       let result;
@@ -255,16 +259,16 @@ export class ScoreEditor {
         // Clear autosave
         localStorage.removeItem('shakuhachi-editor-autosave');
 
-        alert(
-          `Score ${this.isEditing ? 'updated' : 'created'} successfully!`
-        );
+        alert(`Score ${this.isEditing ? 'updated' : 'created'} successfully!`);
 
         // Redirect to library
         window.location.href = '/';
       }
     } catch (error) {
       alert(
-        `Error saving score: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error saving score: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     } finally {
       if (saveBtn) {
@@ -319,7 +323,9 @@ export class ScoreEditor {
             <div id="validation-error" class="validation-error"></div>
             <textarea
               id="score-data-input"
-              placeholder="Enter ${this.dataFormat === 'json' ? 'JSON' : 'MusicXML'} score data here..."
+              placeholder="Enter ${
+                this.dataFormat === 'json' ? 'JSON' : 'MusicXML'
+              } score data here..."
             >${this.scoreData}</textarea>
           </div>
 
@@ -379,7 +385,9 @@ export class ScoreEditor {
     const validationDiv = this.container.querySelector('#validation-error');
     if (validationDiv) {
       if (this.validationError) {
-        validationDiv.innerHTML = `${renderIcon('alert-circle')} ${this.validationError}`;
+        validationDiv.innerHTML = `${renderIcon('alert-circle')} ${
+          this.validationError
+        }`;
         validationDiv.classList.add('show');
         initIcons();
       } else {
@@ -392,7 +400,7 @@ export class ScoreEditor {
   private attachEventListeners(): void {
     // Score data input
     const textarea = this.container.querySelector(
-      '#score-data-input'
+      '#score-data-input',
     ) as HTMLTextAreaElement;
     textarea?.addEventListener('input', (e) => {
       this.handleDataChange((e.target as HTMLTextAreaElement).value);
@@ -400,12 +408,12 @@ export class ScoreEditor {
 
     // Format toggle
     const formatRadios = this.container.querySelectorAll(
-      'input[name="format"]'
+      'input[name="format"]',
     );
     formatRadios.forEach((radio) => {
       radio.addEventListener('change', (e) => {
         this.handleFormatChange(
-          (e.target as HTMLInputElement).value as ScoreDataFormat
+          (e.target as HTMLInputElement).value as ScoreDataFormat,
         );
       });
     });
@@ -419,21 +427,33 @@ export class ScoreEditor {
 
   private attachMetadataListeners(): void {
     // Title
-    this.container.querySelector('#title-input')
+    this.container
+      .querySelector('#title-input')
       ?.addEventListener('input', (e) => {
-        this.handleMetadataChange('title', (e.target as HTMLInputElement).value);
+        this.handleMetadataChange(
+          'title',
+          (e.target as HTMLInputElement).value,
+        );
       });
 
     // Composer
-    this.container.querySelector('#composer-input')
+    this.container
+      .querySelector('#composer-input')
       ?.addEventListener('input', (e) => {
-        this.handleMetadataChange('composer', (e.target as HTMLInputElement).value);
+        this.handleMetadataChange(
+          'composer',
+          (e.target as HTMLInputElement).value,
+        );
       });
 
     // Description
-    this.container.querySelector('#description-input')
+    this.container
+      .querySelector('#description-input')
       ?.addEventListener('input', (e) => {
-        this.handleMetadataChange('description', (e.target as HTMLTextAreaElement).value);
+        this.handleMetadataChange(
+          'description',
+          (e.target as HTMLTextAreaElement).value,
+        );
       });
   }
 

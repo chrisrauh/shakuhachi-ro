@@ -6,18 +6,20 @@
  * @example generateSlug("San'ya Sugagaki") // "sanya-sugagaki"
  */
 export function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    // Remove apostrophes
-    .replace(/'/g, '')
-    // Replace spaces and special characters with hyphens
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    // Remove leading/trailing hyphens
-    .replace(/^-+|-+$/g, '')
-    // Collapse multiple hyphens
-    .replace(/-+/g, '-');
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      // Remove apostrophes
+      .replace(/'/g, '')
+      // Replace spaces and special characters with hyphens
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      // Remove leading/trailing hyphens
+      .replace(/^-+|-+$/g, '')
+      // Collapse multiple hyphens
+      .replace(/-+/g, '-')
+  );
 }
 
 /**
@@ -29,7 +31,7 @@ export function generateSlug(text: string): string {
  */
 export function ensureUniqueSlug(
   baseSlug: string,
-  existingSlugs: string[]
+  existingSlugs: string[],
 ): string {
   if (!existingSlugs.includes(baseSlug)) {
     return baseSlug;

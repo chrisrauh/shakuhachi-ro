@@ -29,13 +29,13 @@ export type PitchAlteration = 'meri' | 'kari' | 'dai-meri' | null;
  * Common shakuhachi techniques
  */
 export type Technique =
-  | 'yuri'      // Vibrato
-  | 'atari'     // Finger pop/percussion
-  | 'muraiki'   // Breathy/airy tone
+  | 'yuri' // Vibrato
+  | 'atari' // Finger pop/percussion
+  | 'muraiki' // Breathy/airy tone
   | 'korokoro' // Flutter tongue
-  | 'uchi'      // Strong attack
-  | 'suri'      // Slide up
-  | 'ori';      // Slide down
+  | 'uchi' // Strong attack
+  | 'suri' // Slide up
+  | 'ori'; // Slide down
 
 /**
  * Fingering pattern (simplified - true = hole closed, false = hole open)
@@ -79,11 +79,11 @@ export const kinkoMap: Record<string, KinkoSymbol> = {
   ro: {
     kana: 'ロ',
     romaji: 'ro',
-    pitch: 'D4',  // On 1.8 shakuhachi
+    pitch: 'D4', // On 1.8 shakuhachi
     defaultOctave: 'otsu',
-    fingering: [true, true, true, true, true],  // All holes closed
+    fingering: [true, true, true, true, true], // All holes closed
     canAlter: true,
-    unicode: 'U+30ED'
+    unicode: 'U+30ED',
   },
 
   tsu: {
@@ -91,9 +91,9 @@ export const kinkoMap: Record<string, KinkoSymbol> = {
     romaji: 'tsu',
     pitch: 'F4',
     defaultOctave: 'otsu',
-    fingering: [true, true, true, true, false],  // Bottom hole (thumb) open
+    fingering: [true, true, true, true, false], // Bottom hole (thumb) open
     canAlter: true,
-    unicode: 'U+30C4'
+    unicode: 'U+30C4',
   },
 
   re: {
@@ -101,9 +101,9 @@ export const kinkoMap: Record<string, KinkoSymbol> = {
     romaji: 're',
     pitch: 'G4',
     defaultOctave: 'otsu',
-    fingering: [true, true, true, false, false],  // Bottom two holes open
+    fingering: [true, true, true, false, false], // Bottom two holes open
     canAlter: true,
-    unicode: 'U+30EC'
+    unicode: 'U+30EC',
   },
 
   chi: {
@@ -111,30 +111,30 @@ export const kinkoMap: Record<string, KinkoSymbol> = {
     romaji: 'chi',
     pitch: 'A4',
     defaultOctave: 'otsu',
-    fingering: [true, true, false, false, false],  // Top two holes closed
+    fingering: [true, true, false, false, false], // Top two holes closed
     canAlter: true,
-    unicode: 'U+30C1'
+    unicode: 'U+30C1',
   },
 
   ri: {
     kana: 'リ',
     romaji: 'ri',
-    pitch: 'C5',  // Note: sometimes B4 depending on fingering
+    pitch: 'C5', // Note: sometimes B4 depending on fingering
     defaultOctave: 'otsu',
-    fingering: [true, false, false, false, false],  // Only top hole closed
+    fingering: [true, false, false, false, false], // Only top hole closed
     canAlter: true,
-    unicode: 'U+30EA'
+    unicode: 'U+30EA',
   },
 
   // Additional common notes
   u: {
     kana: 'ウ',
     romaji: 'u',
-    pitch: 'C4',  // Lower than ro
+    pitch: 'C4', // Lower than ro
     defaultOctave: 'otsu',
-    fingering: [true, true, true, true, true],  // All closed + special embouchure
+    fingering: [true, true, true, true, true], // All closed + special embouchure
     canAlter: false,
-    unicode: 'U+30A6'
+    unicode: 'U+30A6',
   },
 
   hi: {
@@ -144,8 +144,8 @@ export const kinkoMap: Record<string, KinkoSymbol> = {
     defaultOctave: 'otsu',
     fingering: [true, true, true, false, true],
     canAlter: true,
-    unicode: 'U+30D2'
-  }
+    unicode: 'U+30D2',
+  },
 };
 
 /**
@@ -159,7 +159,7 @@ export function getKinkoSymbols(): string[] {
  * Helper function to get symbol by kana character
  */
 export function getSymbolByKana(kana: string): KinkoSymbol | undefined {
-  return Object.values(kinkoMap).find(symbol => symbol.kana === kana);
+  return Object.values(kinkoMap).find((symbol) => symbol.kana === kana);
 }
 
 /**
@@ -173,7 +173,7 @@ export function getSymbolByRomaji(romaji: string): KinkoSymbol | undefined {
  * Helper function to get symbol by western pitch (e.g., "D4", "G4", "A4")
  */
 export function getSymbolByPitch(pitch: string): KinkoSymbol | undefined {
-  return Object.values(kinkoMap).find(symbol => symbol.pitch === pitch);
+  return Object.values(kinkoMap).find((symbol) => symbol.pitch === pitch);
 }
 
 /**
@@ -203,18 +203,18 @@ export function parseNote(input: string): KinkoSymbol | undefined {
  * Pitch modifiers for octave calculation
  */
 export const octaveModifiers: Record<Octave, number> = {
-  otsu: 0,      // Base octave
-  kan: 12,      // +1 octave (12 semitones)
-  daikan: 24    // +2 octaves (24 semitones)
+  otsu: 0, // Base octave
+  kan: 12, // +1 octave (12 semitones)
+  daikan: 24, // +2 octaves (24 semitones)
 };
 
 /**
  * Pitch alterations in semitones
  */
 export const alterationSemitones: Record<string, number> = {
-  'meri': -1,        // Half step down
-  'dai-meri': -2,    // Whole step down
-  'kari': 1          // Half step up
+  meri: -1, // Half step down
+  'dai-meri': -2, // Whole step down
+  kari: 1, // Half step up
 };
 
 /**
@@ -226,30 +226,30 @@ export const alterationSemitones: Record<string, number> = {
  * - Kari: カ (katakana "ka")
  */
 export const meriKariSymbols: Record<string, string> = {
-  'meri': 'メ',       // Katakana "me"
-  'dai-meri': '大',   // Kanji "dai" (big/great)
-  'kari': 'カ'        // Katakana "ka"
+  meri: 'メ', // Katakana "me"
+  'dai-meri': '大', // Kanji "dai" (big/great)
+  kari: 'カ', // Katakana "ka"
 };
 
 /**
  * Visual symbols for performance techniques
  */
 export const techniqueSymbols: Record<string, string> = {
-  'yuri': '〜',       // Wave/tilde for vibrato
-  'atari': '>',      // Accent mark
-  'muraiki': 'ム',   // Katakana mu
-  'uchi': '^',       // Strong attack
-  'suri': '↗',       // Slide up
-  'ori': '↘'         // Slide down
+  yuri: '〜', // Wave/tilde for vibrato
+  atari: '>', // Accent mark
+  muraiki: 'ム', // Katakana mu
+  uchi: '^', // Strong attack
+  suri: '↗', // Slide up
+  ori: '↘', // Slide down
 };
 
 /**
  * Number of dots to display for each octave register
  */
 export const octaveDots: Record<Octave, { above: number; below: number }> = {
-  'otsu': { above: 0, below: 1 },
-  'kan': { above: 1, below: 0 },
-  'daikan': { above: 2, below: 0 }
+  otsu: { above: 0, below: 1 },
+  kan: { above: 1, below: 0 },
+  daikan: { above: 2, below: 0 },
 };
 
 /**
@@ -260,7 +260,13 @@ export const octaveDots: Record<Octave, { above: number; below: number }> = {
  */
 export function pitchToMidi(pitch: string): number {
   const pitchClassMap: Record<string, number> = {
-    'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11
+    C: 0,
+    D: 2,
+    E: 4,
+    F: 5,
+    G: 7,
+    A: 9,
+    B: 11,
   };
 
   const match = pitch.match(/^([A-G])(#|b)?(\d+)$/);
@@ -292,7 +298,7 @@ export function getNoteMidi(romaji: string, octave: number): number {
   }
 
   const baseMidi = pitchToMidi(symbol.pitch);
-  return baseMidi + (octave * 12);
+  return baseMidi + octave * 12;
 }
 
 // TODO: Add Tozan notation mappings when needed

@@ -35,7 +35,10 @@ export class AtariModifier extends Modifier {
    * @param style - Visual style: 'arrow', 'chevron', or 'dot'
    * @param position - Where to position relative to note (default: 'left')
    */
-  constructor(style: AtariStyle = 'chevron', position: ModifierPosition = 'left') {
+  constructor(
+    style: AtariStyle = 'chevron',
+    position: ModifierPosition = 'left',
+  ) {
     super(position);
     this.style = style;
     this.setDefaultOffsets();
@@ -93,14 +96,7 @@ export class AtariModifier extends Modifier {
 
     // Arrow pointing right (toward note if on left side)
     // Horizontal line
-    renderer.drawLine(
-      x - this.size,
-      y,
-      x,
-      y,
-      this.color,
-      this.strokeWidth
-    );
+    renderer.drawLine(x - this.size, y, x, y, this.color, this.strokeWidth);
 
     // Arrowhead (two lines forming >)
     renderer.drawLine(
@@ -109,7 +105,7 @@ export class AtariModifier extends Modifier {
       x - halfSize,
       y - halfSize,
       this.color,
-      this.strokeWidth
+      this.strokeWidth,
     );
     renderer.drawLine(
       x,
@@ -117,7 +113,7 @@ export class AtariModifier extends Modifier {
       x - halfSize,
       y + halfSize,
       this.color,
-      this.strokeWidth
+      this.strokeWidth,
     );
   }
 
@@ -135,7 +131,7 @@ export class AtariModifier extends Modifier {
       x,
       y,
       this.color,
-      this.strokeWidth
+      this.strokeWidth,
     );
     renderer.drawLine(
       x,
@@ -143,7 +139,7 @@ export class AtariModifier extends Modifier {
       x - halfSize,
       y + halfSize,
       this.color,
-      this.strokeWidth
+      this.strokeWidth,
     );
   }
 

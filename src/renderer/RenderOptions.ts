@@ -264,7 +264,9 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
  * @param options - User-provided options (partial)
  * @returns Complete options object with all values defined
  */
-export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderOptions> {
+export function mergeWithDefaults(
+  options: RenderOptions = {},
+): Required<RenderOptions> {
   return {
     ...DEFAULT_RENDER_OPTIONS,
     ...options,

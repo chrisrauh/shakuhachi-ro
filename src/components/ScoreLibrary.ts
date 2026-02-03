@@ -48,7 +48,7 @@ export class ScoreLibrary {
       filtered = filtered.filter(
         (score) =>
           score.title.toLowerCase().includes(query) ||
-          (score.composer && score.composer.toLowerCase().includes(query))
+          (score.composer && score.composer.toLowerCase().includes(query)),
       );
     }
 
@@ -97,7 +97,9 @@ export class ScoreLibrary {
       <div class="score-library">
         <div class="score-library-header">
           <h1>Score Library</h1>
-          <p class="score-count" id="score-count">${this.filteredScores.length} ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
+          <p class="score-count" id="score-count">${
+            this.filteredScores.length
+          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
         </div>
 
         <div class="score-library-filters">
@@ -112,14 +114,24 @@ export class ScoreLibrary {
         </div>
 
         <div class="score-library-grid" id="score-grid">
-          ${this.filteredScores.length === 0 ? `
+          ${
+            this.filteredScores.length === 0
+              ? `
             <div class="no-scores">
               <p>No scores found</p>
-              ${this.searchQuery ? `
+              ${
+                this.searchQuery
+                  ? `
                 <button id="clear-filters-btn">Clear Filters</button>
-              ` : ''}
+              `
+                  : ''
+              }
             </div>
-          ` : this.filteredScores.map((score) => this.renderScoreCard(score)).join('')}
+          `
+              : this.filteredScores
+                  .map((score) => this.renderScoreCard(score))
+                  .join('')
+          }
         </div>
       </div>
     `;
@@ -140,17 +152,28 @@ export class ScoreLibrary {
     }
 
     // Update count
-    countElement.textContent = `${this.filteredScores.length} ${this.filteredScores.length === 1 ? 'score' : 'scores'}`;
+    countElement.textContent = `${this.filteredScores.length} ${
+      this.filteredScores.length === 1 ? 'score' : 'scores'
+    }`;
 
     // Update grid
-    gridElement.innerHTML = this.filteredScores.length === 0 ? `
+    gridElement.innerHTML =
+      this.filteredScores.length === 0
+        ? `
       <div class="no-scores">
         <p>No scores found</p>
-        ${this.searchQuery ? `
+        ${
+          this.searchQuery
+            ? `
           <button id="clear-filters-btn">Clear Filters</button>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-    ` : this.filteredScores.map((score) => this.renderScoreCard(score)).join('');
+    `
+        : this.filteredScores
+            .map((score) => this.renderScoreCard(score))
+            .join('');
 
     // Initialize icons
     initIcons();
@@ -173,7 +196,9 @@ export class ScoreLibrary {
       this.applyFilters();
 
       // Update UI controls
-      const searchInput = this.container.querySelector('#search-input') as HTMLInputElement;
+      const searchInput = this.container.querySelector(
+        '#search-input',
+      ) as HTMLInputElement;
       if (searchInput) searchInput.value = '';
     });
   }
@@ -183,25 +208,47 @@ export class ScoreLibrary {
       <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
           <h3 class="score-title">
-            ${score.forked_from ? `<span class="forked-indicator" title="This is a forked score">${renderIcon('git-fork')}</span>` : ''}
+            ${
+              score.forked_from
+                ? `<span class="forked-indicator" title="This is a forked score">${renderIcon(
+                    'git-fork',
+                  )}</span>`
+                : ''
+            }
             ${this.escapeHtml(score.title)}
           </h3>
         </div>
 
         <div class="score-card-body">
           <p class="score-composer">
-            ${score.composer ? this.escapeHtml(score.composer) : 'Unknown composer'}
+            ${
+              score.composer
+                ? this.escapeHtml(score.composer)
+                : 'Unknown composer'
+            }
           </p>
 
-          ${score.description ? `
-            <p class="score-description">${this.escapeHtml(score.description)}</p>
-          ` : ''}
+          ${
+            score.description
+              ? `
+            <p class="score-description">${this.escapeHtml(
+              score.description,
+            )}</p>
+          `
+              : ''
+          }
         </div>
 
         <div class="score-card-footer">
-          <span class="score-stat" title="Fork count">${renderIcon('git-fork')} ${score.fork_count}</span>
-          <span class="score-stat" title="View count">${renderIcon('eye')} ${score.view_count}</span>
-          <span class="score-stat" title="Created date">${renderIcon('calendar')} ${this.formatDate(score.created_at)}</span>
+          <span class="score-stat" title="Fork count">${renderIcon(
+            'git-fork',
+          )} ${score.fork_count}</span>
+          <span class="score-stat" title="View count">${renderIcon('eye')} ${
+            score.view_count
+          }</span>
+          <span class="score-stat" title="Created date">${renderIcon(
+            'calendar',
+          )} ${this.formatDate(score.created_at)}</span>
         </div>
       </div>
     `;
@@ -209,7 +256,9 @@ export class ScoreLibrary {
 
   private attachEventListeners(): void {
     // Search input
-    const searchInput = this.container.querySelector('#search-input') as HTMLInputElement;
+    const searchInput = this.container.querySelector(
+      '#search-input',
+    ) as HTMLInputElement;
     searchInput?.addEventListener('input', (e) => {
       this.handleSearch((e.target as HTMLInputElement).value);
     });

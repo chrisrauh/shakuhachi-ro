@@ -108,22 +108,21 @@ export class AuthModal {
   private async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
 
-    const email = (
-      this.modal.querySelector('#auth-email') as HTMLInputElement
-    ).value;
+    const email = (this.modal.querySelector('#auth-email') as HTMLInputElement)
+      .value;
     const password = (
       this.modal.querySelector('#auth-password') as HTMLInputElement
     ).value;
-    const errorDiv = this.modal.querySelector(
-      '#auth-error'
-    ) as HTMLDivElement;
+    const errorDiv = this.modal.querySelector('#auth-error') as HTMLDivElement;
     const submitBtn = this.modal.querySelector(
-      '#auth-submit'
+      '#auth-submit',
     ) as HTMLButtonElement;
 
     errorDiv.style.display = 'none';
     submitBtn.disabled = true;
-    submitBtn.textContent = this.isLoginMode ? 'Logging in...' : 'Signing up...';
+    submitBtn.textContent = this.isLoginMode
+      ? 'Logging in...'
+      : 'Signing up...';
 
     try {
       const result = this.isLoginMode
@@ -138,7 +137,7 @@ export class AuthModal {
       } else {
         this.hide();
         window.dispatchEvent(
-          new CustomEvent('auth-change', { detail: result.user })
+          new CustomEvent('auth-change', { detail: result.user }),
         );
       }
     } catch (error) {
@@ -154,17 +153,15 @@ export class AuthModal {
     this.isLoginMode = !this.isLoginMode;
 
     const title = this.modal.querySelector(
-      '#auth-modal-title'
+      '#auth-modal-title',
     ) as HTMLHeadingElement;
     const submitBtn = this.modal.querySelector(
-      '#auth-submit'
+      '#auth-submit',
     ) as HTMLButtonElement;
     const toggleBtn = this.modal.querySelector(
-      '#auth-toggle'
+      '#auth-toggle',
     ) as HTMLButtonElement;
-    const errorDiv = this.modal.querySelector(
-      '#auth-error'
-    ) as HTMLDivElement;
+    const errorDiv = this.modal.querySelector('#auth-error') as HTMLDivElement;
 
     errorDiv.style.display = 'none';
 
@@ -188,9 +185,7 @@ export class AuthModal {
     const form = this.modal.querySelector('#auth-form') as HTMLFormElement;
     form.reset();
 
-    const errorDiv = this.modal.querySelector(
-      '#auth-error'
-    ) as HTMLDivElement;
+    const errorDiv = this.modal.querySelector('#auth-error') as HTMLDivElement;
     errorDiv.style.display = 'none';
   }
 

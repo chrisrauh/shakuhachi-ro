@@ -21,7 +21,7 @@ export class TestModifier extends Modifier {
   constructor(
     position: ModifierPosition = 'above',
     color: string = '#FF5722',
-    radius: number = 6
+    radius: number = 6,
   ) {
     super(position);
     this.color = color;

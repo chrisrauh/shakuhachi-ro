@@ -30,7 +30,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // Should have 1 column
@@ -50,8 +50,9 @@ describe('ColumnLayoutCalculator', () => {
       // With topMargin=34, spacing=44, height=600:
       // Available: 566px, fits ~12 notes per column
       // Expected: 3 columns (12 + 12 + 1)
-      const notes = Array.from({ length: 25 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 25 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({
@@ -63,7 +64,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // Should have 3 columns based on height
@@ -84,8 +85,9 @@ describe('ColumnLayoutCalculator', () => {
     it('should position columns right-to-left', () => {
       // With 15 notes, defaults (topMargin=34, spacing=44, height=600):
       // Should create 2 columns (12 + 3)
-      const notes = Array.from({ length: 15 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 15 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({
@@ -97,7 +99,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // 2 columns needed
@@ -117,8 +119,9 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should center columns horizontally', () => {
-      const notes = Array.from({ length: 5 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 5 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const svgWidth = 800;
@@ -131,7 +134,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         svgWidth,
         600,
-        options
+        options,
       );
 
       // Single column: should be centered
@@ -157,7 +160,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       const positions = layout.columns[0].notePositions;
@@ -190,7 +193,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       const positions = layout.columns[0].notePositions;
@@ -209,8 +212,9 @@ describe('ColumnLayoutCalculator', () => {
     it('should handle notes that exactly fill columns', () => {
       // With defaults (topMargin=34, spacing=44, height=600), 12 notes fit per column
       // Create exactly 24 notes (2 full columns)
-      const notes = Array.from({ length: 24 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 24 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({});
@@ -219,7 +223,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // Should have exactly 2 columns
@@ -227,8 +231,12 @@ describe('ColumnLayoutCalculator', () => {
       expect(layout.columns.length).toBe(2);
 
       // Each column should have 12 notes
-      expect(layout.columns[0].noteEndIndex - layout.columns[0].noteStartIndex).toBe(12);
-      expect(layout.columns[1].noteEndIndex - layout.columns[1].noteStartIndex).toBe(12);
+      expect(
+        layout.columns[0].noteEndIndex - layout.columns[0].noteStartIndex,
+      ).toBe(12);
+      expect(
+        layout.columns[1].noteEndIndex - layout.columns[1].noteStartIndex,
+      ).toBe(12);
     });
 
     it('should handle single note', () => {
@@ -242,7 +250,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       expect(layout.totalColumns).toBe(1);
@@ -260,7 +268,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // No notes = 0 columns
@@ -270,8 +278,9 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should preserve noteIndex in positions', () => {
       // With defaults, 12 notes per column. 15 notes = 2 columns (12 + 3)
-      const notes = Array.from({ length: 15 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 15 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({});
@@ -280,7 +289,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       // First column: notes 0-11
@@ -296,8 +305,9 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should use custom column width and spacing', () => {
       // With defaults, 12 notes per column. 24 notes = 2 columns
-      const notes = Array.from({ length: 24 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 24 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({
@@ -309,20 +319,22 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         1000,
         600,
-        options
+        options,
       );
 
       expect(layout.columnWidth).toBe(150);
       expect(layout.columnSpacing).toBe(50);
 
       // Distance between columns should be 150 + 50 = 200
-      const distance = layout.columns[0].xPosition - layout.columns[1].xPosition;
+      const distance =
+        layout.columns[0].xPosition - layout.columns[1].xPosition;
       expect(distance).toBe(200);
     });
 
     it('should handle different viewport widths', () => {
-      const notes = Array.from({ length: 5 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 5 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({
@@ -335,7 +347,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         400,
         600,
-        options
+        options,
       );
 
       // Wide viewport
@@ -343,7 +355,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         1200,
         600,
-        options
+        options,
       );
 
       // Both should have same number of columns (height is same)
@@ -376,7 +388,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         800,
         600,
-        options
+        options,
       );
 
       const positions = layout.columns[0].notePositions;
@@ -403,8 +415,9 @@ describe('ColumnLayoutCalculator', () => {
       ];
 
       testCases.forEach(({ noteCount, svgHeight, expectedColumns }) => {
-        const notes = Array.from({ length: noteCount }, () =>
-          new ShakuNote({ symbol: 'ro' })
+        const notes = Array.from(
+          { length: noteCount },
+          () => new ShakuNote({ symbol: 'ro' }),
         );
 
         const options = mergeWithDefaults({});
@@ -413,7 +426,7 @@ describe('ColumnLayoutCalculator', () => {
           notes,
           800,
           svgHeight,
-          options
+          options,
         );
 
         expect(layout.totalColumns).toBe(expectedColumns);
@@ -422,8 +435,9 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should handle large number of columns', () => {
       // 100 notes with default height (600px, ~12 notes/column) = ~9 columns
-      const notes = Array.from({ length: 100 }, () =>
-        new ShakuNote({ symbol: 'ro' })
+      const notes = Array.from(
+        { length: 100 },
+        () => new ShakuNote({ symbol: 'ro' }),
       );
 
       const options = mergeWithDefaults({
@@ -435,7 +449,7 @@ describe('ColumnLayoutCalculator', () => {
         notes,
         2000,
         600,
-        options
+        options,
       );
 
       // Should have 9 columns (100/12 ≈ 8.33, rounded up)

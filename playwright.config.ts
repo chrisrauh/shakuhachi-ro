@@ -19,10 +19,7 @@ export default defineConfig({
   workers: 1, // Single worker for visual consistency
 
   // Reporter configuration
-  reporter: [
-    ['html', { outputFolder: 'tests/visual/reports' }],
-    ['list'],
-  ],
+  reporter: [['html', { outputFolder: 'tests/visual/reports' }], ['list']],
 
   // Shared settings for all tests
   use: {

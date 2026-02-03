@@ -39,7 +39,7 @@ import type { ScoreData } from '../types/ScoreData';
 export async function renderScoreFromURL(
   container: HTMLElement,
   url: string,
-  options?: RenderOptions
+  options?: RenderOptions,
 ): Promise<ScoreRenderer> {
   const renderer = new ScoreRenderer(container, options);
   await renderer.renderFromURL(url);
@@ -74,7 +74,7 @@ export async function renderScoreFromURL(
 export async function renderScore(
   container: HTMLElement,
   scoreData: ScoreData,
-  options?: RenderOptions
+  options?: RenderOptions,
 ): Promise<ScoreRenderer> {
   const renderer = new ScoreRenderer(container, options);
   await renderer.renderFromScoreData(scoreData);

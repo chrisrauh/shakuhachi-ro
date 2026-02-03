@@ -114,9 +114,13 @@ describe('ModifierConfigurator', () => {
       // Verify octave mark removed, but meri and dot remain
       const modifiers = note.getModifiers();
       expect(modifiers.length).toBe(2);
-      expect(modifiers.some((m) => m instanceof OctaveMarksModifier)).toBe(false);
+      expect(modifiers.some((m) => m instanceof OctaveMarksModifier)).toBe(
+        false,
+      );
       expect(modifiers.some((m) => m instanceof MeriKariModifier)).toBe(true);
-      expect(modifiers.some((m) => m instanceof DurationDotModifier)).toBe(true);
+      expect(modifiers.some((m) => m instanceof DurationDotModifier)).toBe(
+        true,
+      );
     });
 
     it('should configure multiple notes correctly', () => {
@@ -195,7 +199,9 @@ describe('ModifierConfigurator', () => {
       // Both should be configured
       const modifiers = note.getModifiers();
       expect(modifiers.length).toBe(2);
-      expect(modifiers.every((m) => m instanceof OctaveMarksModifier)).toBe(true);
+      expect(modifiers.every((m) => m instanceof OctaveMarksModifier)).toBe(
+        true,
+      );
     });
 
     it('should remove all octave marks when disabled, even if multiple', () => {

@@ -32,7 +32,7 @@ export class ModifierConfigurator {
    */
   static configureModifiers(
     notes: ShakuNote[],
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): void {
     notes.forEach((note) => {
       const modifiers = note.getModifiers();
@@ -40,7 +40,7 @@ export class ModifierConfigurator {
       // Remove octave marks if disabled
       if (!options.showOctaveMarks) {
         const nonOctaveModifiers = modifiers.filter(
-          (mod) => !(mod instanceof OctaveMarksModifier)
+          (mod) => !(mod instanceof OctaveMarksModifier),
         );
         note.setModifiers(nonOctaveModifiers);
       } else {
@@ -66,7 +66,7 @@ export class ModifierConfigurator {
    */
   private static configureOctaveMark(
     modifier: OctaveMarksModifier,
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): void {
     modifier
       .setFontSize(options.octaveMarkFontSize)
@@ -82,7 +82,7 @@ export class ModifierConfigurator {
    */
   private static configureMeriKariMark(
     modifier: MeriKariModifier,
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): void {
     modifier
       .setFontSize(options.meriKariFontSize)

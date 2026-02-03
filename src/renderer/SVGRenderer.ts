@@ -48,7 +48,7 @@ export class SVGRenderer {
    * Creates an SVG element with proper namespace
    */
   private create<K extends keyof SVGElementTagNameMap>(
-    tagName: K
+    tagName: K,
   ): SVGElementTagNameMap[K] {
     return document.createElementNS(SVG_NS, tagName);
   }
@@ -79,7 +79,7 @@ export class SVGRenderer {
     fontFamily: string = 'Noto Sans JP, sans-serif',
     fill: string = '#000',
     textAnchor: 'start' | 'middle' | 'end' = 'middle',
-    fontWeight: number | string = 400
+    fontWeight: number | string = 400,
   ): SVGTextElement {
     const textEl = this.create('text');
     textEl.setAttribute('x', String(this.round(x)));
@@ -110,7 +110,7 @@ export class SVGRenderer {
     radius: number,
     fill?: string,
     stroke?: string,
-    strokeWidth: number = 1
+    strokeWidth: number = 1,
   ): SVGCircleElement {
     const circle = this.create('circle');
     circle.setAttribute('cx', String(this.round(x)));
@@ -147,7 +147,7 @@ export class SVGRenderer {
     x2: number,
     y2: number,
     stroke: string = '#000',
-    strokeWidth: number = 1
+    strokeWidth: number = 1,
   ): SVGLineElement {
     const line = this.create('line');
     line.setAttribute('x1', String(this.round(x1)));
@@ -172,7 +172,7 @@ export class SVGRenderer {
     pathData: string,
     fill?: string,
     stroke?: string,
-    strokeWidth: number = 1
+    strokeWidth: number = 1,
   ): SVGPathElement {
     const path = this.create('path');
     path.setAttribute('d', pathData);
@@ -234,9 +234,8 @@ export class SVGRenderer {
     this.groups.pop();
 
     // Restore parent (either previous group or root SVG)
-    this.currentParent = this.groups.length > 0
-      ? this.groups[this.groups.length - 1]
-      : this.svg;
+    this.currentParent =
+      this.groups.length > 0 ? this.groups[this.groups.length - 1] : this.svg;
   }
 
   /**
@@ -256,7 +255,7 @@ export class SVGRenderer {
     height: number,
     fill?: string,
     stroke?: string,
-    strokeWidth: number = 1
+    strokeWidth: number = 1,
   ): SVGRectElement {
     const rect = this.create('rect');
     rect.setAttribute('x', String(this.round(x)));
