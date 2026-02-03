@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src scripts tests *.{js,ts,cjs}",
+    "lint": "eslint src scripts tests *.{js,ts}",
     "test": "npm run type-check && npm run lint && vitest",
     "test:ui": "vitest --ui",
     "test:run": "npm run type-check && npm run lint && vitest run",

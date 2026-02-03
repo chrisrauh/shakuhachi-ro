@@ -10,7 +10,7 @@ import type { ScoreData } from '../types/ScoreData';
 // Mock MusicXMLParser to avoid actual file loading
 vi.mock('../parser/MusicXMLParser', () => ({
   MusicXMLParser: {
-    parseFromURL: vi.fn(async (_url: string) => ({
+    parseFromURL: vi.fn(async () => ({
       title: 'Test Score',
       composer: 'Test Composer',
       style: 'kinko' as const,
