@@ -105,14 +105,14 @@ export class ScoreRenderer {
       notes,
       width,
       height,
-      this.options
+      this.options,
     );
 
     // Render each column
     layout.columns.forEach((columnInfo) => {
       const columnNotes = notes.slice(
         columnInfo.noteStartIndex,
-        columnInfo.noteEndIndex
+        columnInfo.noteEndIndex,
       );
 
       // Render notes at their calculated positions
@@ -149,7 +149,7 @@ export class ScoreRenderer {
     note: ShakuNote,
     globalIndex: number,
     x: number,
-    y: number
+    y: number,
   ): void {
     if (!this.renderer) return;
 
@@ -160,13 +160,17 @@ export class ScoreRenderer {
     // Check for octave modifier
     const octaveModifier = note
       .getModifiers()
-      .find((m) => m instanceof OctaveMarksModifier) as OctaveMarksModifier | undefined;
+      .find((m) => m instanceof OctaveMarksModifier) as
+      | OctaveMarksModifier
+      | undefined;
     const octave = octaveModifier ? `(${octaveModifier.getRegister()})` : '';
 
     // Check for meri modifier
     const meriModifier = note
       .getModifiers()
-      .find((m) => m instanceof MeriKariModifier) as MeriKariModifier | undefined;
+      .find((m) => m instanceof MeriKariModifier) as
+      | MeriKariModifier
+      | undefined;
     const meriInfo = meriModifier ? meriModifier.getType() : '';
 
     const label = `${globalIndex + 1} ${romanji} ${octave} ${meriInfo}`.trim();
@@ -178,7 +182,7 @@ export class ScoreRenderer {
       this.options.debugLabelFontSize,
       this.options.debugLabelFontFamily,
       this.options.debugLabelColor,
-      'start' // Left-aligned text
+      'start', // Left-aligned text
     );
   }
 

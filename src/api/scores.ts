@@ -51,7 +51,7 @@ export interface ScoresResult {
  * Create a new score
  */
 export async function createScore(
-  scoreData: CreateScoreData
+  scoreData: CreateScoreData,
 ): Promise<ScoreResult> {
   try {
     const { user } = await getCurrentUser();
@@ -59,7 +59,7 @@ export async function createScore(
     if (!user) {
       return {
         score: null,
-        error: new Error('User must be logged in to create scores')
+        error: new Error('User must be logged in to create scores'),
       };
     }
 
@@ -85,7 +85,7 @@ export async function createScore(
         description: scoreData.description || null,
         data_format: scoreData.data_format,
         data: scoreData.data,
-        forked_from: scoreData.forked_from || null
+        forked_from: scoreData.forked_from || null,
       })
       .select()
       .single();
@@ -93,7 +93,7 @@ export async function createScore(
     if (error) {
       return {
         score: null,
-        error: new Error(`Failed to create score: ${error.message}`)
+        error: new Error(`Failed to create score: ${error.message}`),
       };
     }
 
@@ -104,7 +104,7 @@ export async function createScore(
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error creating score')
+          : new Error('Unknown error creating score'),
     };
   }
 }
@@ -114,7 +114,7 @@ export async function createScore(
  */
 export async function updateScore(
   id: string,
-  updates: UpdateScoreData
+  updates: UpdateScoreData,
 ): Promise<ScoreResult> {
   try {
     const { user } = await getCurrentUser();
@@ -122,7 +122,7 @@ export async function updateScore(
     if (!user) {
       return {
         score: null,
-        error: new Error('User must be logged in to update scores')
+        error: new Error('User must be logged in to update scores'),
       };
     }
 
@@ -138,12 +138,14 @@ export async function updateScore(
       if (error.code === 'PGRST116') {
         return {
           score: null,
-          error: new Error('Score not found or you do not have permission to update it')
+          error: new Error(
+            'Score not found or you do not have permission to update it',
+          ),
         };
       }
       return {
         score: null,
-        error: new Error(`Failed to update score: ${error.message}`)
+        error: new Error(`Failed to update score: ${error.message}`),
       };
     }
 
@@ -154,7 +156,7 @@ export async function updateScore(
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error updating score')
+          : new Error('Unknown error updating score'),
     };
   }
 }
@@ -162,13 +164,15 @@ export async function updateScore(
 /**
  * Delete a score
  */
-export async function deleteScore(id: string): Promise<{ error: Error | null }> {
+export async function deleteScore(
+  id: string,
+): Promise<{ error: Error | null }> {
   try {
     const { user } = await getCurrentUser();
 
     if (!user) {
       return {
-        error: new Error('User must be logged in to delete scores')
+        error: new Error('User must be logged in to delete scores'),
       };
     }
 
@@ -180,7 +184,7 @@ export async function deleteScore(id: string): Promise<{ error: Error | null }> 
 
     if (error) {
       return {
-        error: new Error(`Failed to delete score: ${error.message}`)
+        error: new Error(`Failed to delete score: ${error.message}`),
       };
     }
 
@@ -190,7 +194,7 @@ export async function deleteScore(id: string): Promise<{ error: Error | null }> 
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error deleting score')
+          : new Error('Unknown error deleting score'),
     };
   }
 }
@@ -210,12 +214,12 @@ export async function getScore(id: string): Promise<ScoreResult> {
       if (error.code === 'PGRST116') {
         return {
           score: null,
-          error: new Error('Score not found')
+          error: new Error('Score not found'),
         };
       }
       return {
         score: null,
-        error: new Error(`Failed to fetch score: ${error.message}`)
+        error: new Error(`Failed to fetch score: ${error.message}`),
       };
     }
 
@@ -224,7 +228,9 @@ export async function getScore(id: string): Promise<ScoreResult> {
     return {
       score: null,
       error:
-        error instanceof Error ? error : new Error('Unknown error fetching score')
+        error instanceof Error
+          ? error
+          : new Error('Unknown error fetching score'),
     };
   }
 }
@@ -244,12 +250,12 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
       if (error.code === 'PGRST116') {
         return {
           score: null,
-          error: new Error('Score not found')
+          error: new Error('Score not found'),
         };
       }
       return {
         score: null,
-        error: new Error(`Failed to fetch score: ${error.message}`)
+        error: new Error(`Failed to fetch score: ${error.message}`),
       };
     }
 
@@ -258,7 +264,9 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
     return {
       score: null,
       error:
-        error instanceof Error ? error : new Error('Unknown error fetching score')
+        error instanceof Error
+          ? error
+          : new Error('Unknown error fetching score'),
     };
   }
 }
@@ -277,7 +285,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
     if (error) {
       return {
         scores: [],
-        error: new Error(`Failed to fetch user scores: ${error.message}`)
+        error: new Error(`Failed to fetch user scores: ${error.message}`),
       };
     }
 
@@ -288,7 +296,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error fetching user scores')
+          : new Error('Unknown error fetching user scores'),
     };
   }
 }
@@ -306,7 +314,7 @@ export async function getAllScores(): Promise<ScoresResult> {
     if (error) {
       return {
         scores: [],
-        error: new Error(`Failed to fetch scores: ${error.message}`)
+        error: new Error(`Failed to fetch scores: ${error.message}`),
       };
     }
 
@@ -317,7 +325,7 @@ export async function getAllScores(): Promise<ScoresResult> {
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error fetching scores')
+          : new Error('Unknown error fetching scores'),
     };
   }
 }
@@ -342,7 +350,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
     if (error) {
       return {
         scores: [],
-        error: new Error(`Failed to search scores: ${error.message}`)
+        error: new Error(`Failed to search scores: ${error.message}`),
       };
     }
 
@@ -353,7 +361,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error searching scores')
+          : new Error('Unknown error searching scores'),
     };
   }
 }
@@ -361,15 +369,17 @@ export async function searchScores(query: string): Promise<ScoresResult> {
 /**
  * Increment view count for a score
  */
-export async function incrementViewCount(id: string): Promise<{ error: Error | null }> {
+export async function incrementViewCount(
+  id: string,
+): Promise<{ error: Error | null }> {
   try {
     const { error } = await supabase.rpc('increment_view_count', {
-      score_id: id
+      score_id: id,
     });
 
     if (error) {
       return {
-        error: new Error(`Failed to increment view count: ${error.message}`)
+        error: new Error(`Failed to increment view count: ${error.message}`),
       };
     }
 
@@ -379,7 +389,7 @@ export async function incrementViewCount(id: string): Promise<{ error: Error | n
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error incrementing view count')
+          : new Error('Unknown error incrementing view count'),
     };
   }
 }
@@ -394,7 +404,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     if (!user) {
       return {
         score: null,
-        error: new Error('User must be logged in to fork scores')
+        error: new Error('User must be logged in to fork scores'),
       };
     }
 
@@ -408,7 +418,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     if (fetchError || !originalScore) {
       return {
         score: null,
-        error: new Error('Failed to fetch score to fork')
+        error: new Error('Failed to fetch score to fork'),
       };
     }
 
@@ -419,7 +429,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       description: originalScore.description || undefined,
       data_format: originalScore.data_format,
       data: originalScore.data,
-      forked_from: scoreId
+      forked_from: scoreId,
     });
 
     if (forkResult.error) {
@@ -439,7 +449,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       error:
         error instanceof Error
           ? error
-          : new Error('Unknown error forking score')
+          : new Error('Unknown error forking score'),
     };
   }
 }

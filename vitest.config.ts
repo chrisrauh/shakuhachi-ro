@@ -11,11 +11,11 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.ts', 'src/**/*.js'],
       exclude: [
-        'src/**/*.test.ts',      // Exclude test files
-        'src/**/*.test.js',      // Exclude test files
-        'src/test-*.js',         // Exclude visual test scripts
-        'src/index.ts'           // Exclude main export file
-      ]
-    }
-  }
+        'src/**/*.test.ts', // Exclude test files
+        'src/**/*.test.js', // Exclude test files
+        'src/test-*.js', // Exclude visual test scripts
+        'src/index.ts', // Exclude main export file
+      ],
+    },
+  },
 });

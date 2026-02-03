@@ -31,12 +31,13 @@ export class MusicXMLParser {
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
 
-    noteElements.forEach(noteElement => {
+    noteElements.forEach((noteElement) => {
       // Check for rests
       const restElement = noteElement.querySelector('rest');
       if (restElement) {
         // Extract duration for rest
-        const durationElement = noteElement.querySelector('duration')?.textContent || '1';
+        const durationElement =
+          noteElement.querySelector('duration')?.textContent || '1';
         const duration = parseInt(durationElement, 10);
 
         // Create rest note (following MusicXML structure)
@@ -68,7 +69,8 @@ export class MusicXMLParser {
       }
 
       // Extract duration (simplified - just map to basic durations)
-      const durationElement = noteElement.querySelector('duration')?.textContent || '1';
+      const durationElement =
+        noteElement.querySelector('duration')?.textContent || '1';
       const duration = parseInt(durationElement, 10);
 
       // Check if note is dotted

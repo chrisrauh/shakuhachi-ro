@@ -71,7 +71,7 @@ export class VerticalSystem {
   renderColumn(
     notes: ShakuNote[],
     renderer: SVGRenderer,
-    columnX: number = this.x
+    columnX: number = this.x,
   ): SVGGElement {
     // Create a group for this column
     const columnGroup = renderer.openGroup('shaku-column');
@@ -80,7 +80,7 @@ export class VerticalSystem {
     this.formatter.format(notes, 0, 0);
 
     // Render all notes in the group
-    notes.forEach(note => note.render(renderer));
+    notes.forEach((note) => note.render(renderer));
 
     // Close the group
     renderer.closeGroup();
@@ -119,7 +119,7 @@ export class VerticalSystem {
     const columnGroups: SVGGElement[] = [];
     columns.forEach((columnNotes, index) => {
       // Calculate X position (moving left as index increases)
-      const columnX = startX - (index * this.columnSpacing);
+      const columnX = startX - index * this.columnSpacing;
 
       const group = this.renderColumn(columnNotes, renderer, columnX);
       columnGroups.push(group);
@@ -141,7 +141,7 @@ export class VerticalSystem {
   private drawColumnSeparators(
     columnCount: number,
     startX: number,
-    renderer: SVGRenderer
+    renderer: SVGRenderer,
   ): void {
     if (columnCount <= 1) {
       return; // No separators needed for single column
@@ -150,8 +150,8 @@ export class VerticalSystem {
     // Draw separator lines between each pair of columns
     for (let i = 0; i < columnCount - 1; i++) {
       // Calculate X position halfway between columns
-      const column1X = startX - (i * this.columnSpacing);
-      const column2X = startX - ((i + 1) * this.columnSpacing);
+      const column1X = startX - i * this.columnSpacing;
+      const column2X = startX - (i + 1) * this.columnSpacing;
       const separatorX = (column1X + column2X) / 2;
 
       // Draw vertical line
@@ -161,7 +161,7 @@ export class VerticalSystem {
         separatorX,
         this.y + this.columnHeight + 20, // Extend slightly below
         '#ccc', // Light gray color
-        1 // Line width
+        1, // Line width
       );
     }
   }
@@ -179,7 +179,7 @@ export class VerticalSystem {
     notes: ShakuNote[],
     renderer: SVGRenderer,
     x: number,
-    y?: number
+    y?: number,
   ): SVGGElement {
     const columnGroup = renderer.openGroup('shaku-column-single');
 
@@ -187,7 +187,7 @@ export class VerticalSystem {
     this.formatter.format(notes, 0, 0);
 
     // Render notes
-    notes.forEach(note => note.render(renderer));
+    notes.forEach((note) => note.render(renderer));
 
     renderer.closeGroup();
 

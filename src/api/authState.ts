@@ -5,7 +5,9 @@ export class AuthStateManager {
   private static instance: AuthStateManager;
   private user: User | null = null;
   private session: Session | null = null;
-  private listeners: Array<(user: User | null, session: Session | null) => void> = [];
+  private listeners: Array<
+    (user: User | null, session: Session | null) => void
+  > = [];
 
   private constructor() {
     this.initialize();
@@ -42,7 +44,7 @@ export class AuthStateManager {
   }
 
   public subscribe(
-    callback: (user: User | null, session: Session | null) => void
+    callback: (user: User | null, session: Session | null) => void,
   ): () => void {
     this.listeners.push(callback);
 

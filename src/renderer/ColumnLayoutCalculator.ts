@@ -95,7 +95,7 @@ export class ColumnLayoutCalculator {
     notes: ShakuNote[],
     svgWidth: number,
     svgHeight: number,
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): ColumnLayout {
     // Extract layout parameters from options
     const columnWidth = options.columnWidth;
@@ -109,7 +109,7 @@ export class ColumnLayoutCalculator {
       svgHeight,
       startY,
       verticalSpacing,
-      options
+      options,
     );
 
     const totalColumns = columnBreaks.length;
@@ -137,8 +137,8 @@ export class ColumnLayoutCalculator {
           noteEndIndex,
           verticalSpacing,
           notes,
-          options
-        )
+          options,
+        ),
       );
     }
 
@@ -170,7 +170,7 @@ export class ColumnLayoutCalculator {
     svgHeight: number,
     startY: number,
     verticalSpacing: number,
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): ColumnBreak[] {
     // Handle empty notes array
     if (notes.length === 0) {
@@ -244,7 +244,7 @@ export class ColumnLayoutCalculator {
     noteEndIndex: number,
     verticalSpacing: number,
     notes: ShakuNote[],
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): ColumnInfo {
     // Calculate column X position (reverse order: rightmost is first)
     const xPosition =
@@ -257,7 +257,7 @@ export class ColumnLayoutCalculator {
       startY,
       verticalSpacing,
       notes,
-      options
+      options,
     );
 
     return {
@@ -286,7 +286,7 @@ export class ColumnLayoutCalculator {
     startY: number,
     verticalSpacing: number,
     notes: ShakuNote[],
-    options: Required<RenderOptions>
+    options: Required<RenderOptions>,
   ): NotePosition[] {
     const positions: NotePosition[] = [];
     let currentY = startY;

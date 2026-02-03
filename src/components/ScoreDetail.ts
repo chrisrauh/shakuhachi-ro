@@ -1,4 +1,9 @@
-import { getScoreBySlug, getScore, incrementViewCount, forkScore } from '../api/scores';
+import {
+  getScoreBySlug,
+  getScore,
+  incrementViewCount,
+  forkScore,
+} from '../api/scores';
 import { authState } from '../api/authState';
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
@@ -65,7 +70,7 @@ export class ScoreDetail {
 
     try {
       this.renderer = new ScoreRenderer(scoreContainer as HTMLElement, {
-        showDebugLabels: false
+        showDebugLabels: false,
       });
 
       if (this.score.data_format === 'json') {
@@ -84,7 +89,9 @@ export class ScoreDetail {
     } catch (error) {
       scoreContainer.innerHTML = `
         <div style="text-align: center; padding: 40px; color: #f44336;">
-          <p>Error rendering score: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+          <p>Error rendering score: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }</p>
         </div>
       `;
     }
@@ -106,7 +113,10 @@ export class ScoreDetail {
       this.container.innerHTML = `
         <div class="score-detail-error">
           <h2>Score Not Found</h2>
-          <p>${this.error?.message || 'The score you are looking for does not exist.'}</p>
+          <p>${
+            this.error?.message ||
+            'The score you are looking for does not exist.'
+          }</p>
           <a href="/" class="btn btn-primary">Browse All Scores</a>
         </div>
       `;
@@ -122,36 +132,70 @@ export class ScoreDetail {
         <div class="score-detail-header">
           <div class="score-detail-metadata">
             <h1>${this.escapeHtml(this.score.title)}</h1>
-            ${this.score.composer ? `
-              <p class="score-composer">By ${this.escapeHtml(this.score.composer)}</p>
-            ` : ''}
+            ${
+              this.score.composer
+                ? `
+              <p class="score-composer">By ${this.escapeHtml(
+                this.score.composer,
+              )}</p>
+            `
+                : ''
+            }
 
-            ${this.parentScore ? `
+            ${
+              this.parentScore
+                ? `
               <div class="fork-attribution">
-                ${renderIcon('git-fork')} Forked from <a href="/score.html?slug=${this.parentScore.slug}">${this.escapeHtml(this.parentScore.title)}</a>
+                ${renderIcon(
+                  'git-fork',
+                )} Forked from <a href="/score.html?slug=${
+                  this.parentScore.slug
+                }">${this.escapeHtml(this.parentScore.title)}</a>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
 
             <div class="score-creator">
-              <a href="/profile.html?id=${this.score.user_id}">View creator's profile</a>
+              <a href="/profile.html?id=${
+                this.score.user_id
+              }">View creator's profile</a>
             </div>
 
-            ${this.score.description ? `
-              <p class="score-description">${this.escapeHtml(this.score.description)}</p>
-            ` : ''}
+            ${
+              this.score.description
+                ? `
+              <p class="score-description">${this.escapeHtml(
+                this.score.description,
+              )}</p>
+            `
+                : ''
+            }
 
             <div class="score-stats">
-              <span class="score-stat">${renderIcon('git-fork')} ${this.score.fork_count} forks</span>
-              <span class="score-stat">${renderIcon('eye')} ${this.score.view_count} views</span>
-              <span class="score-stat">${renderIcon('calendar')} ${this.formatDate(this.score.created_at)}</span>
+              <span class="score-stat">${renderIcon('git-fork')} ${
+                this.score.fork_count
+              } forks</span>
+              <span class="score-stat">${renderIcon('eye')} ${
+                this.score.view_count
+              } views</span>
+              <span class="score-stat">${renderIcon(
+                'calendar',
+              )} ${this.formatDate(this.score.created_at)}</span>
             </div>
           </div>
 
           <div class="score-detail-actions">
-            ${isOwner ? `
+            ${
+              isOwner
+                ? `
               <a href="/editor.html?id=${this.score.id}" class="btn btn-primary">Edit Score</a>
-            ` : ''}
-            <button id="fork-btn" class="btn ${isOwner ? 'btn-secondary' : 'btn-primary'}">Fork Score</button>
+            `
+                : ''
+            }
+            <button id="fork-btn" class="btn ${
+              isOwner ? 'btn-secondary' : 'btn-primary'
+            }">Fork Score</button>
             <a href="/" class="btn btn-secondary">Back to Library</a>
           </div>
         </div>
@@ -176,7 +220,9 @@ export class ScoreDetail {
     if (!this.score) return;
 
     // Disable the fork button to prevent double-clicks
-    const forkBtn = this.container.querySelector('#fork-btn') as HTMLButtonElement;
+    const forkBtn = this.container.querySelector(
+      '#fork-btn',
+    ) as HTMLButtonElement;
     if (forkBtn) {
       forkBtn.disabled = true;
       forkBtn.textContent = 'Forking...';

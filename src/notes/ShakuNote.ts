@@ -146,7 +146,7 @@ export class ShakuNote {
         radius,
         undefined, // no fill
         this.color, // stroke color
-        strokeWidth
+        strokeWidth,
       );
     } else {
       // Draw the kana symbol
@@ -158,12 +158,12 @@ export class ShakuNote {
         this.fontFamily,
         this.color,
         'middle',
-        this.fontWeight
+        this.fontWeight,
       );
     }
 
     // Render all modifiers
-    this.modifiers.forEach(modifier => {
+    this.modifiers.forEach((modifier) => {
       modifier.render(renderer, this.x, this.y);
     });
 
@@ -277,7 +277,7 @@ export class ShakuNote {
     let maxY = this.y;
 
     // Expand bbox to include all modifiers
-    this.modifiers.forEach(modifier => {
+    this.modifiers.forEach((modifier) => {
       const modOffset = modifier.getOffset();
       const modWidth = modifier.getWidth();
       const modHeight = modifier.getHeight();
@@ -295,7 +295,7 @@ export class ShakuNote {
       x: minX,
       y: minY,
       width: maxX - minX,
-      height: maxY - minY
+      height: maxY - minY,
     };
 
     return this.bbox;
