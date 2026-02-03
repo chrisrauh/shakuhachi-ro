@@ -294,10 +294,8 @@ export class ScoreRenderer {
       return;
     }
 
-    this.resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        this.handleResize(entry.contentRect.width, entry.contentRect.height);
-      }
+    this.resizeObserver = new ResizeObserver(() => {
+      this.handleResize();
     });
 
     this.resizeObserver.observe(this.container);
@@ -305,11 +303,9 @@ export class ScoreRenderer {
 
   /**
    * Handles resize events by triggering re-render
-   * @param _width - New container width (unused, dimensions re-read from container)
-   * @param _height - New container height (unused, dimensions re-read from container)
    * @private
    */
-  private handleResize(_width: number, _height: number): void {
+  private handleResize(): void {
     if (this.currentNotes.length > 0) {
       this.renderNotes(this.currentNotes);
     }
