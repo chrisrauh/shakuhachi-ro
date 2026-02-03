@@ -41,9 +41,9 @@ export class MeriKariModifier extends Modifier {
 
   /** Katakana/Kanji characters for each alteration type */
   private static readonly symbols: Record<MeriKariType, string> = {
-    'meri': 'メ',      // Katakana "me" - full meri
-    'chu-meri': '中',  // Kanji "chu" (middle) - half meri
-    'dai-meri': '大'   // Kanji "dai" (big/great) - great meri
+    meri: 'メ', // Katakana "me" - full meri
+    'chu-meri': '中', // Kanji "chu" (middle) - half meri
+    'dai-meri': '大', // Kanji "dai" (big/great) - great meri
   };
 
   /**
@@ -52,7 +52,10 @@ export class MeriKariModifier extends Modifier {
    * @param type - Type of alteration: 'meri', 'chu-meri', or 'dai-meri'
    * @param position - Where to position relative to note (default: 'left')
    */
-  constructor(type: MeriKariType = 'meri', position: ModifierPosition = 'left') {
+  constructor(
+    type: MeriKariType = 'meri',
+    position: ModifierPosition = 'left',
+  ) {
     super(position);
     this.type = type;
     this.setDefaultOffsets();
@@ -64,7 +67,7 @@ export class MeriKariModifier extends Modifier {
   private setDefaultOffsets(): void {
     if (this.position === 'left') {
       this.offsetX = -22; // To the left of note
-      this.offsetY = 0;   // Centered vertically with note
+      this.offsetY = 0; // Centered vertically with note
     } else if (this.position === 'right') {
       this.offsetX = 22; // To the right of note
       this.offsetY = 0;
@@ -95,7 +98,7 @@ export class MeriKariModifier extends Modifier {
       this.fontFamily,
       this.color,
       'middle',
-      this.fontWeight
+      this.fontWeight,
     );
   }
 

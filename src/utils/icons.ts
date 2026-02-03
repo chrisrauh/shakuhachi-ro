@@ -11,8 +11,8 @@ export function initIcons(): void {
       GitFork,
       Eye,
       AlertCircle,
-      Calendar
-    }
+      Calendar,
+    },
   });
 }
 

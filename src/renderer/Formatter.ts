@@ -14,12 +14,12 @@ import type { ShakuNote, NoteDuration } from '../notes/ShakuNote';
  * Following VexFlow's convention: quarter note = 1024 ticks
  */
 const DURATION_TICKS: Record<NoteDuration, number> = {
-  'w': 4096,   // Whole note = 4 quarters
-  'h': 2048,   // Half note = 2 quarters
-  'q': 1024,   // Quarter note (base unit)
-  '8': 512,    // Eighth note = 1/2 quarter
-  '16': 256,   // Sixteenth note = 1/4 quarter
-  '32': 128    // Thirty-second note = 1/8 quarter
+  w: 4096, // Whole note = 4 quarters
+  h: 2048, // Half note = 2 quarters
+  q: 1024, // Quarter note (base unit)
+  '8': 512, // Eighth note = 1/2 quarter
+  '16': 256, // Sixteenth note = 1/4 quarter
+  '32': 128, // Thirty-second note = 1/8 quarter
 };
 
 /**
@@ -83,7 +83,7 @@ export class Formatter {
         const ticks = DURATION_TICKS[duration];
         const spacing = Math.max(
           ticks * this.pixelsPerTick,
-          this.minNoteSpacing
+          this.minNoteSpacing,
         );
 
         currentX += spacing;
@@ -112,7 +112,7 @@ export class Formatter {
         const ticks = DURATION_TICKS[duration];
         const spacing = Math.max(
           ticks * this.pixelsPerTick,
-          this.minNoteSpacing
+          this.minNoteSpacing,
         );
         totalWidth += spacing;
       }

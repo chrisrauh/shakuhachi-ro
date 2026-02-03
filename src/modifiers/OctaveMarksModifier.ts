@@ -37,9 +37,9 @@ export class OctaveMarksModifier extends Modifier {
 
   /** Kanji characters for each register */
   private static readonly registerSymbols: Record<OctaveRegister, string> = {
-    'otsu': '乙',
-    'kan': '甲',
-    'daikan': '大甲' // Future: daikan support
+    otsu: '乙',
+    kan: '甲',
+    daikan: '大甲', // Future: daikan support
   };
 
   /**
@@ -83,7 +83,7 @@ export class OctaveMarksModifier extends Modifier {
       this.fontFamily,
       this.color,
       'middle',
-      this.fontWeight
+      this.fontWeight,
     );
   }
 

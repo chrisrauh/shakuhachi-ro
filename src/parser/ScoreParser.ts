@@ -46,8 +46,8 @@ function mapDuration(duration: number): NoteDuration {
  * - Eighth note (0.5): 2 lines
  */
 function getDurationLineCount(duration: number): number {
-  if (duration >= 2) return 0;  // Half note or longer (no lines)
-  if (duration >= 1) return 1;  // Quarter note (1 line)
+  if (duration >= 2) return 0; // Half note or longer (no lines)
+  if (duration >= 1) return 1; // Quarter note (1 line)
   if (duration >= 0.5) return 2; // Eighth note (2 lines)
   return 3; // Sixteenth or shorter (very rare)
 }
@@ -84,16 +84,21 @@ export class ScoreParser {
         const restNote = new ShakuNote({
           symbol: 'rest',
           duration: mapDuration(note.duration),
-          isRest: true
+          isRest: true,
         });
 
         // Add duration lines to rests as well
         const lineCount = getDurationLineCount(note.duration);
         if (lineCount > 0) {
           // Check if this is the last note in a continuous duration line sequence
-          const isLastInSequence = i === scoreData.notes.length - 1 ||
-                                   getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
-          const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
+          const isLastInSequence =
+            i === scoreData.notes.length - 1 ||
+            getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+          const durationLines = new DurationLineModifier(
+            lineCount,
+            isLastInSequence,
+            'right',
+          );
           restNote.addModifier(durationLines);
         }
 
@@ -104,7 +109,9 @@ export class ScoreParser {
 
       // Ensure pitch exists for non-rest notes
       if (!note.pitch) {
-        throw new Error(`Note at index ${i} must have pitch when rest is not set`);
+        throw new Error(
+          `Note at index ${i} must have pitch when rest is not set`,
+        );
       }
 
       // Calculate which octave would be "expected" based on closest-note principle
@@ -112,13 +119,13 @@ export class ScoreParser {
         note.pitch.step,
         note.pitch.octave,
         previousNoteMidi,
-        i === 0 || previousNoteMidi === null
+        i === 0 || previousNoteMidi === null,
       );
 
       // Create the base note
       const shakuNote = new ShakuNote({
         symbol: note.pitch.step,
-        duration: mapDuration(note.duration)
+        duration: mapDuration(note.duration),
       });
 
       // Add octave mark only if needed (violates closest-note rule)
@@ -157,9 +164,14 @@ export class ScoreParser {
       if (lineCount > 0) {
         // Check if this is the last note in a continuous duration line sequence
         // by checking if the next note also has a duration line
-        const isLastInSequence = i === scoreData.notes.length - 1 ||
-                                 getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
-        const durationLines = new DurationLineModifier(lineCount, isLastInSequence, 'right');
+        const isLastInSequence =
+          i === scoreData.notes.length - 1 ||
+          getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+        const durationLines = new DurationLineModifier(
+          lineCount,
+          isLastInSequence,
+          'right',
+        );
         shakuNote.addModifier(durationLines);
       }
 
@@ -185,7 +197,7 @@ export class ScoreParser {
     romaji: string,
     actualOctave: number,
     previousNoteMidi: number | null,
-    isFirst: boolean
+    isFirst: boolean,
   ): boolean {
     // First note: default is otsu (0), mark if different
     if (isFirst || previousNoteMidi === null) {
@@ -206,7 +218,10 @@ export class ScoreParser {
    * @param referenceMidi - Reference MIDI pitch to measure distance from
    * @returns Octave number (0, 1, or 2) that is closest
    */
-  private static findClosestOctave(romaji: string, referenceMidi: number): number {
+  private static findClosestOctave(
+    romaji: string,
+    referenceMidi: number,
+  ): number {
     let closestOctave = 0;
     let smallestDistance = Infinity;
 
@@ -281,14 +296,14 @@ export class ScoreParser {
       // Validate octave range
       if (note.pitch.octave < 0 || note.pitch.octave > 2) {
         throw new Error(
-          `Note at index ${index} has invalid octave: ${note.pitch.octave}. Must be 0-2.`
+          `Note at index ${index} has invalid octave: ${note.pitch.octave}. Must be 0-2.`,
         );
       }
 
       // Validate duration is positive
       if (note.duration <= 0) {
         throw new Error(
-          `Note at index ${index} has invalid duration: ${note.duration}. Must be > 0.`
+          `Note at index ${index} has invalid duration: ${note.duration}. Must be > 0.`,
         );
       }
     });
@@ -327,7 +342,7 @@ export class ScoreParser {
         throw new Error(`Failed to load score: ${response.statusText}`);
       }
 
-      const scoreData = await response.json() as ScoreData;
+      const scoreData = (await response.json()) as ScoreData;
       return this.parse(scoreData);
     } catch (error) {
       if (error instanceof Error) {

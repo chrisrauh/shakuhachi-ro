@@ -9,12 +9,19 @@
 export { ScoreRenderer } from './renderer/ScoreRenderer';
 export { renderScoreFromURL, renderScore } from './renderer/convenience';
 export type { RenderOptions } from './renderer/RenderOptions';
-export { mergeWithDefaults, DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+export {
+  mergeWithDefaults,
+  DEFAULT_RENDER_OPTIONS,
+} from './renderer/RenderOptions';
 
 // Layout Components
 export { ModifierConfigurator } from './renderer/ModifierConfigurator';
 export { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
-export type { ColumnLayout, ColumnInfo, NotePosition } from './renderer/ColumnLayoutCalculator';
+export type {
+  ColumnLayout,
+  ColumnInfo,
+  NotePosition,
+} from './renderer/ColumnLayoutCalculator';
 
 // Low-level Renderer exports
 export { SVGRenderer } from './renderer/SVGRenderer';
@@ -28,7 +35,11 @@ export { ScoreParser } from './parser/ScoreParser';
 
 // Note exports
 export { ShakuNote } from './notes/ShakuNote';
-export type { ShakuNoteOptions, NoteDuration, BoundingBox } from './notes/ShakuNote';
+export type {
+  ShakuNoteOptions,
+  NoteDuration,
+  BoundingBox,
+} from './notes/ShakuNote';
 
 // Modifier exports
 export { Modifier } from './modifiers/Modifier';
@@ -54,17 +65,23 @@ export {
   alterationSemitones,
   meriKariSymbols,
   techniqueSymbols,
-  octaveDots
+  octaveDots,
 } from './data/mappings';
 export type {
   KinkoSymbol,
   Octave,
   PitchAlteration,
   Technique,
-  Fingering
+  Fingering,
 } from './data/mappings';
 
 // Score Data types
-export type { ScoreData, ScoreNote, Pitch, PitchStep, NotationStyle } from './types/ScoreData';
+export type {
+  ScoreData,
+  ScoreNote,
+  Pitch,
+  PitchStep,
+  NotationStyle,
+} from './types/ScoreData';
 
 // Uncomment exports as we implement each component

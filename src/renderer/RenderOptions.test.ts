@@ -27,7 +27,9 @@ describe('RenderOptions', () => {
       expect(DEFAULT_RENDER_OPTIONS.noteFontSize).toBe(28);
       expect(DEFAULT_RENDER_OPTIONS.noteFontWeight).toBe(400);
       expect(DEFAULT_RENDER_OPTIONS.noteVerticalSpacing).toBe(44);
-      expect(DEFAULT_RENDER_OPTIONS.noteFontFamily).toBe('Noto Sans JP, sans-serif');
+      expect(DEFAULT_RENDER_OPTIONS.noteFontFamily).toBe(
+        'Noto Sans JP, sans-serif',
+      );
       expect(DEFAULT_RENDER_OPTIONS.noteColor).toBe('#000');
     });
 
@@ -96,7 +98,9 @@ describe('RenderOptions', () => {
       expect(result.columnSpacing).toBe(50);
       expect(result.columnWidth).toBe(120);
       // Other options should still be defaults
-      expect(result.showOctaveMarks).toBe(DEFAULT_RENDER_OPTIONS.showOctaveMarks);
+      expect(result.showOctaveMarks).toBe(
+        DEFAULT_RENDER_OPTIONS.showOctaveMarks,
+      );
     });
 
     it('should merge note typography options correctly', () => {
@@ -185,9 +189,13 @@ describe('RenderOptions', () => {
 
       // Unchanged defaults
       expect(result.noteFontWeight).toBe(DEFAULT_RENDER_OPTIONS.noteFontWeight);
-      expect(result.showOctaveMarks).toBe(DEFAULT_RENDER_OPTIONS.showOctaveMarks);
+      expect(result.showOctaveMarks).toBe(
+        DEFAULT_RENDER_OPTIONS.showOctaveMarks,
+      );
       expect(result.columnSpacing).toBe(DEFAULT_RENDER_OPTIONS.columnSpacing);
-      expect(result.octaveMarkFontSize).toBe(DEFAULT_RENDER_OPTIONS.octaveMarkFontSize);
+      expect(result.octaveMarkFontSize).toBe(
+        DEFAULT_RENDER_OPTIONS.octaveMarkFontSize,
+      );
     });
 
     it('should handle all options being overridden', () => {
