@@ -23,3 +23,21 @@ Adds the `slug` field to the `scores` table for human-readable URLs.
 - Creates index on `slug` for fast lookups
 
 **Run this migration:** Before deploying the slug-based URL feature.
+
+### `remove_tags_from_scores.sql`
+
+Removes the `tags` column from the `scores` table as part of feature bloat reduction.
+
+**What it does:**
+- Drops the `tags` column from `scores` table
+
+**Run this migration:** After deploying the tag removal feature.
+
+### `remove_difficulty_from_scores.sql`
+
+Removes the `difficulty` column from the `scores` table as part of feature bloat reduction.
+
+**What it does:**
+- Drops the `difficulty` column from `scores` table
+
+**Run this migration:** After deploying the difficulty removal feature.

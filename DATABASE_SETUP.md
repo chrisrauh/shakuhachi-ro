@@ -104,7 +104,6 @@ CREATE TABLE scores (
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,  -- New field
   composer TEXT,
-  difficulty TEXT,
   description TEXT,
   data_format TEXT NOT NULL,
   data JSONB NOT NULL,

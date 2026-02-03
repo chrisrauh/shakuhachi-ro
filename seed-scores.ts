@@ -30,7 +30,6 @@ async function seedScores() {
   const akatomboResult = await createScore({
     title: 'Akatombo',
     composer: 'Traditional',
-    difficulty: 'beginner',
     description: 'A beloved Japanese folk song about red dragonflies. This piece is perfect for beginners learning shakuhachi notation.',
     data_format: 'musicxml',
     data: akatomboXML
