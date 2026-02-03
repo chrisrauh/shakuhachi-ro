@@ -2,7 +2,6 @@ import { supabase } from './supabase';
 import { getCurrentUser } from './auth';
 import { generateSlug, ensureUniqueSlug } from '../utils/slug';
 
-export type ScoreDifficulty = 'beginner' | 'intermediate' | 'advanced';
 export type ScoreDataFormat = 'musicxml' | 'json';
 
 export interface Score {
@@ -11,7 +10,6 @@ export interface Score {
   title: string;
   slug: string;
   composer: string | null;
-  difficulty: ScoreDifficulty | null;
   description: string | null;
   data_format: ScoreDataFormat;
   data: any;
@@ -25,7 +23,6 @@ export interface Score {
 export interface CreateScoreData {
   title: string;
   composer?: string;
-  difficulty?: ScoreDifficulty;
   description?: string;
   data_format: ScoreDataFormat;
   data: any;
@@ -35,7 +32,6 @@ export interface CreateScoreData {
 export interface UpdateScoreData {
   title?: string;
   composer?: string;
-  difficulty?: ScoreDifficulty;
   description?: string;
   data_format?: ScoreDataFormat;
   data?: any;
@@ -86,7 +82,6 @@ export async function createScore(
         title: scoreData.title,
         slug: uniqueSlug,
         composer: scoreData.composer || null,
-        difficulty: scoreData.difficulty || null,
         description: scoreData.description || null,
         data_format: scoreData.data_format,
         data: scoreData.data,
@@ -421,7 +416,6 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     const forkResult = await createScore({
       title: originalScore.title,
       composer: originalScore.composer || undefined,
-      difficulty: originalScore.difficulty || undefined,
       description: originalScore.description || undefined,
       data_format: originalScore.data_format,
       data: originalScore.data,

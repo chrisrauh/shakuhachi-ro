@@ -90,19 +90,6 @@ export class ScoreDetail {
     }
   }
 
-  private getDifficultyColor(difficulty: string | null): string {
-    switch (difficulty) {
-      case 'beginner':
-        return '#4caf50';
-      case 'intermediate':
-        return '#ff9800';
-      case 'advanced':
-        return '#f44336';
-      default:
-        return '#9e9e9e';
-    }
-  }
-
   private render(): void {
     if (this.isLoading) {
       this.container.innerHTML = `
@@ -147,14 +134,6 @@ export class ScoreDetail {
 
             <div class="score-creator">
               <a href="/profile.html?id=${this.score.user_id}">View creator's profile</a>
-            </div>
-
-            <div class="score-meta-tags">
-              ${this.score.difficulty ? `
-                <span class="difficulty-badge" style="background-color: ${this.getDifficultyColor(this.score.difficulty)}">
-                  ${this.score.difficulty}
-                </span>
-              ` : ''}
             </div>
 
             ${this.score.description ? `
@@ -313,21 +292,6 @@ export class ScoreDetail {
 
       .score-creator a:hover {
         text-decoration: underline;
-      }
-
-      .score-meta-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
-      }
-
-      .difficulty-badge {
-        padding: 6px 12px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        color: white;
-        text-transform: capitalize;
       }
 
       .score-description {

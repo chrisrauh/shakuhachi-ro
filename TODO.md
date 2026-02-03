@@ -12,6 +12,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 ## Remove feature bloat
 
 - [x] Remove tagging feature
+- [x] Remove difficulty feature
 - [ ] Remove views feature
 - [ ] Remove creator's profile feature
 

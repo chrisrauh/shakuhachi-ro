@@ -2,12 +2,11 @@ import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { renderIcon, initIcons } from '../utils/icons';
-import type { ScoreDifficulty, ScoreDataFormat } from '../api/scores';
+import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
   title: string;
   composer: string;
-  difficulty: ScoreDifficulty | '';
   description: string;
 }
 
@@ -18,7 +17,6 @@ export class ScoreEditor {
   private metadata: ScoreMetadata = {
     title: '',
     composer: '',
-    difficulty: '',
     description: ''
   };
   private validationError: string | null = null;
@@ -58,7 +56,6 @@ export class ScoreEditor {
     this.metadata = {
       title: score.title,
       composer: score.composer || '',
-      difficulty: score.difficulty || '',
       description: score.description || ''
     };
 
@@ -240,7 +237,6 @@ export class ScoreEditor {
       const scoreData = {
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
-        difficulty: this.metadata.difficulty || undefined,
         description: this.metadata.description || undefined,
         data_format: this.dataFormat,
         data: data
@@ -367,16 +363,6 @@ export class ScoreEditor {
           />
         </div>
 
-        <div class="metadata-field">
-          <label for="difficulty-input">Difficulty</label>
-          <select id="difficulty-input">
-            <option value="" ${this.metadata.difficulty === '' ? 'selected' : ''}>Not specified</option>
-            <option value="beginner" ${this.metadata.difficulty === 'beginner' ? 'selected' : ''}>Beginner</option>
-            <option value="intermediate" ${this.metadata.difficulty === 'intermediate' ? 'selected' : ''}>Intermediate</option>
-            <option value="advanced" ${this.metadata.difficulty === 'advanced' ? 'selected' : ''}>Advanced</option>
-          </select>
-        </div>
-
         <div class="metadata-field metadata-field-full">
           <label for="description-input">Description</label>
           <textarea
@@ -442,12 +428,6 @@ export class ScoreEditor {
     this.container.querySelector('#composer-input')
       ?.addEventListener('input', (e) => {
         this.handleMetadataChange('composer', (e.target as HTMLInputElement).value);
-      });
-
-    // Difficulty
-    this.container.querySelector('#difficulty-input')
-      ?.addEventListener('change', (e) => {
-        this.handleMetadataChange('difficulty', (e.target as HTMLSelectElement).value);
       });
 
     // Description
