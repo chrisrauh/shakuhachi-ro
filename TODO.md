@@ -4,13 +4,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
-## Remove feature bloat
-
-- [x] Remove tagging feature
-- [x] Remove difficulty feature
-- [x] Remove views feature
-- [x] Remove creator's profile feature
-
 ### Phase 8: Navigation & UI Polish
 
 - [ ] Create site header component (logo, navigation)
