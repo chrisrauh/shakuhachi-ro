@@ -1,9 +1,4 @@
-import {
-  getScoreBySlug,
-  getScore,
-  incrementViewCount,
-  forkScore,
-} from '../api/scores';
+import { getScoreBySlug, getScore, forkScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
@@ -54,9 +49,6 @@ export class ScoreDetail {
         this.parentScore = parentResult.score;
       }
     }
-
-    // Increment view count (fire and forget)
-    incrementViewCount(this.score.id);
 
     this.render();
     this.renderScore();
@@ -176,9 +168,6 @@ export class ScoreDetail {
               <span class="score-stat">${renderIcon('git-fork')} ${
                 this.score.fork_count
               } forks</span>
-              <span class="score-stat">${renderIcon('eye')} ${
-                this.score.view_count
-              } views</span>
               <span class="score-stat">${renderIcon(
                 'calendar',
               )} ${this.formatDate(this.score.created_at)}</span>

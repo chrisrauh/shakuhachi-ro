@@ -243,9 +243,6 @@ export class ScoreLibrary {
           <span class="score-stat" title="Fork count">${renderIcon(
             'git-fork',
           )} ${score.fork_count}</span>
-          <span class="score-stat" title="View count">${renderIcon('eye')} ${
-            score.view_count
-          }</span>
           <span class="score-stat" title="Created date">${renderIcon(
             'calendar',
           )} ${this.formatDate(score.created_at)}</span>
