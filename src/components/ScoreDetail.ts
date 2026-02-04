@@ -256,6 +256,9 @@ export class ScoreDetail {
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
       }
 
       .score-detail-header {
@@ -375,10 +378,12 @@ export class ScoreDetail {
       }
 
       .score-renderer-container {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        flex: 1;
+        min-height: 0;
+      }
+
+      #score-renderer {
+        height: 100%;
       }
 
       .score-detail-loading {
