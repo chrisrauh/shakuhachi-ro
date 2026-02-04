@@ -4,6 +4,12 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
+### Score Renderer Layout Improvements
+
+- [ ] Make score container use full viewport height (remove 600px fixed height)
+- [ ] Add mobile breakpoint (< 768px) for single-column vertical scroll layout
+- [ ] Test responsive behavior on different screen sizes
+
 ### Phase 8: Navigation & UI Polish
 
 - [ ] Create site header component (logo, navigation)
@@ -18,6 +24,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Renderer Enhancements (Future)
 
+- [ ] Add pagination for desktop score viewing (when score doesn't fit viewport)
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Add JSDoc comments to public APIs
