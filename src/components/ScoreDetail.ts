@@ -148,12 +148,6 @@ export class ScoreDetail {
                 : ''
             }
 
-            <div class="score-creator">
-              <a href="/profile.html?id=${
-                this.score.user_id
-              }">View creator's profile</a>
-            </div>
-
             ${
               this.score.description
                 ? `
@@ -312,20 +306,6 @@ export class ScoreDetail {
       }
 
       .fork-attribution a:hover {
-        text-decoration: underline;
-      }
-
-      .score-creator {
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-      }
-
-      .score-creator a {
-        color: #2196f3;
-        text-decoration: none;
-      }
-
-      .score-creator a:hover {
         text-decoration: underline;
       }
 
