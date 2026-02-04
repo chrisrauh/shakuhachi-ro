@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "lint": "eslint src scripts tests *.{js,ts}",
-    "test": "npm run type-check && npm run lint && vitest",
+    "test": "npm run type-check && npm run lint && vitest run",
     "test:ui": "vitest --ui",
     "test:run": "npm run type-check && npm run lint && vitest run",
     "test:coverage": "npm run type-check && npm run lint && vitest run --coverage",
