@@ -41,3 +41,13 @@ Removes the `difficulty` column from the `scores` table as part of feature bloat
 - Drops the `difficulty` column from `scores` table
 
 **Run this migration:** After deploying the difficulty removal feature.
+
+### `remove_view_count_from_scores.sql`
+
+Removes the `view_count` column and related RPC function from the `scores` table as part of feature bloat reduction.
+
+**What it does:**
+- Drops the `increment_view_count` RPC function
+- Drops the `view_count` column from `scores` table
+
+**Run this migration:** After deploying the view count removal feature.

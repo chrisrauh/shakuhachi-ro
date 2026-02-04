@@ -15,7 +15,6 @@ export interface Score {
   data: any;
   forked_from: string | null;
   fork_count: number;
-  view_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -362,34 +361,6 @@ export async function searchScores(query: string): Promise<ScoresResult> {
         error instanceof Error
           ? error
           : new Error('Unknown error searching scores'),
-    };
-  }
-}
-
-/**
- * Increment view count for a score
- */
-export async function incrementViewCount(
-  id: string,
-): Promise<{ error: Error | null }> {
-  try {
-    const { error } = await supabase.rpc('increment_view_count', {
-      score_id: id,
-    });
-
-    if (error) {
-      return {
-        error: new Error(`Failed to increment view count: ${error.message}`),
-      };
-    }
-
-    return { error: null };
-  } catch (error) {
-    return {
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error incrementing view count'),
     };
   }
 }
