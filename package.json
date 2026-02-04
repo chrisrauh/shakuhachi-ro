@@ -12,7 +12,6 @@
     "lint": "eslint src scripts tests *.{js,ts}",
     "test": "npm run type-check && npm run lint && vitest run",
     "test:ui": "vitest --ui",
-    "test:run": "npm run type-check && npm run lint && vitest run",
     "test:coverage": "npm run type-check && npm run lint && vitest run --coverage",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
