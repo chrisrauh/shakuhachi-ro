@@ -9,7 +9,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [x] Remove tagging feature
 - [x] Remove difficulty feature
 - [x] Remove views feature
-- [ ] Remove creator's profile feature
+- [x] Remove creator's profile feature
 
 ### Phase 8: Navigation & UI Polish
 
