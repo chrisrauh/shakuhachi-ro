@@ -120,72 +120,68 @@ export class ScoreDetail {
     const isOwner = currentUser && currentUser.id === this.score.user_id;
 
     this.container.innerHTML = `
-      <div class="score-detail">
-        <div class="score-detail-header">
-          <div class="score-detail-metadata">
-            <h1>${this.escapeHtml(this.score.title)}</h1>
-            ${
-              this.score.composer
-                ? `
-              <p class="score-composer">By ${this.escapeHtml(
-                this.score.composer,
-              )}</p>
-            `
-                : ''
-            }
+      <div class="score-detail-header">
+        <div class="score-detail-metadata">
+          <h1>${this.escapeHtml(this.score.title)}</h1>
+          ${
+            this.score.composer
+              ? `
+            <p class="score-composer">By ${this.escapeHtml(
+              this.score.composer,
+            )}</p>
+          `
+              : ''
+          }
 
-            ${
-              this.parentScore
-                ? `
-              <div class="fork-attribution">
-                ${renderIcon(
-                  'git-fork',
-                )} Forked from <a href="/score.html?slug=${
-                  this.parentScore.slug
-                }">${this.escapeHtml(this.parentScore.title)}</a>
-              </div>
-            `
-                : ''
-            }
-
-            ${
-              this.score.description
-                ? `
-              <p class="score-description">${this.escapeHtml(
-                this.score.description,
-              )}</p>
-            `
-                : ''
-            }
-
-            <div class="score-stats">
-              <span class="score-stat">${renderIcon('git-fork')} ${
-                this.score.fork_count
-              } forks</span>
-              <span class="score-stat">${renderIcon(
-                'calendar',
-              )} ${this.formatDate(this.score.created_at)}</span>
+          ${
+            this.parentScore
+              ? `
+            <div class="fork-attribution">
+              ${renderIcon('git-fork')} Forked from <a href="/score.html?slug=${
+                this.parentScore.slug
+              }">${this.escapeHtml(this.parentScore.title)}</a>
             </div>
-          </div>
+          `
+              : ''
+          }
 
-          <div class="score-detail-actions">
-            ${
-              isOwner
-                ? `
-              <a href="/editor.html?id=${this.score.id}" class="btn btn-primary">Edit Score</a>
-            `
-                : ''
-            }
-            <button id="fork-btn" class="btn ${
-              isOwner ? 'btn-secondary' : 'btn-primary'
-            }">Fork Score</button>
-            <a href="/" class="btn btn-secondary">Back to Library</a>
+          ${
+            this.score.description
+              ? `
+            <p class="score-description">${this.escapeHtml(
+              this.score.description,
+            )}</p>
+          `
+              : ''
+          }
+
+          <div class="score-stats">
+            <span class="score-stat">${renderIcon('git-fork')} ${
+              this.score.fork_count
+            } forks</span>
+            <span class="score-stat">${renderIcon(
+              'calendar',
+            )} ${this.formatDate(this.score.created_at)}</span>
           </div>
         </div>
 
-        <div class="score-renderer-container">
-          <div id="score-renderer"></div>
+        <div class="score-detail-actions">
+          ${
+            isOwner
+              ? `
+            <a href="/editor.html?id=${this.score.id}" class="btn btn-primary">Edit Score</a>
+          `
+              : ''
+          }
+          <button id="fork-btn" class="btn ${
+            isOwner ? 'btn-secondary' : 'btn-primary'
+          }">Fork Score</button>
+          <a href="/" class="btn btn-secondary">Back to Library</a>
         </div>
+      </div>
+
+      <div class="score-renderer-container">
+        <div id="score-renderer"></div>
       </div>
     `;
 
@@ -252,12 +248,6 @@ export class ScoreDetail {
     const style = document.createElement('style');
     style.id = 'score-detail-styles';
     style.textContent = `
-      .score-detail {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
       .score-detail-header {
         background: white;
         padding: 30px;
@@ -375,10 +365,12 @@ export class ScoreDetail {
       }
 
       .score-renderer-container {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        flex: 1;
+        min-height: 0;
+      }
+
+      #score-renderer {
+        height: 100%;
       }
 
       .score-detail-loading {
