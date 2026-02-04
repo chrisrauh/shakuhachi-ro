@@ -11,17 +11,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [x] Remove views feature
 - [ ] Remove creator's profile feature
 
-### Phase 7: User Profile
-
-- [ ] Create profile.html page (URL: /profile.html?id=<user-id>)
-- [ ] Display user's scores in grid
-- [ ] Show username/email
-- [ ] Link to each score
-- [ ] Add edit/delete buttons (if own profile)
-- [ ] Implement getUserScores(userId) query
-- [ ] Add "My Scores" link in navigation
-- [ ] Test: View own profile, view other user's profile
-
 ### Phase 8: Navigation & UI Polish
 
 - [ ] Create site header component (logo, navigation)
