@@ -24,7 +24,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Renderer Enhancements (Future)
 
-- [ ] Add pagination for desktop score viewing (when score doesn't fit viewport)
+- [ ] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Add JSDoc comments to public APIs
