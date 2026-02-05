@@ -66,14 +66,14 @@ export {
   meriKariSymbols,
   techniqueSymbols,
   octaveDots,
-} from './data/mappings';
+} from './constants/kinko-symbols';
 export type {
   KinkoSymbol,
   Octave,
   PitchAlteration,
   Technique,
   Fingering,
-} from './data/mappings';
+} from './constants/kinko-symbols';
 
 // Score Data types
 export type {

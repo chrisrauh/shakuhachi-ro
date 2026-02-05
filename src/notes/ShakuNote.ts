@@ -10,7 +10,10 @@
 
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 import type { Modifier } from '../modifiers/Modifier';
-import { getSymbolByRomaji, type KinkoSymbol } from '../data/mappings';
+import {
+  getSymbolByRomaji,
+  type KinkoSymbol,
+} from '../constants/kinko-symbols';
 
 /**
  * Duration for spacing calculations

@@ -13,7 +13,7 @@ import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import type { ScoreData } from '../types/ScoreData';
-import { getNoteMidi } from '../data/mappings';
+import { getNoteMidi } from '../constants/kinko-symbols';
 
 /**
  * Maps numeric duration to NoteDuration
