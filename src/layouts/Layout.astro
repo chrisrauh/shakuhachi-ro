@@ -3,9 +3,11 @@ interface Props {
   title: string;
   currentPage: 'browse' | 'create' | 'score';
   logoVariant?: 'icon' | 'text';
+  fullHeight?: boolean;
+  noPadding?: boolean;
 }
 
-const { title, currentPage, logoVariant = 'text' } = Astro.props;
+const { title, currentPage, logoVariant = 'text', fullHeight = false, noPadding = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -25,7 +27,7 @@ const { title, currentPage, logoVariant = 'text' } = Astro.props;
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
     />
   </head>
-  <body>
+  <body class={fullHeight ? 'full-height' : ''}>
     <header>
       <div class="header-left">
         {logoVariant === 'icon' ? (
@@ -43,7 +45,7 @@ const { title, currentPage, logoVariant = 'text' } = Astro.props;
       <div id="auth-widget"></div>
     </header>
 
-    <main>
+    <main class={noPadding ? 'no-padding' : ''}>
       <slot />
     </main>
 
@@ -63,6 +65,20 @@ const { title, currentPage, logoVariant = 'text' } = Astro.props;
           sans-serif;
         background: #fafafa;
         min-height: 100vh;
+      }
+
+      body.full-height {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      body.full-height main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
       }
 
       header {
@@ -130,6 +146,10 @@ const { title, currentPage, logoVariant = 'text' } = Astro.props;
 
       main {
         padding: 20px 0;
+      }
+
+      main.no-padding {
+        padding: 0;
       }
 
       @media (max-width: 768px) {

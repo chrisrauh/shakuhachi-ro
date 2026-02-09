@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Score Editor - Shakuhachi Score Library" currentPage="create">
+<Layout title="Score Editor - Shakuhachi Score Library" currentPage="create" noPadding={true}>
   <div id="score-editor"></div>
 
   <script>
@@ -30,9 +30,3 @@ import Layout from '../layouts/Layout.astro';
     new ScoreEditor('score-editor', scoreId || undefined);
   </script>
 </Layout>
-
-<style>
-  main {
-    padding: 0;
-  }
-</style>

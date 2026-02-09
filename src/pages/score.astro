@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Score - Shakuhachi Score Library" currentPage="score">
+<Layout title="Score - Shakuhachi Score Library" currentPage="score" fullHeight={true}>
   <div id="score-detail"></div>
 
   <script>
@@ -41,23 +41,6 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  :root {
-    --header-height: 70px;
-  }
-
-  body {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
   #score-detail {
     height: 100%;
     max-width: 1200px;
