@@ -10,4 +10,7 @@ export default defineConfig({
   build: {
     format: 'file', // Generates /index.html instead of /index/index.html
   },
+  vite: {
+    envPrefix: ['VITE_'],
+  },
 });
