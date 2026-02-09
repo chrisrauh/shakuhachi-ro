@@ -1,0 +1,13 @@
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  root: '.',
+  srcDir: './src',
+  publicDir: './public',
+  outDir: './dist',
+  site: 'https://shakuhachi.ro',
+  base: '/',
+  build: {
+    format: 'file', // Generates /index.html instead of /index/index.html
+  },
+});

@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Score - Shakuhachi Score Library" currentPage="score">
+  <div id="score-detail"></div>
+
+  <script>
+    import { AuthWidget } from '../components/AuthComponents';
+    import { authState } from '../api/authState';
+    import { ScoreDetail } from '../components/ScoreDetail';
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Get slug from URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+
+    // Initialize score detail component
+    if (slug) {
+      new ScoreDetail('score-detail', slug);
+    } else {
+      document.getElementById('score-detail')!.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <h1>Score not found</h1>
+          <p><a href="/">Browse all scores</a></p>
+        </div>
+      `;
+    }
+  </script>
+</Layout>
+
+<style>
+  :root {
+    --header-height: 70px;
+  }
+
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #score-detail {
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+</style>

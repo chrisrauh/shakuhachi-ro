@@ -1,9 +1,19 @@
-<!DOCTYPE html>
+---
+interface Props {
+  title: string;
+  currentPage: 'browse' | 'create' | 'score';
+  logoVariant?: 'icon' | 'text';
+}
+
+const { title, currentPage, logoVariant = 'text' } = Astro.props;
+---
+
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Score - Shakuhachi Score Library</title>
+    <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,11 +24,30 @@
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
     />
-    <style>
-      :root {
-        --header-height: 70px;
-      }
+  </head>
+  <body>
+    <header>
+      <div class="header-left">
+        {logoVariant === 'icon' ? (
+          <a href="/" class="logo">
+            <div class="logo-icon">ロ</div>
+          </a>
+        ) : (
+          <a href="/" class="logo">🪈 Shakuhachi Ro</a>
+        )}
+        <nav>
+          <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Browse</a>
+          <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create Score</a>
+        </nav>
+      </div>
+      <div id="auth-widget"></div>
+    </header>
 
+    <main>
+      <slot />
+    </main>
+
+    <style>
       * {
         margin: 0;
         padding: 0;
@@ -26,11 +55,14 @@
       }
 
       body {
-        font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family:
+          'Noto Sans JP',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
         background: #fafafa;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
+        min-height: 100vh;
       }
 
       header {
@@ -59,6 +91,19 @@
         text-decoration: none;
       }
 
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        color: #191919;
+        border-radius: 8px;
+        font-size: 24px;
+        text-align: center;
+        line-height: 24px;
+        font-weight: 450;
+        border: #191919 2px solid;
+        box-sizing: border-box;
+      }
+
       nav {
         display: flex;
         gap: 20px;
@@ -73,7 +118,8 @@
         transition: all 0.2s;
       }
 
-      nav a:hover {
+      nav a:hover,
+      nav a.active {
         color: #2196f3;
         border-bottom-color: #2196f3;
       }
@@ -83,19 +129,7 @@
       }
 
       main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      #score-detail {
-        height: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
+        padding: 20px 0;
       }
 
       @media (max-width: 768px) {
@@ -115,55 +149,5 @@
         }
       }
     </style>
-  </head>
-  <body>
-    <header>
-      <div class="header-left">
-        <a href="/" class="logo">🪈 Shakuhachi Score Library</a>
-        <nav>
-          <a href="/">Browse</a>
-          <a href="/editor.html">Create</a>
-        </nav>
-      </div>
-      <div id="auth-widget"></div>
-    </header>
-
-    <main>
-      <div id="score-detail"></div>
-    </main>
-
-    <script type="module">
-      import { AuthWidget } from './src/components/AuthComponents';
-      import { authState } from './src/api/authState';
-      import { ScoreDetail } from './src/components/ScoreDetail';
-
-      // Initialize auth widget
-      const authWidget = new AuthWidget('auth-widget');
-
-      // Subscribe to auth state changes
-      authState.subscribe((user) => {
-        if (user) {
-          authWidget.setUser(user);
-        } else {
-          authWidget.setUser(null);
-        }
-      });
-
-      // Get slug from URL query parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('slug');
-
-      // Initialize score detail component
-      if (slug) {
-        new ScoreDetail('score-detail', slug);
-      } else {
-        document.getElementById('score-detail').innerHTML = `
-          <div style="text-align: center; padding: 60px 20px;">
-            <h1>Score not found</h1>
-            <p><a href="/">Browse all scores</a></p>
-          </div>
-        `;
-      }
-    </script>
   </body>
 </html>

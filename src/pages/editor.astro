@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Score Editor - Shakuhachi Score Library" currentPage="create">
+  <div id="score-editor"></div>
+
+  <script>
+    import { AuthWidget } from '../components/AuthComponents';
+    import { authState } from '../api/authState';
+    import { ScoreEditor } from '../components/ScoreEditor';
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Get score ID from URL if editing
+    const urlParams = new URLSearchParams(window.location.search);
+    const scoreId = urlParams.get('id');
+
+    // Initialize score editor
+    new ScoreEditor('score-editor', scoreId || undefined);
+  </script>
+</Layout>
+
+<style>
+  main {
+    padding: 0;
+  }
+</style>
