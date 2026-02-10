@@ -6,7 +6,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ### Score Renderer Layout Improvements
 
-- [x] Make score container use full viewport height (remove 600px fixed height)
 - [ ] Add mobile breakpoint (< 768px) for single-column vertical scroll layout
 - [ ] Test responsive behavior on different screen sizes
 
