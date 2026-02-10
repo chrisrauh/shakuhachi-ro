@@ -2,12 +2,11 @@
 interface Props {
   title: string;
   currentPage: 'browse' | 'create' | 'score';
-  logoVariant?: 'icon' | 'text';
   fullHeight?: boolean;
   noPadding?: boolean;
 }
 
-const { title, currentPage, logoVariant = 'text', fullHeight = false, noPadding = false } = Astro.props;
+const { title, currentPage, fullHeight = false, noPadding = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -30,13 +29,9 @@ const { title, currentPage, logoVariant = 'text', fullHeight = false, noPadding 
   <body class={fullHeight ? 'full-height' : ''}>
     <header>
       <div class="header-left">
-        {logoVariant === 'icon' ? (
-          <a href="/" class="logo">
-            <div class="logo-icon">ロ</div>
-          </a>
-        ) : (
-          <a href="/" class="logo">🪈 Shakuhachi Ro</a>
-        )}
+        <a href="/" class="logo">
+          <div class="logo-icon">ロ</div>
+        </a>
         <nav>
           <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Browse</a>
           <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create Score</a>
@@ -98,13 +93,6 @@ const { title, currentPage, logoVariant = 'text', fullHeight = false, noPadding 
         display: flex;
         align-items: center;
         gap: 30px;
-      }
-
-      .logo {
-        font-size: 1.5rem;
-        font-weight: 300;
-        color: #333;
-        text-decoration: none;
       }
 
       .logo-icon {

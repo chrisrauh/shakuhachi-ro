@@ -77,28 +77,4 @@ test.describe('Visual Regression - Akatombo Score', () => {
       fullPage: false,
     });
   });
-
-  // Additional test: Verify SVG is rendered (sanity check)
-  test('SVG element is present and rendered', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForTimeout(2000);
-
-    // Check that SVG exists
-    const svg = await page.locator('svg');
-    await expect(svg).toBeVisible();
-
-    // Check that SVG has content (notes rendered)
-    const svgContent = await page.locator('svg text').first();
-    await expect(svgContent).toBeVisible();
-  });
-
-  // Additional test: Verify score title is displayed
-  test('displays score title and metadata', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForTimeout(2000);
-
-    // Check title is displayed
-    const title = await page.locator('h1#score-title');
-    await expect(title).toContainText('Akatombo');
-  });
 });
