@@ -174,7 +174,7 @@ export class ScoreEditor {
     // Don't re-render - just update internal state
   }
 
-  private updatePreview(): void {
+  private async updatePreview(): Promise<void> {
     const previewContainer = this.container.querySelector(
       '#preview-pane',
     ) as HTMLElement;
@@ -210,11 +210,12 @@ export class ScoreEditor {
           .getPropertyValue('--color-neutral-500')
           .trim();
 
-        new ScoreRenderer(scorePreview, {
-          ...data,
+        const renderer = new ScoreRenderer(scorePreview, {
           noteColor: noteColor || '#000',
           debugLabelColor: debugLabelColor || '#999',
         });
+
+        await renderer.renderFromScoreData(data);
       } else {
         // For MusicXML, we'd need to parse it properly
         // For now, show a placeholder
