@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Shakuhachi Score Library" currentPage="browse" logoVariant="icon">
+  <div id="score-library"></div>
+
+  <script>
+    import { AuthWidget } from '../components/AuthComponents';
+    import { authState } from '../api/authState';
+    import { ScoreLibrary } from '../components/ScoreLibrary';
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Initialize score library
+    new ScoreLibrary('score-library');
+  </script>
+</Layout>
