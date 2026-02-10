@@ -1,0 +1,302 @@
+/**
+ * Design Tokens - Light Theme
+ * Colors: Tailwind CSS OKLCH primitives (https://tailwindcss.com/docs/colors)
+ * Structure: Shoelace design system (https://shoelace.style)
+ */
+
+:root,
+.theme-light {
+  color-scheme: light;
+
+  /* ============================================
+     COLORS - Tailwind OKLCH Primitives
+     Reference: https://tailwindcss.com/docs/customizing-colors
+     ============================================ */
+
+  /* Gray (Slate from Tailwind) */
+  --color-gray-50: oklch(0.985 0.003 247.858);
+  --color-gray-100: oklch(0.961 0.006 247.896);
+  --color-gray-200: oklch(0.929 0.012 255.508);
+  --color-gray-300: oklch(0.872 0.019 252.894);
+  --color-gray-400: oklch(0.712 0.032 256.757);
+  --color-gray-500: oklch(0.551 0.027 264.364);
+  --color-gray-600: oklch(0.446 0.03 256.329);
+  --color-gray-700: oklch(0.371 0.032 257.287);
+  --color-gray-800: oklch(0.273 0.028 259.733);
+  --color-gray-900: oklch(0.197 0.021 265.755);
+  --color-gray-950: oklch(0.131 0.015 285.938);
+
+  /* Blue - Tailwind's blue palette */
+  --color-blue-50: oklch(0.971 0.014 236.621);
+  --color-blue-100: oklch(0.939 0.028 235.165);
+  --color-blue-200: oklch(0.883 0.066 232.661);
+  --color-blue-300: oklch(0.799 0.117 232.496);
+  --color-blue-400: oklch(0.714 0.159 234.135);
+  --color-blue-500: oklch(0.623 0.214 259.815);
+  --color-blue-600: oklch(0.528 0.206 257.417);
+  --color-blue-700: oklch(0.451 0.158 256.389);
+  --color-blue-800: oklch(0.393 0.113 256.501);
+  --color-blue-900: oklch(0.35 0.077 258.996);
+  --color-blue-950: oklch(0.257 0.053 263.534);
+
+  /* Green - Tailwind's green palette */
+  --color-green-50: oklch(0.977 0.023 156.582);
+  --color-green-100: oklch(0.95 0.054 155.826);
+  --color-green-200: oklch(0.906 0.105 153.738);
+  --color-green-300: oklch(0.839 0.156 152.495);
+  --color-green-400: oklch(0.763 0.193 151.704);
+  --color-green-500: oklch(0.685 0.177 151.679);
+  --color-green-600: oklch(0.573 0.15 152.531);
+  --color-green-700: oklch(0.477 0.12 153.619);
+  --color-green-800: oklch(0.395 0.095 155.996);
+  --color-green-900: oklch(0.338 0.079 158.774);
+  --color-green-950: oklch(0.217 0.053 163.233);
+
+  /* Amber (Warning) - Tailwind's amber palette */
+  --color-amber-50: oklch(0.987 0.029 95.409);
+  --color-amber-100: oklch(0.973 0.064 96.58);
+  --color-amber-200: oklch(0.939 0.125 96.905);
+  --color-amber-300: oklch(0.9 0.176 94.699);
+  --color-amber-400: oklch(0.846 0.185 84.429);
+  --color-amber-500: oklch(0.778 0.16 66.029);
+  --color-amber-600: oklch(0.663 0.155 52.846);
+  --color-amber-700: oklch(0.541 0.147 44.867);
+  --color-amber-800: oklch(0.456 0.125 42.009);
+  --color-amber-900: oklch(0.393 0.104 41.137);
+  --color-amber-950: oklch(0.263 0.073 39.652);
+
+  /* Red (Danger) - Tailwind's red palette */
+  --color-red-50: oklch(0.973 0.021 17.536);
+  --color-red-100: oklch(0.949 0.041 17.717);
+  --color-red-200: oklch(0.906 0.083 19.656);
+  --color-red-300: oklch(0.838 0.155 23.445);
+  --color-red-400: oklch(0.735 0.221 25.331);
+  --color-red-500: oklch(0.637 0.237 25.331);
+  --color-red-600: oklch(0.549 0.233 25.662);
+  --color-red-700: oklch(0.469 0.209 26.558);
+  --color-red-800: oklch(0.405 0.174 26.426);
+  --color-red-900: oklch(0.365 0.141 24.724);
+  --color-red-950: oklch(0.238 0.098 26.385);
+
+  /* ============================================
+     COLORS - Semantic Mappings
+     ============================================ */
+
+  /* Map semantic colors to Tailwind palettes */
+  --color-primary-50: var(--color-blue-50);
+  --color-primary-100: var(--color-blue-100);
+  --color-primary-200: var(--color-blue-200);
+  --color-primary-300: var(--color-blue-300);
+  --color-primary-400: var(--color-blue-400);
+  --color-primary-500: var(--color-blue-500);
+  --color-primary-600: var(--color-blue-600);
+  --color-primary-700: var(--color-blue-700);
+  --color-primary-800: var(--color-blue-800);
+  --color-primary-900: var(--color-blue-900);
+  --color-primary-950: var(--color-blue-950);
+
+  --color-success-50: var(--color-green-50);
+  --color-success-100: var(--color-green-100);
+  --color-success-200: var(--color-green-200);
+  --color-success-300: var(--color-green-300);
+  --color-success-400: var(--color-green-400);
+  --color-success-500: var(--color-green-500);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-success-800: var(--color-green-800);
+  --color-success-900: var(--color-green-900);
+  --color-success-950: var(--color-green-950);
+
+  --color-warning-50: var(--color-amber-50);
+  --color-warning-100: var(--color-amber-100);
+  --color-warning-200: var(--color-amber-200);
+  --color-warning-300: var(--color-amber-300);
+  --color-warning-400: var(--color-amber-400);
+  --color-warning-500: var(--color-amber-500);
+  --color-warning-600: var(--color-amber-600);
+  --color-warning-700: var(--color-amber-700);
+  --color-warning-800: var(--color-amber-800);
+  --color-warning-900: var(--color-amber-900);
+  --color-warning-950: var(--color-amber-950);
+
+  --color-danger-50: var(--color-red-50);
+  --color-danger-100: var(--color-red-100);
+  --color-danger-200: var(--color-red-200);
+  --color-danger-300: var(--color-red-300);
+  --color-danger-400: var(--color-red-400);
+  --color-danger-500: var(--color-red-500);
+  --color-danger-600: var(--color-red-600);
+  --color-danger-700: var(--color-red-700);
+  --color-danger-800: var(--color-red-800);
+  --color-danger-900: var(--color-red-900);
+  --color-danger-950: var(--color-red-950);
+
+  --color-neutral-50: var(--color-gray-50);
+  --color-neutral-100: var(--color-gray-100);
+  --color-neutral-200: var(--color-gray-200);
+  --color-neutral-300: var(--color-gray-300);
+  --color-neutral-400: var(--color-gray-400);
+  --color-neutral-500: var(--color-gray-500);
+  --color-neutral-600: var(--color-gray-600);
+  --color-neutral-700: var(--color-gray-700);
+  --color-neutral-800: var(--color-gray-800);
+  --color-neutral-900: var(--color-gray-900);
+  --color-neutral-950: var(--color-gray-950);
+
+  /* Absolute colors */
+  --color-neutral-0: oklch(1 0 0); /* Pure white */
+  --color-neutral-1000: oklch(0 0 0); /* Pure black */
+
+  /* ============================================
+     SPACING - From Shoelace
+     ============================================ */
+
+  --spacing-3x-small: 0.125rem; /* 2px */
+  --spacing-2x-small: 0.25rem;  /* 4px */
+  --spacing-x-small: 0.5rem;    /* 8px */
+  --spacing-small: 0.75rem;     /* 12px */
+  --spacing-medium: 1rem;       /* 16px */
+  --spacing-large: 1.25rem;     /* 20px */
+  --spacing-x-large: 1.75rem;   /* 28px */
+  --spacing-2x-large: 2.25rem;  /* 36px */
+  --spacing-3x-large: 3rem;     /* 48px */
+  --spacing-4x-large: 4.5rem;   /* 72px */
+
+  /* ============================================
+     BORDER RADIUS - From Shoelace
+     ============================================ */
+
+  --border-radius-small: 0.1875rem;  /* 3px */
+  --border-radius-medium: 0.25rem;   /* 4px */
+  --border-radius-large: 0.5rem;     /* 8px */
+  --border-radius-x-large: 1rem;     /* 16px */
+  --border-radius-circle: 50%;
+  --border-radius-pill: 9999px;
+
+  /* ============================================
+     SHADOWS - From Shoelace (using gray-500 for shadow color)
+     ============================================ */
+
+  --shadow-x-small: 0 1px 2px oklch(0.551 0.027 264.364 / 6%);
+  --shadow-small: 0 1px 2px oklch(0.551 0.027 264.364 / 12%);
+  --shadow-medium: 0 2px 4px oklch(0.551 0.027 264.364 / 12%);
+  --shadow-large: 0 2px 8px oklch(0.551 0.027 264.364 / 12%);
+  --shadow-x-large: 0 4px 16px oklch(0.551 0.027 264.364 / 12%);
+
+  /* ============================================
+     TYPOGRAPHY - From Shoelace
+     ============================================ */
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --font-size-2x-small: 0.625rem;   /* 10px */
+  --font-size-x-small: 0.75rem;     /* 12px */
+  --font-size-small: 0.875rem;      /* 14px */
+  --font-size-medium: 1rem;         /* 16px */
+  --font-size-large: 1.25rem;       /* 20px */
+  --font-size-x-large: 1.5rem;      /* 24px */
+  --font-size-2x-large: 2.25rem;    /* 36px */
+  --font-size-3x-large: 3rem;       /* 48px */
+  --font-size-4x-large: 4.5rem;     /* 72px */
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 700;
+
+  --line-height-denser: 1;
+  --line-height-dense: 1.4;
+  --line-height-normal: 1.8;
+  --line-height-loose: 2.2;
+  --line-height-looser: 2.6;
+
+  --letter-spacing-denser: -0.03em;
+  --letter-spacing-dense: -0.015em;
+  --letter-spacing-normal: normal;
+  --letter-spacing-loose: 0.075em;
+  --letter-spacing-looser: 0.15em;
+
+  /* ============================================
+     TRANSITIONS - From Shoelace
+     ============================================ */
+
+  --transition-x-slow: 1000ms;
+  --transition-slow: 500ms;
+  --transition-medium: 250ms;
+  --transition-fast: 150ms;
+  --transition-x-fast: 50ms;
+
+  /* ============================================
+     INPUTS - From Shoelace
+     ============================================ */
+
+  --input-height-small: 1.875rem;   /* 30px */
+  --input-height-medium: 2.5rem;    /* 40px */
+  --input-height-large: 3.125rem;   /* 50px */
+
+  --input-background-color: var(--color-neutral-0);
+  --input-background-color-hover: var(--color-neutral-0);
+  --input-background-color-focus: var(--color-neutral-0);
+  --input-background-color-disabled: var(--color-neutral-100);
+
+  --input-border-color: var(--color-neutral-300);
+  --input-border-color-hover: var(--color-neutral-400);
+  --input-border-color-focus: var(--color-primary-500);
+  --input-border-color-disabled: var(--color-neutral-300);
+  --input-border-width: 1px;
+
+  --input-border-radius-small: var(--border-radius-medium);
+  --input-border-radius-medium: var(--border-radius-medium);
+  --input-border-radius-large: var(--border-radius-medium);
+
+  --input-font-family: var(--font-sans);
+  --input-font-weight: var(--font-weight-normal);
+  --input-font-size-small: var(--font-size-small);
+  --input-font-size-medium: var(--font-size-medium);
+  --input-font-size-large: var(--font-size-large);
+
+  --input-color: var(--color-neutral-700);
+  --input-color-hover: var(--color-neutral-700);
+  --input-color-focus: var(--color-neutral-700);
+  --input-color-disabled: var(--color-neutral-900);
+
+  --input-placeholder-color: var(--color-neutral-400);
+  --input-spacing-small: var(--spacing-small);
+  --input-spacing-medium: var(--spacing-medium);
+  --input-spacing-large: var(--spacing-large);
+
+  --input-focus-ring-color: oklch(0.623 0.214 259.815 / 40%); /* blue-500 with opacity */
+  --input-focus-ring-offset: 0;
+
+  /* ============================================
+     OVERLAY, PANEL, TOOLTIP - From Shoelace
+     ============================================ */
+
+  --overlay-background-color: oklch(0.551 0.027 264.364 / 33%);
+
+  --panel-background-color: var(--color-neutral-0);
+  --panel-border-color: var(--color-neutral-200);
+  --panel-border-width: 1px;
+
+  --tooltip-border-radius: var(--border-radius-medium);
+  --tooltip-background-color: var(--color-neutral-800);
+  --tooltip-color: var(--color-neutral-0);
+  --tooltip-font-family: var(--font-sans);
+  --tooltip-font-weight: var(--font-weight-normal);
+  --tooltip-font-size: var(--font-size-small);
+  --tooltip-line-height: var(--line-height-dense);
+  --tooltip-padding: var(--spacing-2x-small) var(--spacing-x-small);
+  --tooltip-arrow-size: 6px;
+
+  /* ============================================
+     Z-INDEX - From Shoelace
+     ============================================ */
+
+  --z-index-drawer: 700;
+  --z-index-dialog: 800;
+  --z-index-dropdown: 900;
+  --z-index-toast: 950;
+  --z-index-tooltip: 1000;
+}

@@ -20,63 +20,63 @@ export class AuthModal {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
+      background: var(--overlay-background-color);
+      z-index: var(--z-index-dialog);
       justify-content: center;
       align-items: center;
     `;
 
     modal.innerHTML = `
       <div class="auth-modal-content" style="
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
+        background: var(--panel-background-color);
+        padding: var(--spacing-x-large);
+        border-radius: var(--border-radius-large);
         max-width: 400px;
         width: 90%;
       ">
         <h2 id="auth-modal-title">Log In</h2>
         <form id="auth-form">
-          <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 5px;">Email</label>
+          <div style="margin: var(--spacing-large) 0;">
+            <label style="display: block; margin-bottom: var(--spacing-x-small);">Email</label>
             <input
               type="email"
               id="auth-email"
               required
-              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium);"
             />
           </div>
-          <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 5px;">Password</label>
+          <div style="margin: var(--spacing-large) 0;">
+            <label style="display: block; margin-bottom: var(--spacing-x-small);">Password</label>
             <input
               type="password"
               id="auth-password"
               required
               minlength="6"
-              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium);"
             />
           </div>
-          <div id="auth-error" style="color: #e74c3c; margin: 10px 0; display: none;"></div>
-          <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <div id="auth-error" style="color: var(--color-danger-600); margin: var(--spacing-small) 0; display: none;"></div>
+          <div style="display: flex; gap: var(--spacing-small); margin-top: var(--spacing-large);">
             <button
               type="submit"
               id="auth-submit"
-              style="flex: 1; padding: 10px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              style="flex: 1; padding: var(--spacing-small); background: var(--color-success-600); color: var(--color-neutral-0); border: none; border-radius: var(--border-radius-medium); cursor: pointer; font-size: var(--font-size-medium); transition: background var(--transition-fast);"
             >
               Log In
             </button>
             <button
               type="button"
               id="auth-cancel"
-              style="flex: 1; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              style="flex: 1; padding: var(--spacing-small); background: var(--color-neutral-500); color: var(--color-neutral-0); border: none; border-radius: var(--border-radius-medium); cursor: pointer; font-size: var(--font-size-medium); transition: background var(--transition-fast);"
             >
               Cancel
             </button>
           </div>
-          <div style="margin-top: 15px; text-align: center;">
+          <div style="margin-top: var(--spacing-medium); text-align: center;">
             <button
               type="button"
               id="auth-toggle"
-              style="background: none; border: none; color: #3498db; cursor: pointer; text-decoration: underline;"
+              style="background: none; border: none; color: var(--color-primary-600); cursor: pointer; text-decoration: underline; font-size: var(--font-size-medium);"
             >
               Need an account? Sign up
             </button>
@@ -221,9 +221,9 @@ export class AuthWidget {
   private render(): void {
     if (this.currentUser) {
       this.container.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span>${this.currentUser.email}</span>
-          <button id="auth-logout" style="padding: 5px 10px; cursor: pointer;">
+        <div style="display: flex; align-items: center; gap: var(--spacing-small);">
+          <span style="color: var(--color-neutral-700); font-size: var(--font-size-small);">${this.currentUser.email}</span>
+          <button id="auth-logout" style="padding: var(--spacing-x-small) var(--spacing-small); cursor: pointer; background: var(--color-neutral-200); border: var(--input-border-width) solid var(--color-neutral-300); border-radius: var(--border-radius-medium); color: var(--color-neutral-700); font-size: var(--font-size-small); transition: background var(--transition-fast);">
             Log Out
           </button>
         </div>
@@ -233,11 +233,11 @@ export class AuthWidget {
       logoutBtn?.addEventListener('click', () => this.handleLogout());
     } else {
       this.container.innerHTML = `
-        <div style="display: flex; gap: 10px;">
-          <button id="auth-login" style="padding: 5px 15px; cursor: pointer;">
+        <div style="display: flex; gap: var(--spacing-small);">
+          <button id="auth-login" style="padding: var(--spacing-x-small) var(--spacing-medium); cursor: pointer; background: var(--color-primary-600); border: none; border-radius: var(--border-radius-medium); color: var(--color-neutral-0); font-size: var(--font-size-small); transition: background var(--transition-fast);">
             Log In
           </button>
-          <button id="auth-signup" style="padding: 5px 15px; cursor: pointer;">
+          <button id="auth-signup" style="padding: var(--spacing-x-small) var(--spacing-medium); cursor: pointer; background: var(--color-neutral-200); border: var(--input-border-width) solid var(--color-neutral-300); border-radius: var(--border-radius-medium); color: var(--color-neutral-700); font-size: var(--font-size-small); transition: background var(--transition-fast);">
             Sign Up
           </button>
         </div>

@@ -308,44 +308,61 @@ export class ScoreLibrary {
       .score-library {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
+        padding: var(--spacing-large);
       }
 
       .score-library-header {
-        margin-bottom: 30px;
+        margin-bottom: var(--spacing-x-large);
       }
 
       .score-library-header h1 {
-        font-size: 2rem;
-        margin-bottom: 5px;
+        font-size: var(--font-size-2x-large);
+        margin-bottom: var(--spacing-x-small);
       }
 
       .score-count {
-        color: #666;
-        font-size: 0.9rem;
+        color: var(--color-neutral-600);
+        font-size: var(--font-size-small);
       }
 
       .score-library-filters {
-        background: #f5f5f5;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
+        background: var(--color-neutral-100);
+        padding: var(--spacing-large);
+        border-radius: var(--border-radius-large);
+        margin-bottom: var(--spacing-x-large);
       }
 
       .search-bar {
-        margin-bottom: 15px;
+        margin-bottom: var(--spacing-medium);
       }
 
       .search-bar input {
         width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
+        padding: var(--input-spacing-small);
+        border: var(--input-border-width) solid var(--input-border-color);
+        border-radius: var(--input-border-radius-medium);
+        font-size: var(--input-font-size-medium);
+        background: var(--input-background-color);
+        color: var(--input-color);
+        transition: border-color var(--transition-fast);
+      }
+
+      .search-bar input:hover {
+        border-color: var(--input-border-color-hover);
+      }
+
+      .search-bar input:focus {
+        outline: none;
+        border-color: var(--input-border-color-focus);
+        box-shadow: 0 0 0 var(--input-focus-ring-offset) var(--input-focus-ring-color);
+      }
+
+      .search-bar input::placeholder {
+        color: var(--input-placeholder-color);
       }
 
       .filter-group {
-        margin-bottom: 15px;
+        margin-bottom: var(--spacing-medium);
       }
 
       .filter-group:last-child {
@@ -354,61 +371,63 @@ export class ScoreLibrary {
 
       .filter-group label {
         display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #333;
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--spacing-x-small);
+        color: var(--color-neutral-700);
       }
 
       .filter-group select {
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
+        padding: var(--spacing-x-small) var(--spacing-small);
+        border: var(--input-border-width) solid var(--input-border-color);
+        border-radius: var(--input-border-radius-medium);
+        font-size: var(--input-font-size-medium);
         min-width: 200px;
+        background: var(--input-background-color);
+        color: var(--input-color);
       }
 
       .score-library-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
+        gap: var(--spacing-large);
       }
 
       .score-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 20px;
+        background: var(--panel-background-color);
+        border: var(--panel-border-width) solid var(--panel-border-color);
+        border-radius: var(--border-radius-large);
+        padding: var(--spacing-large);
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       }
 
       .score-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-large);
       }
 
       .score-card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 12px;
-        gap: 10px;
+        margin-bottom: var(--spacing-small);
+        gap: var(--spacing-small);
       }
 
       .score-title {
-        font-size: 1.2rem;
+        font-size: var(--font-size-large);
         margin: 0;
-        color: #333;
+        color: var(--color-neutral-700);
         flex: 1;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--spacing-x-small);
       }
 
       .forked-indicator {
         display: inline-flex;
         align-items: center;
-        color: #2196f3;
+        color: var(--color-primary-600);
       }
 
       .forked-indicator svg {
@@ -417,20 +436,20 @@ export class ScoreLibrary {
       }
 
       .score-card-body {
-        margin-bottom: 15px;
+        margin-bottom: var(--spacing-medium);
       }
 
       .score-composer {
-        color: #666;
-        margin: 0 0 10px 0;
+        color: var(--color-neutral-600);
+        margin: 0 0 var(--spacing-small) 0;
         font-style: italic;
       }
 
       .score-description {
-        color: #555;
-        font-size: 0.9rem;
-        margin: 10px 0;
-        line-height: 1.4;
+        color: var(--color-neutral-700);
+        font-size: var(--font-size-small);
+        margin: var(--spacing-small) 0;
+        line-height: var(--line-height-dense);
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
@@ -441,16 +460,16 @@ export class ScoreLibrary {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: 12px;
-        border-top: 1px solid #f0f0f0;
-        font-size: 0.85rem;
-        color: #666;
+        padding-top: var(--spacing-small);
+        border-top: var(--panel-border-width) solid var(--color-neutral-200);
+        font-size: var(--font-size-x-small);
+        color: var(--color-neutral-600);
       }
 
       .score-stat {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: var(--spacing-3x-small);
       }
 
       .score-stat svg {
@@ -462,44 +481,45 @@ export class ScoreLibrary {
       .no-scores {
         grid-column: 1 / -1;
         text-align: center;
-        padding: 60px 20px;
-        color: #999;
+        padding: var(--spacing-3x-large) var(--spacing-large);
+        color: var(--color-neutral-500);
       }
 
       .no-scores p {
-        font-size: 1.2rem;
-        margin-bottom: 20px;
+        font-size: var(--font-size-large);
+        margin-bottom: var(--spacing-large);
       }
 
       .no-scores button,
       .score-library-error button {
-        background: #2196f3;
-        color: white;
+        background: var(--color-primary-600);
+        color: var(--color-neutral-0);
         border: none;
-        padding: 10px 20px;
-        border-radius: 4px;
+        padding: var(--spacing-small) var(--spacing-large);
+        border-radius: var(--border-radius-medium);
         cursor: pointer;
-        font-size: 1rem;
+        font-size: var(--font-size-medium);
+        transition: background var(--transition-fast);
       }
 
       .no-scores button:hover,
       .score-library-error button:hover {
-        background: #1976d2;
+        background: var(--color-primary-700);
       }
 
       .score-library-loading {
         text-align: center;
-        padding: 60px 20px;
+        padding: var(--spacing-3x-large) var(--spacing-large);
       }
 
       .spinner {
         width: 50px;
         height: 50px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #2196f3;
+        border: 4px solid var(--color-neutral-200);
+        border-top: 4px solid var(--color-primary-600);
         border-radius: 50%;
         animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
+        margin: 0 auto var(--spacing-large);
       }
 
       @keyframes spin {
@@ -509,26 +529,26 @@ export class ScoreLibrary {
 
       .score-library-error {
         text-align: center;
-        padding: 60px 20px;
-        color: #f44336;
+        padding: var(--spacing-3x-large) var(--spacing-large);
+        color: var(--color-danger-600);
       }
 
       .score-library-error h2 {
-        margin-bottom: 10px;
+        margin-bottom: var(--spacing-small);
       }
 
       .score-library-error p {
-        margin-bottom: 20px;
-        color: #666;
+        margin-bottom: var(--spacing-large);
+        color: var(--color-neutral-600);
       }
 
       @media (max-width: 768px) {
         .score-library {
-          padding: 15px;
+          padding: var(--spacing-medium);
         }
 
         .score-library-header h1 {
-          font-size: 1.5rem;
+          font-size: var(--font-size-x-large);
         }
 
         .score-library-grid {

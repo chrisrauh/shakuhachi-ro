@@ -6,9 +6,13 @@ import Layout from '../layouts/Layout.astro';
   <div id="score-library"></div>
 
   <script>
+    import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
     import { ScoreLibrary } from '../components/ScoreLibrary';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
 
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
