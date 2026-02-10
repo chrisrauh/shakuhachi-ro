@@ -115,23 +115,24 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         text-decoration: none;
       }
 
-      /* Logo exception - keep exact brand values */
+      /* Logo - relative to text color */
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: var(--logo-color, #191919);
+        color: var(--color-neutral-800); /* Darker than text (--color-neutral-700) */
         border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: 2px solid var(--logo-color, #191919);
+        border: 2px solid var(--color-neutral-800);
         box-sizing: border-box;
       }
 
-      /* Logo color override for dark mode */
+      /* Logo in dark mode - lighter than text */
       .theme-dark .logo-icon {
-        --logo-color: oklch(0.95 0.003 247.858); /* Light gray for dark mode */
+        color: var(--color-neutral-600);
+        border-color: var(--color-neutral-600);
       }
 
       nav {
