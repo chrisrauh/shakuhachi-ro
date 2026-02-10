@@ -7,6 +7,9 @@ export default defineConfig({
   outDir: './dist',
   site: 'https://shakuhachi.ro',
   base: '/',
+  server: {
+    port: 3001,
+  },
   build: {
     format: 'file', // Generates /index.html instead of /index/index.html
   },
