@@ -6,7 +6,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ### Visual Regression Testing
 
-- [ ] Fix logo showing underlined on score and create score pages
+- [x] Fix logo showing underlined on score and create score pages
 - [ ] Add visual regression tests for Editor page (/editor)
   - [ ] Test default empty state
   - [ ] Test with score data entered
