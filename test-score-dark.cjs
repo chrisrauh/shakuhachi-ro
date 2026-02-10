@@ -9,6 +9,10 @@ const { chromium } = require('@playwright/test');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(1000);
 
+  // Fill in title to pass validation
+  await page.fill('input[placeholder="Score title"]', 'Test Score');
+  await page.waitForTimeout(200);
+
   // Switch to JSON format
   await page.click('input[value="json"]');
   await page.waitForTimeout(200);
@@ -25,7 +29,7 @@ const { chromium } = require('@playwright/test');
   }, null, 2);
 
   await page.fill('#score-data-input', sampleScore);
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1500);
 
   // Take light mode screenshot with score
   await page.screenshot({ path: 'screenshots/score-render-light.png', fullPage: true });
@@ -33,7 +37,7 @@ const { chromium } = require('@playwright/test');
 
   // Switch to dark mode
   await page.click('#theme-toggle');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1500);
 
   // Take dark mode screenshot with score
   await page.screenshot({ path: 'screenshots/score-render-dark.png', fullPage: true });

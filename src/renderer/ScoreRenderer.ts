@@ -73,7 +73,7 @@ export class ScoreRenderer {
    */
   async renderFromScoreData(scoreData: ScoreData): Promise<void> {
     this.currentScoreData = scoreData;
-    const notes = ScoreParser.parse(scoreData);
+    const notes = ScoreParser.parse(scoreData, this.options.noteColor);
     this.renderNotes(notes);
   }
 
