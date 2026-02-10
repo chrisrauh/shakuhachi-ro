@@ -495,10 +495,10 @@ export class ScoreLibrary {
         background: var(--color-primary-600);
         color: var(--color-neutral-0);
         border: none;
-        padding: var(--spacing-small) var(--spacing-large);
+        padding: var(--spacing-x-small) var(--spacing-small);
         border-radius: var(--border-radius-medium);
         cursor: pointer;
-        font-size: var(--font-size-medium);
+        font-size: var(--font-size-small);
         transition: background var(--transition-fast);
       }
 

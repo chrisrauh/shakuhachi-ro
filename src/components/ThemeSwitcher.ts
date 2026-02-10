@@ -33,19 +33,17 @@ export class ThemeSwitcher {
 
     this.container.innerHTML = `
       <button id="theme-toggle" aria-label="Toggle theme" style="
+        padding: var(--spacing-x-small) var(--spacing-small);
+        cursor: pointer;
         background: var(--color-neutral-200);
         border: var(--input-border-width) solid var(--color-neutral-300);
         border-radius: var(--border-radius-medium);
-        padding: var(--spacing-x-small) var(--spacing-medium);
-        cursor: pointer;
         color: var(--color-neutral-700);
         font-size: var(--font-size-small);
-        transition: background var(--transition-fast), border-color var(--transition-fast);
+        transition: background var(--transition-fast);
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 40px;
-        height: 40px;
       ">
         <span id="theme-icon">${this.currentTheme === 'light' ? moonIcon : sunIcon}</span>
       </button>

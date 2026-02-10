@@ -363,19 +363,19 @@ export class ScoreDetail {
       }
 
       .btn {
-        padding: var(--spacing-small) var(--spacing-large);
-        border: none;
+        padding: var(--spacing-x-small) var(--spacing-small);
         border-radius: var(--border-radius-medium);
         cursor: pointer;
-        font-size: var(--font-size-medium);
+        font-size: var(--font-size-small);
         text-decoration: none;
         display: inline-block;
-        transition: all var(--transition-fast);
+        transition: background var(--transition-fast);
       }
 
       .btn-primary {
         background: var(--color-primary-600);
         color: var(--color-neutral-0);
+        border: none;
       }
 
       .btn-primary:hover {
@@ -383,13 +383,13 @@ export class ScoreDetail {
       }
 
       .btn-secondary {
-        background: var(--color-neutral-100);
+        background: var(--color-neutral-200);
         color: var(--color-neutral-700);
-        border: var(--panel-border-width) solid var(--color-neutral-300);
+        border: var(--input-border-width) solid var(--color-neutral-300);
       }
 
       .btn-secondary:hover {
-        background: var(--color-neutral-200);
+        background: var(--color-neutral-300);
       }
 
       .score-renderer-container {
