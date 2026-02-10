@@ -39,6 +39,20 @@ export class ScoreEditor {
 
     this.render();
     this.setupAutoSave();
+    this.setupThemeListener();
+  }
+
+  private setupThemeListener(): void {
+    // Use MutationObserver to watch for theme class changes on <html>
+    const observer = new MutationObserver(() => {
+      // Re-render preview when theme changes
+      this.updatePreview();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
   }
 
   private async loadExistingScore(scoreId: string): Promise<void> {
@@ -187,7 +201,20 @@ export class ScoreEditor {
 
       if (this.dataFormat === 'json') {
         const data = JSON.parse(this.scoreData);
-        new ScoreRenderer(scorePreview, data);
+
+        // Read theme-aware colors from CSS variables
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-neutral-900')
+          .trim();
+        const debugLabelColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-neutral-500')
+          .trim();
+
+        new ScoreRenderer(scorePreview, {
+          ...data,
+          noteColor: noteColor || '#000',
+          debugLabelColor: debugLabelColor || '#999',
+        });
       } else {
         // For MusicXML, we'd need to parse it properly
         // For now, show a placeholder
