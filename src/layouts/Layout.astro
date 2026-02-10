@@ -84,8 +84,8 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       header {
-        background: var(--color-neutral-0);
-        border-bottom: var(--input-border-width) solid var(--color-neutral-300);
+        background: var(--panel-background-color);
+        border-bottom: var(--panel-border-width) solid var(--panel-border-color);
         padding: var(--spacing-medium) var(--spacing-large);
         display: flex;
         justify-content: space-between;
@@ -116,14 +116,19 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: #191919;
+        color: var(--logo-color, #191919);
         border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: #191919 2px solid;
+        border: 2px solid var(--logo-color, #191919);
         box-sizing: border-box;
+      }
+
+      /* Logo color override for dark mode */
+      .theme-dark .logo-icon {
+        --logo-color: oklch(0.95 0.003 247.858); /* Light gray for dark mode */
       }
 
       nav {
