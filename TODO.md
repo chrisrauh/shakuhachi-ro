@@ -4,6 +4,24 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
+### Visual Regression Testing
+
+- [ ] Fix logo showing underlined on score and create score pages
+- [ ] Add visual regression tests for Editor page (/editor)
+  - [ ] Test default empty state
+  - [ ] Test with score data entered
+  - [ ] Test viewport and full page screenshots
+- [ ] Add visual regression tests for Score page (/score)
+  - [ ] Test score rendering (full page and viewport)
+  - [ ] Test debug mode
+  - [ ] Test different viewport sizes (desktop, tablet, mobile)
+- [ ] Update Browse page visual tests to properly test library view
+  - [ ] Test empty state (no scores)
+  - [ ] Test with scores displayed
+  - [ ] Test search/filter interactions
+- [ ] Add cross-viewport testing (desktop 1280x720, tablet 768x1024, mobile 375x667)
+- [ ] Add visual tests for different auth states (logged in vs logged out)
+
 ### Score Renderer Layout Improvements
 
 - [ ] Add mobile breakpoint (< 768px) for single-column vertical scroll layout
