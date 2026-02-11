@@ -9,40 +9,76 @@ async function takeScreenshot() {
   const page = await browser.newPage();
 
   try {
-    // Navigate to the dev server
+    // Light mode screenshots
     await page.goto(baseUrl, {
       waitUntil: 'networkidle',
     });
 
-    // Take screenshot
     await page.screenshot({
       path: 'screenshots/current.png',
       fullPage: true,
     });
 
-    // Navigate to the dev server
     await page.goto(`${baseUrl}?debug=true`, {
       waitUntil: 'networkidle',
     });
 
-    // Take screenshot
     await page.screenshot({
       path: 'screenshots/current-debug.png',
       fullPage: true,
     });
 
-    // Navigate with octave dots disabled
     await page.goto(`${baseUrl}?octaveDots=false`, {
       waitUntil: 'networkidle',
     });
 
-    // Take screenshot
     await page.screenshot({
       path: 'screenshots/current-no-octave-dots.png',
       fullPage: true,
     });
 
+    // Switch to dark mode
+    await page.goto(baseUrl, {
+      waitUntil: 'networkidle',
+    });
+
+    // Wait for theme switcher and toggle to dark mode
+    await page.waitForSelector('#theme-toggle');
+    await page.click('#theme-toggle');
+    // Wait for localStorage to be written and theme to apply
+    await page.waitForTimeout(500);
+
+    // Dark mode screenshots - theme should persist from localStorage
+    await page.screenshot({
+      path: 'screenshots/current-dark.png',
+      fullPage: true,
+    });
+
+    await page.goto(`${baseUrl}?debug=true`, {
+      waitUntil: 'networkidle',
+    });
+
+    await page.screenshot({
+      path: 'screenshots/current-dark-debug.png',
+      fullPage: true,
+    });
+
+    await page.goto(`${baseUrl}?octaveDots=false`, {
+      waitUntil: 'networkidle',
+    });
+
+    await page.screenshot({
+      path: 'screenshots/current-dark-no-octave-dots.png',
+      fullPage: true,
+    });
+
     console.log('Screenshots saved to screenshots/');
+    console.log(
+      'Light mode: current.png, current-debug.png, current-no-octave-dots.png',
+    );
+    console.log(
+      'Dark mode: current-dark.png, current-dark-debug.png, current-dark-no-octave-dots.png',
+    );
   } catch (error) {
     console.error('Error taking screenshot:', error.message);
     process.exit(1);
