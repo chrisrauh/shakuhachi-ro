@@ -6,9 +6,13 @@ import Layout from '../layouts/Layout.astro';
   <div id="score-detail"></div>
 
   <script>
+    import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
     import { ScoreDetail } from '../components/ScoreDetail';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
 
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
@@ -45,7 +49,7 @@ import Layout from '../layouts/Layout.astro';
     height: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: var(--spacing-large);
     display: flex;
     flex-direction: column;
   }

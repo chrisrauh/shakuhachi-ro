@@ -39,6 +39,20 @@ export class ScoreEditor {
 
     this.render();
     this.setupAutoSave();
+    this.setupThemeListener();
+  }
+
+  private setupThemeListener(): void {
+    // Use MutationObserver to watch for theme class changes on <html>
+    const observer = new MutationObserver(() => {
+      // Re-render preview when theme changes
+      this.updatePreview();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
   }
 
   private async loadExistingScore(scoreId: string): Promise<void> {
@@ -160,7 +174,7 @@ export class ScoreEditor {
     // Don't re-render - just update internal state
   }
 
-  private updatePreview(): void {
+  private async updatePreview(): Promise<void> {
     const previewContainer = this.container.querySelector(
       '#preview-pane',
     ) as HTMLElement;
@@ -187,7 +201,21 @@ export class ScoreEditor {
 
       if (this.dataFormat === 'json') {
         const data = JSON.parse(this.scoreData);
-        new ScoreRenderer(scorePreview, data);
+
+        // Read theme-aware colors from CSS variables
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-neutral-700')
+          .trim();
+        const debugLabelColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-neutral-500')
+          .trim();
+
+        const renderer = new ScoreRenderer(scorePreview, {
+          noteColor: noteColor || '#000',
+          debugLabelColor: debugLabelColor || '#999',
+        });
+
+        await renderer.renderFromScoreData(data);
       } else {
         // For MusicXML, we'd need to parse it properly
         // For now, show a placeholder
@@ -472,75 +500,77 @@ export class ScoreEditor {
       .score-editor {
         max-width: 1600px;
         margin: 0 auto;
-        padding: 20px;
+        padding: var(--spacing-large);
       }
 
       .editor-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: var(--spacing-x-large);
+        padding-bottom: var(--spacing-large);
+        border-bottom: 2px solid var(--color-neutral-300);
       }
 
       .editor-header h1 {
         margin: 0;
-        font-size: 2rem;
-        font-weight: 300;
+        font-size: var(--font-size-2x-large);
+        font-weight: var(--font-weight-light);
+        color: var(--color-neutral-700);
       }
 
       .editor-actions {
         display: flex;
-        gap: 10px;
+        gap: var(--spacing-small);
       }
 
       .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
+        padding: var(--spacing-x-small) var(--spacing-small);
+        border-radius: var(--border-radius-medium);
         cursor: pointer;
-        font-size: 1rem;
+        font-size: var(--font-size-small);
         text-decoration: none;
         display: inline-block;
-        transition: all 0.2s;
+        transition: background var(--transition-fast);
       }
 
       .btn-primary {
-        background: #2196f3;
-        color: white;
+        background: var(--color-primary-600);
+        color: var(--color-neutral-0);
+        border: none;
       }
 
       .btn-primary:hover:not(:disabled) {
-        background: #1976d2;
+        background: var(--color-primary-700);
       }
 
       .btn-primary:disabled {
-        background: #bdbdbd;
+        background: var(--color-neutral-400);
         cursor: not-allowed;
       }
 
       .btn-secondary {
-        background: #f5f5f5;
-        color: #333;
-        border: 1px solid #ddd;
+        background: var(--color-neutral-200);
+        color: var(--color-neutral-700);
+        border: var(--input-border-width) solid var(--color-neutral-300);
       }
 
       .btn-secondary:hover {
-        background: #e0e0e0;
+        background: var(--color-neutral-300);
       }
 
       .editor-metadata {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        background: var(--panel-background-color);
+        padding: var(--spacing-large);
+        border-radius: var(--border-radius-large);
+        margin-bottom: var(--spacing-large);
+        border: var(--panel-border-width) solid var(--panel-border-color);
       }
 
       .metadata-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
+        gap: var(--spacing-medium);
       }
 
       .metadata-field-full {
@@ -549,20 +579,36 @@ export class ScoreEditor {
 
       .metadata-field label {
         display: block;
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: #333;
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--spacing-x-small);
+        color: var(--color-neutral-700);
       }
 
       .metadata-field input,
       .metadata-field select,
       .metadata-field textarea {
         width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
+        padding: var(--input-spacing-small);
+        border: var(--input-border-width) solid var(--input-border-color);
+        border-radius: var(--input-border-radius-medium);
+        font-size: var(--input-font-size-medium);
         font-family: inherit;
+        background: var(--input-background-color);
+        color: var(--input-color);
+        transition: border-color var(--transition-fast);
+      }
+
+      .metadata-field input:focus,
+      .metadata-field select:focus,
+      .metadata-field textarea:focus {
+        outline: none;
+        border-color: var(--input-border-color-focus);
+        box-shadow: 0 0 0 var(--input-focus-ring-offset) var(--input-focus-ring-color);
+      }
+
+      .metadata-field input::placeholder,
+      .metadata-field textarea::placeholder {
+        color: var(--input-placeholder-color);
       }
 
       .metadata-field textarea {
@@ -572,7 +618,7 @@ export class ScoreEditor {
       .editor-main {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        gap: var(--spacing-large);
         height: calc(100vh - 400px);
         min-height: 500px;
       }
@@ -580,53 +626,56 @@ export class ScoreEditor {
       .editor-pane {
         display: flex;
         flex-direction: column;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        border: var(--panel-border-width) solid var(--panel-border-color);
+        border-radius: var(--border-radius-large);
         overflow: hidden;
+        background: var(--panel-background-color);
       }
 
       .editor-pane-header {
-        background: #f5f5f5;
-        padding: 15px 20px;
+        background: var(--color-neutral-100);
+        padding: var(--spacing-medium) var(--spacing-large);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: var(--panel-border-width) solid var(--panel-border-color);
       }
 
       .editor-pane-header h2 {
         margin: 0;
-        font-size: 1.2rem;
-        font-weight: 500;
+        font-size: var(--font-size-large);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-700);
       }
 
       .format-toggle {
         display: flex;
-        gap: 15px;
+        gap: var(--spacing-medium);
       }
 
       .format-toggle label {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: var(--spacing-x-small);
         cursor: pointer;
+        color: var(--color-neutral-700);
       }
 
       .validation-error {
-        background: #ffebee;
-        color: #c62828;
+        background: var(--color-danger-50);
+        color: var(--color-danger-800);
         padding: 0;
         margin: 0;
         max-height: 0;
         overflow: hidden;
-        transition: all 0.3s;
+        transition: all var(--transition-medium);
       }
 
       .validation-error.show {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
+        gap: var(--spacing-x-small);
+        padding: var(--spacing-small) var(--spacing-large);
         max-height: 100px;
       }
 
@@ -638,19 +687,21 @@ export class ScoreEditor {
 
       #score-data-input {
         flex: 1;
-        padding: 20px;
+        padding: var(--spacing-large);
         border: none;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9rem;
+        font-family: var(--font-mono);
+        font-size: var(--font-size-small);
         resize: none;
         outline: none;
+        background: var(--input-background-color);
+        color: var(--input-color);
       }
 
       .preview-pane {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        border: var(--panel-border-width) solid var(--panel-border-color);
+        border-radius: var(--border-radius-large);
         overflow: auto;
-        background: white;
+        background: var(--panel-background-color);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -659,27 +710,27 @@ export class ScoreEditor {
       .preview-placeholder,
       .preview-error {
         text-align: center;
-        color: #999;
-        padding: 40px;
+        color: var(--color-neutral-500);
+        padding: var(--spacing-3x-large);
       }
 
       .preview-placeholder p:first-child,
       .preview-error p:first-child {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        color: #666;
+        font-size: var(--font-size-large);
+        margin-bottom: var(--spacing-small);
+        color: var(--color-neutral-600);
       }
 
       .preview-hint {
-        font-size: 0.9rem;
+        font-size: var(--font-size-small);
       }
 
       .preview-error {
-        color: #f44336;
+        color: var(--color-danger-600);
       }
 
       #score-preview {
-        padding: 20px;
+        padding: var(--spacing-large);
         width: 100%;
       }
 
@@ -699,7 +750,7 @@ export class ScoreEditor {
         .editor-header {
           flex-direction: column;
           align-items: flex-start;
-          gap: 15px;
+          gap: var(--spacing-medium);
         }
 
         .metadata-grid {

@@ -22,7 +22,25 @@ export class ScoreDetail {
     this.container = container;
     this.slug = slug;
 
+    // Listen for theme changes and re-render score
+    this.setupThemeListener();
+
     this.loadScore();
+  }
+
+  private setupThemeListener(): void {
+    // Use MutationObserver to watch for theme class changes on <html>
+    const observer = new MutationObserver(() => {
+      // Re-render score when theme changes
+      if (this.score) {
+        this.renderScore();
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
   }
 
   private async loadScore(): Promise<void> {
@@ -61,8 +79,18 @@ export class ScoreDetail {
     if (!scoreContainer) return;
 
     try {
+      // Read theme-aware colors from CSS variables
+      const noteColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-neutral-700')
+        .trim();
+      const debugLabelColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-neutral-500')
+        .trim();
+
       this.renderer = new ScoreRenderer(scoreContainer as HTMLElement, {
         showDebugLabels: false,
+        noteColor: noteColor || '#000', // Fallback to black
+        debugLabelColor: debugLabelColor || '#999', // Fallback to gray
       });
 
       if (this.score.data_format === 'json') {
@@ -80,7 +108,7 @@ export class ScoreDetail {
       }
     } catch (error) {
       scoreContainer.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: #f44336;">
+        <div style="text-align: center; padding: 40px; color: var(--color-danger-600);">
           <p>Error rendering score: ${
             error instanceof Error ? error.message : 'Unknown error'
           }</p>
@@ -249,38 +277,38 @@ export class ScoreDetail {
     style.id = 'score-detail-styles';
     style.textContent = `
       .score-detail-header {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        background: var(--panel-background-color);
+        padding: var(--spacing-x-large);
+        border-radius: var(--border-radius-large);
+        margin-bottom: var(--spacing-x-large);
+        box-shadow: var(--shadow-small);
       }
 
       .score-detail-metadata h1 {
-        font-size: 2.5rem;
-        font-weight: 300;
-        margin-bottom: 10px;
-        color: #333;
+        font-size: var(--font-size-3x-large);
+        font-weight: var(--font-weight-light);
+        margin-bottom: var(--spacing-small);
+        color: var(--color-neutral-700);
       }
 
       .score-composer {
-        font-size: 1.2rem;
-        color: #666;
+        font-size: var(--font-size-large);
+        color: var(--color-neutral-600);
         font-style: italic;
-        margin-bottom: 20px;
+        margin-bottom: var(--spacing-large);
       }
 
       .fork-attribution {
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 10px 15px;
-        background: #f5f5f5;
-        border-left: 3px solid #2196f3;
-        border-radius: 4px;
-        margin-bottom: 15px;
-        font-size: 0.9rem;
-        color: #666;
+        gap: var(--spacing-2x-small);
+        padding: var(--spacing-small) var(--spacing-medium);
+        background: var(--color-neutral-100);
+        border-left: 3px solid var(--color-primary-600);
+        border-radius: var(--border-radius-medium);
+        margin-bottom: var(--spacing-medium);
+        font-size: var(--font-size-small);
+        color: var(--color-neutral-600);
       }
 
       .fork-attribution svg {
@@ -290,9 +318,9 @@ export class ScoreDetail {
       }
 
       .fork-attribution a {
-        color: #2196f3;
+        color: var(--color-primary-600);
         text-decoration: none;
-        font-weight: 500;
+        font-weight: var(--font-weight-semibold);
       }
 
       .fork-attribution a:hover {
@@ -300,26 +328,26 @@ export class ScoreDetail {
       }
 
       .score-description {
-        font-size: 1rem;
-        line-height: 1.6;
-        color: #555;
-        margin-bottom: 20px;
+        font-size: var(--font-size-medium);
+        line-height: var(--line-height-normal);
+        color: var(--color-neutral-700);
+        margin-bottom: var(--spacing-large);
       }
 
       .score-stats {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #e0e0e0;
+        gap: var(--spacing-large);
+        padding-top: var(--spacing-large);
+        border-top: var(--panel-border-width) solid var(--color-neutral-300);
       }
 
       .score-stat {
         display: flex;
         align-items: center;
-        gap: 6px;
-        color: #666;
-        font-size: 0.9rem;
+        gap: var(--spacing-2x-small);
+        color: var(--color-neutral-600);
+        font-size: var(--font-size-small);
       }
 
       .score-stat svg {
@@ -330,38 +358,38 @@ export class ScoreDetail {
 
       .score-detail-actions {
         display: flex;
-        gap: 10px;
-        margin-top: 20px;
+        gap: var(--spacing-small);
+        margin-top: var(--spacing-large);
       }
 
       .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 4px;
+        padding: var(--spacing-x-small) var(--spacing-small);
+        border-radius: var(--border-radius-medium);
         cursor: pointer;
-        font-size: 1rem;
+        font-size: var(--font-size-small);
         text-decoration: none;
         display: inline-block;
-        transition: all 0.2s;
+        transition: background var(--transition-fast);
       }
 
       .btn-primary {
-        background: #2196f3;
-        color: white;
+        background: var(--color-primary-600);
+        color: var(--color-neutral-0);
+        border: none;
       }
 
       .btn-primary:hover {
-        background: #1976d2;
+        background: var(--color-primary-700);
       }
 
       .btn-secondary {
-        background: #f5f5f5;
-        color: #333;
-        border: 1px solid #ddd;
+        background: var(--color-neutral-200);
+        color: var(--color-neutral-700);
+        border: var(--input-border-width) solid var(--color-neutral-300);
       }
 
       .btn-secondary:hover {
-        background: #e0e0e0;
+        background: var(--color-neutral-300);
       }
 
       .score-renderer-container {
@@ -375,17 +403,17 @@ export class ScoreDetail {
 
       .score-detail-loading {
         text-align: center;
-        padding: 60px 20px;
+        padding: var(--spacing-3x-large) var(--spacing-large);
       }
 
       .spinner {
         width: 50px;
         height: 50px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #2196f3;
+        border: 4px solid var(--color-neutral-200);
+        border-top: 4px solid var(--color-primary-600);
         border-radius: 50%;
         animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
+        margin: 0 auto var(--spacing-large);
       }
 
       @keyframes spin {
@@ -395,22 +423,22 @@ export class ScoreDetail {
 
       .score-detail-error {
         text-align: center;
-        padding: 60px 20px;
+        padding: var(--spacing-3x-large) var(--spacing-large);
       }
 
       .score-detail-error h2 {
-        margin-bottom: 10px;
-        color: #f44336;
+        margin-bottom: var(--spacing-small);
+        color: var(--color-danger-600);
       }
 
       .score-detail-error p {
-        margin-bottom: 20px;
-        color: #666;
+        margin-bottom: var(--spacing-large);
+        color: var(--color-neutral-600);
       }
 
       @media (max-width: 768px) {
         .score-detail-metadata h1 {
-          font-size: 2rem;
+          font-size: var(--font-size-2x-large);
         }
 
         .score-detail-actions {

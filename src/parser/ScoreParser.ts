@@ -66,9 +66,10 @@ export class ScoreParser {
    * - Rests carry octave context through (don't reset)
    *
    * @param scoreData - The score data to parse
+   * @param noteColor - Optional color for notes (defaults to '#000')
    * @returns Array of ShakuNote objects ready for rendering
    */
-  static parse(scoreData: ScoreData): ShakuNote[] {
+  static parse(scoreData: ScoreData, noteColor: string = '#000'): ShakuNote[] {
     // Validate score data
     this.validate(scoreData);
 
@@ -85,6 +86,7 @@ export class ScoreParser {
           symbol: 'rest',
           duration: mapDuration(note.duration),
           isRest: true,
+          color: noteColor,
         });
 
         // Add duration lines to rests as well
@@ -126,6 +128,7 @@ export class ScoreParser {
       const shakuNote = new ShakuNote({
         symbol: note.pitch.step,
         duration: mapDuration(note.duration),
+        color: noteColor,
       });
 
       // Add octave mark only if needed (violates closest-note rule)

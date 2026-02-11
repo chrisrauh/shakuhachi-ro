@@ -37,7 +37,10 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
           <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create Score</a>
         </nav>
       </div>
-      <div id="auth-widget"></div>
+      <div class="header-right">
+        <div id="theme-switcher"></div>
+        <div id="auth-widget"></div>
+      </div>
     </header>
 
     <main class={noPadding ? 'no-padding' : ''}>
@@ -45,6 +48,14 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
     </main>
 
     <style>
+      @import '../styles/tokens/light.css';
+      @import '../styles/tokens/dark.css';
+
+      /* ONLY OVERRIDE: Font family to use Noto Sans JP */
+      :root {
+        --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -52,14 +63,13 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       body {
-        font-family:
-          'Noto Sans JP',
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
-        background: #fafafa;
+        font-family: var(--font-sans);
+        background: var(--color-neutral-50);
+        color: var(--color-neutral-700);
         min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
       }
 
       body.full-height {
@@ -77,59 +87,76 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       header {
-        background: white;
-        border-bottom: 1px solid #e0e0e0;
-        padding: 15px 20px;
+        background: var(--panel-background-color);
+        border-bottom: var(--panel-border-width) solid var(--panel-border-color);
+        padding: var(--spacing-medium) var(--spacing-large);
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: sticky;
         top: 0;
         z-index: 100;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-small);
       }
 
       .header-left {
         display: flex;
         align-items: center;
-        gap: 30px;
+        gap: var(--spacing-x-large);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-medium);
       }
 
       .logo {
         text-decoration: none;
       }
 
+      /* Logo - relative to text color */
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: #191919;
-        border-radius: 8px;
+        color: var(--color-neutral-800); /* Darker than text (--color-neutral-700) */
+        border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: #191919 2px solid;
+        border: 2px solid var(--color-neutral-800);
         box-sizing: border-box;
+      }
+
+      /* Logo in dark mode - lighter than text */
+      .theme-dark .logo-icon {
+        color: var(--color-neutral-600);
+        border-color: var(--color-neutral-600);
       }
 
       nav {
         display: flex;
-        gap: 20px;
+        gap: var(--spacing-large);
       }
 
       nav a {
-        color: #666;
+        color: var(--color-neutral-600);
         text-decoration: none;
-        font-size: 0.95rem;
-        padding: 5px 0;
+        font-size: var(--font-size-small);
+        padding: var(--spacing-x-small) 0;
         border-bottom: 2px solid transparent;
-        transition: all 0.2s;
+        transition: all var(--transition-fast);
       }
 
       nav a:hover,
       nav a.active {
-        color: #2196f3;
-        border-bottom-color: #2196f3;
+        color: var(--color-primary-600);
+        border-bottom-color: var(--color-primary-600);
+      }
+
+      #theme-switcher {
+        flex-shrink: 0;
       }
 
       #auth-widget {
@@ -137,7 +164,7 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       main {
-        padding: 20px 0;
+        padding: var(--spacing-large) 0;
       }
 
       main.no-padding {
@@ -147,13 +174,17 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       @media (max-width: 768px) {
         header {
           flex-direction: column;
-          gap: 15px;
+          gap: var(--spacing-medium);
           align-items: stretch;
         }
 
         .header-left {
           flex-direction: column;
-          gap: 15px;
+          gap: var(--spacing-medium);
+        }
+
+        .header-right {
+          justify-content: center;
         }
 
         nav {
