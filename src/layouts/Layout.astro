@@ -33,8 +33,8 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
           <div class="logo-icon">ロ</div>
         </a>
         <nav>
-          <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Browse</a>
-          <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create Score</a>
+          <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Scores</a>
+          <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create</a>
         </nav>
       </div>
       <div class="header-right">
@@ -87,7 +87,7 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       header {
-        padding: var(--spacing-medium) var(--spacing-large);
+        padding: var(--spacing-small) var(--spacing-medium);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -112,17 +112,17 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         text-decoration: none;
       }
 
-      /* Logo - relative to text color */
+      /* Logo */
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: var(--color-neutral-800); /* Darker than text (--color-neutral-700) */
+        color: var(--color-neutral-700);
         border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: 2px solid var(--color-neutral-800);
+        border: 2px solid var(--color-neutral-700);
         box-sizing: border-box;
       }
 
