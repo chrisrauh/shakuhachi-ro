@@ -38,37 +38,35 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
   <!-- Score metadata in header -->
   <div slot="header-metadata" class="score-header-metadata">
     <h1 class="score-title">{score.title}</h1>
-    <div class="score-metadata-inline">
-      {score.composer && (
-        <>
-          <span class="metadata-separator">·</span>
-          <span>By {score.composer}</span>
-        </>
-      )}
-      <span class="metadata-separator">·</span>
-      <span class="score-stat">
-        <GitFork size={14} />
-        {score.fork_count}
-        <button id="fork-btn"
-                class="inline-action-btn"
-                aria-label="Fork score">
-          <GitFork size={12} />
-        </button>
-      </span>
-      <span class="metadata-separator">·</span>
-      <span class="score-stat">
-        <Calendar size={14} />
-        {formattedDate}
-      </span>
-      {parentScore && (
-        <>
-          <span class="metadata-separator">·</span>
-          <span>
-            Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-          </span>
-        </>
-      )}
-    </div>
+    {score.composer && (
+      <>
+        <span class="metadata-separator">·</span>
+        <span>By {score.composer}</span>
+      </>
+    )}
+    <span class="metadata-separator">·</span>
+    <span class="score-stat">
+      <GitFork size={14} />
+      {score.fork_count}
+      <button id="fork-btn"
+              class="inline-action-btn"
+              aria-label="Fork score">
+        <GitFork size={12} />
+      </button>
+    </span>
+    <span class="metadata-separator">·</span>
+    <span class="score-stat">
+      <Calendar size={14} />
+      {formattedDate}
+    </span>
+    {parentScore && (
+      <>
+        <span class="metadata-separator">·</span>
+        <span>
+          Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+        </span>
+      </>
+    )}
   </div>
 
   <!-- Score content -->
@@ -122,8 +120,10 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
     /* Header metadata styling (in header slot) */
     :global(.score-header-metadata) {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: var(--spacing-x-small);
+      font-size: var(--font-size-small);
+      color: var(--color-neutral-600);
       flex-wrap: wrap;
     }
 
@@ -132,15 +132,6 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       font-weight: var(--font-weight-semibold);
       color: var(--color-neutral-900);
       margin: 0;
-    }
-
-    :global(.score-metadata-inline) {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-x-small);
-      font-size: var(--font-size-small);
-      color: var(--color-neutral-600);
-      flex-wrap: wrap;
     }
 
     :global(.metadata-separator) {
@@ -184,12 +175,12 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       cursor: not-allowed;
     }
 
-    :global(.score-metadata-inline a) {
+    :global(.score-header-metadata a) {
       color: var(--color-primary-600);
       text-decoration: none;
     }
 
-    :global(.score-metadata-inline a:hover) {
+    :global(.score-header-metadata a:hover) {
       text-decoration: underline;
     }
 
