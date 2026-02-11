@@ -1,9 +1,37 @@
 import { chromium } from 'playwright';
+import { rename } from 'fs/promises';
+import { existsSync } from 'fs';
 
 async function takeScreenshot() {
-  // Get port from command-line argument, default to 3002
-  const port = process.argv[2] || '3002';
+  // Parse arguments: port and optional --debug flag
+  const args = process.argv.slice(2);
+  const port = args.find((arg) => !arg.startsWith('--')) || '3002';
+  const debugMode = args.includes('--debug');
   const baseUrl = `http://localhost:${port}`;
+
+  // Rename existing screenshots before taking new ones
+  const screenshotsToRename = [
+    'screenshots/current.png',
+    'screenshots/current-dark.png',
+  ];
+  if (debugMode) {
+    screenshotsToRename.push(
+      'screenshots/current-debug.png',
+      'screenshots/current-dark-debug.png',
+    );
+  }
+
+  for (const screenshot of screenshotsToRename) {
+    if (existsSync(screenshot)) {
+      const beforePath = screenshot.replace('current', 'before');
+      try {
+        await rename(screenshot, beforePath);
+        console.log(`Renamed ${screenshot} → ${beforePath}`);
+      } catch (error) {
+        console.warn(`Could not rename ${screenshot}:`, error.message);
+      }
+    }
+  }
 
   const browser = await chromium.launch();
   const page = await browser.newPage();
@@ -19,23 +47,16 @@ async function takeScreenshot() {
       fullPage: true,
     });
 
-    await page.goto(`${baseUrl}?debug=true`, {
-      waitUntil: 'networkidle',
-    });
+    if (debugMode) {
+      await page.goto(`${baseUrl}?debug=true`, {
+        waitUntil: 'networkidle',
+      });
 
-    await page.screenshot({
-      path: 'screenshots/current-debug.png',
-      fullPage: true,
-    });
-
-    await page.goto(`${baseUrl}?octaveDots=false`, {
-      waitUntil: 'networkidle',
-    });
-
-    await page.screenshot({
-      path: 'screenshots/current-no-octave-dots.png',
-      fullPage: true,
-    });
+      await page.screenshot({
+        path: 'screenshots/current-debug.png',
+        fullPage: true,
+      });
+    }
 
     // Switch to dark mode
     await page.goto(baseUrl, {
@@ -54,31 +75,23 @@ async function takeScreenshot() {
       fullPage: true,
     });
 
-    await page.goto(`${baseUrl}?debug=true`, {
-      waitUntil: 'networkidle',
-    });
+    if (debugMode) {
+      await page.goto(`${baseUrl}?debug=true`, {
+        waitUntil: 'networkidle',
+      });
 
-    await page.screenshot({
-      path: 'screenshots/current-dark-debug.png',
-      fullPage: true,
-    });
+      await page.screenshot({
+        path: 'screenshots/current-dark-debug.png',
+        fullPage: true,
+      });
+    }
 
-    await page.goto(`${baseUrl}?octaveDots=false`, {
-      waitUntil: 'networkidle',
-    });
-
-    await page.screenshot({
-      path: 'screenshots/current-dark-no-octave-dots.png',
-      fullPage: true,
-    });
-
-    console.log('Screenshots saved to screenshots/');
-    console.log(
-      'Light mode: current.png, current-debug.png, current-no-octave-dots.png',
-    );
-    console.log(
-      'Dark mode: current-dark.png, current-dark-debug.png, current-dark-no-octave-dots.png',
-    );
+    console.log('\nScreenshots saved to screenshots/');
+    console.log('Light mode: current.png');
+    console.log('Dark mode: current-dark.png');
+    if (debugMode) {
+      console.log('Debug mode: current-debug.png, current-dark-debug.png');
+    }
   } catch (error) {
     console.error('Error taking screenshot:', error.message);
     process.exit(1);
