@@ -88,32 +88,50 @@ Don't use for:
 
 **Screenshot Management**
 
-The screenshot script automatically captures both light and dark mode screenshots and renames existing ones for before/after comparison.
+**CRITICAL: Always use the existing screenshot script** - `scripts/screenshot.js`
+- DO NOT create temporary screenshot scripts with Puppeteer/Playwright
+- DO NOT write one-off screenshot code - the script handles everything
+- The script automatically captures light + dark modes and renames for before/after comparison
 
-**Default behavior** (no flags):
+**Script capabilities**:
 - Captures: `current.png` (light mode) and `current-dark.png` (dark mode)
-- Renames existing screenshots: `current.png` → `before.png`, `current-dark.png` → `before-dark.png`
-- Enables easy visual comparison of changes
+- Auto-renames: `current.png` → `before.png`, `current-dark.png` → `before-dark.png`
+- Handles theme switching automatically
+- Supports custom routes via `--path=` parameter
+- Optional debug mode screenshots
 
-**With --debug flag**:
-- Also captures: `current-debug.png` and `current-dark-debug.png`
-- Use when you need to verify debug mode rendering
+**Usage patterns**:
 
-**Usage**:
 ```bash
-# Basic screenshots (light + dark mode)
-node scripts/screenshot.js [port]
+# Homepage (default)
+node scripts/screenshot.js 3002
 
-# Include debug mode screenshots
-node scripts/screenshot.js [port] --debug
+# Specific route (score detail page)
+node scripts/screenshot.js 3002 --path=/score/akatombo
+
+# Editor page
+node scripts/screenshot.js 3002 --path=/editor
+
+# With debug mode
+node scripts/screenshot.js 3002 --path=/score/akatombo --debug
+
+# Different port
+node scripts/screenshot.js 4321 --path=/score/test-score
 ```
+
+**Testing workflow**:
+1. Start dev server: `npm run dev` (leave running)
+2. Take screenshots: `node scripts/screenshot.js <port> --path=<route>`
+3. Make changes to code
+4. Take new screenshots: `node scripts/screenshot.js <port> --path=<route>` (auto-creates before.png)
+5. Compare: `before.png` vs `current.png`, `before-dark.png` vs `current-dark.png`
 
 **Guidelines**:
 - Screenshots saved to `screenshots/` directory (gitignored)
 - Script handles all renaming automatically - don't manually rename
-- Before comparing screenshots, take new ones to create before.png automatically
-- Clean up old before.png files when starting new visual work
 - Both light and dark modes are always captured - verify changes in both themes
+- Always specify `--path=` when testing non-homepage routes
+- Clean up old screenshots when starting new visual work
 
 **Dev Server Management**
 
