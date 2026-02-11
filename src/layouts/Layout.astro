@@ -34,6 +34,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         <a href="/" class="logo">
           <div class="logo-icon">ロ</div>
         </a>
+        <slot name="header-metadata" />
       </div>
       <div class="header-right">
         <a
@@ -183,17 +184,20 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
 
       @media (max-width: 768px) {
         header {
-          flex-direction: column;
-          gap: var(--spacing-medium);
-          align-items: stretch;
+          gap: var(--spacing-small);
+          align-items: flex-start;
         }
 
         .header-left {
-          justify-content: center;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--spacing-small);
+          flex: 1;
         }
 
         .header-right {
-          justify-content: center;
+          justify-content: flex-end;
+          flex-shrink: 0;
         }
       }
     </style>
