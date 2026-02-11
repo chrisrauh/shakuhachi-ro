@@ -133,18 +133,20 @@ export class ScoreDetailClient {
 
     // Disable the fork button to prevent double-clicks
     const forkBtn = document.getElementById('fork-btn') as HTMLButtonElement;
+    const originalContent = forkBtn?.innerHTML;
+
     if (forkBtn) {
       forkBtn.disabled = true;
-      forkBtn.innerHTML = '<span>Forking...</span>';
+      forkBtn.textContent = '⋯';
     }
 
     try {
       const result = await forkScore(this.score.id);
       if (result.error) {
         alert(`Error forking score: ${result.error.message}`);
-        if (forkBtn) {
+        if (forkBtn && originalContent) {
           forkBtn.disabled = false;
-          forkBtn.innerHTML = `<svg width="16" height="16"><use href="#git-fork-icon" /></svg>`;
+          forkBtn.innerHTML = originalContent;
         }
         return;
       }
@@ -155,9 +157,9 @@ export class ScoreDetailClient {
       }
     } catch {
       alert('Failed to fork score');
-      if (forkBtn) {
+      if (forkBtn && originalContent) {
         forkBtn.disabled = false;
-        forkBtn.innerHTML = `<svg width="16" height="16"><use href="#git-fork-icon" /></svg>`;
+        forkBtn.innerHTML = originalContent;
       }
     }
   }
