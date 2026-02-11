@@ -1,4 +1,6 @@
 ---
+import { Book, Plus } from '@lucide/astro';
+
 interface Props {
   title: string;
   currentPage: 'browse' | 'create' | 'score';
@@ -32,12 +34,22 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         <a href="/" class="logo">
           <div class="logo-icon">ロ</div>
         </a>
-        <nav>
-          <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Scores</a>
-          <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create</a>
-        </nav>
       </div>
       <div class="header-right">
+        <a
+          href="/"
+          class={`nav-btn ${currentPage === 'browse' ? 'active' : ''}`}
+          aria-label="View scores"
+        >
+          <Book size={16} stroke-width={2} />
+        </a>
+        <a
+          href="/editor"
+          class={`nav-btn ${currentPage === 'create' ? 'active' : ''}`}
+          aria-label="Create new score"
+        >
+          <Plus size={16} stroke-width={2} />
+        </a>
         <div id="theme-switcher"></div>
         <div id="auth-widget"></div>
       </div>
@@ -108,11 +120,10 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         gap: var(--spacing-medium);
       }
 
+      /* Logo */
       .logo {
         text-decoration: none;
       }
-
-      /* Logo */
       .logo-icon {
         width: 32px;
         height: 32px;
@@ -124,6 +135,7 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         font-weight: 450;
         border: 2px solid var(--color-neutral-700);
         box-sizing: border-box;
+
       }
 
       /* Logo in dark mode - lighter than text */
@@ -132,24 +144,30 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         border-color: var(--color-neutral-600);
       }
 
-      nav {
-        display: flex;
-        gap: var(--spacing-large);
-      }
-
-      nav a {
-        color: var(--color-neutral-600);
-        text-decoration: none;
-        font-size: var(--font-size-small);
-        padding: var(--spacing-x-small) 0;
-        border-bottom: 2px solid transparent;
+      /* Navigation icon buttons */
+      .nav-btn {
+        padding: var(--spacing-x-small);
+        cursor: pointer;
+        background: var(--color-neutral-200);
+        border: var(--input-border-width) solid var(--color-neutral-300);
+        border-radius: var(--border-radius-medium);
+        color: var(--color-neutral-700);
         transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
+        text-decoration: none;
       }
 
-      nav a:hover,
-      nav a.active {
-        color: var(--color-primary-600);
-        border-bottom-color: var(--color-primary-600);
+      .nav-btn:hover {
+        background: var(--color-neutral-300);
+      }
+
+      .nav-btn.active {
+        border-top-color: var(--color-primary-600);
+        border-top-width: 3px;
+        padding-top: calc(var(--spacing-x-small) - 2px);
       }
 
       #theme-switcher {
@@ -176,15 +194,10 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         }
 
         .header-left {
-          flex-direction: column;
-          gap: var(--spacing-medium);
-        }
-
-        .header-right {
           justify-content: center;
         }
 
-        nav {
+        .header-right {
           justify-content: center;
         }
       }
