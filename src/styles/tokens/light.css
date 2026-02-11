@@ -274,6 +274,8 @@
      OVERLAY, PANEL, TOOLTIP - From Shoelace
      ============================================ */
 
+  --page-background-color: var(--color-neutral-50);
+
   --overlay-background-color: oklch(0.551 0.027 264.364 / 33%);
 
   --panel-background-color: var(--color-neutral-0);
