@@ -326,14 +326,15 @@ export class ScoreLibrary {
       }
 
       .score-library-filters {
-        background: var(--color-neutral-100);
+        background: var(--panel-background-color);
+        border: var(--panel-border-width) solid var(--panel-border-color);
         padding: var(--spacing-large);
         border-radius: var(--border-radius-large);
         margin-bottom: var(--spacing-x-large);
       }
 
       .search-bar {
-        margin-bottom: var(--spacing-medium);
+        margin: 0;
       }
 
       .search-bar input {
@@ -345,6 +346,7 @@ export class ScoreLibrary {
         background: var(--input-background-color);
         color: var(--input-color);
         transition: border-color var(--transition-fast);
+        box-sizing: border-box;
       }
 
       .search-bar input:hover {
