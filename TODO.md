@@ -4,8 +4,21 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
+### Bug Fixes
+
+- [ ] Fix score editor preview error
+  - [ ] Preview shows "Score title is required" error even when title is filled
+  - [ ] Investigate why preview validation isn't working correctly
+  - [ ] Verify updatePreview() is being called after title changes
+
 ### Visual Regression Testing
 
+- [ ] Update existing visual tests to capture both light and dark mode
+  - [ ] Browse page - light & dark mode screenshots
+  - [ ] Editor page - light & dark mode screenshots
+  - [ ] Score detail page - light & dark mode screenshots
+  - [ ] Add appropriate wait times for theme transitions
+  - [ ] Ensure score rendering completes before capturing
 - [ ] Add visual regression tests for Editor page (/editor)
   - [ ] Test default empty state
   - [ ] Test with score data entered
