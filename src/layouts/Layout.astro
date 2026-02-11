@@ -87,8 +87,6 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       header {
-        background: var(--panel-background-color);
-        border-bottom: var(--panel-border-width) solid var(--panel-border-color);
         padding: var(--spacing-medium) var(--spacing-large);
         display: flex;
         justify-content: space-between;
@@ -96,7 +94,6 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         position: sticky;
         top: 0;
         z-index: 100;
-        box-shadow: var(--shadow-small);
       }
 
       .header-left {
