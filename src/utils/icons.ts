@@ -1,4 +1,11 @@
-import { createIcons, GitFork, Eye, AlertCircle, Calendar } from 'lucide';
+import {
+  createIcons,
+  GitFork,
+  Eye,
+  AlertCircle,
+  Calendar,
+  SquarePen,
+} from 'lucide';
 
 /**
  * Initialize all Lucide icons on the page
@@ -12,6 +19,7 @@ export function initIcons(): void {
       Eye,
       AlertCircle,
       Calendar,
+      SquarePen,
     },
   });
 }

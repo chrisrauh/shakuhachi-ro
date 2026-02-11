@@ -1,56 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
+// Redirect old ?slug= URLs to new /score/[slug] format
+const url = new URL(Astro.request.url);
+const slug = url.searchParams.get('slug');
+
+if (slug) {
+  return Astro.redirect(`/score/${slug}`);
+}
+
+// If no slug, redirect to home
+return Astro.redirect('/');
 ---
-
-<Layout title="Score - Shakuhachi Score Library" currentPage="score" fullHeight={true}>
-  <div id="score-detail"></div>
-
-  <script>
-    import { ThemeSwitcher } from '../components/ThemeSwitcher';
-    import { AuthWidget } from '../components/AuthComponents';
-    import { authState } from '../api/authState';
-    import { ScoreDetail } from '../components/ScoreDetail';
-
-    // Initialize theme switcher
-    new ThemeSwitcher('theme-switcher');
-
-    // Initialize auth widget
-    const authWidget = new AuthWidget('auth-widget');
-
-    // Subscribe to auth state changes
-    authState.subscribe((user) => {
-      if (user) {
-        authWidget.setUser(user);
-      } else {
-        authWidget.setUser(null);
-      }
-    });
-
-    // Get slug from URL query parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
-
-    // Initialize score detail component
-    if (slug) {
-      new ScoreDetail('score-detail', slug);
-    } else {
-      document.getElementById('score-detail')!.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-          <h1>Score not found</h1>
-          <p><a href="/">Browse all scores</a></p>
-        </div>
-      `;
-    }
-  </script>
-</Layout>
-
-<style>
-  #score-detail {
-    height: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-large);
-    display: flex;
-    flex-direction: column;
-  }
-</style>
