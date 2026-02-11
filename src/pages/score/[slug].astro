@@ -35,57 +35,52 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
 ---
 
 <Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score">
-  <!-- Server-rendered metadata (compact layout) -->
-  <div class="score-detail-container">
-    <div class="score-detail-header">
-      <div class="score-title-section">
-        <div class="score-title-row">
-          <h1>{score.title}</h1>
-          <div class="score-metadata-inline">
-            {score.composer && (
-              <>
-                <span class="metadata-separator">·</span>
-                <span>By {score.composer}</span>
-              </>
-            )}
-            <span class="metadata-separator">·</span>
-            <span class="score-stat">
-              <GitFork size={14} />
-              {score.fork_count}
-            </span>
-            <span class="metadata-separator">·</span>
-            <span class="score-stat">
-              <Calendar size={14} />
-              {formattedDate}
-            </span>
-          </div>
-        </div>
-
-        {parentScore && (
-          <div class="fork-attribution">
-            <GitFork size={14} />
-            Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-          </div>
-        )}
-      </div>
-
-      <div class="score-actions">
-        <!-- Owner-only edit button (client-side conditional) -->
-        <a href={`/editor.html?id=${score.id}`}
-           class="score-action-btn"
-           id="edit-btn"
-           aria-label="Edit score"
-           style="display: none;">
-          <SquarePen size={16} />
-        </a>
-
+  <!-- Score metadata in header -->
+  <div slot="header-metadata" class="score-header-metadata">
+    <h1 class="score-title">{score.title}</h1>
+    <div class="score-metadata-inline">
+      {score.composer && (
+        <>
+          <span class="metadata-separator">·</span>
+          <span>By {score.composer}</span>
+        </>
+      )}
+      <span class="metadata-separator">·</span>
+      <span class="score-stat">
+        <GitFork size={14} />
+        {score.fork_count}
         <button id="fork-btn"
-                class="score-action-btn"
+                class="inline-action-btn"
                 aria-label="Fork score">
-          <GitFork size={16} />
+          <GitFork size={12} />
         </button>
-      </div>
+      </span>
+      <span class="metadata-separator">·</span>
+      <span class="score-stat">
+        <Calendar size={14} />
+        {formattedDate}
+      </span>
+      {parentScore && (
+        <>
+          <span class="metadata-separator">·</span>
+          <span>
+            Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+          </span>
+        </>
+      )}
     </div>
+  </div>
+
+  <!-- Score content -->
+  <div class="score-detail-container">
+    <!-- Owner-only edit button (floating) -->
+    <a href={`/editor.html?id=${score.id}`}
+       class="floating-edit-btn"
+       id="edit-btn"
+       aria-label="Edit score"
+       style="display: none;">
+      <SquarePen size={16} />
+    </a>
 
     <!-- Score renderer container -->
     <div id="score-renderer-container"></div>
@@ -124,89 +119,95 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
   </script>
 
   <style>
-    /* Compact layout styling */
-    .score-detail-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 var(--spacing-large);
-    }
-
-    .score-detail-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--spacing-large);
-      margin-bottom: var(--spacing-x-large);
-      /* NO panel styling - no background, border, shadow */
-    }
-
-    .score-title-section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-small);
-    }
-
-    .score-title-row {
+    /* Header metadata styling (in header slot) */
+    :global(.score-header-metadata) {
       display: flex;
       align-items: baseline;
-      gap: var(--spacing-small);
+      gap: var(--spacing-x-small);
       flex-wrap: wrap;
     }
 
-    .score-title-row h1 {
-      font-size: var(--font-size-x-large); /* 24px */
-      font-weight: var(--font-weight-semibold); /* 500 */
+    :global(.score-title) {
+      font-size: var(--font-size-large);
+      font-weight: var(--font-weight-semibold);
       color: var(--color-neutral-900);
       margin: 0;
     }
 
-    .score-metadata-inline {
+    :global(.score-metadata-inline) {
       display: flex;
       align-items: center;
-      gap: var(--spacing-small);
+      gap: var(--spacing-x-small);
       font-size: var(--font-size-small);
       color: var(--color-neutral-600);
       flex-wrap: wrap;
     }
 
-    .metadata-separator {
+    :global(.metadata-separator) {
       color: var(--color-neutral-400);
     }
 
-    .score-stat {
+    :global(.score-stat) {
       display: inline-flex;
       align-items: center;
       gap: var(--spacing-3x-small);
     }
 
-    .fork-attribution {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-2x-small);
-      font-size: var(--font-size-small);
+    :global(.inline-action-btn) {
+      padding: var(--spacing-3x-small) var(--spacing-2x-small);
+      margin-left: var(--spacing-3x-small);
+      cursor: pointer;
+      background: transparent;
+      border: var(--input-border-width) solid var(--color-neutral-300);
+      border-radius: var(--border-radius-small);
       color: var(--color-neutral-600);
-      /* Simplified - no background box */
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      vertical-align: middle;
     }
 
-    .fork-attribution a {
+    :global(.inline-action-btn:hover) {
+      background: var(--color-neutral-100);
+      border-color: var(--color-neutral-400);
+      color: var(--color-neutral-700);
+    }
+
+    :global(.inline-action-btn:active) {
+      transform: translateY(1px);
+    }
+
+    :global(.inline-action-btn:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    :global(.score-metadata-inline a) {
       color: var(--color-primary-600);
       text-decoration: none;
     }
 
-    .fork-attribution a:hover {
+    :global(.score-metadata-inline a:hover) {
       text-decoration: underline;
     }
 
-    .score-actions {
-      display: flex;
-      gap: var(--spacing-small);
+    /* Page content styling */
+    .score-detail-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-large);
+      position: relative;
     }
 
-    .score-action-btn {
+    .floating-edit-btn {
+      position: fixed;
+      top: 80px;
+      right: var(--spacing-large);
       padding: var(--spacing-x-small);
       cursor: pointer;
-      background: transparent;
+      background: var(--page-background-color);
       border: var(--input-border-width) solid var(--color-neutral-300);
       border-radius: var(--border-radius-medium);
       color: var(--color-neutral-700);
@@ -216,11 +217,14 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       justify-content: center;
       line-height: 0;
       text-decoration: none;
+      z-index: 50;
+      box-shadow: var(--shadow-small);
     }
 
-    .score-action-btn:hover {
-      background: var(--color-neutral-200);
+    .floating-edit-btn:hover {
+      background: var(--color-neutral-100);
       border-color: var(--color-neutral-400);
+      box-shadow: var(--shadow-medium);
     }
 
     #score-renderer-container {
@@ -229,18 +233,19 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
 
     /* Responsive */
     @media (max-width: 768px) {
-      .score-detail-header {
+      :global(.score-header-metadata) {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
+        gap: var(--spacing-2x-small);
       }
 
-      .score-title-row h1 {
-        font-size: var(--font-size-large);
+      :global(.score-title) {
+        font-size: var(--font-size-medium);
       }
 
-      .score-actions {
-        justify-content: flex-start;
-        margin-top: var(--spacing-medium);
+      .floating-edit-btn {
+        top: 120px;
+        right: var(--spacing-medium);
       }
     }
   </style>
