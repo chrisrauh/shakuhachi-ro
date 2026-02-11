@@ -41,21 +41,8 @@ export class ThemeSwitcher {
   private render(): void {
     const button = document.createElement('button');
     button.id = 'theme-toggle';
+    button.className = 'header-btn';
     button.setAttribute('aria-label', 'Toggle theme');
-    button.style.cssText = `
-      padding: var(--spacing-x-small) var(--spacing-small);
-      cursor: pointer;
-      background: var(--color-neutral-200);
-      border: var(--input-border-width) solid var(--color-neutral-300);
-      border-radius: var(--border-radius-medium);
-      color: var(--color-neutral-700);
-      font-size: var(--font-size-small);
-      transition: background var(--transition-fast);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-    `;
 
     button.appendChild(this.getIcon());
     this.container.innerHTML = '';
@@ -63,15 +50,6 @@ export class ThemeSwitcher {
 
     button.addEventListener('click', () => {
       this.toggleTheme();
-    });
-
-    // Add hover effect matching other buttons
-    button.addEventListener('mouseenter', () => {
-      button.style.background = 'var(--color-neutral-300)';
-    });
-
-    button.addEventListener('mouseleave', () => {
-      button.style.background = 'var(--color-neutral-200)';
     });
   }
 

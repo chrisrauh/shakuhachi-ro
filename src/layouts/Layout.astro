@@ -38,14 +38,14 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       <div class="header-right">
         <a
           href="/"
-          class="nav-btn"
+          class="header-btn"
           aria-label="View scores"
         >
           <Book size={16} stroke-width={2} />
         </a>
         <a
           href="/editor"
-          class="nav-btn"
+          class="header-btn"
           aria-label="Create new score"
         >
           <Plus size={16} stroke-width={2} />
@@ -144,11 +144,11 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         border-color: var(--color-neutral-600);
       }
 
-      /* Navigation icon buttons */
-      .nav-btn {
+      /* Shared header button styling - used by nav buttons and theme switcher */
+      :global(.header-btn) {
         padding: var(--spacing-x-small);
         cursor: pointer;
-        background: var(--color-neutral-200);
+        background: transparent;
         border: var(--input-border-width) solid var(--color-neutral-300);
         border-radius: var(--border-radius-medium);
         color: var(--color-neutral-700);
@@ -160,8 +160,9 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         text-decoration: none;
       }
 
-      .nav-btn:hover {
-        background: var(--color-neutral-300);
+      :global(.header-btn:hover) {
+        background: var(--color-neutral-200);
+        border-color: var(--color-neutral-400);
       }
 
       #theme-switcher {
