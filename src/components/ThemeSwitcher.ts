@@ -3,7 +3,7 @@
  * Uses class-based theme switching (.theme-light / .theme-dark)
  */
 
-import { createElement, Moon, Sun } from 'lucide';
+import { createElement, SunMoon } from 'lucide';
 
 export class ThemeSwitcher {
   private container: HTMLElement;
@@ -29,9 +29,8 @@ export class ThemeSwitcher {
     this.applyTheme(this.currentTheme);
   }
 
-  private getIcon(theme: 'light' | 'dark'): SVGElement {
-    const iconData = theme === 'light' ? Moon : Sun;
-    const icon = createElement(iconData);
+  private getIcon(): SVGElement {
+    const icon = createElement(SunMoon);
     icon.setAttribute('width', '16');
     icon.setAttribute('height', '16');
     icon.setAttribute('stroke-width', '2');
@@ -58,7 +57,7 @@ export class ThemeSwitcher {
       line-height: 0;
     `;
 
-    button.appendChild(this.getIcon(this.currentTheme));
+    button.appendChild(this.getIcon());
     this.container.innerHTML = '';
     this.container.appendChild(button);
 
@@ -80,13 +79,6 @@ export class ThemeSwitcher {
     this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
     this.applyTheme(this.currentTheme);
     localStorage.setItem('theme', this.currentTheme);
-
-    // Update icon
-    const button = document.getElementById('theme-toggle');
-    if (button) {
-      button.innerHTML = '';
-      button.appendChild(this.getIcon(this.currentTheme));
-    }
   }
 
   private applyTheme(theme: 'light' | 'dark'): void {
