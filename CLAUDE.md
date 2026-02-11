@@ -88,11 +88,32 @@ Don't use for:
 
 **Screenshot Management**
 
-- Use standard names: `current.png`, `before.png`, `after.png`
-- Overwrite existing screenshots - do not create timestamped versions
-- Keep only the most recent screenshot(s) needed for current work
-- Location: `screenshots/` directory (gitignored)
-- Clean up old screenshots when starting new visual tasks
+The screenshot script automatically captures both light and dark mode screenshots and renames existing ones for before/after comparison.
+
+**Default behavior** (no flags):
+- Captures: `current.png` (light mode) and `current-dark.png` (dark mode)
+- Renames existing screenshots: `current.png` → `before.png`, `current-dark.png` → `before-dark.png`
+- Enables easy visual comparison of changes
+
+**With --debug flag**:
+- Also captures: `current-debug.png` and `current-dark-debug.png`
+- Use when you need to verify debug mode rendering
+
+**Usage**:
+```bash
+# Basic screenshots (light + dark mode)
+node scripts/screenshot.js [port]
+
+# Include debug mode screenshots
+node scripts/screenshot.js [port] --debug
+```
+
+**Guidelines**:
+- Screenshots saved to `screenshots/` directory (gitignored)
+- Script handles all renaming automatically - don't manually rename
+- Before comparing screenshots, take new ones to create before.png automatically
+- Clean up old before.png files when starting new visual work
+- Both light and dark modes are always captured - verify changes in both themes
 
 **Dev Server Management**
 
