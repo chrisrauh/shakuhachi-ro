@@ -1,4 +1,6 @@
 ---
+import { Book, Plus } from '@lucide/astro';
+
 interface Props {
   title: string;
   currentPage: 'browse' | 'create' | 'score';
@@ -6,7 +8,7 @@ interface Props {
   noPadding?: boolean;
 }
 
-const { title, currentPage, fullHeight = false, noPadding = false } = Astro.props;
+const { title, currentPage: _currentPage, fullHeight = false, noPadding = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -32,12 +34,22 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         <a href="/" class="logo">
           <div class="logo-icon">ロ</div>
         </a>
-        <nav>
-          <a href="/" class={currentPage === 'browse' ? 'active' : ''}>Browse</a>
-          <a href="/editor" class={currentPage === 'create' ? 'active' : ''}>Create Score</a>
-        </nav>
       </div>
       <div class="header-right">
+        <a
+          href="/"
+          class="header-btn"
+          aria-label="View scores"
+        >
+          <Book size={16} stroke-width={2} />
+        </a>
+        <a
+          href="/editor"
+          class="header-btn"
+          aria-label="Create new score"
+        >
+          <Plus size={16} stroke-width={2} />
+        </a>
         <div id="theme-switcher"></div>
         <div id="auth-widget"></div>
       </div>
@@ -64,7 +76,7 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
 
       body {
         font-family: var(--font-sans);
-        background: var(--color-neutral-50);
+        background: var(--page-background-color);
         color: var(--color-neutral-700);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
@@ -87,16 +99,13 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
       }
 
       header {
-        background: var(--panel-background-color);
-        border-bottom: var(--panel-border-width) solid var(--panel-border-color);
-        padding: var(--spacing-medium) var(--spacing-large);
+        padding: var(--spacing-small) var(--spacing-medium);
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: sticky;
         top: 0;
         z-index: 100;
-        box-shadow: var(--shadow-small);
       }
 
       .header-left {
@@ -111,22 +120,22 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         gap: var(--spacing-medium);
       }
 
+      /* Logo */
       .logo {
         text-decoration: none;
       }
-
-      /* Logo - relative to text color */
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: var(--color-neutral-800); /* Darker than text (--color-neutral-700) */
+        color: var(--color-neutral-700);
         border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: 2px solid var(--color-neutral-800);
+        border: 2px solid var(--color-neutral-700);
         box-sizing: border-box;
+
       }
 
       /* Logo in dark mode - lighter than text */
@@ -135,24 +144,25 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         border-color: var(--color-neutral-600);
       }
 
-      nav {
-        display: flex;
-        gap: var(--spacing-large);
-      }
-
-      nav a {
-        color: var(--color-neutral-600);
-        text-decoration: none;
-        font-size: var(--font-size-small);
-        padding: var(--spacing-x-small) 0;
-        border-bottom: 2px solid transparent;
+      /* Shared header button styling - used by nav buttons and theme switcher */
+      :global(.header-btn) {
+        padding: var(--spacing-x-small);
+        cursor: pointer;
+        background: transparent;
+        border: var(--input-border-width) solid var(--color-neutral-300);
+        border-radius: var(--border-radius-medium);
+        color: var(--color-neutral-700);
         transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
+        text-decoration: none;
       }
 
-      nav a:hover,
-      nav a.active {
-        color: var(--color-primary-600);
-        border-bottom-color: var(--color-primary-600);
+      :global(.header-btn:hover) {
+        background: var(--color-neutral-200);
+        border-color: var(--color-neutral-400);
       }
 
       #theme-switcher {
@@ -179,15 +189,10 @@ const { title, currentPage, fullHeight = false, noPadding = false } = Astro.prop
         }
 
         .header-left {
-          flex-direction: column;
-          gap: var(--spacing-medium);
-        }
-
-        .header-right {
           justify-content: center;
         }
 
-        nav {
+        .header-right {
           justify-content: center;
         }
       }
