@@ -3,11 +3,13 @@ import { rename } from 'fs/promises';
 import { existsSync } from 'fs';
 
 async function takeScreenshot() {
-  // Parse arguments: port and optional --debug flag
+  // Parse arguments: port, optional --debug flag, and optional --path=<url>
   const args = process.argv.slice(2);
   const port = args.find((arg) => !arg.startsWith('--')) || '3002';
   const debugMode = args.includes('--debug');
-  const baseUrl = `http://localhost:${port}`;
+  const pathArg = args.find((arg) => arg.startsWith('--path='));
+  const urlPath = pathArg ? pathArg.replace('--path=', '') : '/';
+  const baseUrl = `http://localhost:${port}${urlPath}`;
 
   // Rename existing screenshots before taking new ones
   const screenshotsToRename = [
@@ -87,6 +89,7 @@ async function takeScreenshot() {
     }
 
     console.log('\nScreenshots saved to screenshots/');
+    console.log(`URL: ${baseUrl}`);
     console.log('Light mode: current.png');
     console.log('Dark mode: current-dark.png');
     if (debugMode) {
