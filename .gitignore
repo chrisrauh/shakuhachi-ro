@@ -44,3 +44,6 @@ yarn-error.log*
 # Claude Code local settings
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Local Netlify folder
+.netlify
