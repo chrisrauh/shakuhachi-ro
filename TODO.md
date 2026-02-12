@@ -65,7 +65,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 - [ ] Add score selector dropdown
 - [ ] Load different score files dynamically
 - [ ] Add JSDoc comments to public APIs
-- [ ] Write usage guide in references/README.md
+- [ ] Write usage guide in reference/README.md
 - [ ] Document score data format
 
 ### Additional Modifiers

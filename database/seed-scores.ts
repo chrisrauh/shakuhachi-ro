@@ -31,7 +31,7 @@ async function seedScores() {
   // Seed Akatombo
   console.log('Adding Akatombo...');
   const akatomboXML = fs.readFileSync(
-    './public/data/Akatombo.musicxml',
+    '../reference/score-data/Akatombo.musicxml',
     'utf-8',
   );
 

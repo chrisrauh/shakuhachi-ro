@@ -248,7 +248,7 @@ src/
 
 docs/                   # Documentation
 tests/                  # Test files
-references/             # Reference materials (scores, fingering charts)
+reference/              # Reference materials (scores, fingering charts, score data)
 ```
 
 ## Examples

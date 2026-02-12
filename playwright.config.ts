@@ -9,6 +9,9 @@ export default defineConfig({
   // Test directory
   testDir: './tests/visual',
 
+  // Output directory for test artifacts
+  outputDir: './tests/visual/test-results',
+
   // Timeout for each test
   timeout: 30000,
 

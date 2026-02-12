@@ -431,7 +431,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
  */
 export function getCuratedScoreSlugs(): string[] {
   return [
-    'akatombo', // from public/data/Akatombo.musicxml
-    'love-story', // from public/data/love-story.json
+    'akatombo', // reference: reference/score-data/Akatombo.musicxml
+    'love-story', // reference: reference/score-data/love-story.json
   ];
 }
