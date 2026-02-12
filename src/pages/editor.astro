@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Prerender this page at build time (static HTML)
+export const prerender = true;
 ---
 
 <Layout title="Score Editor - Shakuhachi Score Library" currentPage="create" noPadding={true}>
