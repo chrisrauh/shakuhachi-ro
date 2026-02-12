@@ -154,6 +154,7 @@
   --spacing-3x-small: 0.125rem; /* 2px */
   --spacing-2x-small: 0.25rem;  /* 4px */
   --spacing-x-small: 0.5rem;    /* 8px */
+  --spacing-button: 0.4375rem;  /* 7px - for 32px icon buttons (16px icon + 7px×2 padding + 1px×2 border) */
   --spacing-small: 0.75rem;     /* 12px */
   --spacing-medium: 1rem;       /* 16px */
   --spacing-large: 1.25rem;     /* 20px */
