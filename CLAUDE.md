@@ -20,6 +20,23 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 ## Dev Workflow
 
+⚠️ **CRITICAL - READ BEFORE EVERY COMMIT** ⚠️
+
+**NEVER COMMIT DIRECTLY TO MAIN!**
+- ❌ WRONG: `git commit` on main branch → push to main
+- ✅ RIGHT: Create feature branch FIRST, then commit
+
+**Before running `git commit`, verify:**
+```bash
+git branch --show-current  # Must NOT be "main"
+```
+
+If you're on main, STOP and create a feature branch first!
+
+---
+
+**Standard workflow:**
+
 1. Create feature branch
 2. Make changes and test
 3. Commit locally (do NOT push yet, do NOT add "Co-Authored-By" attribution)
