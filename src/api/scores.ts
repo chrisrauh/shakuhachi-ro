@@ -424,3 +424,14 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     };
   }
 }
+
+/**
+ * Get list of curated scores for static prerendering
+ * These are the official library scores that exist as static files
+ */
+export function getCuratedScoreSlugs(): string[] {
+  return [
+    'akatombo', // from public/data/Akatombo.musicxml
+    'love-story', // from public/data/love-story.json
+  ];
+}

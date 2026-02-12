@@ -19,6 +19,7 @@
     "screenshot": "node scripts/screenshot.js"
   },
   "dependencies": {
+    "@astrojs/netlify": "^6.6.4",
     "@lucide/astro": "^0.563.0",
     "@supabase/supabase-js": "^2.39.0",
     "lucide": "^0.562.0"

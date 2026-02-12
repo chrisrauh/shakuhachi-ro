@@ -1,11 +1,19 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getScoreBySlug, getScore } from '../../api/scores';
+import { getScoreBySlug, getScore, getCuratedScoreSlugs } from '../../api/scores';
 import { GitFork, Calendar, SquarePen } from '@lucide/astro';
 
-// Enable server-side rendering for this dynamic route
-export const prerender = false;
+// Define which scores to prerender at build time
+// In hybrid mode, any other slugs will SSR automatically
+export async function getStaticPaths() {
+  const curatedSlugs = getCuratedScoreSlugs();
 
+  return curatedSlugs.map(slug => ({
+    params: { slug },
+  }));
+}
+
+// This works for both prerendered (build time) and SSR (request time)
 const { slug } = Astro.params;
 
 if (!slug) {
