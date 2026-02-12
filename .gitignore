@@ -8,7 +8,7 @@
 
 # Playwright
 /tests/visual/reports
-/test-results
+/tests/visual/test-results
 /playwright-report
 /.playwright
 

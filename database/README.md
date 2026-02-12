@@ -84,7 +84,7 @@ After running the migration, add the Akatombo score to the database.
 
 ## Next Steps: Love Story
 
-The Love Story score is available as an image (`references/scores-pictures/Love story.jpg`) but needs to be:
+The Love Story score is available as an image (`reference/scores-pictures/Love story.jpg`) but needs to be:
 1. Transcribed to MusicXML or JSON format
 2. Added to the database using the seed page
 
