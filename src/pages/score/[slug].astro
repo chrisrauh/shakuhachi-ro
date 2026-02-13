@@ -37,37 +37,29 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
   <!-- Score metadata in header -->
   <div slot="header-metadata" class="score-header-metadata">
     <h1 class="score-title">{score.title}</h1>
-    {score.composer && (
+
+    {parentScore && (
       <>
-        <span class="metadata-separator">·</span>
-        <span>By {score.composer}</span>
+        <span>
+          forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+        </span>
       </>
     )}
-    <span class="metadata-separator">·</span>
-    <span class="score-stat">
-      <GitFork size={14} />
-      {score.fork_count}
-      <button id="fork-btn"
-              class="btn btn-icon"
-              style="margin-left: var(--spacing-3x-small); vertical-align: middle;"
-              aria-label="Fork score">
-        <GitFork size={16} />
-      </button>
-    </span>
-    <span class="metadata-separator">·</span>
+
     <span class="score-stat">
       <Calendar size={14} />
       {formattedDate}
     </span>
-    {parentScore && (
-      <>
-        <span class="metadata-separator">·</span>
-        <span>
-          Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-        </span>
-      </>
-    )}
   </div>
+
+  <!-- Fork button in header actions (right side of navbar) -->
+  <button slot="header-actions"
+          id="fork-btn"
+          class="btn btn-icon-with-count"
+          aria-label="Fork this score">
+    <GitFork size={16} />
+    <span class="count">{score.fork_count}</span>
+  </button>
 
   <!-- Score content -->
   <div class="score-detail-container">
@@ -121,7 +113,7 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
     :global(.score-header-metadata) {
       display: flex;
       align-items: center;
-      gap: var(--spacing-x-small);
+      gap: var(--spacing-small);
       font-size: var(--font-size-small);
       color: var(--color-neutral-600);
       flex-wrap: wrap;
@@ -132,6 +124,8 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       font-weight: var(--font-weight-semibold);
       color: var(--color-neutral-900);
       margin: 0;
+      text-box-trim: trim-both; /* Trims space above/below actual glyphs */
+      text-box-edge: cap alphabetic; /* Uses cap-height and baseline */
     }
 
     :global(.metadata-separator) {
@@ -142,6 +136,40 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       display: inline-flex;
       align-items: center;
       gap: var(--spacing-3x-small);
+    }
+
+    /* GitHub-style fork button with integrated counter */
+    :global(.btn-icon-with-count) {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-x-small);
+      padding: var(--spacing-button) var(--spacing-small);
+      border: 1px solid var(--color-neutral-300);
+      background: var(--color-neutral-50);
+      color: var(--color-neutral-700);
+      border-radius: var(--border-radius-medium);
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-semibold);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    :global(.btn-icon-with-count:hover) {
+      background: var(--color-neutral-100);
+      border-color: var(--color-neutral-400);
+    }
+
+    :global(.btn-icon-with-count:active) {
+      transform: translateY(1px);
+    }
+
+    :global(.btn-icon-with-count:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    :global(.btn-icon-with-count .count) {
+      line-height: var(--line-height-denser);
     }
 
     :global(.score-header-metadata a) {
