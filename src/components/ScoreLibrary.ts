@@ -1,6 +1,7 @@
 import { getAllScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
+import '@github/relative-time-element';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -95,13 +96,6 @@ export class ScoreLibrary {
 
     this.container.innerHTML = `
       <div class="score-library">
-        <div class="score-library-header">
-          <h1>Score Library</h1>
-          <p class="score-count" id="score-count">${
-            this.filteredScores.length
-          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
-        </div>
-
         <div class="score-library-filters">
           <div class="search-bar">
             <input
@@ -111,6 +105,9 @@ export class ScoreLibrary {
               value="${this.searchQuery}"
             />
           </div>
+          <p class="score-count" id="score-count">${
+            this.filteredScores.length
+          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
         </div>
 
         <div class="score-library-grid" id="score-grid">
@@ -208,6 +205,7 @@ export class ScoreLibrary {
       <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
           <h3 class="score-title">
+            ${this.escapeHtml(score.title)}
             ${
               score.forked_from
                 ? `<span class="forked-indicator" title="This is a forked score">${renderIcon(
@@ -215,7 +213,6 @@ export class ScoreLibrary {
                   )}</span>`
                 : ''
             }
-            ${this.escapeHtml(score.title)}
           </h3>
         </div>
 
@@ -243,9 +240,7 @@ export class ScoreLibrary {
           <span class="score-stat" title="Fork count">${renderIcon(
             'git-fork',
           )} ${score.fork_count}</span>
-          <span class="score-stat" title="Created date">${renderIcon(
-            'calendar',
-          )} ${this.formatDate(score.created_at)}</span>
+          <span class="score-stat" title="Created date"><relative-time datetime="${score.created_at}" format="relative"></relative-time></span>
         </div>
       </div>
     `;
@@ -285,20 +280,6 @@ export class ScoreLibrary {
     return div.innerHTML;
   }
 
-  private formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
-  }
-
   private addStyles(): void {
     if (document.getElementById('score-library-styles')) return;
 
@@ -311,26 +292,19 @@ export class ScoreLibrary {
         padding: var(--spacing-large);
       }
 
-      .score-library-header {
-        margin-bottom: var(--spacing-x-large);
-      }
-
-      .score-library-header h1 {
-        font-size: var(--font-size-2x-large);
-        margin-bottom: var(--spacing-x-small);
-      }
-
-      .score-count {
-        color: var(--color-neutral-600);
-        font-size: var(--font-size-small);
-      }
-
       .score-library-filters {
         background: var(--panel-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
         padding: var(--spacing-large);
         border-radius: var(--border-radius-large);
         margin-bottom: var(--spacing-x-large);
+      }
+
+      .score-count {
+        color: var(--color-neutral-600);
+        font-size: var(--font-size-small);
+        margin-top: var(--spacing-small);
+        margin-bottom: 0;
       }
 
       .search-bar {
@@ -429,7 +403,7 @@ export class ScoreLibrary {
       .forked-indicator {
         display: inline-flex;
         align-items: center;
-        color: var(--color-primary-600);
+        color: var(--color-neutral-600);
       }
 
       .forked-indicator svg {
@@ -471,7 +445,7 @@ export class ScoreLibrary {
       .score-stat {
         display: flex;
         align-items: center;
-        gap: var(--spacing-3x-small);
+        gap: var(--spacing-2x-small);
       }
 
       .score-stat svg {
@@ -547,10 +521,6 @@ export class ScoreLibrary {
       @media (max-width: 768px) {
         .score-library {
           padding: var(--spacing-medium);
-        }
-
-        .score-library-header h1 {
-          font-size: var(--font-size-x-large);
         }
 
         .score-library-grid {
