@@ -1,6 +1,7 @@
 /**
  * ThemeSwitcher - Toggle between light and dark themes
- * Uses class-based theme switching (.theme-light / .theme-dark)
+ * Uses data-theme attribute for manual theme overrides
+ * CSS media queries handle automatic system preference (no JavaScript needed)
  */
 
 import { createElement, SunMoon } from 'lucide';
@@ -18,21 +19,13 @@ export class ThemeSwitcher {
     }
     this.container = container;
 
-    // Always use system preference on first load
+    // Determine current system preference
     const prefersDark = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches;
     this.currentTheme = prefersDark ? 'dark' : 'light';
 
-    // Listen for system theme changes and auto-update
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', (e) => {
-      this.currentTheme = e.matches ? 'dark' : 'light';
-      this.applyTheme(this.currentTheme);
-    });
-
     this.render();
-    this.applyTheme(this.currentTheme);
   }
 
   private getIcon(): SVGElement {
@@ -67,7 +60,6 @@ export class ThemeSwitcher {
 
   private applyTheme(theme: 'light' | 'dark'): void {
     const html = document.documentElement;
-    html.classList.remove('theme-light', 'theme-dark');
-    html.classList.add(`theme-${theme}`);
+    html.setAttribute('data-theme', theme);
   }
 }
