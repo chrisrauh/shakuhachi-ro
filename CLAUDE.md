@@ -58,7 +58,7 @@ If you're on main, STOP and create a feature branch first!
 
 - Unit tests (Vitest): Logic, validation, transformations
 - Visual tests (Browser): Rendering, layout
-- **Always test visual changes with screenshots** - Take screenshots before/after to verify rendering
+- **Always test visual changes with chrome-devtools-mcp** - See "Chrome DevTools MCP" section for screenshot workflow
 - **When you find an error during development, implement a unit test that would have caught that error**
 - **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
@@ -73,7 +73,7 @@ Verify all aspects before considering visual changes complete:
 - **SVG**: `overflow: visible` set to prevent clipping of modifiers extending beyond boundaries
 - **Modes**: Debug and non-debug render identically
 - **Edge cases**: First/last notes in columns, multiple modifiers, rests
-- **Process**: Take before/after screenshots, run `npm run test:visual`
+- **Process**: Use chrome-devtools-mcp to take before/after screenshots (see workflow below), run `npm run test:visual`
 
 **Visual Regression Test Workflow**
 
