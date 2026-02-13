@@ -62,8 +62,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     </main>
 
     <style is:global>
-      @import '../styles/tokens/light.css';
-      @import '../styles/tokens/dark.css';
+      @import '../styles/tokens/themes.css';
       @import '../styles/components.css';
     </style>
 
@@ -144,9 +143,16 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       }
 
       /* Logo in dark mode - lighter than text */
-      .theme-dark .logo-icon {
+      :root[data-theme="dark"] .logo-icon {
         color: var(--color-neutral-600);
         border-color: var(--color-neutral-600);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) .logo-icon {
+          color: var(--color-neutral-600);
+          border-color: var(--color-neutral-600);
+        }
       }
 
       #theme-switcher {
