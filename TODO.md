@@ -13,11 +13,11 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ### Deployment & Infrastructure
 
-- [ ] Configure custom domain on Netlify
-  - [ ] Add shakuhachi.ro domain in Netlify dashboard (Domain settings → Add custom domain)
-  - [ ] Update DNS records to point to Netlify
-  - [ ] Enable HTTPS/SSL certificate (auto-provisioned by Netlify)
-  - [ ] Verify domain propagation and test site access
+- [x] Configure custom domain on Netlify
+  - [x] Add shakuhachi.ro domain in Netlify dashboard (Domain settings → Add custom domain)
+  - [x] Update DNS records to point to Netlify
+  - [x] Enable HTTPS/SSL certificate (auto-provisioned by Netlify)
+  - [x] Verify domain propagation and test site access
 
 ### Visual Regression Testing
 
