@@ -15,8 +15,7 @@
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "test:visual:report": "playwright show-report tests/visual/reports",
-    "test:visual:debug": "playwright test --debug",
-    "screenshot": "node scripts/screenshot.js"
+    "test:visual:debug": "playwright test --debug"
   },
   "dependencies": {
     "@astrojs/netlify": "^6.6.4",
