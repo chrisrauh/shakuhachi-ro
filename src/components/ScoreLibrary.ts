@@ -240,9 +240,7 @@ export class ScoreLibrary {
           <span class="score-stat" title="Fork count">${renderIcon(
             'git-fork',
           )} ${score.fork_count}</span>
-          <span class="score-stat" title="Created date">${renderIcon(
-            'calendar',
-          )} <relative-time datetime="${score.created_at}" format="relative"></relative-time></span>
+          <span class="score-stat" title="Created date"><relative-time datetime="${score.created_at}" format="relative"></relative-time></span>
         </div>
       </div>
     `;
@@ -447,7 +445,7 @@ export class ScoreLibrary {
       .score-stat {
         display: flex;
         align-items: center;
-        gap: var(--spacing-3x-small);
+        gap: var(--spacing-2x-small);
       }
 
       .score-stat svg {
