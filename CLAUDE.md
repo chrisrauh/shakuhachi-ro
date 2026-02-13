@@ -73,14 +73,20 @@ Verify all aspects before considering visual changes complete:
 - **SVG**: `overflow: visible` set to prevent clipping of modifiers extending beyond boundaries
 - **Modes**: Debug and non-debug render identically
 - **Edge cases**: First/last notes in columns, multiple modifiers, rests
-- **Process**: Use chrome-devtools-mcp to take before/after screenshots (see workflow below), run `npm run test:visual`
+- **Process**:
+  - During development: Use chrome-devtools-mcp for iterative before/after screenshots (see workflow below)
+  - Before PR: Run `npm run test:visual` to verify against regression baselines
 
 **Visual Regression Test Workflow**
+
+**When to run:** At the end of a feature, just before creating the PR (not during iterative development)
+
+Run `npm run test:visual` to verify changes against Playwright baselines.
 
 When Playwright visual regression tests fail:
 - Run `npx playwright show-report` to open the diff viewer
 - Ask user to review and approve changes
-- Only update baselines after user approval
+- Only update baselines after user approval with `npm run test:visual:update`
 - This applies ONLY to Playwright visual regression tests (`npm run test:visual`)
 - Unit tests can be updated directly as they don't require visual approval
 
