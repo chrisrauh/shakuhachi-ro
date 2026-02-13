@@ -37,6 +37,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         <slot name="header-metadata" />
       </div>
       <div class="header-right">
+        <slot name="header-actions" />
         <a
           href="/"
           class="btn btn-icon"
@@ -51,7 +52,6 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         >
           <Plus size={16} stroke-width={2} />
         </a>
-        <slot name="header-actions" />
         <div id="theme-switcher"></div>
         <div id="auth-widget"></div>
       </div>

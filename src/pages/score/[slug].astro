@@ -37,25 +37,19 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
   <!-- Score metadata in header -->
   <div slot="header-metadata" class="score-header-metadata">
     <h1 class="score-title">{score.title}</h1>
-    {score.composer && (
+
+    {parentScore && (
       <>
-        <span class="metadata-separator">·</span>
-        <span>By {score.composer}</span>
+        <span>
+          forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+        </span>
       </>
     )}
-    <span class="metadata-separator">·</span>
+
     <span class="score-stat">
       <Calendar size={14} />
       {formattedDate}
     </span>
-    {parentScore && (
-      <>
-        <span class="metadata-separator">·</span>
-        <span>
-          Forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-        </span>
-      </>
-    )}
   </div>
 
   <!-- Fork button in header actions (right side of navbar) -->
@@ -119,7 +113,7 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
     :global(.score-header-metadata) {
       display: flex;
       align-items: center;
-      gap: var(--spacing-x-small);
+      gap: var(--spacing-small);
       font-size: var(--font-size-small);
       color: var(--color-neutral-600);
       flex-wrap: wrap;
@@ -130,6 +124,8 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       font-weight: var(--font-weight-semibold);
       color: var(--color-neutral-900);
       margin: 0;
+      text-box-trim: trim-both; /* Trims space above/below actual glyphs */
+      text-box-edge: cap alphabetic; /* Uses cap-height and baseline */
     }
 
     :global(.metadata-separator) {
