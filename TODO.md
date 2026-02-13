@@ -11,14 +11,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
   - [ ] Investigate why preview validation isn't working correctly
   - [ ] Verify updatePreview() is being called after title changes
 
-### Deployment & Infrastructure
-
-- [x] Configure custom domain on Netlify
-  - [x] Add shakuhachi.ro domain in Netlify dashboard (Domain settings → Add custom domain)
-  - [x] Update DNS records to point to Netlify
-  - [x] Enable HTTPS/SSL certificate (auto-provisioned by Netlify)
-  - [x] Verify domain propagation and test site access
-
 ### Visual Regression Testing
 
 - [ ] Update existing visual tests to capture both light and dark mode
