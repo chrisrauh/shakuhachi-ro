@@ -39,14 +39,14 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       <div class="header-right">
         <a
           href="/"
-          class="header-btn"
+          class="btn btn-icon"
           aria-label="View scores"
         >
           <Book size={16} stroke-width={2} />
         </a>
         <a
           href="/editor"
-          class="header-btn"
+          class="btn btn-icon"
           aria-label="Create new score"
         >
           <Plus size={16} stroke-width={2} />
@@ -60,10 +60,13 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       <slot />
     </main>
 
-    <style>
+    <style is:global>
       @import '../styles/tokens/light.css';
       @import '../styles/tokens/dark.css';
+      @import '../styles/components.css';
+    </style>
 
+    <style>
       /* ONLY OVERRIDE: Font family to use Noto Sans JP */
       :root {
         --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -143,27 +146,6 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       .theme-dark .logo-icon {
         color: var(--color-neutral-600);
         border-color: var(--color-neutral-600);
-      }
-
-      /* Shared header button styling - used by nav buttons and theme switcher */
-      :global(.header-btn) {
-        padding: var(--spacing-x-small);
-        cursor: pointer;
-        background: transparent;
-        border: var(--input-border-width) solid var(--color-neutral-300);
-        border-radius: var(--border-radius-medium);
-        color: var(--color-neutral-700);
-        transition: all var(--transition-fast);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 0;
-        text-decoration: none;
-      }
-
-      :global(.header-btn:hover) {
-        background: var(--color-neutral-200);
-        border-color: var(--color-neutral-400);
       }
 
       #theme-switcher {

@@ -1,0 +1,121 @@
+/**
+ * Shared Component Styles
+ * Reusable component classes used throughout the application
+ */
+
+/* ============================================
+   BUTTONS - Base styles
+   ============================================ */
+
+/* Base button - all buttons should extend this */
+.btn {
+  cursor: pointer;
+  border-radius: var(--border-radius-medium);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Icon button - 32px × 32px with centered icon */
+.btn-icon {
+  padding: var(--spacing-button);
+  background: transparent;
+  border: var(--input-border-width) solid var(--color-neutral-300);
+  border-radius: var(--border-radius-medium);
+  color: var(--color-neutral-700);
+  line-height: 0;
+  font-size: var(--font-size-medium);
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: var(--color-neutral-200);
+  border-color: var(--color-neutral-400);
+}
+
+.btn-icon:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Text button - normal padding for text/labels */
+.btn-text {
+  padding: var(--spacing-x-small) var(--spacing-medium);
+  border: none;
+  font-size: var(--font-size-small);
+  line-height: 1;
+}
+
+/* Text button with border */
+.btn-text-bordered {
+  padding: var(--spacing-x-small) var(--spacing-medium);
+  border: var(--input-border-width) solid var(--color-neutral-300);
+  font-size: var(--font-size-small);
+  line-height: 1;
+}
+
+/* Button variants - colors */
+.btn-primary {
+  background: var(--color-primary-600);
+  color: var(--color-neutral-0);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-700);
+}
+
+.btn-success {
+  background: var(--color-success-600);
+  color: var(--color-neutral-0);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: var(--color-success-700);
+}
+
+.btn-neutral {
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-700);
+}
+
+.btn-neutral:hover:not(:disabled) {
+  background: var(--color-neutral-300);
+}
+
+.btn-neutral-bordered {
+  background: var(--color-neutral-200);
+  border: var(--input-border-width) solid var(--color-neutral-300);
+  color: var(--color-neutral-700);
+}
+
+.btn-neutral-bordered:hover:not(:disabled) {
+  background: var(--color-neutral-300);
+  border-color: var(--color-neutral-400);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary-600);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* Special styling for floating buttons */
+.btn-floating {
+  position: fixed;
+  z-index: 50;
+  box-shadow: var(--shadow-small);
+  background: var(--page-background-color);
+}
+
+.btn-floating:hover:not(:disabled) {
+  box-shadow: var(--shadow-medium);
+}

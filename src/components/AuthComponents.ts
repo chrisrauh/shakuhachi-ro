@@ -60,14 +60,16 @@ export class AuthModal {
             <button
               type="submit"
               id="auth-submit"
-              style="flex: 1; padding: var(--spacing-small); background: var(--color-success-600); color: var(--color-neutral-0); border: none; border-radius: var(--border-radius-medium); cursor: pointer; font-size: var(--font-size-medium); transition: background var(--transition-fast);"
+              class="btn btn-text btn-success"
+              style="flex: 1;"
             >
               Log In
             </button>
             <button
               type="button"
               id="auth-cancel"
-              style="flex: 1; padding: var(--spacing-small); background: var(--color-neutral-500); color: var(--color-neutral-0); border: none; border-radius: var(--border-radius-medium); cursor: pointer; font-size: var(--font-size-medium); transition: background var(--transition-fast);"
+              class="btn btn-text btn-neutral-bordered"
+              style="flex: 1;"
             >
               Cancel
             </button>
@@ -76,7 +78,7 @@ export class AuthModal {
             <button
               type="button"
               id="auth-toggle"
-              style="background: none; border: none; color: var(--color-primary-600); cursor: pointer; text-decoration: underline; font-size: var(--font-size-medium);"
+              class="btn btn-ghost"
             >
               Need an account? Sign up
             </button>
@@ -223,7 +225,7 @@ export class AuthWidget {
       this.container.innerHTML = `
         <div style="display: flex; align-items: center; gap: var(--spacing-small);">
           <span style="color: var(--color-neutral-700); font-size: var(--font-size-small);">${this.currentUser.email}</span>
-          <button id="auth-logout" style="padding: var(--spacing-x-small) var(--spacing-small); cursor: pointer; background: var(--color-neutral-200); border: var(--input-border-width) solid var(--color-neutral-300); border-radius: var(--border-radius-medium); color: var(--color-neutral-700); font-size: var(--font-size-small); transition: background var(--transition-fast);">
+          <button id="auth-logout" class="btn btn-text-bordered btn-neutral-bordered">
             Log Out
           </button>
         </div>
@@ -234,10 +236,10 @@ export class AuthWidget {
     } else {
       this.container.innerHTML = `
         <div style="display: flex; gap: var(--spacing-small);">
-          <button id="auth-login" style="padding: var(--spacing-x-small) var(--spacing-medium); cursor: pointer; background: var(--color-primary-600); border: none; border-radius: var(--border-radius-medium); color: var(--color-neutral-0); font-size: var(--font-size-small); transition: background var(--transition-fast);">
+          <button id="auth-login" class="btn btn-text btn-primary">
             Log In
           </button>
-          <button id="auth-signup" style="padding: var(--spacing-x-small) var(--spacing-medium); cursor: pointer; background: var(--color-neutral-200); border: var(--input-border-width) solid var(--color-neutral-300); border-radius: var(--border-radius-medium); color: var(--color-neutral-700); font-size: var(--font-size-small); transition: background var(--transition-fast);">
+          <button id="auth-signup" class="btn btn-text-bordered btn-neutral-bordered">
             Sign Up
           </button>
         </div>
