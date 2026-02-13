@@ -41,7 +41,7 @@ export class ThemeSwitcher {
   private render(): void {
     const button = document.createElement('button');
     button.id = 'theme-toggle';
-    button.className = 'header-btn';
+    button.className = 'btn btn-icon';
     button.setAttribute('aria-label', 'Toggle theme');
 
     button.appendChild(this.getIcon());

@@ -48,9 +48,10 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       <GitFork size={14} />
       {score.fork_count}
       <button id="fork-btn"
-              class="inline-action-btn"
+              class="btn btn-icon"
+              style="margin-left: var(--spacing-3x-small); vertical-align: middle;"
               aria-label="Fork score">
-        <GitFork size={12} />
+        <GitFork size={16} />
       </button>
     </span>
     <span class="metadata-separator">·</span>
@@ -72,10 +73,10 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
   <div class="score-detail-container">
     <!-- Owner-only edit button (floating) -->
     <a href={`/editor.html?id=${score.id}`}
-       class="floating-edit-btn"
+       class="btn btn-icon btn-floating"
        id="edit-btn"
        aria-label="Edit score"
-       style="display: none;">
+       style="display: none; top: 80px; right: var(--spacing-large);">
       <SquarePen size={16} />
     </a>
 
@@ -143,37 +144,6 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       gap: var(--spacing-3x-small);
     }
 
-    :global(.inline-action-btn) {
-      padding: var(--spacing-3x-small) var(--spacing-2x-small);
-      margin-left: var(--spacing-3x-small);
-      cursor: pointer;
-      background: transparent;
-      border: var(--input-border-width) solid var(--color-neutral-300);
-      border-radius: var(--border-radius-small);
-      color: var(--color-neutral-600);
-      transition: all var(--transition-fast);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-      vertical-align: middle;
-    }
-
-    :global(.inline-action-btn:hover) {
-      background: var(--color-neutral-100);
-      border-color: var(--color-neutral-400);
-      color: var(--color-neutral-700);
-    }
-
-    :global(.inline-action-btn:active) {
-      transform: translateY(1px);
-    }
-
-    :global(.inline-action-btn:disabled) {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     :global(.score-header-metadata a) {
       color: var(--color-primary-600);
       text-decoration: none;
@@ -189,32 +159,6 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       margin: 0 auto;
       padding: 0 var(--spacing-large);
       position: relative;
-    }
-
-    .floating-edit-btn {
-      position: fixed;
-      top: 80px;
-      right: var(--spacing-large);
-      padding: var(--spacing-x-small);
-      cursor: pointer;
-      background: var(--page-background-color);
-      border: var(--input-border-width) solid var(--color-neutral-300);
-      border-radius: var(--border-radius-medium);
-      color: var(--color-neutral-700);
-      transition: all var(--transition-fast);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-      text-decoration: none;
-      z-index: 50;
-      box-shadow: var(--shadow-small);
-    }
-
-    .floating-edit-btn:hover {
-      background: var(--color-neutral-100);
-      border-color: var(--color-neutral-400);
-      box-shadow: var(--shadow-medium);
     }
 
     #score-renderer-container {
