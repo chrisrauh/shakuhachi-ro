@@ -44,16 +44,12 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       </>
     )}
     <span class="metadata-separator">·</span>
-    <span class="score-stat">
-      <GitFork size={14} />
-      {score.fork_count}
-      <button id="fork-btn"
-              class="btn btn-icon"
-              style="margin-left: var(--spacing-3x-small); vertical-align: middle;"
-              aria-label="Fork score">
-        <GitFork size={16} />
-      </button>
-    </span>
+    <button id="fork-btn"
+            class="btn btn-icon-with-count"
+            aria-label="Fork this score">
+      <GitFork size={16} />
+      <span class="count">{score.fork_count}</span>
+    </button>
     <span class="metadata-separator">·</span>
     <span class="score-stat">
       <Calendar size={14} />
@@ -142,6 +138,40 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       display: inline-flex;
       align-items: center;
       gap: var(--spacing-3x-small);
+    }
+
+    /* GitHub-style fork button with integrated counter */
+    :global(.btn-icon-with-count) {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-x-small);
+      padding: var(--spacing-button) var(--spacing-small);
+      border: 1px solid var(--color-neutral-300);
+      background: var(--color-neutral-50);
+      color: var(--color-neutral-700);
+      border-radius: var(--border-radius-medium);
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-semibold);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    :global(.btn-icon-with-count:hover) {
+      background: var(--color-neutral-100);
+      border-color: var(--color-neutral-400);
+    }
+
+    :global(.btn-icon-with-count:active) {
+      transform: translateY(1px);
+    }
+
+    :global(.btn-icon-with-count:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    :global(.btn-icon-with-count .count) {
+      line-height: var(--line-height-denser);
     }
 
     :global(.score-header-metadata a) {
