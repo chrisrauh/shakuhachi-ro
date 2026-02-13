@@ -1,6 +1,7 @@
 import { getAllScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
+import { formatHybridDate } from '../utils/formatDate';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -241,7 +242,7 @@ export class ScoreLibrary {
           )} ${score.fork_count}</span>
           <span class="score-stat" title="Created date">${renderIcon(
             'calendar',
-          )} ${this.formatDate(score.created_at)}</span>
+          )} ${formatHybridDate(score.created_at)}</span>
         </div>
       </div>
     `;
@@ -279,20 +280,6 @@ export class ScoreLibrary {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-  }
-
-  private formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
   }
 
   private addStyles(): void {
