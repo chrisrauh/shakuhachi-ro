@@ -9,7 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "type-check": "tsc --noEmit && astro check",
-    "lint": "eslint src scripts tests *.{js,ts}",
+    "lint": "eslint src tests *.{js,ts}",
     "test": "npm run type-check && npm run lint && vitest run",
     "test:coverage": "npm run type-check && npm run lint && vitest run --coverage",
     "test:visual": "playwright test",
@@ -21,6 +21,7 @@
     "@astrojs/netlify": "^6.6.4",
     "@lucide/astro": "^0.563.0",
     "@supabase/supabase-js": "^2.39.0",
+    "dayjs": "^1.11.19",
     "lucide": "^0.562.0"
   },
   "devDependencies": {

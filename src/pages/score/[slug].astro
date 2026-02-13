@@ -1,7 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
-import { GitFork, Calendar, SquarePen } from '@lucide/astro';
+import { GitFork, SquarePen } from '@lucide/astro';
+import { formatHybridDate } from '../../utils/formatDate';
 
 // In server mode, this page SSRs all routes dynamically
 // (getStaticPaths not used - all score URLs render on-demand)
@@ -26,10 +27,13 @@ if (score.forked_from) {
   parentScore = parentResult.score;
 }
 
-const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
-  month: 'short',
+const formattedDate = formatHybridDate(score.created_at);
+const exactDate = new Date(score.created_at).toLocaleDateString('en-US', {
+  month: 'long',
   day: 'numeric',
-  year: 'numeric'
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric'
 });
 ---
 
@@ -46,8 +50,7 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       </>
     )}
 
-    <span class="score-stat">
-      <Calendar size={14} />
+    <span class="score-stat" title={exactDate}>
       {formattedDate}
     </span>
   </div>
