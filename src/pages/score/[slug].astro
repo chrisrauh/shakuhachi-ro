@@ -33,7 +33,7 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
 });
 ---
 
-<Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score">
+<Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true}>
   <!-- Score metadata in header -->
   <div slot="header-metadata" class="score-header-metadata">
     <h1 class="score-title">{score.title}</h1>
@@ -185,12 +185,20 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
     .score-detail-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 var(--spacing-large);
+      padding: var(--spacing-large) var(--spacing-large) 0;
       position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     #score-renderer-container {
-      margin-top: var(--spacing-large);
+      flex: 1;
+      min-height: 0; /* Important for flex child with overflow */
+    }
+
+    :global(#score-renderer-container svg) {
+      display: block; /* Remove inline descender space */
     }
 
     /* Responsive */
