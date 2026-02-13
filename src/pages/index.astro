@@ -37,4 +37,25 @@ export const prerender = true;
     // Initialize score library
     new ScoreLibrary('score-library');
   </script>
+
+  <style>
+    /* Header metadata styling - matches score page styling */
+    :global(.score-header-metadata) {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-small);
+      font-size: var(--font-size-small);
+      color: var(--color-neutral-600);
+      flex-wrap: wrap;
+    }
+
+    :global(.score-title) {
+      font-size: var(--font-size-large);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+      margin: 0;
+      text-box-trim: trim-both; /* Trims space above/below actual glyphs */
+      text-box-edge: cap alphabetic; /* Uses cap-height and baseline */
+    }
+  </style>
 </Layout>
