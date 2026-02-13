@@ -109,69 +109,63 @@ Don't use for:
 - Trivial updates
 - Simple bug fixes
 
-**Chrome DevTools MCP - Visual Testing Workflow**
+**Chrome DevTools MCP - Visual Verification Workflow**
 
-**CRITICAL: Always use chrome-devtools-mcp** for visual testing and browser interaction during development.
+**CRITICAL: Always use chrome-devtools-mcp** for visual verification during development.
 - DO NOT create temporary screenshot scripts
 - DO NOT use external Bash scripts for screenshots
 - USE chrome-devtools-mcp tools directly for full debugging capabilities
 
-### Taking Before/After Screenshots
+**When to use visual verification:**
+- Styling/layout changes: Verify the visual appearance looks correct
+- Refactoring: Verify nothing changed visually (before/after comparison)
+- Note: `take_snapshot()` gives you markup structure, `take_screenshot()` shows actual rendered appearance
 
-Standard pattern for making visual changes:
+**DO NOT save screenshots to files** - use them for immediate visual verification only
 
-**1. Before changes - Capture baseline:**
+### Visual Verification Pattern
+
+**For styling/layout work:**
 ```
-# Start/verify dev server (do this ONCE per session, leave running)
-# Then get page list and navigate
-list_pages
-# If no pages exist or need new page:
-new_page({ url: "http://localhost:PORT/path" })
-# OR select existing page:
-select_page({ pageId: N, bringToFront: true })
-
-# Navigate to the page you want to test
+# Navigate to the page
 navigate_page({ url: "http://localhost:PORT/path" })
 
-# Capture light mode
+# Check light mode appearance
 emulate({ colorScheme: "light" })
-take_screenshot({ filePath: "screenshots/before.png", fullPage: true })
+take_screenshot() // Visual verification - no filePath needed
 
-# Capture dark mode
+# Check dark mode appearance
 emulate({ colorScheme: "dark" })
-take_screenshot({ filePath: "screenshots/before-dark.png", fullPage: true })
+take_screenshot() // Visual verification - no filePath needed
 
-# Verify page state (catch errors early)
+# Verify page state
 take_snapshot() // Check element structure
 list_console_messages() // Check for errors
 ```
 
-**2. Make code changes:**
-- Implement changes as planned
-- Run tests: `npm test`
-
-**3. After changes - Capture results:**
+**For refactors (verify nothing changed):**
 ```
-# Reload to see changes
-navigate_page({ type: "reload" })
-
-# Capture light mode
+# Before changes - capture baseline for comparison
+navigate_page({ url: "http://localhost:PORT/path" })
 emulate({ colorScheme: "light" })
-take_screenshot({ filePath: "screenshots/current.png", fullPage: true })
+take_screenshot() // Remember what it looks like
 
-# Capture dark mode
+# Make code changes
+# Run tests: `npm test`
+
+# After changes - verify nothing changed visually
+navigate_page({ type: "reload" })
+emulate({ colorScheme: "light" })
+take_screenshot() // Compare to what you saw before
+
+# Verify in dark mode too
 emulate({ colorScheme: "dark" })
-take_screenshot({ filePath: "screenshots/current-dark.png", fullPage: true })
+take_screenshot() // Verify dark mode unchanged
 
-# Verify changes
-take_snapshot() // Verify element structure changes
+# Check for errors
+take_snapshot() // Verify element structure unchanged
 list_console_messages() // Check for new errors
-# Optional: list_network_requests() if testing API calls
 ```
-
-**4. Ask user to review:**
-- Before vs current screenshots (both light and dark modes)
-- Console messages if any errors appeared
 - Element structure changes if significant
 
 ### Element-Specific Debugging
@@ -186,7 +180,8 @@ take_snapshot({ verbose: false })
 
 **2. Screenshot specific element:**
 ```
-take_screenshot({ uid: "element-uid", filePath: "screenshots/element.png" })
+take_screenshot({ uid: "element-uid" })
+// Visual verification of specific element
 ```
 
 **3. Inspect element state:**
@@ -212,7 +207,7 @@ performance_start_trace({ reload: true, autoStop: true })
 performance_analyze_insight({ insightSetId: "...", insightName: "LCPBreakdown" })
 ```
 
-**3. Save trace data:**
+**3. Save trace data (if needed for analysis):**
 ```
 performance_stop_trace({ filePath: "traces/score-rendering.json.gz" })
 ```
@@ -224,29 +219,29 @@ When testing responsive design:
 **1. Desktop (1280x720):**
 ```
 emulate({ viewport: { width: 1280, height: 720, deviceScaleFactor: 1 } })
-take_screenshot({ filePath: "screenshots/desktop.png", fullPage: true })
+take_screenshot() // Verify desktop layout
 ```
 
 **2. Tablet (768x1024):**
 ```
 emulate({ viewport: { width: 768, height: 1024, deviceScaleFactor: 2, isMobile: true } })
-take_screenshot({ filePath: "screenshots/tablet.png", fullPage: true })
+take_screenshot() // Verify tablet layout
 ```
 
 **3. Mobile (375x667):**
 ```
 emulate({ viewport: { width: 375, height: 667, deviceScaleFactor: 3, isMobile: true, hasTouch: true } })
-take_screenshot({ filePath: "screenshots/mobile.png", fullPage: true })
+take_screenshot() // Verify mobile layout
 ```
 
 ### Debugging Visual Issues
 
 When investigating unexpected visual behavior:
 
-**1. Screenshot + full inspection:**
+**1. Visual + structural inspection:**
 ```
-take_screenshot({ filePath: "screenshots/issue.png" })
-take_snapshot({ verbose: true }) // Detailed a11y tree
+take_screenshot() // See the rendered page
+take_snapshot({ verbose: true }) // Detailed a11y tree structure
 list_console_messages({ types: ["error", "warn"] }) // Errors/warnings only
 list_network_requests({ resourceTypes: ["xhr", "fetch"] }) // API calls
 ```
@@ -265,12 +260,12 @@ evaluate_script({
 
 ### Guidelines
 
-- Screenshots saved to `screenshots/` directory (gitignored)
-- Always capture both light and dark modes - verify changes in both themes
-- Use take_snapshot() to verify element structure before/after changes
-- Use list_console_messages() to catch JavaScript errors proactively
-- Clean up old screenshots when starting new visual work
-- Port is typically 3002 for dev server (verify with list_pages)
+- **DO NOT save screenshots to files** - use for immediate visual verification only
+- Always verify both light and dark modes during styling/layout work
+- Use `take_snapshot()` to verify element structure (gives markup, not visuals)
+- Use `take_screenshot()` to verify rendered appearance (shows actual visuals)
+- Use `list_console_messages()` to catch JavaScript errors proactively
+- Port is typically 3002 or 3003 for dev server (verify with list_pages)
 
 **Dev Server Management**
 
