@@ -18,12 +18,18 @@ export class ThemeSwitcher {
     }
     this.container = container;
 
-    // Check localStorage or system preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    // Always use system preference on first load
     const prefersDark = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches;
-    this.currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    this.currentTheme = prefersDark ? 'dark' : 'light';
+
+    // Listen for system theme changes and auto-update
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', (e) => {
+      this.currentTheme = e.matches ? 'dark' : 'light';
+      this.applyTheme(this.currentTheme);
+    });
 
     this.render();
     this.applyTheme(this.currentTheme);
@@ -56,7 +62,7 @@ export class ThemeSwitcher {
   private toggleTheme(): void {
     this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
     this.applyTheme(this.currentTheme);
-    localStorage.setItem('theme', this.currentTheme);
+    // No localStorage - theme only persists for current session
   }
 
   private applyTheme(theme: 'light' | 'dark'): void {
