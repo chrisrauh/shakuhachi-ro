@@ -95,13 +95,6 @@ export class ScoreLibrary {
 
     this.container.innerHTML = `
       <div class="score-library">
-        <div class="score-library-header">
-          <h1>Score Library</h1>
-          <p class="score-count" id="score-count">${
-            this.filteredScores.length
-          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
-        </div>
-
         <div class="score-library-filters">
           <div class="search-bar">
             <input
@@ -111,6 +104,9 @@ export class ScoreLibrary {
               value="${this.searchQuery}"
             />
           </div>
+          <p class="score-count" id="score-count">${
+            this.filteredScores.length
+          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
         </div>
 
         <div class="score-library-grid" id="score-grid">
@@ -208,6 +204,7 @@ export class ScoreLibrary {
       <div class="score-card" data-score-slug="${score.slug}">
         <div class="score-card-header">
           <h3 class="score-title">
+            ${this.escapeHtml(score.title)}
             ${
               score.forked_from
                 ? `<span class="forked-indicator" title="This is a forked score">${renderIcon(
@@ -215,7 +212,6 @@ export class ScoreLibrary {
                   )}</span>`
                 : ''
             }
-            ${this.escapeHtml(score.title)}
           </h3>
         </div>
 
@@ -311,26 +307,19 @@ export class ScoreLibrary {
         padding: var(--spacing-large);
       }
 
-      .score-library-header {
-        margin-bottom: var(--spacing-x-large);
-      }
-
-      .score-library-header h1 {
-        font-size: var(--font-size-2x-large);
-        margin-bottom: var(--spacing-x-small);
-      }
-
-      .score-count {
-        color: var(--color-neutral-600);
-        font-size: var(--font-size-small);
-      }
-
       .score-library-filters {
         background: var(--panel-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
         padding: var(--spacing-large);
         border-radius: var(--border-radius-large);
         margin-bottom: var(--spacing-x-large);
+      }
+
+      .score-count {
+        color: var(--color-neutral-600);
+        font-size: var(--font-size-small);
+        margin-top: var(--spacing-small);
+        margin-bottom: 0;
       }
 
       .search-bar {
@@ -429,7 +418,7 @@ export class ScoreLibrary {
       .forked-indicator {
         display: inline-flex;
         align-items: center;
-        color: var(--color-primary-600);
+        color: var(--color-neutral-600);
       }
 
       .forked-indicator svg {
@@ -547,10 +536,6 @@ export class ScoreLibrary {
       @media (max-width: 768px) {
         .score-library {
           padding: var(--spacing-medium);
-        }
-
-        .score-library-header h1 {
-          font-size: var(--font-size-x-large);
         }
 
         .score-library-grid {
