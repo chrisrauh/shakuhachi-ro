@@ -37,6 +37,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         <slot name="header-metadata" />
       </div>
       <div class="header-right">
+        <slot name="header-actions" />
         <a
           href="/"
           class="btn btn-icon"
@@ -115,7 +116,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       .header-left {
         display: flex;
         align-items: center;
-        gap: var(--spacing-large);
+        gap: var(--spacing-medium);
       }
 
       .header-right {
