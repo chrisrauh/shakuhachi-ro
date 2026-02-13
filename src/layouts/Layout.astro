@@ -51,6 +51,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         >
           <Plus size={16} stroke-width={2} />
         </a>
+        <slot name="header-actions" />
         <div id="theme-switcher"></div>
         <div id="auth-widget"></div>
       </div>

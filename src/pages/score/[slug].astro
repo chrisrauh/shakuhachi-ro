@@ -44,13 +44,6 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       </>
     )}
     <span class="metadata-separator">·</span>
-    <button id="fork-btn"
-            class="btn btn-icon-with-count"
-            aria-label="Fork this score">
-      <GitFork size={16} />
-      <span class="count">{score.fork_count}</span>
-    </button>
-    <span class="metadata-separator">·</span>
     <span class="score-stat">
       <Calendar size={14} />
       {formattedDate}
@@ -64,6 +57,15 @@ const formattedDate = new Date(score.created_at).toLocaleDateString('en-US', {
       </>
     )}
   </div>
+
+  <!-- Fork button in header actions (right side of navbar) -->
+  <button slot="header-actions"
+          id="fork-btn"
+          class="btn btn-icon-with-count"
+          aria-label="Fork this score">
+    <GitFork size={16} />
+    <span class="count">{score.fork_count}</span>
+  </button>
 
   <!-- Score content -->
   <div class="score-detail-container">
