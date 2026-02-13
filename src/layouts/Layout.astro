@@ -17,13 +17,6 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <!-- Inline script to apply theme immediately (prevent white flash) -->
-    <script is:inline>
-      // Apply theme class before page renders to prevent flash
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = prefersDark ? 'dark' : 'light';
-      document.documentElement.classList.add(`theme-${theme}`);
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -69,8 +62,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     </main>
 
     <style is:global>
-      @import '../styles/tokens/light.css';
-      @import '../styles/tokens/dark.css';
+      @import '../styles/tokens/themes.css';
       @import '../styles/components.css';
     </style>
 
@@ -151,9 +143,16 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       }
 
       /* Logo in dark mode - lighter than text */
-      .theme-dark .logo-icon {
+      :root[data-theme="dark"] .logo-icon {
         color: var(--color-neutral-600);
         border-color: var(--color-neutral-600);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) .logo-icon {
+          color: var(--color-neutral-600);
+          border-color: var(--color-neutral-600);
+        }
       }
 
       #theme-switcher {
