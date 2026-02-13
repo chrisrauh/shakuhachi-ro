@@ -1,7 +1,7 @@
 import { getAllScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
-import { formatHybridDate } from '../utils/formatDate';
+import '@github/relative-time-element';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -242,7 +242,7 @@ export class ScoreLibrary {
           )} ${score.fork_count}</span>
           <span class="score-stat" title="Created date">${renderIcon(
             'calendar',
-          )} ${formatHybridDate(score.created_at)}</span>
+          )} <relative-time datetime="${score.created_at}" format="relative"></relative-time></span>
         </div>
       </div>
     `;
