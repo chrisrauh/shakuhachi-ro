@@ -1,7 +1,28 @@
 # Claude Code Instructions
 
 - Tasks: [TODO.md](./TODO.md)
-- Architecture: [docs/architecture.md](./docs/architecture.md)
+- Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
+
+## Project Context
+
+**This project has two parts:**
+
+1. **Web Platform** (shakuhachi.ro)
+   - Share shakuhachi scores via links
+   - Primary use case: Mobile viewing of shared scores
+   - Secondary use case: Practice/perform from the platform
+   - Built with Astro + Supabase
+
+2. **Renderer Library** (standalone package)
+   - Framework-agnostic TypeScript/SVG renderer
+   - Similar to VexFlow but for shakuhachi notation
+   - Powers the web platform
+   - Published for other developers to use
+
+**How they relate:**
+- The platform uses and tests the renderer in real-world scenarios
+- Renderer improvements are driven by platform needs
+- Both are production-quality, just serving different audiences
 
 ## Software engineering principles
 
