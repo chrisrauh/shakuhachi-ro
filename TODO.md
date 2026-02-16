@@ -150,6 +150,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ### Phase 8: Navigation & UI Polish
 
+- [ ] Test geometricPrecision on shakuhachi SVG notes
 - [ ] Create site header component (logo, navigation)
 - [ ] Add navigation links: Home | Create Score | My Scores | Profile
 - [ ] Add auth UI: Login/Signup or Username/Logout
