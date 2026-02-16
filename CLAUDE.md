@@ -6,6 +6,7 @@
 ## Software engineering principles
 
 - **Simplicity (KISS)** - Prefer the simplest thing that works. Complexity is technical debt.
+- **YAGNI (You Aren't Gonna Need It)** - Don't build features, abstractions, or complexity for hypothetical future needs. Build what's needed now. Future requirements will change anyway.
 - **Single Responsibility** - A module/function/class should have one reason to change (one actor). Prevents coupling changes from different sources.
 - **Separation of Concerns** - Don't mix UI, business logic, data access, config, etc. Boundaries make systems evolvable.
 - **Abstraction with Intent** - Abstract _why_, not _how_. Bad abstractions are worse than duplication.
