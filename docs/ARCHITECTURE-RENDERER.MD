@@ -1,6 +1,8 @@
-# Architecture
+# Renderer Library Architecture
 
-This document explains the design and architecture of the Shakuhachi Score Renderer, following VexFlow-inspired patterns for music notation rendering.
+**Scope:** This document covers the renderer library architecture. For web platform architecture, see [ARCHITECTURE-PLATFORM.MD](./ARCHITECTURE-PLATFORM.MD).
+
+This document explains the design and architecture of the standalone shakuhachi notation renderer, following VexFlow-inspired patterns for music notation rendering.
 
 ## Overview
 

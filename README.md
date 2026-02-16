@@ -1,8 +1,25 @@
 # Shakuhachi.ro
 
-A standalone shakuhachi notation renderer built with vanilla TypeScript and SVG. Clean, focused, and framework-agnostic.
+A web platform for sharing shakuhachi scores, built on a standalone notation renderer.
 
-## Features
+## Using the Platform
+
+Share and discover shakuhachi scores:
+
+- Browse the score library
+- Create new scores or fork existing ones
+- Share scores via links (works on mobile)
+- Edit scores with live preview
+
+Visit: **https://shakuhachi.ro**
+
+---
+
+## Using the Renderer (For Developers)
+
+The platform is powered by a standalone TypeScript/SVG renderer that you can use in your own projects, similar to how VexFlow works for Western notation.
+
+### Features
 
 - **Simple API** - Render scores with one line of code
 - **SVG Rendering** - Clean, scalable vector graphics
@@ -38,7 +55,7 @@ import { renderScoreFromURL } from 'shakuhachi-ro';
 // Render a score from MusicXML
 await renderScoreFromURL(
   document.getElementById('container'),
-  '/data/Akatombo.musicxml'
+  '/data/Akatombo.musicxml',
 );
 ```
 
@@ -48,9 +65,9 @@ await renderScoreFromURL(
 import { renderScoreFromURL } from 'shakuhachi-ro';
 
 await renderScoreFromURL(container, '/score.musicxml', {
-  showOctaveMarks: false,    // Hide octave marks
-  notesPerColumn: 8,          // 8 notes per column
-  showDebugLabels: true       // Show note names
+  showOctaveMarks: false, // Hide octave marks
+  notesPerColumn: 8, // 8 notes per column
+  showDebugLabels: true, // Show note names
 });
 ```
 
@@ -61,7 +78,7 @@ import { ScoreRenderer } from 'shakuhachi-ro';
 
 const renderer = new ScoreRenderer(container, {
   notesPerColumn: 10,
-  showOctaveMarks: true
+  showOctaveMarks: true,
 });
 
 await renderer.renderFromURL('/score.musicxml');
@@ -82,8 +99,8 @@ const scoreData = {
   notes: [
     { pitch: { step: 'ro', octave: 0 }, duration: 1 },
     { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
-    { pitch: { step: 'chi', octave: 1 }, duration: 2 }
-  ]
+    { pitch: { step: 'chi', octave: 1 }, duration: 2 },
+  ],
 };
 
 await renderScore(container, scoreData);
@@ -119,7 +136,7 @@ Full list of available options:
 }
 ```
 
-See [docs/api.md](./docs/api.md) for complete API reference.
+See [docs/API.MD](./docs/API.MD) for complete API reference.
 
 ## Testing
 
@@ -156,8 +173,9 @@ npm run test:visual
 
 ## Documentation
 
-- **[api.md](./docs/api.md)** - Complete API reference with examples
-- **[architecture.md](./docs/architecture.md)** - Technical architecture and design patterns
+- **[API.MD](./docs/API.MD)** - Complete API reference with examples
+- **[ARCHITECTURE-RENDERER.MD](./docs/ARCHITECTURE-RENDERER.MD)** - Renderer library architecture
+- **[ARCHITECTURE-PLATFORM.MD](./docs/ARCHITECTURE-PLATFORM.MD)** - Web platform architecture
 - **[TODO.md](./TODO.md)** - Project roadmap and active tasks
 - **[CLAUDE.md](./CLAUDE.md)** - Development workflow and coding standards
 
@@ -215,12 +233,13 @@ SVGRenderer (Drawing primitives)
 ```
 
 Key principles:
+
 - **Separation of Concerns** - Each component has one responsibility
 - **Data vs Presentation** - Score data is separate from rendering
 - **Type Safety** - Full TypeScript support
 - **VexFlow Patterns** - Constructor + options, fluent API, explicit render()
 
-See [docs/architecture.md](./docs/architecture.md) for details.
+See [docs/ARCHITECTURE-RENDERER.MD](./docs/ARCHITECTURE-RENDERER.MD) for details.
 
 ## Project Structure
 
@@ -264,7 +283,7 @@ See `index.html` for a complete working example:
   await renderScoreFromURL(
     document.getElementById('score-container'),
     '/data/Akatombo.musicxml',
-    { showOctaveMarks: true }
+    { showOctaveMarks: true },
   );
 </script>
 ```
