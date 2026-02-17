@@ -46,8 +46,8 @@ export class MobileMenu {
 
       .mobile-menu-dropdown {
         position: fixed;
-        top: 46px;
-        right: var(--spacing-small);
+        top: 48px;
+        right: var(--spacing-medium);
         background: var(--panel-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
         border-radius: 6px;
