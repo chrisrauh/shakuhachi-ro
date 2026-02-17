@@ -110,7 +110,7 @@ export class ScoreDetailClient {
   }
 
   private setupThemeListener(): void {
-    // Use MutationObserver to watch for theme class changes on <html>
+    // Use MutationObserver to watch for theme attribute changes on <html>
     const observer = new MutationObserver(() => {
       // Re-render score when theme changes
       if (this.score) {
@@ -120,7 +120,7 @@ export class ScoreDetailClient {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['data-theme'],
     });
   }
 
