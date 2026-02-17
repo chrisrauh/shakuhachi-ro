@@ -9,10 +9,12 @@ export const prerender = true;
   <div id="score-editor"></div>
 
   <script>
+    import { createElement, Book, Plus, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
     import { ScoreEditor } from '../components/ScoreEditor';
+    import { MobileMenu } from '../components/MobileMenu';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -35,5 +37,47 @@ export const prerender = true;
 
     // Initialize score editor
     new ScoreEditor('score-editor', scoreId || undefined);
+
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'Library',
+        href: '/',
+        icon: getIconHTML(Book),
+        dividerAfter: false,
+      },
+      {
+        id: 'create',
+        label: 'Create score',
+        href: '/editor',
+        icon: getIconHTML(Plus),
+        dividerAfter: true,
+      },
+      {
+        id: 'theme',
+        label: 'Toggle theme',
+        action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
+      },
+    ]);
   </script>
 </Layout>

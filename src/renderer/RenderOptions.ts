@@ -208,6 +208,15 @@ export interface RenderOptions {
    * @default true
    */
   autoResize?: boolean;
+
+  /**
+   * Force single-column layout by calculating exact required height.
+   * When enabled, the renderer calculates the precise height needed for all notes
+   * in a single column and uses that for rendering instead of viewport height.
+   * Useful for mobile devices where vertical scrolling is preferred.
+   * @default false
+   */
+  singleColumn?: boolean;
 }
 
 /**
@@ -256,6 +265,7 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
   width: undefined as any, // Will be auto-detected
   height: undefined as any, // Will be auto-detected
   autoResize: true,
+  singleColumn: false,
 };
 
 /**
