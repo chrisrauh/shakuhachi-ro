@@ -6,13 +6,6 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
-### Bug Fixes
-
-- [ ] Fix score editor preview error
-  - [ ] Preview shows "Score title is required" error even when title is filled
-  - [ ] Investigate why preview validation isn't working correctly
-  - [ ] Verify updatePreview() is being called after title changes
-
 ### API Improvements & Refactoring
 
 **Reference**: See [docs/API-IMPROVEMENTS.MD](./docs/API-IMPROVEMENTS.MD) for detailed rationale and implementation examples.
