@@ -38,22 +38,27 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       </div>
       <div class="header-right">
         <slot name="header-actions" />
-        <a
-          href="/"
-          class="btn btn-icon"
-          aria-label="View scores"
-        >
-          <Book size={16} stroke-width={2} />
-        </a>
-        <a
-          href="/editor"
-          class="btn btn-icon"
-          aria-label="Create new score"
-        >
-          <Plus size={16} stroke-width={2} />
-        </a>
-        <div id="theme-switcher"></div>
-        <div id="auth-widget"></div>
+        <!-- Desktop navigation (hidden on mobile) -->
+        <div class="header-desktop-nav">
+          <a
+            href="/"
+            class="btn btn-icon"
+            aria-label="View scores"
+          >
+            <Book size={16} stroke-width={2} />
+          </a>
+          <a
+            href="/editor"
+            class="btn btn-icon"
+            aria-label="Create new score"
+          >
+            <Plus size={16} stroke-width={2} />
+          </a>
+          <div id="theme-switcher"></div>
+          <div id="auth-widget"></div>
+        </div>
+        <!-- Mobile menu (shown on mobile) -->
+        <div id="mobile-menu" class="mobile-menu-container"></div>
       </div>
     </header>
 
@@ -124,6 +129,18 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         gap: var(--spacing-medium);
       }
 
+      /* Desktop navigation - hide on mobile */
+      .header-desktop-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-medium);
+      }
+
+      /* Mobile menu - hide on desktop */
+      .mobile-menu-container {
+        display: none;
+      }
+
       /* Logo */
       .logo {
         text-decoration: none;
@@ -187,6 +204,17 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         .header-right {
           justify-content: flex-end;
           flex-shrink: 0;
+          gap: var(--spacing-small);
+        }
+
+        /* Hide desktop navigation on mobile */
+        .header-desktop-nav {
+          display: none;
+        }
+
+        /* Show mobile menu on mobile */
+        .mobile-menu-container {
+          display: block;
         }
       }
     </style>

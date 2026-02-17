@@ -18,6 +18,7 @@ export const prerender = true;
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
     import { ScoreLibrary } from '../components/ScoreLibrary';
+    import { MobileMenu } from '../components/MobileMenu';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -36,6 +37,33 @@ export const prerender = true;
 
     // Initialize score library
     new ScoreLibrary('score-library');
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'View Scores',
+        href: '/',
+      },
+      {
+        id: 'create',
+        label: 'Create Score',
+        href: '/editor',
+      },
+      {
+        id: 'theme',
+        label: 'Toggle Theme',
+        action: toggleTheme,
+      },
+    ]);
   </script>
 
   <style>

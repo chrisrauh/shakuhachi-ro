@@ -82,6 +82,7 @@ if (score.forked_from) {
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
     import { authState } from '../../api/authState';
+    import { MobileMenu } from '../../components/MobileMenu';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -97,6 +98,33 @@ if (score.forked_from) {
         authWidget.setUser(null);
       }
     });
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'View Scores',
+        href: '/',
+      },
+      {
+        id: 'create',
+        label: 'Create Score',
+        href: '/editor',
+      },
+      {
+        id: 'theme',
+        label: 'Toggle Theme',
+        action: toggleTheme,
+      },
+    ]);
   </script>
 
   <!-- Client-side logic -->
@@ -214,6 +242,31 @@ if (score.forked_from) {
       .floating-edit-btn {
         top: 120px;
         right: var(--spacing-medium);
+      }
+
+      /* Mobile score rendering - allow natural height expansion */
+      .score-detail-container {
+        flex: none; /* Remove flex constraint */
+        overflow: visible; /* Allow content to overflow viewport */
+        padding: var(--spacing-medium) var(--spacing-small) 0;
+        max-width: 100%; /* Constrain to viewport width */
+      }
+
+      #score-renderer-container {
+        flex: none; /* Remove flex constraint */
+        min-height: auto; /* Allow natural height */
+        width: 100%; /* Full width of container */
+      }
+
+      /* Remove fullHeight layout on mobile */
+      :global(body.full-height) {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      :global(body.full-height main) {
+        flex: none;
+        overflow: visible;
       }
     }
   </style>
