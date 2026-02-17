@@ -6,6 +6,70 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ## Remaining Tasks
 
+### New Score Creation Flow
+
+Implement the creation flow documented in ARCHITECTURE-PLATFORM.MD: create empty score with temporary slug → edit at `/score/[slug]/edit` → title changes update slug.
+
+**API Layer:**
+
+- [ ] Add `generateRandomSlug()` utility function
+  - Generate random words-based slug (e.g., "flying-circus-catnip")
+  - Ensure uniqueness against existing slugs
+  - Use memorable word combinations for better UX
+
+- [ ] Add `createEmptyScore()` API function
+  - Create score with random temporary slug
+  - Set placeholder title ("Untitled Score")
+  - Set empty data structure based on format
+  - Return created score for redirect
+
+- [ ] Add `updateScoreSlug()` API function
+  - Take score ID and new title
+  - Regenerate slug from title
+  - Ensure slug uniqueness
+  - Update both title and slug atomically
+  - Handle slug conflicts gracefully
+
+**Pages & Components:**
+
+- [ ] Create `/score/[slug]/edit.astro` page
+  - SSR to load existing score data
+  - Form for title, composer, description
+  - Notation input area (textarea for VexFlow/MusicXML)
+  - Live preview pane using ScoreRenderer
+  - Permission check (only owner can edit)
+  - Redirect if not owner
+
+- [ ] Create `ScoreEditClient.ts` component
+  - Form state management
+  - Debounced title change → slug update
+  - Live preview rendering on notation changes
+  - Save button → updateScore() API call
+  - Validation (title required, valid notation)
+  - Loading/error states
+  - Auto-save draft support (optional)
+
+**Integration:**
+
+- [ ] Update "Create Score" button flow
+  - Change from `/editor` to calling `createEmptyScore()`
+  - Redirect to `/score/[slug]/edit`
+  - Show loading state during creation
+
+- [ ] Update fork flow
+  - Change redirect from `/editor?id=X` to `/score/[slug]/edit`
+  - Remove query param approach
+
+- [ ] Update mobile menu "Create score" link
+  - Point to new creation flow instead of `/editor`
+
+**Cleanup:**
+
+- [ ] Deprecate `/editor` route
+  - Add notice that it's deprecated
+  - Keep for backwards compatibility temporarily
+  - Plan for eventual removal
+
 ### API Improvements & Refactoring
 
 **Reference**: See [docs/API-IMPROVEMENTS.MD](./docs/API-IMPROVEMENTS.MD) for detailed rationale and implementation examples.
