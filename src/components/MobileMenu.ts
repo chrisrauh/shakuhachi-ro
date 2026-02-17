@@ -62,7 +62,7 @@ export class MobileMenu {
         right: var(--spacing-medium);
         background: var(--page-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
-        border-radius: 12px;
+        border-radius: 6px;
         box-shadow: var(--shadow-large);
         z-index: 1000;
         min-width: 192px;
@@ -71,7 +71,9 @@ export class MobileMenu {
       }
 
       .mobile-menu-item {
-        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-x-small);
         padding: var(--spacing-x-small) var(--spacing-small);
         background: none;
         border: none;
@@ -80,11 +82,8 @@ export class MobileMenu {
         font-size: var(--font-size-small);
         color: var(--color-neutral-700);
         transition: background var(--transition-fast);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-x-small);
         text-decoration: none;
-        border-radius: 6px;
+        border-radius: 4px;
       }
 
       .mobile-menu-item:hover {
