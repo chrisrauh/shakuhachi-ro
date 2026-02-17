@@ -76,6 +76,18 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] AuthStateManager: document or fix the async initialization race condition
   - `src/api/authState.ts:12-14` — The constructor calls `this.initialize()` which is async, but constructors can't await. Any code that calls `authState.getUser()` synchronously right after import gets `null` even if the user is logged in, because `getCurrentUser()` hasn't resolved yet. Either (a) document this behavior with a JSDoc warning, (b) provide an `onReady()` promise, or (c) have components always use `subscribe()` which fires on resolution.
 
+- [ ] forkScore: check error on fork count increment
+  - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
+
+- [ ] forkScore: handle slug query error in createScore
+  - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
+
+- [ ] ScoreDetailClient.handleFork: preserve error context in catch block
+  - `src/components/ScoreDetailClient.ts:166` — The catch block `catch { alert('Failed to fork score'); }` discards the original error entirely. Add `console.error('Fork failed:', error)` so debugging context isn't lost.
+
+- [ ] AuthComponents.show(): remove pointless double toggleMode() call
+  - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
+
 #### Single Responsibility
 
 - [ ] Extract ScoreEditor inline CSS into a stylesheet
@@ -89,6 +101,9 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] Extract auto-save logic out of ScoreEditor
   - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
+
+- [ ] Extract createScore slug generation into its own function
+  - `src/api/scores.ts:62-83` — `createScore()` mixes two responsibilities: generating a unique slug and inserting the score into the database. The slug generation logic (lines 62-83) queries existing slugs, calls `generateSlug()`, and appends a numeric suffix for uniqueness. Extract to a standalone `generateUniqueSlug(title: string): Promise<string>` function. This makes slug generation testable independently and reusable if other entities need unique slugs.
 
 #### Separation of Concerns
 
@@ -124,6 +139,18 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Document MIDI tick values in Formatter.ts
   - `src/renderer/Formatter.ts:16-23` — `DURATION_TICKS` maps note durations to values like 4096, 2048, 1024, etc. Add a one-line comment: "Based on standard MIDI resolution: quarter note = 1024 ticks, each subdivision halves the value."
 
+- [ ] Name magic number for rest vertical centering in ShakuNote
+  - `src/notes/ShakuNote.ts:144` — `this.y - this.fontSize * 0.4` uses an unexplained `0.4` multiplier to position the rest circle relative to the note baseline. Extract to a named constant like `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` with a comment explaining that Japanese characters are typically centered around 40% above the baseline.
+
+- [ ] Name magic number for duration line baseline ratio
+  - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
+
+- [ ] Document authState.subscribe() immediate callback behavior
+  - `src/api/authState.ts:46-51` — `subscribe()` immediately invokes the callback with the current `user` and `session` before returning. This is undocumented and surprising — subscribers may not expect their callback to fire synchronously during registration. Add JSDoc: "Note: The callback is invoked immediately with the current state upon subscription, and again whenever auth state changes."
+
+- [ ] Extract hardcoded editor URL into a route constant
+  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\`` in a shared `src/constants/routes.ts` module.
+
 #### Type Safety
 
 - [ ] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
@@ -141,7 +168,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 #### Loose Coupling
 
 - [ ] Replace MutationObserver theme detection with a custom event
-  - `src/components/ScoreDetailClient.ts:103-115` — Uses `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then fully re-renders the score. This is overcomplicated and couples the component to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
+  - `src/components/ScoreDetailClient.ts:103-115` and `src/components/ScoreEditor.ts:45-56` — Both components use `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then re-render. This is overcomplicated, duplicated, and couples components to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
 
 - [ ] Decouple ColumnLayoutCalculator from DurationDotModifier
   - `src/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
@@ -171,6 +198,12 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
   - `src/components/ScoreDetailClient.ts:7-10` — Defines `interface ScoreData { score: Score; parentScore: Score | null }` which shadows the `ScoreData` type from `src/types/ScoreData.ts`. Rename to `ScorePageData` or `EmbeddedScoreData` to avoid confusion when reading imports.
 
+- [ ] Extract repeated error wrapping pattern in scores.ts
+  - `src/api/scores.ts` — Six functions (`createScore`, `getUserScores`, `getScoreBySlug`, `updateScore`, `deleteScore`, `forkScore`) all share the same try/catch + `{ score: null, error: ... }` wrapping pattern. Each catch block has identical `error instanceof Error ? error : new Error('Unknown error ...')` logic. Extract a helper like `wrapScoreResult<T>(fn: () => Promise<T>): Promise<ScoreResult<T>>` to eliminate the repetition and ensure consistent error handling across all CRUD operations.
+
+- [ ] Move curated score slugs to a configuration file
+  - `src/api/scores.ts:432-437` — `getCuratedScoreSlugs()` returns a hardcoded array `['akatombo', 'love-story']`. Adding a new curated score requires editing TypeScript source code and redeploying. Move to a JSON config file (e.g., `src/data/curated-scores.json`) or read from the database, so the score catalog can be updated without code changes.
+
 #### Test Coverage
 
 - [ ] Add unit tests for MusicXMLParser
@@ -193,6 +226,18 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] Verify mock was called in convenience.test.ts
   - `src/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
+
+- [ ] Add unit tests for auth module
+  - `src/api/auth.ts` and `src/api/authState.ts` have 0 tests. Test: `signUp`/`signIn`/`signOut` call correct Supabase methods and return expected results, `AuthStateManager.subscribe()` fires callback immediately, `isAuthenticated()` reflects current state, `onAuthStateChange` relays Supabase auth events.
+
+- [ ] Add unit tests for scores.ts CRUD operations
+  - `src/api/scores.ts` has 0 tests. Test: `createScore` generates unique slug and inserts record, `getScoreBySlug` returns score or null, `updateScore` updates only specified fields, `deleteScore` removes record, `forkScore` creates copy and increments parent fork count, error wrapping returns consistent `{ score: null, error }` shape.
+
+- [ ] Add unit tests for ScoreLibrary component logic
+  - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
+
+- [ ] Add unit tests for kinko-symbols lookup functions
+  - `src/constants/kinko-symbols.ts` has 0 tests. Test: `getSymbolByKana('ロ')` returns correct symbol, `getSymbolByRomaji('ro')` returns correct symbol, `getSymbolByPitch('D', 4)` returns correct symbol, `parseNote` handles valid and invalid inputs, all 7 base notes are present in the map.
 
 ## Renderer Enhancements (Future)
 
