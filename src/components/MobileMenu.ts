@@ -106,7 +106,7 @@ export class MobileMenu {
       .mobile-menu-divider {
         height: 1px;
         background: var(--panel-border-color);
-        margin: var(--spacing-2x-small) 0;
+        margin: var(--spacing-2x-small) calc(-1 * var(--spacing-2x-small));
       }
 
       /* Active state for menu button when dropdown is open */
