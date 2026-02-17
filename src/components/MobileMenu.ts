@@ -74,16 +74,22 @@ export class MobileMenu {
         display: flex;
         align-items: center;
         gap: var(--spacing-x-small);
+        width: 100%;
         padding: var(--spacing-x-small) var(--spacing-small);
+        margin: 0;
         background: none;
         border: none;
         text-align: left;
         cursor: pointer;
+        font-family: inherit;
         font-size: var(--font-size-small);
+        font-weight: normal;
+        line-height: inherit;
         color: var(--color-neutral-700);
         transition: background var(--transition-fast);
         text-decoration: none;
         border-radius: 4px;
+        box-sizing: border-box;
       }
 
       .mobile-menu-item:hover {
