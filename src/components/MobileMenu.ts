@@ -32,14 +32,6 @@ export class MobileMenu {
     const style = document.createElement('style');
     style.id = 'mobile-menu-styles';
     style.textContent = `
-      .mobile-menu-toggle {
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
       .mobile-menu-overlay {
         position: fixed;
         top: 0;
@@ -86,7 +78,7 @@ export class MobileMenu {
 
   private render(): void {
     this.container.innerHTML = `
-      <button id="mobile-menu-toggle" class="btn btn-icon mobile-menu-toggle" aria-label="Menu" aria-expanded="false">
+      <button id="mobile-menu-toggle" class="btn btn-icon" aria-label="Menu" aria-expanded="false">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
         </svg>
