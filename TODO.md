@@ -8,12 +8,12 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 ### Critical: Mobile Support
 
-- [ ] **Mobile responsive score rendering**
-  - [ ] Single-column vertical scroll layout for mobile (< 768px breakpoint)
-  - [ ] Optimize touch interactions (no hover states, larger tap targets)
+- [x] **Mobile responsive score rendering**
+  - [x] Single-column vertical scroll layout for mobile (< 768px breakpoint)
+  - [x] Optimize touch interactions (no hover states, larger tap targets)
   - [ ] Test on actual mobile devices (iOS Safari, Android Chrome)
-  - [ ] Ensure high-quality rendering on retina displays
-  - [ ] Verify score legibility on small screens
+  - [x] Ensure high-quality rendering on retina displays
+  - [x] Verify score legibility on small screens
   - **Rationale**: Shared score links are primarily opened on mobile. Without mobile support, the core use case (sharing scores) is broken.
 
 ### Bug Fixes
