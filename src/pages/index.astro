@@ -14,6 +14,7 @@ export const prerender = true;
   <div id="score-library"></div>
 
   <script>
+    import { createElement, Book, Plus, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
@@ -38,6 +39,15 @@ export const prerender = true;
     // Initialize score library
     new ScoreLibrary('score-library');
 
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
     // Initialize mobile menu
     const toggleTheme = () => {
       const html = document.documentElement;
@@ -52,16 +62,22 @@ export const prerender = true;
         id: 'browse',
         label: 'View Scores',
         href: '/',
+        icon: getIconHTML(Book),
+        dividerAfter: false,
       },
       {
         id: 'create',
         label: 'Create Score',
         href: '/editor',
+        icon: getIconHTML(Plus),
+        dividerAfter: true,
       },
       {
         id: 'theme',
         label: 'Toggle Theme',
         action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
       },
     ]);
   </script>

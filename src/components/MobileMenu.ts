@@ -3,6 +3,8 @@ export interface MenuItem {
   label: string;
   href?: string;
   action?: () => void; // For action items like theme toggle, auth
+  icon?: string; // SVG icon path
+  dividerAfter?: boolean; // Add divider after this item
 }
 
 export class MobileMenu {
@@ -44,33 +46,48 @@ export class MobileMenu {
 
       .mobile-menu-dropdown {
         position: fixed;
-        top: calc(var(--spacing-small) * 2 + 32px + var(--spacing-small));
-        right: var(--spacing-medium);
+        top: 46px;
+        right: var(--spacing-small);
         background: var(--panel-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
-        border-radius: var(--border-radius-medium);
+        border-radius: 6px;
         box-shadow: var(--shadow-large);
         z-index: 1000;
-        min-width: 200px;
-        padding: var(--spacing-x-small) 0;
+        min-width: 192px;
+        padding: var(--spacing-2x-small) 0;
       }
 
       .mobile-menu-item {
         width: 100%;
-        padding: var(--spacing-small) var(--spacing-medium);
+        padding: var(--spacing-x-small) var(--spacing-small);
         background: none;
         border: none;
         text-align: left;
         cursor: pointer;
-        font-size: var(--font-size-medium);
+        font-size: var(--font-size-small);
         color: var(--color-neutral-700);
         transition: background var(--transition-fast);
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-x-small);
         text-decoration: none;
       }
 
       .mobile-menu-item:hover {
         background: var(--color-neutral-100);
+      }
+
+      .mobile-menu-item-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        color: var(--color-neutral-600);
+      }
+
+      .mobile-menu-divider {
+        height: 1px;
+        background: var(--panel-border-color);
+        margin: var(--spacing-2x-small) 0;
       }
     `;
     document.head.appendChild(style);
@@ -117,7 +134,19 @@ export class MobileMenu {
         // Action button (theme toggle, auth)
         const button = document.createElement('button');
         button.className = 'mobile-menu-item';
-        button.textContent = item.label;
+
+        // Add icon if provided
+        if (item.icon) {
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'mobile-menu-item-icon';
+          iconSpan.innerHTML = item.icon;
+          button.appendChild(iconSpan);
+        }
+
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = item.label;
+        button.appendChild(labelSpan);
+
         button.addEventListener('click', () => {
           item.action!();
           this.toggleMenu(); // Close menu after action
@@ -128,8 +157,27 @@ export class MobileMenu {
         const link = document.createElement('a');
         link.href = item.href;
         link.className = 'mobile-menu-item';
-        link.textContent = item.label;
+
+        // Add icon if provided
+        if (item.icon) {
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'mobile-menu-item-icon';
+          iconSpan.innerHTML = item.icon;
+          link.appendChild(iconSpan);
+        }
+
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = item.label;
+        link.appendChild(labelSpan);
+
         this.dropdown!.appendChild(link);
+      }
+
+      // Add divider if specified
+      if (item.dividerAfter) {
+        const divider = document.createElement('div');
+        divider.className = 'mobile-menu-divider';
+        this.dropdown!.appendChild(divider);
       }
     });
 
