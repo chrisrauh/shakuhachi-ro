@@ -66,7 +66,7 @@ export class MobileMenu {
         box-shadow: var(--shadow-large);
         z-index: 1000;
         min-width: 192px;
-        padding: var(--spacing-2x-small) var(--spacing-x-small);
+        padding: var(--spacing-2x-small);
         animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) mobile-menu-appear;
       }
 
