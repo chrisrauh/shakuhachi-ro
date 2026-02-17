@@ -34,6 +34,17 @@ export class MobileMenu {
     const style = document.createElement('style');
     style.id = 'mobile-menu-styles';
     style.textContent = `
+      @keyframes mobile-menu-appear {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
       .mobile-menu-overlay {
         position: fixed;
         top: 0;
@@ -42,6 +53,7 @@ export class MobileMenu {
         bottom: 0;
         background: rgba(0, 0, 0, 0.3);
         z-index: 999;
+        animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) mobile-menu-appear;
       }
 
       .mobile-menu-dropdown {
@@ -55,6 +67,7 @@ export class MobileMenu {
         z-index: 1000;
         min-width: 192px;
         padding: var(--spacing-2x-small) 0;
+        animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) mobile-menu-appear;
       }
 
       .mobile-menu-item {
@@ -88,6 +101,12 @@ export class MobileMenu {
         height: 1px;
         background: var(--panel-border-color);
         margin: var(--spacing-2x-small) 0;
+      }
+
+      /* Active state for menu button when dropdown is open */
+      #mobile-menu-toggle[aria-expanded="true"] {
+        background: var(--color-neutral-100);
+        border-color: var(--color-neutral-400);
       }
     `;
     document.head.appendChild(style);
