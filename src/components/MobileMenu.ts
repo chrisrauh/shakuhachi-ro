@@ -60,7 +60,7 @@ export class MobileMenu {
         position: fixed;
         top: 48px;
         right: var(--spacing-medium);
-        background: var(--panel-background-color);
+        background: var(--page-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
         border-radius: 6px;
         box-shadow: var(--shadow-large);
@@ -68,6 +68,7 @@ export class MobileMenu {
         min-width: 192px;
         padding: var(--spacing-2x-small) 0;
         animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) mobile-menu-appear;
+        overflow: hidden;
       }
 
       .mobile-menu-item {
@@ -87,7 +88,7 @@ export class MobileMenu {
       }
 
       .mobile-menu-item:hover {
-        background: var(--color-neutral-100);
+        background: var(--panel-background-color);
       }
 
       .mobile-menu-item-icon {
@@ -104,7 +105,7 @@ export class MobileMenu {
       }
 
       /* Active state for menu button when dropdown is open */
-      #mobile-menu-toggle[aria-expanded="true"] {
+      #mobile-menu-toggle.btn.btn-icon[aria-expanded="true"] {
         background: var(--color-neutral-100);
         border-color: var(--color-neutral-400);
       }
