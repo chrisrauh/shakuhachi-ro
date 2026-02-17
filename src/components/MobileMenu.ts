@@ -62,13 +62,12 @@ export class MobileMenu {
         right: var(--spacing-medium);
         background: var(--page-background-color);
         border: var(--panel-border-width) solid var(--panel-border-color);
-        border-radius: 6px;
+        border-radius: 12px;
         box-shadow: var(--shadow-large);
         z-index: 1000;
         min-width: 192px;
-        padding: var(--spacing-2x-small) 0;
+        padding: var(--spacing-2x-small) var(--spacing-x-small);
         animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) mobile-menu-appear;
-        overflow: hidden;
       }
 
       .mobile-menu-item {
@@ -85,6 +84,7 @@ export class MobileMenu {
         align-items: center;
         gap: var(--spacing-x-small);
         text-decoration: none;
+        border-radius: 6px;
       }
 
       .mobile-menu-item:hover {
