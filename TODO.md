@@ -101,7 +101,13 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Move MusicXML parsing out of ScoreDetailClient
   - `src/components/ScoreDetailClient.ts:79-84` — The UI component directly imports `MusicXMLParser` and calls `MusicXMLParser.parse()` to convert stored data before rendering. This parsing concern should live in a shared utility (e.g., `parseScoreByFormat(data, format)`) so that every component that renders a score doesn't need to know about format-specific parsing.
 
+- [ ] Standardize error UX across components
+  - Three different error patterns are used: ScoreEditor uses `alert()` (lines 241, 246, 251, 285, 290, 297), ScoreLibrary renders inline error UI with a retry button (lines 82-94), ScoreDetailClient uses `console.error` with no user feedback (lines 25, 33). Pick one pattern (inline error UI is the best UX) and apply it consistently. At minimum, replace `alert()` calls in ScoreEditor with inline messages near the relevant form controls.
+
 #### Explicit Over Implicit
+
+- [ ] Slug utility: handle Unicode characters (Japanese score titles)
+  - `src/utils/slug.ts:16` — `replace(/[^\w\s-]/g, '')` strips all non-ASCII characters. A score titled "赤とんぼ" produces an empty slug; "Ranjo 大師" loses "大師" and becomes just "ranjo". For a shakuhachi app where Japanese titles are common, this silently produces ambiguous or empty slugs. Either transliterate (e.g., use a library like `slugify` with Unicode support) or preserve Unicode word characters in the regex.
 
 - [ ] Replace hardcoded fallback viewport 800×600 with explicit error or documented default
   - `src/renderer/ScoreRenderer.ts:207-208` — `width: rect.width || 800, height: rect.height || 600` silently substitutes default dimensions when the container has zero size (common when container is hidden or not yet in the DOM). Either throw an error ("Container has zero dimensions — ensure it is visible before rendering") or define a named constant `DEFAULT_VIEWPORT = { width: 800, height: 600 }` so the fallback is discoverable.
@@ -126,10 +132,16 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
   - `src/api/scores.ts:15,27,36` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
 
+- [ ] Fix handleMetadataChange double `as any` cast in ScoreEditor
+  - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
+
 - [ ] Remove `undefined as any` hack from DEFAULT_RENDER_OPTIONS
   - `src/renderer/RenderOptions.ts:256-257` — `width: undefined as any, height: undefined as any` is used to make these fields exist in the defaults object while keeping them "optional". Instead, separate the type: define `ViewportOptions = { width?: number; height?: number }` and merge it separately, avoiding the `any` cast that breaks `Required<RenderOptions>` semantics.
 
 #### Loose Coupling
+
+- [ ] Replace MutationObserver theme detection with a custom event
+  - `src/components/ScoreDetailClient.ts:103-115` — Uses `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then fully re-renders the score. This is overcomplicated and couples the component to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
 
 - [ ] Decouple ColumnLayoutCalculator from DurationDotModifier
   - `src/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
@@ -172,6 +184,9 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] Add unit tests for slug utility
   - `src/utils/slug.ts` has 0 tests. Test: basic ASCII slugification, special characters removed, multiple hyphens collapsed, leading/trailing hyphens stripped, `ensureUniqueSlug` appends counter when slug exists, counter increments correctly.
+
+- [ ] Add unit tests for modifier rendering logic
+  - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
 
 - [ ] Replace waitForTimeout with waitForSelector in visual regression tests
   - `tests/visual/visual-regression.spec.ts:34,47,60,73` — All four tests use `page.waitForTimeout(2000)` which is fragile (slow on CI, may pass prematurely on fast machines). Replace with `page.waitForSelector('svg')` or `page.waitForSelector('[data-testid="score-rendered"]')` to wait for actual score rendering completion.
