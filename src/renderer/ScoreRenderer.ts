@@ -20,6 +20,7 @@ import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
 import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
+import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 
 /**
  * ScoreRenderer - Main class for rendering shakuhachi notation
@@ -94,7 +95,15 @@ export class ScoreRenderer {
 
     // Clear container and create new SVG renderer
     this.container.innerHTML = '';
-    const { width, height } = this.getViewportDimensions();
+
+    // Get viewport dimensions
+    let { width, height } = this.getViewportDimensions();
+
+    // If single column mode, calculate exact required height
+    if (this.options.singleColumn) {
+      height = this.calculateSingleColumnHeight(notes);
+    }
+
     this.renderer = new SVGRenderer(this.container, width, height);
 
     // Configure modifiers based on options
@@ -195,18 +204,47 @@ export class ScoreRenderer {
    * @returns Width and height for SVG viewport
    */
   private getViewportDimensions(): { width: number; height: number } {
-    if (this.options.width !== undefined && this.options.height !== undefined) {
-      return {
-        width: this.options.width,
-        height: this.options.height,
-      };
+    const rect = this.container.getBoundingClientRect();
+
+    return {
+      width:
+        this.options.width !== undefined
+          ? this.options.width
+          : rect.width || 800,
+      height:
+        this.options.height !== undefined
+          ? this.options.height
+          : rect.height || 600,
+    };
+  }
+
+  /**
+   * Calculates the exact height needed to render all notes in a single column
+   * Based on the same logic as ColumnLayoutCalculator.calculateNotePositions
+   *
+   * @param notes - Array of notes to calculate height for
+   * @returns Required height in pixels
+   */
+  private calculateSingleColumnHeight(notes: ShakuNote[]): number {
+    let height = this.options.topMargin; // Start with top margin
+
+    for (const note of notes) {
+      // Check if note has duration dot (requires extra spacing)
+      const hasDurationDot = note
+        .getModifiers()
+        .some((mod) => mod instanceof DurationDotModifier);
+
+      // Add vertical spacing + extra for duration dots
+      const noteHeight =
+        this.options.noteVerticalSpacing +
+        (hasDurationDot ? this.options.durationDotExtraSpacing : 0);
+      height += noteHeight;
     }
 
-    const rect = this.container.getBoundingClientRect();
-    return {
-      width: rect.width || 800,
-      height: rect.height || 600,
-    };
+    // Add bottom padding for last note's modifiers
+    height += 20;
+
+    return height;
   }
 
   /**

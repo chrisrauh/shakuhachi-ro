@@ -70,10 +70,19 @@ export class ScoreDetailClient {
         .getPropertyValue('--color-neutral-500')
         .trim();
 
+      // Detect mobile viewport
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
       this.renderer = new ScoreRenderer(container, {
         showDebugLabels: false,
         noteColor: noteColor || '#000', // Fallback to black
         debugLabelColor: debugLabelColor || '#999', // Fallback to gray
+        // Mobile-specific options
+        singleColumn: isMobile,
+        autoResize: true, // Keep enabled - handles orientation changes automatically
+        noteVerticalSpacing: isMobile ? 40 : 44, // Slightly tighter on mobile
+        // Use viewport width on mobile for proper sizing
+        width: isMobile ? window.innerWidth - 32 : undefined, // Account for padding
       });
 
       if (this.score.data_format === 'json') {
@@ -101,7 +110,7 @@ export class ScoreDetailClient {
   }
 
   private setupThemeListener(): void {
-    // Use MutationObserver to watch for theme class changes on <html>
+    // Use MutationObserver to watch for theme attribute changes on <html>
     const observer = new MutationObserver(() => {
       // Re-render score when theme changes
       if (this.score) {
@@ -111,7 +120,7 @@ export class ScoreDetailClient {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['data-theme'],
     });
   }
 
