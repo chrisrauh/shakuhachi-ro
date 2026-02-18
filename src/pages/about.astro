@@ -1,0 +1,261 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Prerender this page at build time (static HTML)
+export const prerender = true;
+---
+
+<Layout title="About - Shakuhachi.ro" currentPage="browse">
+  <!-- App name in header -->
+  <div slot="header-metadata" class="score-header-metadata">
+    <h1 class="score-title">About</h1>
+  </div>
+
+  <div class="about-page">
+    <section class="about-section">
+      <h2>What is Shakuhachi.ro?</h2>
+      <p>
+        Shakuhachi.ro is a web platform for discovering, creating, and sharing shakuhachi scores.
+        Whether you're learning a new piece or sharing your transcriptions with others, this
+        platform makes it easy to work with shakuhachi notation online.
+      </p>
+      <p>
+        Scores are rendered using traditional kinko-style notation, making them familiar to
+        shakuhachi players while leveraging modern web technology for easy sharing and
+        collaboration.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>How to Use This Platform</h2>
+
+      <div class="feature">
+        <h3>Browse Scores</h3>
+        <p>
+          Explore the library of shakuhachi scores on the <a href="/">home page</a>. Use the
+          search to find scores by title or composer.
+        </p>
+      </div>
+
+      <div class="feature">
+        <h3>View & Share</h3>
+        <p>
+          Click any score to view it in full. Each score has a unique link you can share with
+          others—perfect for sending to your teacher or fellow students. The platform is optimized
+          for mobile viewing, so recipients can open scores on their phones.
+        </p>
+      </div>
+
+      <div class="feature">
+        <h3>Fork a Score</h3>
+        <p>
+          <strong>What is forking?</strong> Forking creates your own editable copy of a score.
+          This is useful when you want to make personal modifications—like adding your own
+          fingering notes, changing the notation, or adapting the piece for your skill level.
+        </p>
+        <p>
+          Your forked copy is completely independent. Changes you make won't affect the original
+          score, and you can edit it freely.
+        </p>
+        <p>
+          To fork a score: view any score and click the "Fork" button. You'll get your own copy
+          that you can edit and share.
+        </p>
+      </div>
+
+      <div class="feature">
+        <h3>Create Your Own Scores</h3>
+        <p>
+          Click "Create score" to start a new score from scratch. Add the title, composer, and
+          notation. Your score will be saved and assigned a unique link for sharing.
+        </p>
+      </div>
+
+      <div class="feature">
+        <h3>Edit Your Scores</h3>
+        <p>
+          For scores you've created or forked, you'll see an "Edit" button. Click it to modify the
+          title, composer, notation, or any other details. Changes are saved to your score.
+        </p>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2>Notation Formats</h2>
+      <p>
+        The platform supports multiple notation input formats including MusicXML, JSON score data,
+        and VexFlow notation. This flexibility allows you to work with scores from different
+        sources or transcription tools.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Open Source</h2>
+      <p>
+        Shakuhachi.ro is an open-source project. The code is available on
+        <a
+          href="https://github.com/chrisrauh/shakuhachi-ro"
+          target="_blank"
+          rel="noopener noreferrer">GitHub</a
+        >.
+      </p>
+      <p>
+        The shakuhachi notation renderer is also available as a standalone library that developers
+        can use in their own projects.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2>Contact</h2>
+      <p>
+        Questions, feedback, or issues? Reach out via
+        <a
+          href="https://github.com/chrisrauh/shakuhachi-ro/issues"
+          target="_blank"
+          rel="noopener noreferrer">GitHub Issues</a
+        >
+        or email
+        <a href="mailto:hello@shakuhachi.ro">hello@shakuhachi.ro</a>.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    import { createElement, Book, Plus, SunMoon } from 'lucide';
+    import { ThemeSwitcher } from '../components/ThemeSwitcher';
+    import { AuthWidget } from '../components/AuthComponents';
+    import { authState } from '../api/authState';
+    import { MobileMenu } from '../components/MobileMenu';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'Library',
+        href: '/',
+        icon: getIconHTML(Book),
+        dividerAfter: false,
+      },
+      {
+        id: 'create',
+        label: 'Create score',
+        href: '/editor',
+        icon: getIconHTML(Plus),
+        dividerAfter: true,
+      },
+      {
+        id: 'theme',
+        label: 'Toggle theme',
+        action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
+      },
+    ]);
+  </script>
+
+  <style>
+    .about-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-medium);
+    }
+
+    .about-section {
+      margin-bottom: var(--spacing-2x-large);
+    }
+
+    .about-section h2 {
+      font-size: var(--font-size-x-large);
+      font-weight: 500;
+      margin-bottom: var(--spacing-medium);
+      color: var(--color-neutral-700);
+    }
+
+    .about-section h3 {
+      font-size: var(--font-size-large);
+      font-weight: 500;
+      margin-bottom: var(--spacing-small);
+      color: var(--color-neutral-700);
+    }
+
+    .about-section p {
+      font-size: var(--font-size-medium);
+      line-height: 1.6;
+      color: var(--color-neutral-600);
+      margin-bottom: var(--spacing-medium);
+    }
+
+    .about-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature {
+      margin-bottom: var(--spacing-large);
+    }
+
+    .feature:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-section a {
+      color: var(--color-primary-600);
+      text-decoration: none;
+      border-bottom: 1px solid var(--color-primary-300);
+      transition: border-color var(--transition-fast);
+    }
+
+    .about-section a:hover {
+      border-bottom-color: var(--color-primary-600);
+    }
+
+    @media (max-width: 768px) {
+      .about-page {
+        padding: 0 var(--spacing-small);
+      }
+
+      .about-section h2 {
+        font-size: var(--font-size-large);
+      }
+
+      .about-section h3 {
+        font-size: var(--font-size-medium);
+      }
+
+      .about-section p {
+        font-size: var(--font-size-small);
+      }
+    }
+  </style>
+</Layout>
