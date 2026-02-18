@@ -239,6 +239,26 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Add unit tests for kinko-symbols lookup functions
   - `src/constants/kinko-symbols.ts` has 0 tests. Test: `getSymbolByKana('ロ')` returns correct symbol, `getSymbolByRomaji('ro')` returns correct symbol, `getSymbolByPitch('D', 4)` returns correct symbol, `parseNote` handles valid and invalid inputs, all 7 base notes are present in the map.
 
+### Architectural Refactoring
+
+Structural issues identified by module-level analysis (dependency graph, information flow, change impact simulation). These are about module boundaries and abstractions, not individual lines. **Before starting any of these tasks: validate the finding by reading all affected files, confirm the problem still exists, and create a step-by-step implementation plan before writing any code.**
+
+- [ ] Extract a RenderingBackend interface from SVGRenderer
+  - `SVGRenderer` is imported as a concrete type in 13 files (all 6 modifiers, ShakuNote, ScoreRenderer, VerticalSystem, ModifierConfigurator, and more). The draw primitives (`drawText`, `drawCircle`, `drawLine`, `drawPath`, `drawRect`, `openGroup`, `closeGroup`, `resize`, `clear`) are already abstract in practice — only the type references are concrete. Define a `RenderingBackend` interface with these methods, have `SVGRenderer` implement it, and change all consumers to depend on the interface. This is a mechanical type-level change with zero runtime cost. It unlocks Canvas/WebGL backends and enables mock renderers for unit testing modifiers and notes without a DOM.
+  - **Validate first**: Read every file that imports `SVGRenderer`, confirm none use SVG-specific APIs beyond the draw primitives (exception: `VerticalSystem` uses `setAttribute('transform', ...)` on SVG group elements — plan how to abstract this). Map every method signature that needs to change.
+
+- [ ] Introduce a Parser interface and registry
+  - There is no formal `Parser` interface. `MusicXMLParser` is a concrete static class imported by name in `ScoreDetailClient` (line 83), `ScoreRenderer` (line 64), and `convenience.ts`. Format dispatch (`if format === 'musicxml' ... else if format === 'json'`) is scattered across 3 components. Define a `Parser` interface (`parse(content: string): ScoreData`), create a `ParserRegistry` keyed by `ScoreDataFormat`, and replace scattered conditionals with `ParserRegistry.get(format).parse(content)`. Adding a new format (e.g., ABC notation) then becomes one new file + one registry entry instead of touching 6 files.
+  - **Validate first**: Read all files that reference `MusicXMLParser` or check `data_format`. Map every call site. Confirm that `ScoreParser` (which converts `ScoreData` → `ShakuNote[]`) is a separate concern and should NOT be part of this interface. Verify `ScoreDataFormat` type location (`api/scores.ts:5`) and whether it belongs in `types/`.
+
+- [ ] Decompose ScoreEditor into model + view
+  - `ScoreEditor.ts` is 771 lines mixing 8+ concerns: state management (instance variables), DOM generation (`innerHTML` templates), event handling, API calls, validation, auto-save, theme detection, and CSS injection. This monolith is the primary bottleneck for adding versioning, collaboration, and i18n — all three require invasive surgery on this single file. Separate into: (a) an `EditorState` model class that holds data and emits change events, (b) an `EditorView` that subscribes to state changes and renders DOM, (c) extracted concerns (CSS → stylesheet, validation → utility, auto-save → utility, already tracked as separate tasks above). The same pattern applies to `ScoreLibrary.ts` (543 lines) and `ScoreDetailClient.ts` (175 lines) at smaller scale.
+  - **Validate first**: Read the full `ScoreEditor.ts`. Map every instance variable and method. Identify which methods are pure state mutations vs DOM manipulation vs API calls. Sketch the `EditorState` interface before writing any code. Consider whether a lightweight event emitter is sufficient or if a more structured pattern is needed.
+
+- [ ] Fix potential theme detection bug: MutationObserver watches wrong attribute
+  - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
+  - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
+
 ## Renderer Enhancements (Future)
 
 - [ ] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
