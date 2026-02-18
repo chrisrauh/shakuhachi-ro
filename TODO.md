@@ -10,7 +10,7 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 Complete in order. These are blocking the alpha release to users.
 
-1. **[ ] About page**
+1. **[x] About page**
    - Project description and purpose
    - How to use the platform (browse, create, edit, fork, share)
    - Explain forking concept for musicians ("What is forking? Forking creates your own editable copy of a score...")
