@@ -4,77 +4,90 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 **Project Vision**: A web platform for sharing shakuhachi scores. Primary use case is discovering and sharing scores via links (most often opened on mobile devices). Secondary use case is using the platform to practice/perform from shared scores.
 
-## Remaining Tasks
+**Current Milestone**: Alpha Release - basic functionality for initial user feedback
 
-### New Score Creation Flow
+## Alpha Release (Must-Haves)
 
-Implement the creation flow documented in ARCHITECTURE-PLATFORM.MD: create empty score with temporary slug → edit at `/score/[slug]/edit` → title changes update slug.
+Complete in order. These are blocking the alpha release to users.
 
-**API Layer:**
+1. **[ ] About page**
+   - Project description and purpose
+   - How to use the platform (browse, create, edit, fork, share)
+   - Explain forking concept for musicians ("What is forking? Forking creates your own editable copy of a score...")
+   - Contact information
 
-- [ ] Add `generateRandomSlug()` utility function
-  - Generate random words-based slug (e.g., "flying-circus-catnip")
-  - Ensure uniqueness against existing slugs
-  - Use memorable word combinations for better UX
+2. **[ ] Fix typography alignment on score page header**
+   - Typography/logo not aligning properly in header
+   - Visual polish before alpha
 
-- [ ] Add `createEmptyScore()` API function
-  - Create score with random temporary slug
-  - Set placeholder title ("Untitled Score")
-  - Set empty data structure based on format
-  - Return created score for redirect
+3. **[ ] Edit existing score** (`/score/[slug]/edit`)
+   - Same page as score view, not separate route
+   - Desktop: side-by-side layout (score preview + editor panel)
+   - Mobile: toggle between preview and editor panels
+   - Permission check: only owner can edit (redirect if not owner)
+   - Form fields: title, composer, description, notation
+   - Notation input: support MusicXML, JSON, VexFlow notation (YAGNI - just what's needed for current features)
+   - Save functionality
+   - Live preview updates as notation changes
 
-- [ ] Add `updateScoreSlug()` API function
-  - Take score ID and new title
-  - Regenerate slug from title
-  - Ensure slug uniqueness
-  - Update both title and slug atomically
-  - Handle slug conflicts gracefully
+4. **[ ] Fork confirmation dialog**
+   - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
+   - Tooltip on Fork button: "Create your own editable copy of this score"
+   - Note: Everyone gets Fork button (including author). Author also gets Edit button.
 
-**Pages & Components:**
+5. **[ ] Delete score with confirmation**
+   - Owner can delete their own scores
+   - Confirmation dialog: "Delete '[title]'? This cannot be undone."
+   - Remove from database and redirect to landing page
 
-- [ ] Create `/score/[slug]/edit.astro` page
-  - SSR to load existing score data
-  - Form for title, composer, description
-  - Notation input area (textarea for VexFlow/MusicXML)
-  - Live preview pane using ScoreRenderer
-  - Permission check (only owner can edit)
-  - Redirect if not owner
+6. **[ ] Create new score flow**
+   - Generate random slug (e.g., "flying-circus-catnip")
+   - Create empty score in database
+   - Redirect to `/score/[slug]/edit`
+   - User fills in title, notation, etc.
 
-- [ ] Create `ScoreEditClient.ts` component
-  - Form state management
-  - Debounced title change → slug update
-  - Live preview rendering on notation changes
-  - Save button → updateScore() API call
-  - Validation (title required, valid notation)
-  - Loading/error states
-  - Auto-save draft support (optional)
+7. **[ ] Landing page: My Scores section**
+   - When user is logged in, show their scores first
+   - Then show library scores below
+   - Clear visual separation between sections
 
-**Integration:**
+8. **[ ] 404 page for nonexistent scores**
+   - When `/score/[slug]` doesn't exist
+   - Friendly error message
+   - Link back to library
 
-- [ ] Update "Create Score" button flow
-  - Change from `/editor` to calling `createEmptyScore()`
-  - Redirect to `/score/[slug]/edit`
-  - Show loading state during creation
+9. **[ ] Permission denied page**
+   - When user tries to access `/score/[slug]/edit` without ownership
+   - Clear message: "You don't have permission to edit this score"
+   - Option to Fork instead
 
-- [ ] Update fork flow
-  - Change redirect from `/editor?id=X` to `/score/[slug]/edit`
-  - Remove query param approach
+## Fast Follow (Post-Alpha)
 
-- [ ] Update mobile menu "Create score" link
-  - Point to new creation flow instead of `/editor`
+These improve UX but aren't blocking alpha release.
 
-**Cleanup:**
+- [ ] Loading states and spinners
+  - During save operations
+  - During score creation
+  - During fork operations
+  - During delete operations
 
-- [ ] Deprecate `/editor` route
-  - Add notice that it's deprecated
-  - Keep for backwards compatibility temporarily
-  - Plan for eventual removal
+- [ ] Notation format help in editor
+  - Examples of valid notation
+  - Links to documentation
+  - Format validation and helpful error messages
 
-### API Improvements & Refactoring
+- [ ] Unsaved changes warning
+  - Detect unsaved changes in editor
+  - Warn before navigating away
+  - "You have unsaved changes. Are you sure you want to leave?"
+
+## Future Enhancements (Post-Alpha)
+
+These are important improvements but not needed for initial alpha release.
+
+### API & Architecture Improvements
 
 **Reference**: See [docs/API-IMPROVEMENTS.MD](./docs/API-IMPROVEMENTS.MD) for detailed rationale and implementation examples.
-
-#### High Priority (Non-Breaking)
 
 - [ ] **Add options validation with warnings**
   - [ ] Validate `notesPerColumn >= 1`
@@ -193,7 +206,6 @@ Implement the creation flow documented in ARCHITECTURE-PLATFORM.MD: create empty
   - [ ] Test search/filter interactions
 - [ ] Add cross-viewport testing (desktop 1280x720, tablet 768x1024, mobile 375x667)
 - [ ] Add visual tests for different auth states (logged in vs logged out)
-
 
 ### Phase 8: Navigation & UI Polish
 
