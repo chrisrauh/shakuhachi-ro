@@ -175,6 +175,64 @@ export class ScoreEditor {
   }
 
   private async updatePreview(): Promise<void> {
+    // Check for external preview container (new edit page)
+    const externalPreview = document.getElementById('score-preview');
+
+    // If external preview exists, use it directly
+    if (externalPreview && !this.container.contains(externalPreview)) {
+      // External preview mode (side-by-side edit page)
+      if (!this.validateScoreData() || !this.scoreData.trim()) {
+        externalPreview.innerHTML = `
+          <div class="preview-placeholder">
+            <p>Preview will appear here</p>
+            <p class="preview-hint">Enter valid ${
+              this.dataFormat === 'json' ? 'JSON' : 'MusicXML'
+            } score data to see the preview</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        externalPreview.innerHTML = ''; // Clear existing content
+
+        if (this.dataFormat === 'json') {
+          const data = JSON.parse(this.scoreData);
+
+          // Read theme-aware colors from CSS variables
+          const noteColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-neutral-700')
+            .trim();
+          const debugLabelColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-neutral-500')
+            .trim();
+
+          const renderer = new ScoreRenderer(externalPreview, {
+            noteColor: noteColor || '#000',
+            debugLabelColor: debugLabelColor || '#999',
+          });
+
+          await renderer.renderFromScoreData(data);
+        } else {
+          externalPreview.innerHTML = `
+            <div class="preview-placeholder">
+              <p>MusicXML Preview</p>
+              <p class="preview-hint">MusicXML rendering will be implemented soon</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        externalPreview.innerHTML = `
+          <div class="preview-error">
+            <p>Preview Error</p>
+            <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Internal preview mode (original /editor page)
     const previewContainer = this.container.querySelector(
       '#preview-pane',
     ) as HTMLElement;

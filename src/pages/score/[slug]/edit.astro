@@ -1,0 +1,156 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getScoreBySlug } from '../../../api/scores';
+import { createClient } from '@supabase/supabase-js';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/');
+
+// Server-side auth check using cookies
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+// Create Supabase client with auth headers from cookies
+const authToken = Astro.cookies.get('sb-access-token')?.value;
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+  },
+});
+
+// Get current user
+const { data: { user }, error: authError } = await supabase.auth.getUser(authToken);
+
+if (!user || authError) {
+  return Astro.redirect(`/login?redirect=/score/${slug}/edit`);
+}
+
+// Try to fetch existing score
+const scoreResult = await getScoreBySlug(slug);
+const { score } = scoreResult;
+
+// If score exists, check ownership
+if (score && user.id !== score.user_id) {
+  return Astro.redirect(`/score/${slug}?error=permission_denied`);
+}
+
+// If score doesn't exist, this is create mode with temp slug
+---
+
+<Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
+  <div class="edit-layout">
+    <!-- Mobile toggle -->
+    <div class="mobile-toggle">
+      <button id="toggle-preview" class="btn">Preview</button>
+      <button id="toggle-editor" class="btn btn-primary">Edit</button>
+    </div>
+
+    <!-- Desktop: side-by-side | Mobile: toggle -->
+    <div class="preview-panel" id="preview-panel">
+      <div id="score-preview"></div>
+    </div>
+
+    <div class="editor-panel" id="editor-panel">
+      <!-- ScoreEditor renders here (full-page layout) -->
+      <div id="score-editor"></div>
+    </div>
+  </div>
+
+  <!-- Embed score data if editing existing -->
+  {score && (
+    <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
+  )}
+
+  <!-- Initialize ScoreEditor (existing component, no changes) -->
+  <script>
+    import { ScoreEditor } from '../../../components/ScoreEditor';
+
+    // Edit mode: pass score ID | Create mode: no ID
+    const scoreDataEl = document.getElementById('score-data');
+    const scoreId = scoreDataEl ? JSON.parse(scoreDataEl.textContent).score.id : undefined;
+
+    new ScoreEditor('score-editor', scoreId);
+  </script>
+
+  <style>
+    /* Desktop: side-by-side grid */
+    .edit-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: var(--spacing-large);
+      height: 100%;
+      padding: var(--spacing-large);
+    }
+
+    .mobile-toggle {
+      display: none;
+      grid-column: 1 / -1; /* Full width */
+    }
+
+    .preview-panel,
+    .editor-panel {
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    /* Mobile: stack + toggle */
+    @media (max-width: 768px) {
+      .edit-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        padding: var(--spacing-medium);
+      }
+
+      .mobile-toggle {
+        display: flex;
+        gap: var(--spacing-small);
+      }
+
+      .mobile-toggle button {
+        flex: 1;
+      }
+
+      /* Toggle visibility */
+      .preview-panel.hidden,
+      .editor-panel.hidden {
+        display: none;
+      }
+    }
+
+    /* ScoreEditor will render its own styles (inline CSS) */
+    /* Accept some visual quirks in constrained layout for now */
+  </style>
+
+  <!-- Mobile toggle logic -->
+  <script>
+    const togglePreview = document.getElementById('toggle-preview');
+    const toggleEditor = document.getElementById('toggle-editor');
+    const previewPanel = document.getElementById('preview-panel');
+    const editorPanel = document.getElementById('editor-panel');
+
+    togglePreview?.addEventListener('click', () => {
+      previewPanel?.classList.remove('hidden');
+      editorPanel?.classList.add('hidden');
+      togglePreview.classList.add('btn-primary');
+      toggleEditor?.classList.remove('btn-primary');
+    });
+
+    toggleEditor?.addEventListener('click', () => {
+      editorPanel?.classList.remove('hidden');
+      previewPanel?.classList.add('hidden');
+      toggleEditor.classList.add('btn-primary');
+      togglePreview?.classList.remove('btn-primary');
+    });
+
+    // Default: editor on mobile
+    if (window.innerWidth < 768) {
+      previewPanel?.classList.add('hidden');
+    }
+  </script>
+</Layout>
