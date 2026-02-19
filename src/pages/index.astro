@@ -1,15 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
 
 // Prerender this page at build time (static HTML)
 export const prerender = true;
 ---
 
 <Layout title="Shakuhachi Score Library" currentPage="browse">
-  <!-- App name in header -->
-  <div slot="header-metadata" class="score-header-metadata">
-    <h1 class="score-title">Shakuhachi.ro</h1>
-  </div>
+  <PageHeader slot="header-metadata" title="Shakuhachi.ro" />
 
   <div id="score-library"></div>
 
@@ -88,25 +86,4 @@ export const prerender = true;
       },
     ]);
   </script>
-
-  <style>
-    /* Header metadata styling - matches score page styling */
-    :global(.score-header-metadata) {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-small);
-      font-size: var(--font-size-small);
-      color: var(--color-neutral-600);
-      flex-wrap: wrap;
-    }
-
-    :global(.score-title) {
-      font-size: var(--font-size-large);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-neutral-900);
-      margin: 0;
-      text-box-trim: trim-both; /* Trims space above/below actual glyphs */
-      text-box-edge: cap alphabetic; /* Uses cap-height and baseline */
-    }
-  </style>
 </Layout>

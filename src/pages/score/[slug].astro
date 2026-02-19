@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
 import { GitFork, SquarePen } from '@lucide/astro';
 
@@ -29,21 +30,17 @@ if (score.forked_from) {
 
 <Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true}>
   <!-- Score metadata in header -->
-  <div slot="header-metadata" class="score-header-metadata">
-    <h1 class="score-title">{score.title}</h1>
-
+  <PageHeader slot="header-metadata" title={score.title}>
     {parentScore && (
-      <>
-        <span>
-          forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-        </span>
-      </>
+      <span>
+        forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+      </span>
     )}
 
     <span class="score-stat">
       updated <relative-time datetime={score.created_at} format="relative"></relative-time>
     </span>
-  </div>
+  </PageHeader>
 
   <!-- Fork button in header actions (right side of navbar) -->
   <button slot="header-actions"
@@ -158,25 +155,6 @@ if (score.forked_from) {
   </script>
 
   <style>
-    /* Header metadata styling (in header slot) */
-    :global(.score-header-metadata) {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-small);
-      font-size: var(--font-size-small);
-      color: var(--color-neutral-600);
-      flex-wrap: wrap;
-    }
-
-    :global(.score-title) {
-      font-size: var(--font-size-large);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-neutral-900);
-      margin: 0;
-      text-box-trim: trim-both; /* Trims space above/below actual glyphs */
-      text-box-edge: cap alphabetic; /* Uses cap-height and baseline */
-    }
-
     :global(.metadata-separator) {
       color: var(--color-neutral-400);
     }
