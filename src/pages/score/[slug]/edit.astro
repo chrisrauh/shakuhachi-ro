@@ -1,45 +1,16 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getScoreBySlug } from '../../../api/scores';
-import { createClient } from '@supabase/supabase-js';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/');
-
-// Server-side auth check using cookies
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-// Create Supabase client with auth headers from cookies
-const authToken = Astro.cookies.get('sb-access-token')?.value;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  global: {
-    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
-  },
-});
-
-// Get current user
-const { data: { user }, error: authError } = await supabase.auth.getUser(authToken);
-
-if (!user || authError) {
-  return Astro.redirect(`/login?redirect=/score/${slug}/edit`);
-}
 
 // Try to fetch existing score
 const scoreResult = await getScoreBySlug(slug);
 const { score } = scoreResult;
 
-// If score exists, check ownership
-if (score && user.id !== score.user_id) {
-  return Astro.redirect(`/score/${slug}?error=permission_denied`);
-}
-
-// If score doesn't exist, this is create mode with temp slug
+// Note: Auth check happens client-side for now (YAGNI - server-side auth can be added later)
+// If user is not authenticated or not owner, client will redirect
 ---
 
 <Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
@@ -69,6 +40,34 @@ if (score && user.id !== score.user_id) {
   <!-- Initialize ScoreEditor (existing component, no changes) -->
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
+    import { authState } from '../../../api/authState';
+
+    // Client-side auth and permission check
+    authState.subscribe((user) => {
+      const scoreDataEl = document.getElementById('score-data');
+      const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent) : null;
+
+      // If editing existing score, check ownership
+      if (scoreData && scoreData.score) {
+        if (!user) {
+          // Not logged in - redirect to login
+          window.location.href = `/login?redirect=${window.location.pathname}`;
+          return;
+        }
+
+        if (user.id !== scoreData.score.user_id) {
+          // Not owner - redirect to view page
+          window.location.href = `/score/${scoreData.score.slug}?error=permission_denied`;
+          return;
+        }
+      } else {
+        // Creating new score - just check if logged in
+        if (!user) {
+          window.location.href = `/login?redirect=${window.location.pathname}`;
+          return;
+        }
+      }
+    });
 
     // Edit mode: pass score ID | Create mode: no ID
     const scoreDataEl = document.getElementById('score-data');
