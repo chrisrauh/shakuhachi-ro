@@ -1,15 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
 
 // Prerender this page at build time (static HTML)
 export const prerender = true;
 ---
 
 <Layout title="About - Shakuhachi.ro" currentPage="browse">
-  <!-- App name in header -->
-  <div slot="header-metadata" class="score-header-metadata">
-    <h1 class="score-title">About</h1>
-  </div>
+  <PageHeader slot="header-metadata" title="About" />
 
   <div class="about-page">
     <section class="about-section">
