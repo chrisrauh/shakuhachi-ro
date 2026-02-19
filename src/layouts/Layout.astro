@@ -1,5 +1,5 @@
 ---
-import { Book, Plus } from '@lucide/astro';
+import { Book, Plus, Info } from '@lucide/astro';
 
 interface Props {
   title: string;
@@ -53,6 +53,13 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
             aria-label="Create new score"
           >
             <Plus size={16} stroke-width={2} />
+          </a>
+          <a
+            href="/about"
+            class="btn btn-icon"
+            aria-label="About"
+          >
+            <Info size={16} stroke-width={2} />
           </a>
           <div id="theme-switcher"></div>
           <div id="auth-widget"></div>
