@@ -121,7 +121,7 @@ export const prerender = true;
   </div>
 
   <script>
-    import { createElement, Book, Plus, SunMoon } from 'lucide';
+    import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
     import { authState } from '../api/authState';
@@ -173,6 +173,13 @@ export const prerender = true;
         label: 'Create score',
         href: '/editor',
         icon: getIconHTML(Plus),
+        dividerAfter: false,
+      },
+      {
+        id: 'about',
+        label: 'About',
+        href: '/about',
+        icon: getIconHTML(Info),
         dividerAfter: true,
       },
       {
