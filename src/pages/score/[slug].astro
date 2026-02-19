@@ -42,25 +42,28 @@ if (score.forked_from) {
     </span>
   </PageHeader>
 
-  <!-- Fork button in header actions (right side of navbar) -->
-  <button slot="header-actions"
-          id="fork-btn"
-          class="btn btn-icon-with-count"
-          aria-label="Fork this score">
-    <GitFork size={16} />
-    <span class="count">{score.fork_count}</span>
-  </button>
+  <!-- Header actions (right side of navbar) -->
+  <div slot="header-actions" style="display: flex; gap: var(--spacing-small); align-items: center;">
+    <!-- Owner-only edit button -->
+    <a href={`/score/${score.slug}/edit`}
+       class="btn btn-icon"
+       id="edit-btn"
+       aria-label="Edit score"
+       style="display: none;">
+      <SquarePen size={16} />
+    </a>
+
+    <!-- Fork button -->
+    <button id="fork-btn"
+            class="btn btn-icon-with-count"
+            aria-label="Fork this score">
+      <GitFork size={16} />
+      <span class="count">{score.fork_count}</span>
+    </button>
+  </div>
 
   <!-- Score content -->
   <div class="score-detail-container">
-    <!-- Owner-only edit button (floating) -->
-    <a href={`/score/${score.slug}/edit`}
-       class="btn btn-icon btn-floating"
-       id="edit-btn"
-       aria-label="Edit score"
-       style="display: none; top: 80px; right: var(--spacing-large);">
-      <SquarePen size={16} />
-    </a>
 
     <!-- Score renderer container -->
     <div id="score-renderer-container"></div>
