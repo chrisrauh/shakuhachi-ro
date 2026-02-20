@@ -41,6 +41,10 @@ const { score } = scoreResult;
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { authState } from '../../../api/authState';
+    import { AuthModal } from '../../../components/AuthComponents';
+
+    // Initialize auth modal
+    const authModal = new AuthModal();
 
     // Client-side auth and permission check
     authState.subscribe((user) => {
@@ -50,20 +54,21 @@ const { score } = scoreResult;
       // If editing existing score, check ownership
       if (scoreData && scoreData.score) {
         if (!user) {
-          // Not logged in - redirect to login
-          window.location.href = `/login?redirect=${window.location.pathname}`;
+          // Not logged in - show login modal
+          authModal.show();
           return;
         }
 
         if (user.id !== scoreData.score.user_id) {
           // Not owner - redirect to view page
-          window.location.href = `/score/${scoreData.score.slug}?error=permission_denied`;
+          alert('You do not have permission to edit this score.');
+          window.location.href = `/score/${scoreData.score.slug}`;
           return;
         }
       } else {
         // Creating new score - just check if logged in
         if (!user) {
-          window.location.href = `/login?redirect=${window.location.pathname}`;
+          authModal.show();
           return;
         }
       }
