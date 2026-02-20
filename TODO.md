@@ -27,17 +27,7 @@ Complete in order. These are blocking the alpha release to users.
    - Visual polish before alpha
    - COMPLETED: Standardized with PageHeader component
 
-4. **[ ] Edit existing score** (`/score/[slug]/edit`)
-   - Same page as score view, not separate route
-   - Desktop: side-by-side layout (score preview + editor panel)
-   - Mobile: toggle between preview and editor panels
-   - Permission check: only owner can edit (redirect if not owner)
-   - Form fields: title, composer, description, notation
-   - Notation input: support MusicXML, JSON, VexFlow notation (YAGNI - just what's needed for current features)
-   - Save functionality
-   - Live preview updates as notation changes
-
-4. **[ ] Edit existing score** (`/score/[slug]/edit`)
+4. **[x] Edit existing score** (`/score/[slug]/edit`)
    - Same page as score view, not separate route
    - Desktop: side-by-side layout (score preview + editor panel)
    - Mobile: toggle between preview and editor panels

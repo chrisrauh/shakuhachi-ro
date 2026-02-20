@@ -3,6 +3,7 @@ import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
 import { authState } from '../api/authState';
 import type { Score } from '../api/scores';
+import type { User } from '@supabase/supabase-js';
 
 interface ScoreData {
   score: Score;
@@ -33,8 +34,10 @@ export class ScoreDetailClient {
       return;
     }
 
-    // Show edit button only if user is owner
-    this.handleEditButtonVisibility();
+    // Subscribe to auth state changes to show/hide edit button
+    authState.subscribe((user) => {
+      this.handleEditButtonVisibility(user);
+    });
 
     // Render score visualization
     await this.renderScore();
@@ -46,14 +49,15 @@ export class ScoreDetailClient {
     this.setupThemeListener();
   }
 
-  private handleEditButtonVisibility() {
+  private handleEditButtonVisibility(user: User | null) {
     if (!this.score) return;
 
-    const user = authState.getUser();
     const editBtn = document.getElementById('edit-btn') as HTMLElement;
 
     if (editBtn && user && user.id === this.score.user_id) {
-      editBtn.style.display = 'flex';
+      editBtn.style.display = 'inline-flex';
+    } else if (editBtn) {
+      editBtn.style.display = 'none';
     }
   }
 
