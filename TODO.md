@@ -78,6 +78,8 @@ Complete in order. These are blocking the alpha release to users.
    - Clear message: "You don't have permission to edit this score"
    - Option to Fork instead
 
+11. [ ] fix login dialog layout
+
 ## Fast Follow (Post-Alpha)
 
 These improve UX but aren't blocking alpha release.
