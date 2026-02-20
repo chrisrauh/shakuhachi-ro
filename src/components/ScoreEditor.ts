@@ -377,7 +377,8 @@ export class ScoreEditor {
 
   private render(): void {
     // Check if external preview exists
-    const hasExternalPreview = document.getElementById('score-preview') !== null;
+    const hasExternalPreview =
+      document.getElementById('score-preview') !== null;
 
     this.container.innerHTML = `
       <div class="score-editor">
@@ -574,7 +575,8 @@ export class ScoreEditor {
     style.id = 'score-editor-styles';
 
     // Check if we're in external preview mode
-    const hasExternalPreview = document.getElementById('score-preview') !== null;
+    const hasExternalPreview =
+      document.getElementById('score-preview') !== null;
 
     style.textContent = `
       .score-editor {
