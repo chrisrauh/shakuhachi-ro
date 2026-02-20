@@ -213,13 +213,24 @@ export class ScoreEditor {
           });
 
           await renderer.renderFromScoreData(data);
-        } else {
-          externalPreview.innerHTML = `
-            <div class="preview-placeholder">
-              <p>MusicXML Preview</p>
-              <p class="preview-hint">MusicXML rendering will be implemented soon</p>
-            </div>
-          `;
+        } else if (this.dataFormat === 'musicxml') {
+          // Parse MusicXML to ScoreData using MusicXMLParser
+          const { MusicXMLParser } = await import('../parser/MusicXMLParser');
+          const scoreData = MusicXMLParser.parse(this.scoreData);
+
+          const noteColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-neutral-700')
+            .trim();
+          const debugLabelColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-neutral-500')
+            .trim();
+
+          const renderer = new ScoreRenderer(externalPreview, {
+            noteColor: noteColor || '#000',
+            debugLabelColor: debugLabelColor || '#999',
+          });
+
+          await renderer.renderFromScoreData(scoreData);
         }
       } catch (error) {
         externalPreview.innerHTML = `
@@ -365,6 +376,9 @@ export class ScoreEditor {
   }
 
   private render(): void {
+    // Check if external preview exists
+    const hasExternalPreview = document.getElementById('score-preview') !== null;
+
     this.container.innerHTML = `
       <div class="score-editor">
         <div class="editor-header">
@@ -415,12 +429,16 @@ export class ScoreEditor {
             >${this.scoreData}</textarea>
           </div>
 
-          <div class="preview-pane" id="preview-pane">
+          ${
+            !hasExternalPreview
+              ? `<div class="preview-pane" id="preview-pane">
             <div class="preview-placeholder">
               <p>Preview will appear here</p>
               <p class="preview-hint">Enter valid score data to see the preview</p>
             </div>
-          </div>
+          </div>`
+              : ''
+          }
         </div>
       </div>
     `;
@@ -554,15 +572,21 @@ export class ScoreEditor {
 
     const style = document.createElement('style');
     style.id = 'score-editor-styles';
+
+    // Check if we're in external preview mode
+    const hasExternalPreview = document.getElementById('score-preview') !== null;
+
     style.textContent = `
       .score-editor {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: var(--spacing-large);
+        ${hasExternalPreview ? '' : 'max-width: 1600px; margin: 0 auto;'}
+        padding: ${hasExternalPreview ? '0' : 'var(--spacing-large)'};
+        height: 100%;
+        display: flex;
+        flex-direction: column;
       }
 
       .editor-header {
-        display: flex;
+        display: ${hasExternalPreview ? 'none' : 'flex'};
         justify-content: space-between;
         align-items: center;
         margin-bottom: var(--spacing-x-large);
@@ -623,11 +647,12 @@ export class ScoreEditor {
         border-radius: var(--border-radius-large);
         margin-bottom: var(--spacing-large);
         border: var(--panel-border-width) solid var(--panel-border-color);
+        flex-shrink: 0;
       }
 
       .metadata-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: ${hasExternalPreview ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))'};
         gap: var(--spacing-medium);
       }
 
@@ -650,35 +675,20 @@ export class ScoreEditor {
         border: var(--input-border-width) solid var(--input-border-color);
         border-radius: var(--input-border-radius-medium);
         font-size: var(--input-font-size-medium);
-        font-family: inherit;
         background: var(--input-background-color);
         color: var(--input-color);
-        transition: border-color var(--transition-fast);
-      }
-
-      .metadata-field input:focus,
-      .metadata-field select:focus,
-      .metadata-field textarea:focus {
-        outline: none;
-        border-color: var(--input-border-color-focus);
-        box-shadow: 0 0 0 var(--input-focus-ring-offset) var(--input-focus-ring-color);
-      }
-
-      .metadata-field input::placeholder,
-      .metadata-field textarea::placeholder {
-        color: var(--input-placeholder-color);
       }
 
       .metadata-field textarea {
+        min-height: 80px;
         resize: vertical;
       }
 
       .editor-main {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: ${hasExternalPreview ? '1fr' : '1fr 1fr'};
         gap: var(--spacing-large);
-        height: calc(100vh - 400px);
-        min-height: 500px;
+        ${hasExternalPreview ? 'flex: 1; min-height: 0;' : 'height: calc(100vh - 400px); min-height: 500px;'}
       }
 
       .editor-pane {
@@ -688,6 +698,7 @@ export class ScoreEditor {
         border-radius: var(--border-radius-large);
         overflow: hidden;
         background: var(--panel-background-color);
+        ${hasExternalPreview ? 'min-height: 0;' : ''}
       }
 
       .editor-pane-header {
@@ -697,6 +708,7 @@ export class ScoreEditor {
         justify-content: space-between;
         align-items: center;
         border-bottom: var(--panel-border-width) solid var(--panel-border-color);
+        flex-shrink: 0;
       }
 
       .editor-pane-header h2 {
@@ -727,6 +739,7 @@ export class ScoreEditor {
         max-height: 0;
         overflow: hidden;
         transition: all var(--transition-medium);
+        flex-shrink: 0;
       }
 
       .validation-error.show {
@@ -753,6 +766,8 @@ export class ScoreEditor {
         outline: none;
         background: var(--input-background-color);
         color: var(--input-color);
+        min-height: 0;
+        width: 100%;
       }
 
       .preview-pane {
@@ -790,6 +805,7 @@ export class ScoreEditor {
       #score-preview {
         padding: var(--spacing-large);
         width: 100%;
+        height: 100%;
       }
 
       @media (max-width: 1024px) {
