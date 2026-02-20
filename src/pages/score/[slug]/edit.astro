@@ -1,0 +1,267 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getScoreBySlug } from '../../../api/scores';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/');
+
+// Try to fetch existing score
+const scoreResult = await getScoreBySlug(slug);
+const { score } = scoreResult;
+
+// Note: Auth check happens client-side for now (YAGNI - server-side auth can be added later)
+// If user is not authenticated or not owner, client will redirect
+---
+
+<Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
+  <!-- Page header with title -->
+  <div slot="header-metadata" style="display: flex; align-items: center; gap: var(--spacing-small);">
+    <h1 style="margin: 0; font-size: var(--font-size-large); font-weight: var(--font-weight-semibold); color: var(--color-neutral-900);">
+      {score ? `Edit ${score.title}` : 'Create New Score'}
+    </h1>
+  </div>
+
+  <div class="edit-layout">
+    <!-- Mobile toggle -->
+    <div class="mobile-toggle">
+      <button id="toggle-preview" class="btn">Preview</button>
+      <button id="toggle-editor" class="btn btn-primary">Edit</button>
+    </div>
+
+    <!-- Desktop: side-by-side | Mobile: toggle -->
+    <div class="preview-panel" id="preview-panel">
+      <div id="score-preview"></div>
+    </div>
+
+    <div class="editor-panel" id="editor-panel">
+      <!-- ScoreEditor renders here (full-page layout) -->
+      <div id="score-editor"></div>
+    </div>
+  </div>
+
+  <!-- Embed score data if editing existing -->
+  {score && (
+    <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
+  )}
+
+  <!-- Initialize theme switcher, auth widget, and mobile menu -->
+  <script>
+    import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
+    import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
+    import { AuthWidget } from '../../../components/AuthComponents';
+    import { authState } from '../../../api/authState';
+    import { MobileMenu } from '../../../components/MobileMenu';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'Library',
+        href: '/',
+        icon: getIconHTML(Book),
+        dividerAfter: false,
+      },
+      {
+        id: 'create',
+        label: 'Create score',
+        href: '/score/new/edit',
+        icon: getIconHTML(Plus),
+        dividerAfter: false,
+      },
+      {
+        id: 'about',
+        label: 'About',
+        href: '/about',
+        icon: getIconHTML(Info),
+        dividerAfter: true,
+      },
+      {
+        id: 'theme',
+        label: 'Toggle theme',
+        action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
+      },
+    ]);
+  </script>
+
+  <!-- Initialize ScoreEditor (existing component, no changes) -->
+  <script>
+    import { ScoreEditor } from '../../../components/ScoreEditor';
+    import { authState } from '../../../api/authState';
+    import { AuthModal } from '../../../components/AuthComponents';
+
+    // Initialize auth modal
+    const authModal = new AuthModal();
+
+    let initialCheckDone = false;
+
+    // Client-side auth and permission check
+    authState.subscribe((user) => {
+      // Skip the initial subscribe callback (fires before auth is fully initialized)
+      if (!initialCheckDone) {
+        initialCheckDone = true;
+
+        // Only show auth modal if definitely not logged in after a short delay
+        setTimeout(() => {
+          const currentUser = authState.getUser();
+          if (!currentUser) {
+            authModal.show();
+          }
+        }, 500);
+
+        return;
+      }
+
+      const scoreDataEl = document.getElementById('score-data');
+      const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent) : null;
+
+      // If editing existing score, check ownership
+      if (scoreData && scoreData.score) {
+        if (!user) {
+          // Not logged in - show login modal
+          authModal.show();
+          return;
+        }
+
+        if (user.id !== scoreData.score.user_id) {
+          // Not owner - redirect to view page
+          alert('You do not have permission to edit this score.');
+          window.location.href = `/score/${scoreData.score.slug}`;
+          return;
+        }
+      } else {
+        // Creating new score - just check if logged in
+        if (!user) {
+          authModal.show();
+          return;
+        }
+      }
+    });
+
+    // Edit mode: pass score ID | Create mode: no ID
+    const scoreDataEl = document.getElementById('score-data');
+    const scoreId = scoreDataEl ? JSON.parse(scoreDataEl.textContent).score.id : undefined;
+
+    new ScoreEditor('score-editor', scoreId);
+  </script>
+
+  <style>
+    /* Desktop: side-by-side grid */
+    .edit-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-large);
+      height: calc(100vh - 80px); /* Full height minus header */
+      padding: var(--spacing-large);
+    }
+
+    .mobile-toggle {
+      display: none;
+    }
+
+    .preview-panel,
+    .editor-panel {
+      overflow-y: auto;
+      min-height: 0; /* Critical for grid children */
+      height: 100%;
+    }
+
+    .preview-panel {
+      border: var(--panel-border-width) solid var(--panel-border-color);
+      border-radius: var(--border-radius-large);
+      background: var(--panel-background-color);
+      padding: var(--spacing-large);
+    }
+
+    /* Make sure preview fills the height */
+    #score-preview {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    /* Mobile: stack + toggle */
+    @media (max-width: 768px) {
+      .edit-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        padding: var(--spacing-medium);
+      }
+
+      .mobile-toggle {
+        display: flex;
+        gap: var(--spacing-small);
+        margin-bottom: var(--spacing-medium);
+      }
+
+      .mobile-toggle button {
+        flex: 1;
+      }
+
+      /* Toggle visibility */
+      .preview-panel.hidden,
+      .editor-panel.hidden {
+        display: none;
+      }
+    }
+  </style>
+
+  <!-- Mobile toggle logic -->
+  <script>
+    const togglePreview = document.getElementById('toggle-preview');
+    const toggleEditor = document.getElementById('toggle-editor');
+    const previewPanel = document.getElementById('preview-panel');
+    const editorPanel = document.getElementById('editor-panel');
+
+    togglePreview?.addEventListener('click', () => {
+      previewPanel?.classList.remove('hidden');
+      editorPanel?.classList.add('hidden');
+      togglePreview.classList.add('btn-primary');
+      toggleEditor?.classList.remove('btn-primary');
+    });
+
+    toggleEditor?.addEventListener('click', () => {
+      editorPanel?.classList.remove('hidden');
+      previewPanel?.classList.add('hidden');
+      toggleEditor.classList.add('btn-primary');
+      togglePreview?.classList.remove('btn-primary');
+    });
+
+    // Default: editor on mobile
+    if (window.innerWidth < 768) {
+      previewPanel?.classList.add('hidden');
+    }
+  </script>
+</Layout>
