@@ -85,7 +85,7 @@ export class MobileMenu {
         font-size: var(--font-size-small);
         font-weight: normal;
         line-height: inherit;
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
         transition: background var(--transition-fast);
         text-decoration: none;
         border-radius: 4px;
@@ -100,7 +100,7 @@ export class MobileMenu {
         width: 16px;
         height: 16px;
         flex-shrink: 0;
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
       }
 
       .mobile-menu-divider {
@@ -111,8 +111,8 @@ export class MobileMenu {
 
       /* Active state for menu button when dropdown is open */
       #mobile-menu-toggle.btn.btn-icon[aria-expanded="true"] {
-        background: var(--color-neutral-100);
-        border-color: var(--color-neutral-400);
+        background: var(--color-bg-hover);
+        border-color: var(--color-border-hover);
       }
     `;
     document.head.appendChild(style);

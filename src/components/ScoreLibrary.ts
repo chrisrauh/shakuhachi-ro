@@ -301,7 +301,7 @@ export class ScoreLibrary {
       }
 
       .score-count {
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
         font-size: var(--font-size-small);
         margin-top: var(--spacing-small);
         margin-bottom: 0;
@@ -349,7 +349,7 @@ export class ScoreLibrary {
         display: block;
         font-weight: var(--font-weight-semibold);
         margin-bottom: var(--spacing-x-small);
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
       }
 
       .filter-group select {
@@ -393,7 +393,7 @@ export class ScoreLibrary {
       .score-title {
         font-size: var(--font-size-large);
         margin: 0;
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
         flex: 1;
         display: flex;
         align-items: center;
@@ -403,7 +403,7 @@ export class ScoreLibrary {
       .forked-indicator {
         display: inline-flex;
         align-items: center;
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
       }
 
       .forked-indicator svg {
@@ -416,13 +416,13 @@ export class ScoreLibrary {
       }
 
       .score-composer {
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
         margin: 0 0 var(--spacing-small) 0;
         font-style: italic;
       }
 
       .score-description {
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
         font-size: var(--font-size-small);
         margin: var(--spacing-small) 0;
         line-height: var(--line-height-dense);
@@ -437,9 +437,9 @@ export class ScoreLibrary {
         justify-content: space-between;
         align-items: center;
         padding-top: var(--spacing-small);
-        border-top: var(--panel-border-width) solid var(--color-neutral-200);
+        border-top: var(--panel-border-width) solid var(--color-border-subtle);
         font-size: var(--font-size-x-small);
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
       }
 
       .score-stat {
@@ -458,7 +458,7 @@ export class ScoreLibrary {
         grid-column: 1 / -1;
         text-align: center;
         padding: var(--spacing-3x-large) var(--spacing-large);
-        color: var(--color-neutral-500);
+        color: var(--color-text-tertiary);
       }
 
       .no-scores p {
@@ -469,7 +469,7 @@ export class ScoreLibrary {
       .no-scores button,
       .score-library-error button {
         background: var(--color-primary-600);
-        color: var(--color-neutral-0);
+        color: var(--color-text-on-dark);
         border: none;
         padding: var(--spacing-x-small) var(--spacing-small);
         border-radius: var(--border-radius-medium);
@@ -491,7 +491,7 @@ export class ScoreLibrary {
       .spinner {
         width: 50px;
         height: 50px;
-        border: 4px solid var(--color-neutral-200);
+        border: 4px solid var(--color-spinner-track);
         border-top: 4px solid var(--color-primary-600);
         border-radius: 50%;
         animation: spin 1s linear infinite;
@@ -515,7 +515,7 @@ export class ScoreLibrary {
 
       .score-library-error p {
         margin-bottom: var(--spacing-large);
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
       }
 
       @media (max-width: 768px) {

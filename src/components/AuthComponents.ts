@@ -224,7 +224,7 @@ export class AuthWidget {
     if (this.currentUser) {
       this.container.innerHTML = `
         <div style="display: flex; align-items: center; gap: var(--spacing-small);">
-          <span style="color: var(--color-neutral-700); font-size: var(--font-size-small);">${this.currentUser.email}</span>
+          <span style="color: var(--color-text-primary); font-size: var(--font-size-small);">${this.currentUser.email}</span>
           <button id="auth-logout" class="btn btn-text-bordered btn-neutral-bordered">
             Log Out
           </button>
