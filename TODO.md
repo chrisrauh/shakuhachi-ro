@@ -80,6 +80,8 @@ Complete in order. These are blocking the alpha release to users.
 
 11. [ ] fix login dialog layout
 
+12. [ ] update favicon to logo image
+
 ## Fast Follow (Post-Alpha)
 
 These improve UX but aren't blocking alpha release.
