@@ -8,6 +8,8 @@ Complete in order. These are blocking the alpha release to users.
 
 - [ ] Update the theme colors
   - [x] Update the primitive colors to match the tailwind 4 colors. Update existing color values with new ones. Add missing color families and color values. Tailwind 4 colors doc: https://tailwindcss.com/docs/colors
+  - [x] Expand the primitive color families to include half steps starting from 25 to 975
+  - [x] The app should only use semantic tokens. Audit all color usage and replace primitive color token references to semantic tokens. Check if a semantic token exists. If a sementico token does not exist for the use case, suggest one and get approval from the user.
   - [ ] Ask for the next task
 
 - [ ] Edit About page content

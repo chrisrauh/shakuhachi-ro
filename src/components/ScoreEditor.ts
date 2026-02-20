@@ -201,10 +201,10 @@ export class ScoreEditor {
 
           // Read theme-aware colors from CSS variables
           const noteColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-neutral-700')
+            .getPropertyValue('--color-text-primary')
             .trim();
           const debugLabelColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-neutral-500')
+            .getPropertyValue('--color-text-tertiary')
             .trim();
 
           const renderer = new ScoreRenderer(externalPreview, {
@@ -273,10 +273,10 @@ export class ScoreEditor {
 
         // Read theme-aware colors from CSS variables
         const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-neutral-700')
+          .getPropertyValue('--color-text-primary')
           .trim();
         const debugLabelColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-neutral-500')
+          .getPropertyValue('--color-text-tertiary')
           .trim();
 
         const renderer = new ScoreRenderer(scorePreview, {
@@ -593,14 +593,14 @@ export class ScoreEditor {
         align-items: center;
         margin-bottom: var(--spacing-x-large);
         padding-bottom: var(--spacing-large);
-        border-bottom: 2px solid var(--color-neutral-300);
+        border-bottom: 2px solid var(--color-border);
       }
 
       .editor-header h1 {
         margin: 0;
         font-size: var(--font-size-2x-large);
         font-weight: var(--font-weight-light);
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
       }
 
       .editor-actions {
@@ -620,7 +620,7 @@ export class ScoreEditor {
 
       .btn-primary {
         background: var(--color-primary-600);
-        color: var(--color-neutral-0);
+        color: var(--color-text-on-dark);
         border: none;
       }
 
@@ -629,14 +629,14 @@ export class ScoreEditor {
       }
 
       .btn-primary:disabled {
-        background: var(--color-neutral-400);
+        background: var(--color-text-disabled);
         cursor: not-allowed;
       }
 
       .btn-secondary {
-        background: var(--color-neutral-200);
-        color: var(--color-neutral-700);
-        border: var(--input-border-width) solid var(--color-neutral-300);
+        background: var(--color-bg-active);
+        color: var(--color-text-primary);
+        border: var(--input-border-width) solid var(--color-border);
       }
 
       .btn-secondary:hover {
@@ -666,7 +666,7 @@ export class ScoreEditor {
         display: block;
         font-weight: var(--font-weight-semibold);
         margin-bottom: var(--spacing-x-small);
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
       }
 
       .metadata-field input,
@@ -704,7 +704,7 @@ export class ScoreEditor {
       }
 
       .editor-pane-header {
-        background: var(--color-neutral-100);
+        background: var(--color-bg-hover);
         padding: var(--spacing-medium) var(--spacing-large);
         display: flex;
         justify-content: space-between;
@@ -717,7 +717,7 @@ export class ScoreEditor {
         margin: 0;
         font-size: var(--font-size-large);
         font-weight: var(--font-weight-semibold);
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
       }
 
       .format-toggle {
@@ -730,7 +730,7 @@ export class ScoreEditor {
         align-items: center;
         gap: var(--spacing-x-small);
         cursor: pointer;
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
       }
 
       .validation-error {
@@ -785,7 +785,7 @@ export class ScoreEditor {
       .preview-placeholder,
       .preview-error {
         text-align: center;
-        color: var(--color-neutral-500);
+        color: var(--color-text-tertiary);
         padding: var(--spacing-3x-large);
       }
 
@@ -793,7 +793,7 @@ export class ScoreEditor {
       .preview-error p:first-child {
         font-size: var(--font-size-large);
         margin-bottom: var(--spacing-small);
-        color: var(--color-neutral-600);
+        color: var(--color-text-secondary);
       }
 
       .preview-hint {

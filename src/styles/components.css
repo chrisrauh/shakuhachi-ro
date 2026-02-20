@@ -28,16 +28,16 @@
 .btn-icon {
   padding: var(--spacing-button);
   background: transparent;
-  border: var(--input-border-width) solid var(--color-neutral-300);
+  border: var(--input-border-width) solid var(--color-border);
   border-radius: var(--border-radius-medium);
-  color: var(--color-neutral-700);
+  color: var(--color-text-primary);
   line-height: 0;
   font-size: var(--font-size-medium);
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: var(--color-neutral-200);
-  border-color: var(--color-neutral-400);
+  background: var(--color-bg-active);
+  border-color: var(--color-border-hover);
 }
 
 .btn-icon:active:not(:disabled) {
@@ -55,7 +55,7 @@
 /* Text button with border */
 .btn-text-bordered {
   padding: var(--spacing-x-small) var(--spacing-medium);
-  border: var(--input-border-width) solid var(--color-neutral-300);
+  border: var(--input-border-width) solid var(--color-border);
   font-size: var(--font-size-small);
   line-height: 1;
 }
@@ -63,7 +63,7 @@
 /* Button variants - colors */
 .btn-primary {
   background: var(--color-primary-600);
-  color: var(--color-neutral-0);
+  color: var(--color-text-on-dark);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -72,7 +72,7 @@
 
 .btn-success {
   background: var(--color-success-600);
-  color: var(--color-neutral-0);
+  color: var(--color-text-on-dark);
 }
 
 .btn-success:hover:not(:disabled) {
@@ -80,8 +80,8 @@
 }
 
 .btn-neutral {
-  background: var(--color-neutral-200);
-  color: var(--color-neutral-700);
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
 }
 
 .btn-neutral:hover:not(:disabled) {
@@ -89,14 +89,14 @@
 }
 
 .btn-neutral-bordered {
-  background: var(--color-neutral-200);
-  border: var(--input-border-width) solid var(--color-neutral-300);
-  color: var(--color-neutral-700);
+  background: var(--color-bg-active);
+  border: var(--input-border-width) solid var(--color-border);
+  color: var(--color-text-primary);
 }
 
 .btn-neutral-bordered:hover:not(:disabled) {
   background: var(--color-neutral-300);
-  border-color: var(--color-neutral-400);
+  border-color: var(--color-border-hover);
 }
 
 .btn-ghost {
