@@ -15,67 +15,46 @@ Complete in order. These are blocking the alpha release to users.
    - Update the semantic colors to point to the closest primitive color in the new ramp to the previous value
    - Replace any hardcoded colors to a semantic colors. If a semantic color is not available the matches the desired value or semantics, ask me what to do: use an existing semantic (suggest) or create a new semantic (suggest).
 
-1. **[x] About page**
-   - Project description and purpose
-   - How to use the platform (browse, create, edit, fork, share)
-   - Explain forking concept for musicians ("What is forking? Forking creates your own editable copy of a score...")
-   - Contact information
-
-2. **[ ] Edit About page content**
+1. **[ ] Edit About page content**
    - Review and refine content for clarity
    - Ensure explanations are clear for shakuhachi musicians
    - Check tone and messaging
    - Verify all information is accurate
 
-3. **[x] Fix typography alignment on score page header**
-   - Typography/logo not aligning properly in header
-   - Visual polish before alpha
-   - COMPLETED: Standardized with PageHeader component
-
-4. **[x] Edit existing score** (`/score/[slug]/edit`)
-   - Same page as score view, not separate route
-   - Desktop: side-by-side layout (score preview + editor panel)
-   - Mobile: toggle between preview and editor panels
-   - Permission check: only owner can edit (redirect if not owner)
-   - Form fields: title, composer, description, notation
-   - Notation input: support MusicXML, JSON, VexFlow notation (YAGNI - just what's needed for current features)
-   - Save functionality
-   - Live preview updates as notation changes
-
-5. **[ ] Fork confirmation dialog**
+2. **[ ] Fork confirmation dialog**
    - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
    - Tooltip on Fork button: "Create your own editable copy of this score"
    - Note: Everyone gets Fork button (including author). Author also gets Edit button.
 
-6. **[ ] Delete score with confirmation**
+3. **[ ] Delete score with confirmation**
    - Owner can delete their own scores
    - Confirmation dialog: "Delete '[title]'? This cannot be undone."
    - Remove from database and redirect to landing page
 
-7. **[ ] Create new score flow**
+4. **[ ] Create new score flow**
    - Generate random slug (e.g., "flying-circus-catnip")
    - Create empty score in database
    - Redirect to `/score/[slug]/edit`
    - User fills in title, notation, etc.
 
-8. **[ ] Landing page: My Scores section**
+5. **[ ] Landing page: My Scores section**
    - When user is logged in, show their scores first
    - Then show library scores below
    - Clear visual separation between sections
 
-9. **[ ] 404 page for nonexistent scores**
+6. **[ ] 404 page for nonexistent scores**
    - When `/score/[slug]` doesn't exist
    - Friendly error message
    - Link back to library
 
-10. **[ ] Permission denied page**
+7. **[ ] Permission denied page**
    - When user tries to access `/score/[slug]/edit` without ownership
    - Clear message: "You don't have permission to edit this score"
    - Option to Fork instead
 
-11. [ ] fix login dialog layout
+8. [ ] fix login dialog layout
 
-12. [ ] update favicon to logo image
+9. [ ] update favicon to logo image
 
 ## Fast Follow (Post-Alpha)
 
