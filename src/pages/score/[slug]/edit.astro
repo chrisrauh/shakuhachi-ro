@@ -37,6 +37,79 @@ const { score } = scoreResult;
     <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
   )}
 
+  <!-- Initialize theme switcher, auth widget, and mobile menu -->
+  <script>
+    import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
+    import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
+    import { AuthWidget } from '../../../components/AuthComponents';
+    import { authState } from '../../../api/authState';
+    import { MobileMenu } from '../../../components/MobileMenu';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Subscribe to auth state changes
+    authState.subscribe((user) => {
+      if (user) {
+        authWidget.setUser(user);
+      } else {
+        authWidget.setUser(null);
+      }
+    });
+
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+    mobileMenu.setItems([
+      {
+        id: 'browse',
+        label: 'Library',
+        href: '/',
+        icon: getIconHTML(Book),
+        dividerAfter: false,
+      },
+      {
+        id: 'create',
+        label: 'Create score',
+        href: '/score/new/edit',
+        icon: getIconHTML(Plus),
+        dividerAfter: false,
+      },
+      {
+        id: 'about',
+        label: 'About',
+        href: '/about',
+        icon: getIconHTML(Info),
+        dividerAfter: true,
+      },
+      {
+        id: 'theme',
+        label: 'Toggle theme',
+        action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
+      },
+    ]);
+  </script>
+
   <!-- Initialize ScoreEditor (existing component, no changes) -->
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
@@ -46,8 +119,25 @@ const { score } = scoreResult;
     // Initialize auth modal
     const authModal = new AuthModal();
 
+    let initialCheckDone = false;
+
     // Client-side auth and permission check
     authState.subscribe((user) => {
+      // Skip the initial subscribe callback (fires before auth is fully initialized)
+      if (!initialCheckDone) {
+        initialCheckDone = true;
+
+        // Only show auth modal if definitely not logged in after a short delay
+        setTimeout(() => {
+          const currentUser = authState.getUser();
+          if (!currentUser) {
+            authModal.show();
+          }
+        }, 500);
+
+        return;
+      }
+
       const scoreDataEl = document.getElementById('score-data');
       const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent) : null;
 
@@ -101,6 +191,11 @@ const { score } = scoreResult;
     .editor-panel {
       overflow-y: auto;
       min-height: 0;
+    }
+
+    /* Hide ScoreEditor's internal preview pane when using external preview */
+    .editor-panel :global(#preview-pane) {
+      display: none;
     }
 
     /* Mobile: stack + toggle */
