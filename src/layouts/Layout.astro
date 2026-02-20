@@ -93,7 +93,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       body {
         font-family: var(--font-sans);
         background: var(--page-background-color);
-        color: var(--color-neutral-700);
+        color: var(--color-text-primary);
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -155,28 +155,14 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       .logo-icon {
         width: 32px;
         height: 32px;
-        color: var(--color-neutral-700);
+        color: var(--color-logo);
         border-radius: var(--border-radius-large);
         font-size: 24px;
         text-align: center;
         line-height: 24px;
         font-weight: 450;
-        border: 2px solid var(--color-neutral-700);
+        border: 2px solid var(--color-logo);
         box-sizing: border-box;
-
-      }
-
-      /* Logo in dark mode - lighter than text */
-      :root[data-theme="dark"] .logo-icon {
-        color: var(--color-neutral-600);
-        border-color: var(--color-neutral-600);
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root:not([data-theme]) .logo-icon {
-          color: var(--color-neutral-600);
-          border-color: var(--color-neutral-600);
-        }
       }
 
       #theme-switcher {

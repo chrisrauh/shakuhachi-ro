@@ -68,10 +68,10 @@ export class ScoreDetailClient {
     try {
       // Read theme-aware colors from CSS variables
       const noteColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-neutral-700')
+        .getPropertyValue('--color-text-primary')
         .trim();
       const debugLabelColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-neutral-500')
+        .getPropertyValue('--color-text-tertiary')
         .trim();
 
       // Detect mobile viewport

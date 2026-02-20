@@ -16,7 +16,7 @@ const { score } = scoreResult;
 <Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
   <!-- Page header with title -->
   <div slot="header-metadata" style="display: flex; align-items: center; gap: var(--spacing-small);">
-    <h1 style="margin: 0; font-size: var(--font-size-large); font-weight: var(--font-weight-semibold); color: var(--color-neutral-900);">
+    <h1 style="margin: 0; font-size: var(--font-size-large); font-weight: var(--font-weight-semibold); color: var(--color-text-heading);">
       {score ? `Edit ${score.title}` : 'Create New Score'}
     </h1>
   </div>
