@@ -10,6 +10,11 @@ This file tracks active tasks for the shakuhachi score library platform. Complet
 
 Complete in order. These are blocking the alpha release to users.
 
+0. Update the primitive colors to match the colors on the reference/color-swatches.svg
+   - Use the row names as the primitive color name and the swatch number as the index: --color-name-index
+   - Update the semantic colors to point to the closest primitive color in the new ramp to the previous value
+   - Replace any hardcoded colors to a semantic colors. If a semantic color is not available the matches the desired value or semantics, ask me what to do: use an existing semantic (suggest) or create a new semantic (suggest).
+
 1. **[x] About page**
    - Project description and purpose
    - How to use the platform (browse, create, edit, fork, share)
