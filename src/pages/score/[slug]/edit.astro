@@ -14,6 +14,13 @@ const { score } = scoreResult;
 ---
 
 <Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
+  <!-- Page header with title -->
+  <div slot="header-metadata" style="display: flex; align-items: center; gap: var(--spacing-small);">
+    <h1 style="margin: 0; font-size: var(--font-size-large); font-weight: var(--font-weight-semibold); color: var(--color-neutral-900);">
+      {score ? `Edit ${score.title}` : 'Create New Score'}
+    </h1>
+  </div>
+
   <div class="edit-layout">
     <!-- Mobile toggle -->
     <div class="mobile-toggle">
@@ -176,26 +183,33 @@ const { score } = scoreResult;
     .edit-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto 1fr;
       gap: var(--spacing-large);
-      height: 100%;
+      height: calc(100vh - 80px); /* Full height minus header */
       padding: var(--spacing-large);
     }
 
     .mobile-toggle {
       display: none;
-      grid-column: 1 / -1; /* Full width */
     }
 
     .preview-panel,
     .editor-panel {
       overflow-y: auto;
-      min-height: 0;
+      min-height: 0; /* Critical for grid children */
+      height: 100%;
     }
 
-    /* Hide ScoreEditor's internal preview pane when using external preview */
-    .editor-panel :global(#preview-pane) {
-      display: none;
+    .preview-panel {
+      border: var(--panel-border-width) solid var(--panel-border-color);
+      border-radius: var(--border-radius-large);
+      background: var(--panel-background-color);
+      padding: var(--spacing-large);
+    }
+
+    /* Make sure preview fills the height */
+    #score-preview {
+      width: 100%;
+      min-height: 100%;
     }
 
     /* Mobile: stack + toggle */
@@ -209,6 +223,7 @@ const { score } = scoreResult;
       .mobile-toggle {
         display: flex;
         gap: var(--spacing-small);
+        margin-bottom: var(--spacing-medium);
       }
 
       .mobile-toggle button {
@@ -221,9 +236,6 @@ const { score } = scoreResult;
         display: none;
       }
     }
-
-    /* ScoreEditor will render its own styles (inline CSS) */
-    /* Accept some visual quirks in constrained layout for now */
   </style>
 
   <!-- Mobile toggle logic -->
