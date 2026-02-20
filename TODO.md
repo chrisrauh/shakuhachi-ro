@@ -2,59 +2,54 @@
 
 This file tracks active tasks for the shakuhachi score library platform. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
 
-**Project Vision**: A web platform for sharing shakuhachi scores. Primary use case is discovering and sharing scores via links (most often opened on mobile devices). Secondary use case is using the platform to practice/perform from shared scores.
-
-**Current Milestone**: Alpha Release - basic functionality for initial user feedback
-
 ## Alpha Release (Must-Haves)
 
 Complete in order. These are blocking the alpha release to users.
 
-0. Update the primitive colors to match the colors on the reference/color-swatches.svg
-   - Use the row names as the primitive color name and the swatch number as the index: --color-name-index
-   - Update the semantic colors to point to the closest primitive color in the new ramp to the previous value
-   - Replace any hardcoded colors to a semantic colors. If a semantic color is not available the matches the desired value or semantics, ask me what to do: use an existing semantic (suggest) or create a new semantic (suggest).
+- [ ] Update the theme colors
+  - [x] Update the primitive colors to match the tailwind 4 colors. Update existing color values with new ones. Add missing color families and color values. Tailwind 4 colors doc: https://tailwindcss.com/docs/colors
+  - [ ] Ask for the next task
 
-1. **[ ] Edit About page content**
-   - Review and refine content for clarity
-   - Ensure explanations are clear for shakuhachi musicians
-   - Check tone and messaging
-   - Verify all information is accurate
+- [ ] Edit About page content
+  - Review and refine content for clarity
+  - Ensure explanations are clear for shakuhachi musicians
+  - Check tone and messaging
+  - Verify all information is accurate
 
-2. **[ ] Fork confirmation dialog**
-   - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
-   - Tooltip on Fork button: "Create your own editable copy of this score"
-   - Note: Everyone gets Fork button (including author). Author also gets Edit button.
+- [ ] Fork confirmation dialog
+  - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
+  - Tooltip on Fork button: "Create your own editable copy of this score"
+  - Note: Everyone gets Fork button (including author). Author also gets Edit button.
 
-3. **[ ] Delete score with confirmation**
-   - Owner can delete their own scores
-   - Confirmation dialog: "Delete '[title]'? This cannot be undone."
-   - Remove from database and redirect to landing page
+- [ ] Delete score with confirmation
+  - Owner can delete their own scores
+  - Confirmation dialog: "Delete '[title]'? This cannot be undone."
+  - Remove from database and redirect to landing page
 
-4. **[ ] Create new score flow**
-   - Generate random slug (e.g., "flying-circus-catnip")
-   - Create empty score in database
-   - Redirect to `/score/[slug]/edit`
-   - User fills in title, notation, etc.
+- [ ] Create new score flow
+  - Generate random slug (e.g., "flying-circus-catnip")
+  - Create empty score in database
+  - Redirect to `/score/[slug]/edit`
+  - User fills in title, notation, etc.
 
-5. **[ ] Landing page: My Scores section**
-   - When user is logged in, show their scores first
-   - Then show library scores below
-   - Clear visual separation between sections
+- [ ] Landing page: My Scores section
+  - When user is logged in, show their scores first
+  - Then show library scores below
+  - Clear visual separation between sections
 
-6. **[ ] 404 page for nonexistent scores**
-   - When `/score/[slug]` doesn't exist
-   - Friendly error message
-   - Link back to library
+- [ ] 404 page for nonexistent scores
+  - When `/score/[slug]` doesn't exist
+  - Friendly error message
+  - Link back to library
 
-7. **[ ] Permission denied page**
-   - When user tries to access `/score/[slug]/edit` without ownership
-   - Clear message: "You don't have permission to edit this score"
-   - Option to Fork instead
+- [ ] Permission denied page
+  - When user tries to access `/score/[slug]/edit` without ownership
+  - Clear message: "You don't have permission to edit this score"
+  - Option to Fork instead
 
-8. [ ] fix login dialog layout
+- [ ] Fix login dialog layout
 
-9. [ ] update favicon to logo image
+- [ ] Update favicon to logo image
 
 ## Fast Follow (Post-Alpha)
 
@@ -313,7 +308,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - `src/api/authState.ts:46-51` — `subscribe()` immediately invokes the callback with the current `user` and `session` before returning. This is undocumented and surprising — subscribers may not expect their callback to fire synchronously during registration. Add JSDoc: "Note: The callback is invoked immediately with the current state upon subscription, and again whenever auth state changes."
 
 - [ ] Extract hardcoded editor URL into a route constant
-  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\`` in a shared `src/constants/routes.ts` module.
+  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\``in a shared`src/constants/routes.ts` module.
 
 #### Type Safety
 
