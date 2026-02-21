@@ -70,6 +70,18 @@ For multi-phase work, create separate PR for each phase.
 - **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
 
+**Writing Tests**
+
+Follow "Test What Matters" - focus on behavior and confidence, not coverage or exhaustiveness:
+
+- **Test behavior, not implementation** - Test what the function does, not how it does it
+- **Keep tests focused** - 5-10 tests per module is usually sufficient; more suggests over-testing
+- **Cover critical paths** - Happy path, common edge cases, known failure modes
+- **Skip redundant tests** - Don't test variations of the same behavior (e.g., multiple valid inputs that take the same code path)
+- **Test outcomes** - What the user/caller experiences, not internal state changes
+
+Example: For a slug utility, test core transformations (lowercase, spaces→hyphens), special cases (empty input, non-ASCII), and unique slug generation. Don't test every possible special character individually.
+
 **Visual Testing Checklist (for UI changes)**
 
 - **Symbols**: All base symbols render correctly (ロ,ツ,レ,チ,リ,ウ,ヒ); no clipping
