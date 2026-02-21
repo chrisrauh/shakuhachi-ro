@@ -12,7 +12,7 @@ Complete in order. These are blocking the alpha release to users.
   - [x] The app should only use semantic tokens. Audit all color usage and replace primitive color token references to semantic tokens. Check if a semantic token exists. If a sementico token does not exist for the use case, suggest one and get approval from the user.
   - [x] Simplify the color token system. Investigate options. One option is to remove the middle layer (e.g. warning, dnager, etc)
 
-- [ ] Remove Astro dev controls overlay
+- [x] Remove Astro dev controls overlay
 
 - [ ] Edit About page content
   - Review and refine content for clarity
