@@ -2,6 +2,7 @@ import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
 import { authState } from '../api/authState';
+import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
 
@@ -143,6 +144,20 @@ export class ScoreDetailClient {
       alert('Please sign in to fork this score');
       return;
     }
+
+    // Show confirmation dialog
+    const dialog = new ConfirmDialog();
+    dialog.show({
+      title: 'Fork score',
+      message: `Fork '${this.score.title}'? This creates your own editable copy.`,
+      confirmText: 'Fork',
+      cancelText: 'Cancel',
+      onConfirm: () => this.performFork(),
+    });
+  }
+
+  private async performFork() {
+    if (!this.score) return;
 
     // Disable the fork button to prevent double-clicks
     const forkBtn = document.getElementById('fork-btn') as HTMLButtonElement;
