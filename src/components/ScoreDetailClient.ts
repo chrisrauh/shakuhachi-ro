@@ -104,7 +104,7 @@ export class ScoreDetailClient {
       }
     } catch (error) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: var(--color-danger-600);">
+        <div style="text-align: center; padding: 40px; color: var(--color-text-danger);">
           <p>Error rendering score: ${
             error instanceof Error ? error.message : 'Unknown error'
           }</p>

@@ -5,6 +5,45 @@
  *
  * Colors: Tailwind CSS v4 OKLCH primitives (https://tailwindcss.com/docs/colors)
  * Structure: Shoelace design system (https://shoelace.style)
+ *
+ * ============================================
+ * COLOR TOKEN ARCHITECTURE (Three-Layer System)
+ * ============================================
+ *
+ * 1. PRIMITIVES (lines 23-572)
+ *    - Tailwind v4 OKLCH color palettes (26 palettes × 24 shades)
+ *    - Includes: slate, gray, zinc, neutral, red, orange, amber, yellow, lime,
+ *      green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia,
+ *      pink, rose, brown
+ *    - Plus absolute white (neutral-0) and black (neutral-1000)
+ *    - NEVER reference directly in components
+ *    - Purpose: Foundation colors for the entire system
+ *
+ * 2. MIDDLE TOKENS - Semantic Mappings (lines 573-702)
+ *    - Maps semantic intent to primitive colors:
+ *      * primary → blue (brand identity)
+ *      * success → green (positive actions, confirmations)
+ *      * warning → amber (caution, reversible actions)
+ *      * danger → red (errors, destructive actions)
+ *      * neutral → gray (UI structure, text, borders)
+ *    - USE FOR: Specialized UI needing specific shade control (buttons, badges)
+ *    - Purpose: Thematic flexibility - rebrand by changing 5 mappings
+ *
+ * 3. PURPOSE-BASED TOKENS - Application Roles (lines 707+)
+ *    - Application-level color roles organized by usage:
+ *      * Text: --color-text-primary, --color-text-secondary, etc.
+ *      * Borders: --color-border, --color-border-subtle, etc.
+ *      * Backgrounds: --color-bg-subtle, --color-bg-hover, etc.
+ *      * Status: --color-text-success, --color-bg-danger, etc.
+ *      * Brand: --color-text-primary-brand, --color-bg-primary-brand, etc.
+ *    - USE BY DEFAULT: All components should use these tokens
+ *    - Purpose: Consistency, easy theming, semantic clarity
+ *
+ * Why Three Layers?
+ * - Separation of concerns: colors (what) vs. meaning (why) vs. usage (where)
+ * - Maintainability: Rebrand in one place, theme changes cascade
+ * - Semantic clarity: Code describes intent, not implementation
+ * - Industry standard: Follows design system best practices
  */
 
 /* ============================================
@@ -726,6 +765,29 @@
   --color-separator: var(--color-neutral-400);      /* Visual separators */
   --color-logo: var(--color-neutral-700);           /* Logo */
   --color-spinner-track: var(--color-neutral-200);  /* Loading spinner track */
+
+  /* STATUS COLORS - Success */
+  --color-text-success: var(--color-success-700);        /* Success text */
+  --color-bg-success: var(--color-success-50);           /* Success backgrounds */
+  --color-bg-success-subtle: var(--color-success-25);    /* Subtle success backgrounds */
+  --color-border-success: var(--color-success-300);      /* Success borders */
+
+  /* STATUS COLORS - Warning */
+  --color-text-warning: var(--color-warning-700);        /* Warning text */
+  --color-bg-warning: var(--color-warning-50);           /* Warning backgrounds */
+  --color-bg-warning-subtle: var(--color-warning-25);    /* Subtle warning backgrounds */
+  --color-border-warning: var(--color-warning-300);      /* Warning borders */
+
+  /* STATUS COLORS - Danger */
+  --color-text-danger: var(--color-danger-700);          /* Danger/error text */
+  --color-bg-danger: var(--color-danger-50);             /* Danger/error backgrounds */
+  --color-bg-danger-subtle: var(--color-danger-25);      /* Subtle danger backgrounds */
+  --color-border-danger: var(--color-danger-300);        /* Danger borders */
+
+  /* BRAND/PRIMARY COLORS */
+  --color-text-primary-brand: var(--color-primary-700);  /* Primary brand text */
+  --color-bg-primary-brand: var(--color-primary-50);     /* Primary brand backgrounds */
+  --color-border-primary-brand: var(--color-primary-300);/* Primary brand borders */
 
   /* ============================================
      SPACING - From Shoelace

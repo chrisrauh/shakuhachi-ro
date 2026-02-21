@@ -506,7 +506,7 @@ export class ScoreLibrary {
       .score-library-error {
         text-align: center;
         padding: var(--spacing-3x-large) var(--spacing-large);
-        color: var(--color-danger-600);
+        color: var(--color-text-danger);
       }
 
       .score-library-error h2 {

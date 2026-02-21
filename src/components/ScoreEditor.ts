@@ -734,8 +734,8 @@ export class ScoreEditor {
       }
 
       .validation-error {
-        background: var(--color-danger-50);
-        color: var(--color-danger-800);
+        background: var(--color-bg-danger);
+        color: var(--color-text-danger);
         padding: 0;
         margin: 0;
         max-height: 0;
@@ -801,7 +801,7 @@ export class ScoreEditor {
       }
 
       .preview-error {
-        color: var(--color-danger-600);
+        color: var(--color-text-danger);
       }
 
       #score-preview {
