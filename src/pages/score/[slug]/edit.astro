@@ -121,10 +121,16 @@ const { score } = scoreResult;
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { authState } from '../../../api/authState';
-    import { AuthModal } from '../../../components/AuthComponents';
 
-    // Initialize auth modal
-    const authModal = new AuthModal();
+    // Helper to get redirect URL based on score data
+    const getRedirectUrl = () => {
+      const scoreDataEl = document.getElementById('score-data');
+      if (scoreDataEl) {
+        const scoreData = JSON.parse(scoreDataEl.textContent!);
+        return `/score/${scoreData.score.slug}`;
+      }
+      return '/';
+    };
 
     let initialCheckDone = false;
 
@@ -134,11 +140,11 @@ const { score } = scoreResult;
       if (!initialCheckDone) {
         initialCheckDone = true;
 
-        // Only show auth modal if definitely not logged in after a short delay
+        // Check if logged in after a short delay (allows auth to initialize)
         setTimeout(() => {
           const currentUser = authState.getUser();
           if (!currentUser) {
-            authModal.show();
+            window.location.href = getRedirectUrl();
           }
         }, 500);
 
@@ -146,13 +152,13 @@ const { score } = scoreResult;
       }
 
       const scoreDataEl = document.getElementById('score-data');
-      const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent) : null;
+      const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent!) : null;
 
       // If editing existing score, check ownership
       if (scoreData && scoreData.score) {
         if (!user) {
-          // Not logged in - show login modal
-          authModal.show();
+          // Not logged in - redirect to score page
+          window.location.href = `/score/${scoreData.score.slug}`;
           return;
         }
 
@@ -163,9 +169,9 @@ const { score } = scoreResult;
           return;
         }
       } else {
-        // Creating new score - just check if logged in
+        // Creating new score - redirect to home if not logged in
         if (!user) {
-          authModal.show();
+          window.location.href = '/';
           return;
         }
       }
