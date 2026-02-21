@@ -378,7 +378,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Add unit tests for SVGRenderer group management
   - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws (after the fail-fast fix above), multiple groups at same level work.
 
-- [ ] Add unit tests for slug utility
+- [x] Add unit tests for slug utility
   - `src/utils/slug.ts` has 0 tests. Test: basic ASCII slugification, special characters removed, multiple hyphens collapsed, leading/trailing hyphens stripped, `ensureUniqueSlug` appends counter when slug exists, counter increments correctly.
 
 - [ ] Add unit tests for modifier rendering logic
