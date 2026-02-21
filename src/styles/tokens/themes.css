@@ -7,43 +7,31 @@
  * Structure: Shoelace design system (https://shoelace.style)
  *
  * ============================================
- * COLOR TOKEN ARCHITECTURE (Three-Layer System)
+ * COLOR TOKEN ARCHITECTURE (Two-Layer System)
  * ============================================
  *
- * 1. PRIMITIVES (lines 23-572)
+ * 1. PRIMITIVES (lines 23-614)
  *    - Tailwind v4 OKLCH color palettes (26 palettes × 24 shades)
  *    - Includes: slate, gray, zinc, neutral, red, orange, amber, yellow, lime,
  *      green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia,
  *      pink, rose, brown
- *    - Plus absolute white (neutral-0) and black (neutral-1000)
- *    - NEVER reference directly in components
- *    - Purpose: Foundation colors for the entire system
+ *    - Foundation colors for the entire system
+ *    - Can be referenced directly for specific use cases (buttons, badges)
  *
- * 2. MIDDLE TOKENS - Semantic Mappings (lines 573-702)
- *    - Maps semantic intent to primitive colors:
- *      * primary → blue (brand identity)
- *      * success → green (positive actions, confirmations)
- *      * warning → amber (caution, reversible actions)
- *      * danger → red (errors, destructive actions)
- *      * neutral → gray (UI structure, text, borders)
- *    - USE FOR: Specialized UI needing specific shade control (buttons, badges)
- *    - Purpose: Thematic flexibility - rebrand by changing 5 mappings
- *
- * 3. PURPOSE-BASED TOKENS - Application Roles (lines 707+)
+ * 2. PURPOSE-BASED TOKENS (lines 615+)
  *    - Application-level color roles organized by usage:
  *      * Text: --color-text-primary, --color-text-secondary, etc.
  *      * Borders: --color-border, --color-border-subtle, etc.
  *      * Backgrounds: --color-bg-subtle, --color-bg-hover, etc.
  *      * Status: --color-text-success, --color-bg-danger, etc.
  *      * Brand: --color-text-primary-brand, --color-bg-primary-brand, etc.
- *    - USE BY DEFAULT: All components should use these tokens
+ *    - USE BY DEFAULT: All components should prefer these tokens
  *    - Purpose: Consistency, easy theming, semantic clarity
  *
- * Why Three Layers?
- * - Separation of concerns: colors (what) vs. meaning (why) vs. usage (where)
- * - Maintainability: Rebrand in one place, theme changes cascade
- * - Semantic clarity: Code describes intent, not implementation
- * - Industry standard: Follows design system best practices
+ * Why Two Layers?
+ * - Separation of concerns: colors (what) vs. usage (where)
+ * - Flexibility: Purpose tokens for consistency, primitives for specific needs
+ * - Simplicity: Fewer layers, more direct mapping
  */
 
 /* ============================================
@@ -613,181 +601,75 @@
      COLORS - Semantic Mappings
      ============================================ */
 
-  /* Map semantic colors to Tailwind palettes */
-  --color-primary-25: var(--color-blue-25);
-  --color-primary-50: var(--color-blue-50);
-  --color-primary-75: var(--color-blue-75);
-  --color-primary-100: var(--color-blue-100);
-  --color-primary-150: var(--color-blue-150);
-  --color-primary-200: var(--color-blue-200);
-  --color-primary-250: var(--color-blue-250);
-  --color-primary-300: var(--color-blue-300);
-  --color-primary-350: var(--color-blue-350);
-  --color-primary-400: var(--color-blue-400);
-  --color-primary-450: var(--color-blue-450);
-  --color-primary-500: var(--color-blue-500);
-  --color-primary-550: var(--color-blue-550);
-  --color-primary-600: var(--color-blue-600);
-  --color-primary-650: var(--color-blue-650);
-  --color-primary-700: var(--color-blue-700);
-  --color-primary-750: var(--color-blue-750);
-  --color-primary-800: var(--color-blue-800);
-  --color-primary-850: var(--color-blue-850);
-  --color-primary-900: var(--color-blue-900);
-  --color-primary-925: var(--color-blue-925);
-  --color-primary-950: var(--color-blue-950);
-  --color-primary-975: var(--color-blue-975);
-
-  --color-success-25: var(--color-green-25);
-  --color-success-50: var(--color-green-50);
-  --color-success-75: var(--color-green-75);
-  --color-success-100: var(--color-green-100);
-  --color-success-150: var(--color-green-150);
-  --color-success-200: var(--color-green-200);
-  --color-success-250: var(--color-green-250);
-  --color-success-300: var(--color-green-300);
-  --color-success-350: var(--color-green-350);
-  --color-success-400: var(--color-green-400);
-  --color-success-450: var(--color-green-450);
-  --color-success-500: var(--color-green-500);
-  --color-success-550: var(--color-green-550);
-  --color-success-600: var(--color-green-600);
-  --color-success-650: var(--color-green-650);
-  --color-success-700: var(--color-green-700);
-  --color-success-750: var(--color-green-750);
-  --color-success-800: var(--color-green-800);
-  --color-success-850: var(--color-green-850);
-  --color-success-900: var(--color-green-900);
-  --color-success-925: var(--color-green-925);
-  --color-success-950: var(--color-green-950);
-  --color-success-975: var(--color-green-975);
-
-  --color-warning-25: var(--color-amber-25);
-  --color-warning-50: var(--color-amber-50);
-  --color-warning-75: var(--color-amber-75);
-  --color-warning-100: var(--color-amber-100);
-  --color-warning-150: var(--color-amber-150);
-  --color-warning-200: var(--color-amber-200);
-  --color-warning-250: var(--color-amber-250);
-  --color-warning-300: var(--color-amber-300);
-  --color-warning-350: var(--color-amber-350);
-  --color-warning-400: var(--color-amber-400);
-  --color-warning-450: var(--color-amber-450);
-  --color-warning-500: var(--color-amber-500);
-  --color-warning-550: var(--color-amber-550);
-  --color-warning-600: var(--color-amber-600);
-  --color-warning-650: var(--color-amber-650);
-  --color-warning-700: var(--color-amber-700);
-  --color-warning-750: var(--color-amber-750);
-  --color-warning-800: var(--color-amber-800);
-  --color-warning-850: var(--color-amber-850);
-  --color-warning-900: var(--color-amber-900);
-  --color-warning-925: var(--color-amber-925);
-  --color-warning-950: var(--color-amber-950);
-  --color-warning-975: var(--color-amber-975);
-
-  --color-danger-25: var(--color-red-25);
-  --color-danger-50: var(--color-red-50);
-  --color-danger-75: var(--color-red-75);
-  --color-danger-100: var(--color-red-100);
-  --color-danger-150: var(--color-red-150);
-  --color-danger-200: var(--color-red-200);
-  --color-danger-250: var(--color-red-250);
-  --color-danger-300: var(--color-red-300);
-  --color-danger-350: var(--color-red-350);
-  --color-danger-400: var(--color-red-400);
-  --color-danger-450: var(--color-red-450);
-  --color-danger-500: var(--color-red-500);
-  --color-danger-550: var(--color-red-550);
-  --color-danger-600: var(--color-red-600);
-  --color-danger-650: var(--color-red-650);
-  --color-danger-700: var(--color-red-700);
-  --color-danger-750: var(--color-red-750);
-  --color-danger-800: var(--color-red-800);
-  --color-danger-850: var(--color-red-850);
-  --color-danger-900: var(--color-red-900);
-  --color-danger-925: var(--color-red-925);
-  --color-danger-950: var(--color-red-950);
-  --color-danger-975: var(--color-red-975);
-
-  /* Neutral maps to gray */
-  --color-neutral-25: var(--color-gray-25);
-  --color-neutral-50: var(--color-gray-50);
-  --color-neutral-75: var(--color-gray-75);
-  --color-neutral-100: var(--color-gray-100);
-  --color-neutral-150: var(--color-gray-150);
-  --color-neutral-200: var(--color-gray-200);
-  --color-neutral-250: var(--color-gray-250);
-  --color-neutral-300: var(--color-gray-300);
-  --color-neutral-350: var(--color-gray-350);
-  --color-neutral-400: var(--color-gray-400);
-  --color-neutral-450: var(--color-gray-450);
-  --color-neutral-500: var(--color-gray-500);
-  --color-neutral-550: var(--color-gray-550);
-  --color-neutral-600: var(--color-gray-600);
-  --color-neutral-650: var(--color-gray-650);
-  --color-neutral-700: var(--color-gray-700);
-  --color-neutral-750: var(--color-gray-750);
-  --color-neutral-800: var(--color-gray-800);
-  --color-neutral-850: var(--color-gray-850);
-  --color-neutral-900: var(--color-gray-900);
-  --color-neutral-925: var(--color-gray-925);
-  --color-neutral-950: var(--color-gray-950);
-  --color-neutral-975: var(--color-gray-975);
-
-  /* Absolute colors */
-  --color-neutral-0: oklch(1 0 0); /* Pure white */
-  --color-neutral-1000: oklch(0 0 0); /* Pure black */
-
   /* ============================================
      PURPOSE-BASED SEMANTIC TOKENS
      ============================================ */
 
   /* TEXT */
-  --color-text-heading: var(--color-neutral-900);   /* Primary headings */
-  --color-text-primary: var(--color-neutral-700);   /* Body text */
-  --color-text-secondary: var(--color-neutral-600); /* Metadata, descriptions */
-  --color-text-tertiary: var(--color-neutral-500);  /* Muted text, hints */
-  --color-text-disabled: var(--color-neutral-400);  /* Disabled states */
-  --color-text-on-dark: var(--color-neutral-0);     /* Text on colored backgrounds */
+  --color-text-heading: var(--color-gray-900);   /* Primary headings */
+  --color-text-primary: var(--color-gray-700);   /* Body text */
+  --color-text-secondary: var(--color-gray-600); /* Metadata, descriptions */
+  --color-text-tertiary: var(--color-gray-500);  /* Muted text, hints */
+  --color-text-disabled: var(--color-gray-400);  /* Disabled states */
+  --color-text-on-dark: oklch(1 0 0);            /* Text on colored backgrounds (pure white) */
 
   /* BORDER */
-  --color-border: var(--color-neutral-300);         /* Default borders */
-  --color-border-subtle: var(--color-neutral-200);  /* Subtle borders */
-  --color-border-hover: var(--color-neutral-400);   /* Hover borders */
+  --color-border: var(--color-gray-300);         /* Default borders */
+  --color-border-subtle: var(--color-gray-200);  /* Subtle borders */
+  --color-border-hover: var(--color-gray-400);   /* Hover borders */
 
   /* BACKGROUND */
-  --color-bg-subtle: var(--color-neutral-50);       /* Subtle backgrounds */
-  --color-bg-hover: var(--color-neutral-100);       /* Hover states */
-  --color-bg-active: var(--color-neutral-200);      /* Active/pressed states */
+  --color-bg-subtle: var(--color-gray-50);       /* Subtle backgrounds */
+  --color-bg-hover: var(--color-gray-100);       /* Hover states */
+  --color-bg-active: var(--color-gray-200);      /* Active/pressed states */
 
   /* SPECIAL */
-  --color-separator: var(--color-neutral-400);      /* Visual separators */
-  --color-logo: var(--color-neutral-700);           /* Logo */
-  --color-spinner-track: var(--color-neutral-200);  /* Loading spinner track */
+  --color-separator: var(--color-gray-400);      /* Visual separators */
+  --color-logo: var(--color-gray-700);           /* Logo */
+  --color-spinner-track: var(--color-gray-200);  /* Loading spinner track */
 
   /* STATUS COLORS - Success */
-  --color-text-success: var(--color-success-700);        /* Success text */
-  --color-bg-success: var(--color-success-50);           /* Success backgrounds */
-  --color-bg-success-subtle: var(--color-success-25);    /* Subtle success backgrounds */
-  --color-border-success: var(--color-success-300);      /* Success borders */
+  --color-text-success: var(--color-green-700);        /* Success text */
+  --color-bg-success: var(--color-green-50);           /* Success backgrounds */
+  --color-bg-success-subtle: var(--color-green-25);    /* Subtle success backgrounds */
+  --color-border-success: var(--color-green-300);      /* Success borders */
 
   /* STATUS COLORS - Warning */
-  --color-text-warning: var(--color-warning-700);        /* Warning text */
-  --color-bg-warning: var(--color-warning-50);           /* Warning backgrounds */
-  --color-bg-warning-subtle: var(--color-warning-25);    /* Subtle warning backgrounds */
-  --color-border-warning: var(--color-warning-300);      /* Warning borders */
+  --color-text-warning: var(--color-amber-700);        /* Warning text */
+  --color-bg-warning: var(--color-amber-50);           /* Warning backgrounds */
+  --color-bg-warning-subtle: var(--color-amber-25);    /* Subtle warning backgrounds */
+  --color-border-warning: var(--color-amber-300);      /* Warning borders */
 
   /* STATUS COLORS - Danger */
-  --color-text-danger: var(--color-danger-700);          /* Danger/error text */
-  --color-bg-danger: var(--color-danger-50);             /* Danger/error backgrounds */
-  --color-bg-danger-subtle: var(--color-danger-25);      /* Subtle danger backgrounds */
-  --color-border-danger: var(--color-danger-300);        /* Danger borders */
+  --color-text-danger: var(--color-red-700);          /* Danger/error text */
+  --color-bg-danger: var(--color-red-50);             /* Danger/error backgrounds */
+  --color-bg-danger-subtle: var(--color-red-25);      /* Subtle danger backgrounds */
+  --color-border-danger: var(--color-red-300);        /* Danger borders */
 
   /* BRAND/PRIMARY COLORS */
-  --color-text-primary-brand: var(--color-primary-700);  /* Primary brand text */
-  --color-bg-primary-brand: var(--color-primary-50);     /* Primary brand backgrounds */
-  --color-border-primary-brand: var(--color-primary-300);/* Primary brand borders */
+  --color-text-primary-brand: var(--color-blue-700);  /* Primary brand text */
+  --color-bg-primary-brand: var(--color-blue-50);     /* Primary brand backgrounds */
+  --color-border-primary-brand: var(--color-blue-300);/* Primary brand borders */
+
+  /* BUTTON COLORS */
+  --color-button-primary: var(--color-blue-600);           /* Primary button background */
+  --color-button-primary-hover: var(--color-blue-700);     /* Primary button hover */
+  --color-button-success: var(--color-green-600);          /* Success button background */
+  --color-button-success-hover: var(--color-green-700);    /* Success button hover */
+  --color-button-secondary-hover: var(--color-gray-300);   /* Secondary button hover */
+  --color-button-ghost: var(--color-blue-600);             /* Ghost button text */
+
+  /* LINK COLORS */
+  --color-link: var(--color-blue-600);                     /* Link text */
+  --color-link-border: var(--color-blue-300);              /* Link underline/border */
+  --color-link-hover: var(--color-blue-600);               /* Link hover text */
+  --color-link-border-hover: var(--color-blue-600);        /* Link hover underline/border */
+
+  /* LOADING INDICATORS */
+  --color-spinner-accent: var(--color-blue-600);           /* Loading spinner accent */
+
+  /* INPUT FOCUS */
+  --color-input-border-focus: var(--color-blue-500);       /* Input focus border */
 
   /* ============================================
      SPACING - From Shoelace
@@ -879,15 +761,15 @@
   --input-height-medium: 2.5rem;    /* 40px */
   --input-height-large: 3.125rem;   /* 50px */
 
-  --input-background-color: var(--color-neutral-0);
-  --input-background-color-hover: var(--color-neutral-0);
-  --input-background-color-focus: var(--color-neutral-0);
-  --input-background-color-disabled: var(--color-neutral-100);
+  --input-background-color: oklch(1 0 0);
+  --input-background-color-hover: oklch(1 0 0);
+  --input-background-color-focus: oklch(1 0 0);
+  --input-background-color-disabled: var(--color-gray-100);
 
-  --input-border-color: var(--color-neutral-300);
-  --input-border-color-hover: var(--color-neutral-400);
-  --input-border-color-focus: var(--color-primary-500);
-  --input-border-color-disabled: var(--color-neutral-300);
+  --input-border-color: var(--color-gray-300);
+  --input-border-color-hover: var(--color-gray-400);
+  --input-border-color-focus: var(--color-blue-500);
+  --input-border-color-disabled: var(--color-gray-300);
   --input-border-width: 1px;
 
   --input-border-radius-small: var(--border-radius-medium);
@@ -900,12 +782,12 @@
   --input-font-size-medium: var(--font-size-medium);
   --input-font-size-large: var(--font-size-large);
 
-  --input-color: var(--color-neutral-700);
-  --input-color-hover: var(--color-neutral-700);
-  --input-color-focus: var(--color-neutral-700);
-  --input-color-disabled: var(--color-neutral-900);
+  --input-color: var(--color-gray-700);
+  --input-color-hover: var(--color-gray-700);
+  --input-color-focus: var(--color-gray-700);
+  --input-color-disabled: var(--color-gray-900);
 
-  --input-placeholder-color: var(--color-neutral-400);
+  --input-placeholder-color: var(--color-gray-400);
   --input-spacing-small: var(--spacing-small);
   --input-spacing-medium: var(--spacing-medium);
   --input-spacing-large: var(--spacing-large);
@@ -917,17 +799,17 @@
      OVERLAY, PANEL, TOOLTIP - From Shoelace
      ============================================ */
 
-  --page-background-color: var(--color-neutral-50);
+  --page-background-color: var(--color-gray-50);
 
   --overlay-background-color: oklch(0.551 0.027 264.364 / 33%);
 
-  --panel-background-color: var(--color-neutral-0);
-  --panel-border-color: var(--color-neutral-200);
+  --panel-background-color: oklch(1 0 0);
+  --panel-border-color: var(--color-gray-200);
   --panel-border-width: 1px;
 
   --tooltip-border-radius: var(--border-radius-medium);
-  --tooltip-background-color: var(--color-neutral-800);
-  --tooltip-color: var(--color-neutral-0);
+  --tooltip-background-color: var(--color-gray-800);
+  --tooltip-color: oklch(1 0 0);
   --tooltip-font-family: var(--font-sans);
   --tooltip-font-weight: var(--font-weight-normal);
   --tooltip-font-size: var(--font-size-small);
@@ -1091,25 +973,25 @@
        INPUTS - Dark mode overrides
        ============================================ */
 
-    --input-background-color: var(--color-neutral-50);
-    --input-background-color-hover: var(--color-neutral-50);
-    --input-background-color-focus: var(--color-neutral-50);
-    --input-background-color-disabled: var(--color-neutral-100);
+    --input-background-color: var(--color-gray-50);
+    --input-background-color-hover: var(--color-gray-50);
+    --input-background-color-focus: var(--color-gray-50);
+    --input-background-color-disabled: var(--color-gray-100);
 
-    --input-border-color: var(--color-neutral-400);
-    --input-border-color-hover: var(--color-neutral-500);
+    --input-border-color: var(--color-gray-400);
+    --input-border-color-hover: var(--color-gray-500);
 
-    --input-color: var(--color-neutral-900);
-    --input-color-hover: var(--color-neutral-900);
-    --input-color-focus: var(--color-neutral-900);
+    --input-color: var(--color-gray-900);
+    --input-color-hover: var(--color-gray-900);
+    --input-color-focus: var(--color-gray-900);
 
-    --input-placeholder-color: var(--color-neutral-500);
+    --input-placeholder-color: var(--color-gray-500);
 
     /* ============================================
        PAGE - Dark mode
        ============================================ */
 
-    --page-background-color: var(--color-neutral-50);
+    --page-background-color: var(--color-gray-50);
 
     /* ============================================
        OVERLAY - Dark mode
@@ -1121,8 +1003,8 @@
        PANEL - Dark mode
        ============================================ */
 
-    --panel-background-color: var(--color-neutral-100);
-    --panel-border-color: var(--color-neutral-400);
+    --panel-background-color: var(--color-gray-100);
+    --panel-border-color: var(--color-gray-400);
 
     /* Shadows with increased opacity for visibility on dark backgrounds */
     --shadow-x-small: 0 1px 2px oklch(0 0 0 / 18%);
@@ -1135,8 +1017,8 @@
        PURPOSE-BASED SEMANTIC TOKENS - Dark mode
        ============================================ */
 
-    /* SPECIAL - Only logo needs override, others auto-adapt via inverted neutrals */
-    --color-logo: var(--color-neutral-600);
+    /* SPECIAL - Only logo needs override, others auto-adapt via inverted grays */
+    --color-logo: var(--color-gray-600);
   }
 }
 
@@ -1275,29 +1157,29 @@
   --color-stone-975: oklch(0.073 0.002 49.25);
 
   /* INPUTS */
-  --input-background-color: var(--color-neutral-0);
-  --input-background-color-hover: var(--color-neutral-0);
-  --input-background-color-focus: var(--color-neutral-0);
-  --input-background-color-disabled: var(--color-neutral-100);
+  --input-background-color: oklch(1 0 0);
+  --input-background-color-hover: oklch(1 0 0);
+  --input-background-color-focus: oklch(1 0 0);
+  --input-background-color-disabled: var(--color-gray-100);
 
-  --input-border-color: var(--color-neutral-300);
-  --input-border-color-hover: var(--color-neutral-400);
+  --input-border-color: var(--color-gray-300);
+  --input-border-color-hover: var(--color-gray-400);
 
-  --input-color: var(--color-neutral-700);
-  --input-color-hover: var(--color-neutral-700);
-  --input-color-focus: var(--color-neutral-700);
+  --input-color: var(--color-gray-700);
+  --input-color-hover: var(--color-gray-700);
+  --input-color-focus: var(--color-gray-700);
 
-  --input-placeholder-color: var(--color-neutral-400);
+  --input-placeholder-color: var(--color-gray-400);
 
   /* PAGE */
-  --page-background-color: var(--color-neutral-50);
+  --page-background-color: var(--color-gray-50);
 
   /* OVERLAY */
   --overlay-background-color: oklch(0.551 0.027 264.364 / 33%);
 
   /* PANEL */
-  --panel-background-color: var(--color-neutral-0);
-  --panel-border-color: var(--color-neutral-200);
+  --panel-background-color: oklch(1 0 0);
+  --panel-border-color: var(--color-gray-200);
 
   /* SHADOWS */
   --shadow-x-small: 0 1px 2px oklch(0.551 0.027 264.364 / 6%);
@@ -1442,29 +1324,29 @@
   --color-stone-975: oklch(0.992 0.001 106.424);
 
   /* INPUTS */
-  --input-background-color: var(--color-neutral-50);
-  --input-background-color-hover: var(--color-neutral-50);
-  --input-background-color-focus: var(--color-neutral-50);
-  --input-background-color-disabled: var(--color-neutral-100);
+  --input-background-color: var(--color-gray-50);
+  --input-background-color-hover: var(--color-gray-50);
+  --input-background-color-focus: var(--color-gray-50);
+  --input-background-color-disabled: var(--color-gray-100);
 
-  --input-border-color: var(--color-neutral-400);
-  --input-border-color-hover: var(--color-neutral-500);
+  --input-border-color: var(--color-gray-400);
+  --input-border-color-hover: var(--color-gray-500);
 
-  --input-color: var(--color-neutral-900);
-  --input-color-hover: var(--color-neutral-900);
-  --input-color-focus: var(--color-neutral-900);
+  --input-color: var(--color-gray-900);
+  --input-color-hover: var(--color-gray-900);
+  --input-color-focus: var(--color-gray-900);
 
-  --input-placeholder-color: var(--color-neutral-500);
+  --input-placeholder-color: var(--color-gray-500);
 
   /* PAGE */
-  --page-background-color: var(--color-neutral-50);
+  --page-background-color: var(--color-gray-50);
 
   /* OVERLAY */
   --overlay-background-color: oklch(0 0 0 / 43%);
 
   /* PANEL */
-  --panel-background-color: var(--color-neutral-100);
-  --panel-border-color: var(--color-neutral-400);
+  --panel-background-color: var(--color-gray-100);
+  --panel-border-color: var(--color-gray-400);
 
   /* SHADOWS */
   --shadow-x-small: 0 1px 2px oklch(0 0 0 / 18%);
@@ -1477,6 +1359,6 @@
      PURPOSE-BASED SEMANTIC TOKENS - Dark mode
      ============================================ */
 
-  /* SPECIAL - Only logo needs override, others auto-adapt via inverted neutrals */
-  --color-logo: var(--color-neutral-600);
+  /* SPECIAL - Only logo needs override, others auto-adapt via inverted grays */
+  --color-logo: var(--color-gray-600);
 }

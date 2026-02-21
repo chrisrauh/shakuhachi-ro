@@ -62,21 +62,21 @@
 
 /* Button variants - colors */
 .btn-primary {
-  background: var(--color-primary-600);
+  background: var(--color-button-primary);
   color: var(--color-text-on-dark);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-700);
+  background: var(--color-button-primary-hover);
 }
 
 .btn-success {
-  background: var(--color-success-600);
+  background: var(--color-button-success);
   color: var(--color-text-on-dark);
 }
 
 .btn-success:hover:not(:disabled) {
-  background: var(--color-success-700);
+  background: var(--color-button-success-hover);
 }
 
 .btn-neutral {
@@ -101,7 +101,7 @@
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-primary-600);
+  color: var(--color-button-ghost);
 }
 
 .btn-ghost:hover:not(:disabled) {
