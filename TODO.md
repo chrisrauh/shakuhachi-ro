@@ -399,7 +399,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Add unit tests for ScoreLibrary component logic
   - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
 
-- [ ] Add unit tests for kinko-symbols lookup functions
+- [x] Add unit tests for kinko-symbols lookup functions
   - `src/constants/kinko-symbols.ts` has 0 tests. Test: `getSymbolByKana('ロ')` returns correct symbol, `getSymbolByRomaji('ro')` returns correct symbol, `getSymbolByPitch('D', 4)` returns correct symbol, `parseNote` handles valid and invalid inputs, all 7 base notes are present in the map.
 
 ### Architectural Refactoring
