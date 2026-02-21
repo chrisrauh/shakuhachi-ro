@@ -10,6 +10,9 @@ export default defineConfig({
   outDir: './dist',
   site: 'https://shakuhachi.ro',
   base: '/',
+  devToolbar: {
+    enabled: false,
+  },
   server: {
     port: 3001,
   },
