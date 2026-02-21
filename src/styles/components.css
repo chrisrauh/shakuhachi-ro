@@ -85,7 +85,7 @@
 }
 
 .btn-neutral:hover:not(:disabled) {
-  background: var(--color-neutral-300);
+  background: var(--color-bg-hover);
 }
 
 .btn-neutral-bordered {
@@ -95,7 +95,7 @@
 }
 
 .btn-neutral-bordered:hover:not(:disabled) {
-  background: var(--color-neutral-300);
+  background: var(--color-bg-hover);
   border-color: var(--color-border-hover);
 }
 
