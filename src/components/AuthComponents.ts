@@ -55,7 +55,7 @@ export class AuthModal {
               style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium);"
             />
           </div>
-          <div id="auth-error" style="color: var(--color-danger-600); margin: var(--spacing-small) 0; display: none;"></div>
+          <div id="auth-error" style="color: var(--color-text-danger); margin: var(--spacing-small) 0; display: none;"></div>
           <div style="display: flex; gap: var(--spacing-small); margin-top: var(--spacing-large);">
             <button
               type="submit"
