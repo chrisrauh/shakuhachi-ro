@@ -1,23 +1,15 @@
 # TODO - Shakuhachi Score Library Platform
 
-This file tracks active tasks for the shakuhachi score library platform. Complete tasks in order, complete one task at a time, check if the task hasn't already been implemented, finish a task before starting the next, following the dev workflow defined in `CLAUDE.md`.
+## How to Work with This File
+
+**IMPORTANT: Follow these rules strictly:**
+
+- **Work in strict top-to-bottom order** - Start with the first unchecked task, then move to the next
+- **One task at a time** - Never work on multiple tasks simultaneously
+- **Verify before starting** - Check if the task is already implemented before beginning work
+- **Follow the dev workflow** - See [CLAUDE.md](./CLAUDE.md)
 
 ## Alpha Release (Must-Haves)
-
-Complete in order. These are blocking the alpha release to users.
-
-- [x] Update the theme colors
-  - [x] Update the primitive colors to match the tailwind 4 colors. Update existing color values with new ones. Add missing color families and color values. Tailwind 4 colors doc: https://tailwindcss.com/docs/colors
-  - [x] Expand the primitive color families to include half steps starting from 25 to 975
-  - [x] The app should only use semantic tokens. Audit all color usage and replace primitive color token references to semantic tokens. Check if a semantic token exists. If a sementico token does not exist for the use case, suggest one and get approval from the user.
-  - [x] Simplify the color token system. Investigate options. One option is to remove the middle layer (e.g. warning, dnager, etc)
-
-- [x] Remove Astro dev controls overlay
-
-- [x] Fork confirmation dialog
-  - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
-  - Tooltip on Fork button: "Create your own editable copy of this score"
-  - Note: Everyone gets Fork button (including author). Author also gets Edit button.
 
 - [ ] Delete score with confirmation
   - Owner can delete their own scores
@@ -40,14 +32,7 @@ Complete in order. These are blocking the alpha release to users.
   - Friendly error message
   - Link back to library
 
-- [ ] Permission denied page
-  - When user tries to access `/score/[slug]/edit` without ownership
-  - Clear message: "You don't have permission to edit this score"
-  - Option to Fork instead
-
-- [ ] Fix login dialog layout
-
-- [x] Update favicon to logo image
+- [ ] Fix login and fork confirmation dialog layout
 
 - [ ] Edit About page content
   - Review and refine content for clarity
@@ -56,8 +41,6 @@ Complete in order. These are blocking the alpha release to users.
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
-
-These improve UX but aren't blocking alpha release.
 
 - [ ] Loading states and spinners
   - During save operations
@@ -96,12 +79,6 @@ These are important improvements but not needed for initial alpha release.
   - [ ] Add `NetworkError` for fetch failures
   - [ ] Add `ValidationError` for invalid options
   - **Rationale**: Better error handling and debugging in user applications
-
-- [ ] **Document autoResize lifecycle** ✓ (DONE)
-  - [x] Add `destroy()` method to API docs
-  - [x] Add responsive rendering section
-  - [x] Add React/Vue cleanup examples
-  - **Rationale**: Prevent memory leaks from ResizeObserver
 
 #### High Priority (Breaking - Plan for v2.0)
 
@@ -378,9 +355,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Add unit tests for SVGRenderer group management
   - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws (after the fail-fast fix above), multiple groups at same level work.
 
-- [x] Add unit tests for slug utility
-  - `src/utils/slug.ts` has 0 tests. Test: basic ASCII slugification, special characters removed, multiple hyphens collapsed, leading/trailing hyphens stripped, `ensureUniqueSlug` appends counter when slug exists, counter increments correctly.
-
 - [ ] Add unit tests for modifier rendering logic
   - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
 
@@ -398,9 +372,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] Add unit tests for ScoreLibrary component logic
   - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
-
-- [x] Add unit tests for kinko-symbols lookup functions
-  - `src/constants/kinko-symbols.ts` has 0 tests. Test: `getSymbolByKana('ロ')` returns correct symbol, `getSymbolByRomaji('ro')` returns correct symbol, `getSymbolByPitch('D', 4)` returns correct symbol, `parseNote` handles valid and invalid inputs, all 7 base notes are present in the map.
 
 ### Architectural Refactoring
 
