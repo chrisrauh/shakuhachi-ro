@@ -468,7 +468,7 @@ export class ScoreLibrary {
 
       .no-scores button,
       .score-library-error button {
-        background: var(--color-primary-600);
+        background: var(--color-button-primary);
         color: var(--color-text-on-dark);
         border: none;
         padding: var(--spacing-x-small) var(--spacing-small);
@@ -480,7 +480,7 @@ export class ScoreLibrary {
 
       .no-scores button:hover,
       .score-library-error button:hover {
-        background: var(--color-primary-700);
+        background: var(--color-button-primary-hover);
       }
 
       .score-library-loading {
@@ -492,7 +492,7 @@ export class ScoreLibrary {
         width: 50px;
         height: 50px;
         border: 4px solid var(--color-spinner-track);
-        border-top: 4px solid var(--color-primary-600);
+        border-top: 4px solid var(--color-spinner-accent);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto var(--spacing-large);
@@ -506,7 +506,7 @@ export class ScoreLibrary {
       .score-library-error {
         text-align: center;
         padding: var(--spacing-3x-large) var(--spacing-large);
-        color: var(--color-danger-600);
+        color: var(--color-text-danger);
       }
 
       .score-library-error h2 {
