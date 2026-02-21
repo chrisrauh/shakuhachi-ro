@@ -14,13 +14,7 @@ Complete in order. These are blocking the alpha release to users.
 
 - [x] Remove Astro dev controls overlay
 
-- [ ] Edit About page content
-  - Review and refine content for clarity
-  - Ensure explanations are clear for shakuhachi musicians
-  - Check tone and messaging
-  - Verify all information is accurate
-
-- [ ] Fork confirmation dialog
+- [x] Fork confirmation dialog
   - Show confirmation before forking: "Fork '[title]'? This creates your own editable copy."
   - Tooltip on Fork button: "Create your own editable copy of this score"
   - Note: Everyone gets Fork button (including author). Author also gets Edit button.
@@ -54,6 +48,12 @@ Complete in order. These are blocking the alpha release to users.
 - [ ] Fix login dialog layout
 
 - [x] Update favicon to logo image
+
+- [ ] Edit About page content
+  - Review and refine content for clarity
+  - Ensure explanations are clear for shakuhachi musicians
+  - Check tone and messaging
+  - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
 
