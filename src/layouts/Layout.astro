@@ -27,6 +27,13 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪈</text></svg>"
     />
+    <script is:inline>
+      // Prevent flash of wrong theme - runs before body renders
+      (function() {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      })();
+    </script>
   </head>
   <body class={fullHeight ? 'full-height' : ''}>
     <header>
