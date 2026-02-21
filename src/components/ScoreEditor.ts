@@ -679,6 +679,7 @@ export class ScoreEditor {
         font-size: var(--input-font-size-medium);
         background: var(--input-background-color);
         color: var(--input-color);
+        box-sizing: border-box;
       }
 
       .metadata-field textarea {
@@ -770,6 +771,7 @@ export class ScoreEditor {
         color: var(--input-color);
         min-height: 0;
         width: 100%;
+        box-sizing: border-box;
       }
 
       .preview-pane {
