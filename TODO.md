@@ -53,7 +53,7 @@ Complete in order. These are blocking the alpha release to users.
 
 - [ ] Fix login dialog layout
 
-- [ ] Update favicon to logo image
+- [x] Update favicon to logo image
 
 ## Fast Follow (Post-Alpha)
 
