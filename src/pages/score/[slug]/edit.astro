@@ -51,6 +51,7 @@ const { score } = scoreResult;
     import { AuthWidget } from '../../../components/AuthComponents';
     import { authState } from '../../../api/authState';
     import { MobileMenu } from '../../../components/MobileMenu';
+    import { createEmptyScore } from '../../../utils/create-score-handler';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -96,7 +97,14 @@ const { score } = scoreResult;
       {
         id: 'create',
         label: 'Create score',
-        href: '/score/new/edit',
+        action: async () => {
+          const result = await createEmptyScore();
+          if (result.error) {
+            alert(result.error.message);
+          } else {
+            window.location.href = `/score/${result.slug}/edit`;
+          }
+        },
         icon: getIconHTML(Plus),
         dividerAfter: false,
       },

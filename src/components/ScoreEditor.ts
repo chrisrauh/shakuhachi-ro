@@ -392,8 +392,8 @@ export class ScoreEditor {
     }
 
     if (!this.metadata.title.trim()) {
-      alert('Please enter a title for the score');
-      return;
+      // Use default title if empty
+      this.metadata.title = 'Untitled Score';
     }
 
     if (!this.validateScoreData()) {

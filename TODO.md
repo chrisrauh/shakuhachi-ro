@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Create new score flow
+- [x] Create new score flow
   - Generate random slug (e.g., "flying-circus-catnip")
   - Create empty score in database
   - Redirect to `/score/[slug]/edit`
@@ -41,6 +41,66 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] Replace alert() dialogs with in-app notifications
+  - Currently using browser alert() for error messages and success confirmations
+  - Examples:
+    - "Please log in to create scores"
+    - "Score updated successfully!"
+    - "Error saving score: [message]"
+    - "Please enter a title for the score"
+  - **Implementation**:
+    - Create notification/toast component
+    - Support different types: success, error, warning, info
+    - Auto-dismiss after timeout (configurable, e.g., 3-5 seconds)
+    - Allow manual dismiss with close button
+    - Stack multiple notifications if needed
+    - Non-blocking (don't stop user workflow like alert() does)
+  - **Locations to update**:
+    - Score creation flow (auth errors, creation errors)
+    - Score editor (save success/failure, validation errors)
+    - Fork flow (success/failure messages)
+    - Authentication (login/signup success/errors)
+
+- [ ] Fix auth state on score detail page
+  - When viewing a score detail page, user appears logged out even though they were logged in
+  - Edit button doesn't appear for score owner (should show if user owns the score)
+  - Auth widget shows "Log In" / "Sign Up" instead of user email and "Log Out"
+  - Likely issues:
+    - Auth state not initializing on score detail page
+    - Race condition where page renders before auth state loads
+    - Mobile menu not showing Edit option for owned scores
+  - Test: Create score → view detail page → verify Edit button appears and user shows as logged in
+
+- [ ] Auto-save to database
+  - Currently: Auto-save only saves to localStorage every 30 seconds
+  - User must manually click "Save" to persist to database
+  - Risk: User might close browser/tab and lose work if they haven't saved
+  - **Implementation considerations**:
+    - Debounce database saves (e.g., 2-3 minutes of inactivity)
+    - Show "Saving..." / "All changes saved" indicator
+    - Handle save conflicts gracefully
+    - Keep localStorage backup as failsafe
+    - Only auto-save for authenticated users
+  - **UI feedback**: Add status indicator showing last saved time
+
+- [ ] Fix ABC notation format not saveable to database
+  - Database constraint only allows `data_format: 'json'` and `'musicxml'`
+  - Editor UI offers ABC as a format option (with auto-conversion)
+  - When user enters ABC notation and tries to save, get error: "new row for relation 'scores' violates check constraint 'scores_data_format_check'"
+  - **Current workaround**: User must switch to JSON format before saving (ABC is auto-converted)
+  - **Options**:
+    1. Add 'abc' to database constraint and store ABC as string (like MusicXML)
+    2. Remove ABC option from editor UI (force users to use JSON/MusicXML only)
+    3. Auto-convert ABC to JSON on save (transparent to user - already implemented in code, just needs to happen on save)
+  - **Recommendation**: Option 3 (auto-convert) - simplest and preserves ABC editing UX
+
+- [ ] Consider slug update behavior when title changes
+  - Currently: Slug is set on creation and never changes, even if title is updated
+  - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
+  - **Current behavior may be intentional** for URL stability (avoid breaking bookmarks/links)
+  - **Document decision**: If intentional, add comment explaining why slug doesn't update
+  - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
 - [ ] Investigate button text vertical alignment
   - Button labels appear ~1px lower than ideal

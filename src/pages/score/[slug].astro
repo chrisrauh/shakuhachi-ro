@@ -84,7 +84,7 @@ if (score.forked_from) {
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
     import { authState } from '../../api/authState';
-    import { MobileMenu } from '../../components/MobileMenu';
+    import { MobileMenu, type MenuItem } from '../../components/MobileMenu';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -122,7 +122,7 @@ if (score.forked_from) {
 
     // Function to update mobile menu items based on auth state
     const updateMobileMenuItems = (isOwner: boolean) => {
-      const baseItems = [
+      const baseItems: MenuItem[] = [
         {
           id: 'browse',
           label: 'Library',
