@@ -11,11 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] Support abc notation on the score editor
-  - Convert between notaiton formats (this should be an decoupled utility)
-  - Only implement the notation features currently in use (YAGNI)
-  - Docs: https://abcnotation.com/
-
 - [ ] Create new score flow
   - Generate random slug (e.g., "flying-circus-catnip")
   - Create empty score in database
