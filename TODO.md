@@ -11,11 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] Landing page: My Scores section
-  - When user is logged in, show their scores first
-  - Then show library scores below
-  - Clear visual separation between sections
-
 - [ ] 404 page for nonexistent scores
   - When `/score/[slug]` doesn't exist
   - Friendly error message
