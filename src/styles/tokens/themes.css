@@ -997,6 +997,11 @@
      PURPOSE-BASED SEMANTIC TOKENS - Dark mode
      ============================================ */
 
+  /* BACKGROUND - Override for dark mode hover states */
+  --color-bg-subtle: var(--color-gray-50);       /* Subtle backgrounds */
+  --color-bg-hover: var(--color-gray-150);       /* Hover states - slightly lighter than panel */
+  --color-bg-active: var(--color-gray-200);      /* Active/pressed states */
+
   /* SPECIAL - Only logo needs override, others auto-adapt via inverted grays */
   --color-logo: var(--color-gray-600);
 }

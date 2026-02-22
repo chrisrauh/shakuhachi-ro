@@ -374,12 +374,11 @@ export class ScoreLibrary {
         border-radius: var(--border-radius-large);
         padding: var(--spacing-large);
         cursor: pointer;
-        transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        transition: background var(--transition-fast);
       }
 
       .score-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-large);
+        background: var(--color-bg-hover);
       }
 
       .score-card-header {
