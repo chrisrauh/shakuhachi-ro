@@ -210,6 +210,45 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
           display: block;
         }
       }
+
+      /* Loading state for Plus button */
+      .btn.loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
     </style>
+
+    <script>
+      import { createEmptyScore } from '../utils/create-score-handler';
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const createBtn = document.querySelector('a[aria-label="Create new score"]');
+
+        createBtn?.addEventListener('click', async (e) => {
+          e.preventDefault();
+
+          // Show loading state
+          createBtn.classList.add('loading');
+          createBtn.setAttribute('aria-busy', 'true');
+
+          try {
+            const result = await createEmptyScore();
+
+            if (result.error) {
+              alert(result.error.message);
+              return;
+            }
+
+            // Redirect to edit page
+            window.location.href = `/score/${result.slug}/edit`;
+          } catch (error) {
+            alert('Failed to create score. Please try again.');
+          } finally {
+            createBtn.classList.remove('loading');
+            createBtn.setAttribute('aria-busy', 'false');
+          }
+        });
+      });
+    </script>
   </body>
 </html>
