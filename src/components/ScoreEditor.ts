@@ -608,41 +608,6 @@ export class ScoreEditor {
         gap: var(--spacing-small);
       }
 
-      .btn {
-        padding: var(--spacing-x-small) var(--spacing-small);
-        border-radius: var(--border-radius-medium);
-        cursor: pointer;
-        font-size: var(--font-size-small);
-        text-decoration: none;
-        display: inline-block;
-        transition: background var(--transition-fast);
-      }
-
-      .btn-primary {
-        background: var(--color-button-primary);
-        color: var(--color-text-on-dark);
-        border: none;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background: var(--color-button-primary-hover);
-      }
-
-      .btn-primary:disabled {
-        background: var(--color-text-disabled);
-        cursor: not-allowed;
-      }
-
-      .btn-secondary {
-        background: var(--color-bg-active);
-        color: var(--color-text-primary);
-        border: var(--input-border-width) solid var(--color-border);
-      }
-
-      .btn-secondary:hover {
-        background: var(--color-button-secondary-hover);
-      }
-
       .editor-metadata {
         background: var(--panel-background-color);
         padding: var(--spacing-large);

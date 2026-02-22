@@ -84,7 +84,7 @@ export class ScoreLibrary {
         <div class="score-library-error">
           <h2>Error Loading Scores</h2>
           <p>${this.error.message}</p>
-          <button id="retry-btn">Retry</button>
+          <button id="retry-btn" class="btn btn-small btn-primary">Retry</button>
         </div>
       `;
       this.addStyles();
@@ -119,7 +119,7 @@ export class ScoreLibrary {
               ${
                 this.searchQuery
                   ? `
-                <button id="clear-filters-btn">Clear Filters</button>
+                <button id="clear-filters-btn" class="btn btn-small btn-primary">Clear Filters</button>
               `
                   : ''
               }
@@ -463,23 +463,6 @@ export class ScoreLibrary {
       .no-scores p {
         font-size: var(--font-size-large);
         margin-bottom: var(--spacing-large);
-      }
-
-      .no-scores button,
-      .score-library-error button {
-        background: var(--color-button-primary);
-        color: var(--color-text-on-dark);
-        border: none;
-        padding: var(--spacing-x-small) var(--spacing-small);
-        border-radius: var(--border-radius-medium);
-        cursor: pointer;
-        font-size: var(--font-size-small);
-        transition: background var(--transition-fast);
-      }
-
-      .no-scores button:hover,
-      .score-library-error button:hover {
-        background: var(--color-button-primary-hover);
       }
 
       .score-library-loading {
