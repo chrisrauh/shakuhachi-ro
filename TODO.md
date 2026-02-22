@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Landing page: My Scores section
+- [x] Landing page: My Scores section
   - When user is logged in, show their scores first
   - Then show library scores below
   - Clear visual separation between sections
@@ -35,6 +35,14 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] Optimize ScoreLibrary initial load (duplicate API calls)
+  - Currently: `getAllScores()` is called twice on initial page load
+  - First call: Triggered by auth subscription callback in constructor
+  - Second call: Triggered by constructor's own `loadScores()` call
+  - **Impact**: Minor - causes duplicate network request but doesn't break functionality
+  - **Fix**: Add loading state check to prevent redundant API calls when data is already being fetched
+  - **Example**: `if (this.isLoading) return;` guard in `loadScores()` or defer initial load until after auth state resolves
 
 - [ ] Replace alert() dialogs with in-app notifications
   - Currently using browser alert() for error messages and success confirmations
