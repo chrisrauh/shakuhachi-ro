@@ -1,15 +1,21 @@
-import { getAllScores } from '../api/scores';
+import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
+import { authState } from '../api/authState';
+import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 
 export class ScoreLibrary {
   private container: HTMLElement;
-  private scores: Score[] = [];
-  private filteredScores: Score[] = [];
+  private currentUser: User | null = null;
+  private myScores: Score[] = [];
+  private libraryScores: Score[] = [];
+  private filteredMyScores: Score[] = [];
+  private filteredLibraryScores: Score[] = [];
   private searchQuery: string = '';
   private isLoading: boolean = false;
   private error: Error | null = null;
+  private unsubscribeAuth?: () => void;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -17,6 +23,15 @@ export class ScoreLibrary {
       throw new Error(`Container with id "${containerId}" not found`);
     }
     this.container = container;
+
+    // Subscribe to auth state changes
+    this.unsubscribeAuth = authState.subscribe((user) => {
+      const userChanged = this.currentUser?.id !== user?.id;
+      if (userChanged) {
+        this.loadScores();
+      }
+    });
+
     this.render();
     this.loadScores();
   }
@@ -26,6 +41,26 @@ export class ScoreLibrary {
     this.error = null;
     this.render();
 
+    // Get current user
+    this.currentUser = authState.getUser();
+
+    // Fetch user's scores if logged in
+    if (this.currentUser) {
+      const { scores: userScores, error: userError } = await getUserScores(
+        this.currentUser.id,
+      );
+      if (userError) {
+        this.error = userError;
+        this.isLoading = false;
+        this.render();
+        return;
+      }
+      this.myScores = userScores || [];
+    } else {
+      this.myScores = [];
+    }
+
+    // Fetch all scores
     const result = await getAllScores();
 
     this.isLoading = false;
@@ -33,27 +68,35 @@ export class ScoreLibrary {
     if (result.error) {
       this.error = result.error;
     } else {
-      this.scores = result.scores;
-      this.filteredScores = result.scores;
+      // If authenticated, filter out user's scores from library
+      this.libraryScores = this.currentUser
+        ? result.scores.filter(
+            (score) => score.user_id !== this.currentUser!.id,
+          )
+        : result.scores;
     }
 
+    this.applyFilters();
     this.render();
   }
 
   private applyFilters(): void {
-    let filtered = [...this.scores];
+    const query = this.searchQuery.toLowerCase();
 
-    // Apply search filter
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (score) =>
-          score.title.toLowerCase().includes(query) ||
-          (score.composer && score.composer.toLowerCase().includes(query)),
-      );
-    }
+    // Filter user's scores
+    this.filteredMyScores = this.myScores.filter(
+      (score) =>
+        score.title.toLowerCase().includes(query) ||
+        (score.composer && score.composer.toLowerCase().includes(query)),
+    );
 
-    this.filteredScores = filtered;
+    // Filter library scores
+    this.filteredLibraryScores = this.libraryScores.filter(
+      (score) =>
+        score.title.toLowerCase().includes(query) ||
+        (score.composer && score.composer.toLowerCase().includes(query)),
+    );
+
     this.renderGrid();
   }
 
@@ -105,30 +148,10 @@ export class ScoreLibrary {
               value="${this.searchQuery}"
             />
           </div>
-          <p class="score-count" id="score-count">${
-            this.filteredScores.length
-          } ${this.filteredScores.length === 1 ? 'score' : 'scores'}</p>
         </div>
 
         <div class="score-library-grid" id="score-grid">
-          ${
-            this.filteredScores.length === 0
-              ? `
-            <div class="no-scores">
-              <p>No scores found</p>
-              ${
-                this.searchQuery
-                  ? `
-                <button id="clear-filters-btn" class="btn btn-small btn-primary">Clear Filters</button>
-              `
-                  : ''
-              }
-            </div>
-          `
-              : this.filteredScores
-                  .map((score) => this.renderScoreCard(score))
-                  .join('')
-          }
+          ${this.renderGridContent()}
         </div>
       </div>
     `;
@@ -140,51 +163,21 @@ export class ScoreLibrary {
 
   private renderGrid(): void {
     const gridElement = this.container.querySelector('#score-grid');
-    const countElement = this.container.querySelector('#score-count');
 
-    if (!gridElement || !countElement) {
+    if (!gridElement) {
       // Fallback to full render if grid not found
       this.render();
       return;
     }
 
-    // Update count
-    countElement.textContent = `${this.filteredScores.length} ${
-      this.filteredScores.length === 1 ? 'score' : 'scores'
-    }`;
-
-    // Update grid
-    gridElement.innerHTML =
-      this.filteredScores.length === 0
-        ? `
-      <div class="no-scores">
-        <p>No scores found</p>
-        ${
-          this.searchQuery
-            ? `
-          <button id="clear-filters-btn">Clear Filters</button>
-        `
-            : ''
-        }
-      </div>
-    `
-        : this.filteredScores
-            .map((score) => this.renderScoreCard(score))
-            .join('');
+    // Update grid with new content
+    gridElement.innerHTML = this.renderGridContent();
 
     // Initialize icons
     initIcons();
 
     // Reattach score card listeners
-    const scoreCards = gridElement.querySelectorAll('.score-card');
-    scoreCards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const scoreSlug = card.getAttribute('data-score-slug');
-        if (scoreSlug) {
-          this.handleScoreClick(scoreSlug);
-        }
-      });
-    });
+    this.attachScoreCardListeners(gridElement);
 
     // Reattach clear filters button if present
     const clearFiltersBtn = gridElement.querySelector('#clear-filters-btn');
@@ -197,6 +190,124 @@ export class ScoreLibrary {
         '#search-input',
       ) as HTMLInputElement;
       if (searchInput) searchInput.value = '';
+    });
+
+    // Reattach create score link listener if present
+    const createScoreLink = gridElement.querySelector('.create-score-link');
+    createScoreLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = '/score/new/edit';
+    });
+  }
+
+  private renderGridContent(): string {
+    // User logged in with scores - show two sections
+    if (this.currentUser && this.myScores.length > 0) {
+      return `
+        <div class="section-header">
+          <h2>My Scores</h2>
+          <div class="section-count">${this.filteredMyScores.length} ${
+            this.filteredMyScores.length === 1 ? 'score' : 'scores'
+          }</div>
+        </div>
+        <div class="score-grid-section">
+          ${
+            this.filteredMyScores.length === 0
+              ? `
+            <div class="no-scores">
+              <p>No scores found matching "${this.searchQuery}"</p>
+            </div>
+          `
+              : this.filteredMyScores
+                  .map((score) => this.renderScoreCard(score))
+                  .join('')
+          }
+        </div>
+
+        <div class="section-header">
+          <h2>Library</h2>
+          <div class="section-count">${this.filteredLibraryScores.length} ${
+            this.filteredLibraryScores.length === 1 ? 'score' : 'scores'
+          }</div>
+        </div>
+        <div class="score-grid-section">
+          ${
+            this.filteredLibraryScores.length === 0
+              ? `
+            <div class="no-scores">
+              <p>${this.searchQuery ? `No scores found matching "${this.searchQuery}"` : 'No other scores yet'}</p>
+            </div>
+          `
+              : this.filteredLibraryScores
+                  .map((score) => this.renderScoreCard(score))
+                  .join('')
+          }
+        </div>
+      `;
+    }
+
+    // User logged in but no scores - show empty state + library
+    if (this.currentUser && this.myScores.length === 0) {
+      return `
+        <div class="empty-state">
+          <p>You haven't created any scores yet.</p>
+          <p><a href="/score/new/edit" class="create-score-link">Create your first score</a></p>
+        </div>
+
+        ${
+          this.libraryScores.length > 0
+            ? `
+          <div class="section-header">
+            <h2>Library</h2>
+            <div class="section-count">${this.filteredLibraryScores.length} ${
+              this.filteredLibraryScores.length === 1 ? 'score' : 'scores'
+            }</div>
+          </div>
+          <div class="score-grid-section">
+            ${this.filteredLibraryScores
+              .map((score) => this.renderScoreCard(score))
+              .join('')}
+          </div>
+        `
+            : ''
+        }
+      `;
+    }
+
+    // User not logged in - show single section
+    return `
+      <div class="score-grid-section">
+        ${
+          this.filteredLibraryScores.length === 0
+            ? `
+          <div class="no-scores">
+            <p>No scores found</p>
+            ${
+              this.searchQuery
+                ? `
+              <button id="clear-filters-btn" class="btn btn-small btn-primary">Clear Filters</button>
+            `
+                : ''
+            }
+          </div>
+        `
+            : this.filteredLibraryScores
+                .map((score) => this.renderScoreCard(score))
+                .join('')
+        }
+      </div>
+    `;
+  }
+
+  private attachScoreCardListeners(container: Element): void {
+    const scoreCards = container.querySelectorAll('.score-card');
+    scoreCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const scoreSlug = card.getAttribute('data-score-slug');
+        if (scoreSlug) {
+          this.handleScoreClick(scoreSlug);
+        }
+      });
     });
   }
 
@@ -256,21 +367,20 @@ export class ScoreLibrary {
     });
 
     // Score cards
-    const scoreCards = this.container.querySelectorAll('.score-card');
-    scoreCards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const scoreSlug = card.getAttribute('data-score-slug');
-        if (scoreSlug) {
-          this.handleScoreClick(scoreSlug);
-        }
-      });
-    });
+    this.attachScoreCardListeners(this.container);
 
     // Clear filters button
     const clearFiltersBtn = this.container.querySelector('#clear-filters-btn');
     clearFiltersBtn?.addEventListener('click', () => {
       this.searchQuery = '';
       this.applyFilters();
+    });
+
+    // Create score link
+    const createScoreLink = this.container.querySelector('.create-score-link');
+    createScoreLink?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = '/score/new/edit';
     });
   }
 
@@ -364,8 +474,67 @@ export class ScoreLibrary {
 
       .score-library-grid {
         display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-large);
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: var(--spacing-x-large) 0;
+      }
+
+      .section-header:first-child {
+        margin-top: 0;
+      }
+
+      .section-header h2 {
+        font-size: var(--font-size-large);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-heading);
+        margin: 0;
+        text-box-trim: trim-both;
+        text-box-edge: cap alphabetic;
+      }
+
+      .section-count {
+        font-size: var(--font-size-small);
+        color: var(--color-text-secondary);
+      }
+
+      .score-grid-section {
+        display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: var(--spacing-large);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: var(--spacing-x-large);
+        color: var(--color-text-secondary);
+        grid-column: 1 / -1;
+      }
+
+      .empty-state p {
+        margin: 0 0 var(--spacing-small) 0;
+      }
+
+      .empty-state p:last-child {
+        margin-bottom: 0;
+      }
+
+      .empty-state .create-score-link {
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      .empty-state .create-score-link:hover {
+        text-decoration: underline;
+      }
+
+      .empty-state + .section-header {
+        margin-top: 0;
       }
 
       .score-card {
@@ -505,7 +674,7 @@ export class ScoreLibrary {
           padding: var(--spacing-medium);
         }
 
-        .score-library-grid {
+        .score-grid-section {
           grid-template-columns: 1fr;
         }
 
@@ -521,5 +690,12 @@ export class ScoreLibrary {
 
   public refresh(): void {
     this.loadScores();
+  }
+
+  public destroy(): void {
+    // Unsubscribe from auth state changes
+    if (this.unsubscribeAuth) {
+      this.unsubscribeAuth();
+    }
   }
 }
