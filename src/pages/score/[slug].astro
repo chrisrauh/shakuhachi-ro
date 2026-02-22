@@ -31,15 +31,15 @@ if (score.forked_from) {
 <Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true}>
   <!-- Score metadata in header -->
   <PageHeader slot="header-metadata" title={score.title}>
-    {parentScore && (
+    {parentScore ? (
       <span>
         forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
       </span>
+    ) : (
+      <span class="score-stat">
+        updated <relative-time datetime={score.created_at} format="relative"></relative-time>
+      </span>
     )}
-
-    <span class="score-stat">
-      updated <relative-time datetime={score.created_at} format="relative"></relative-time>
-    </span>
   </PageHeader>
 
   <!-- Header actions (right side of navbar) -->
@@ -80,7 +80,7 @@ if (score.forked_from) {
 
   <!-- Initialize theme switcher and auth widget -->
   <script>
-    import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
+    import { createElement, Book, Plus, Info, SunMoon, SquarePen } from 'lucide';
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
     import { authState } from '../../api/authState';
@@ -119,36 +119,77 @@ if (score.forked_from) {
     };
 
     const mobileMenu = new MobileMenu('mobile-menu');
-    mobileMenu.setItems([
-      {
-        id: 'browse',
-        label: 'Library',
-        href: '/',
-        icon: getIconHTML(Book),
-        dividerAfter: false,
-      },
-      {
-        id: 'create',
-        label: 'Create score',
-        href: '/editor',
-        icon: getIconHTML(Plus),
-        dividerAfter: false,
-      },
-      {
-        id: 'about',
-        label: 'About',
-        href: '/about',
-        icon: getIconHTML(Info),
-        dividerAfter: true,
-      },
-      {
+
+    // Function to update mobile menu items based on auth state
+    const updateMobileMenuItems = (isOwner: boolean) => {
+      const baseItems = [
+        {
+          id: 'browse',
+          label: 'Library',
+          href: '/',
+          icon: getIconHTML(Book),
+          dividerAfter: false,
+        },
+        {
+          id: 'create',
+          label: 'Create score',
+          href: '/editor',
+          icon: getIconHTML(Plus),
+          dividerAfter: false,
+        },
+        {
+          id: 'about',
+          label: 'About',
+          href: '/about',
+          icon: getIconHTML(Info),
+          dividerAfter: !isOwner, // Add divider if no edit button follows
+        },
+      ];
+
+      // Add edit button if user owns the score
+      if (isOwner) {
+        const editBtn = document.getElementById('edit-btn') as HTMLAnchorElement;
+        if (editBtn) {
+          baseItems.push({
+            id: 'edit',
+            label: 'Edit score',
+            href: editBtn.href,
+            icon: getIconHTML(SquarePen),
+            dividerAfter: true,
+          });
+        }
+      }
+
+      baseItems.push({
         id: 'theme',
         label: 'Toggle theme',
         action: toggleTheme,
         icon: getIconHTML(SunMoon),
         dividerAfter: false,
-      },
-    ]);
+      });
+
+      mobileMenu.setItems(baseItems);
+    };
+
+    // Get score data to check ownership
+    const dataEl = document.getElementById('score-data');
+    if (dataEl) {
+      try {
+        const data = JSON.parse(dataEl.textContent || '{}');
+        const score = data.score;
+
+        // Subscribe to auth changes to update mobile menu
+        authState.subscribe((user) => {
+          const isOwner = !!(user && score && user.id === score.user_id);
+          updateMobileMenuItems(isOwner);
+        });
+      } catch (error) {
+        console.error('Failed to parse score data for menu:', error);
+        updateMobileMenuItems(false);
+      }
+    } else {
+      updateMobileMenuItems(false);
+    }
   </script>
 
   <!-- Client-side logic -->
@@ -242,6 +283,11 @@ if (score.forked_from) {
 
       :global(.score-title) {
         font-size: var(--font-size-medium);
+      }
+
+      /* Hide desktop edit button on mobile - shown in menu instead */
+      :global(#edit-btn) {
+        display: none !important;
       }
 
       .floating-edit-btn {
