@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Landing page: My Scores section
+- [x] Landing page: My Scores section
   - When user is logged in, show their scores first
   - Then show library scores below
   - Clear visual separation between sections
