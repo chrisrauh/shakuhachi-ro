@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Standardize buttons across the app for consistency.
+- [x] Standardize buttons across the app for consistency.
   - Check the types of buttons used
   - Consolidate the button css for each type
   - Apply the consolidated css on the buttons
