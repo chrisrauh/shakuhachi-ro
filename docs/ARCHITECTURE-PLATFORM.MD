@@ -61,7 +61,8 @@ Shakuhachi.ro is a web platform for sharing shakuhachi scores. Musicians can bro
 **Rendering:** Client-side with live preview
 - Load existing score data (or empty for new score)
 - Live notation preview using renderer library
-- VexFlow or MusicXML notation input
+- Notation input supports three formats: ABC, JSON, MusicXML
+- Automatic format conversion when switching formats (preserves content)
 - Title changes update the slug
 - Save to Supabase on submit
 
@@ -81,7 +82,7 @@ Create empty score in Supabase
   ↓
 Redirect to /score/[slug]/edit
   ↓
-User enters title, notation (VexFlow/MusicXML)
+User enters title, notation (ABC/JSON/MusicXML)
   ↓
 Live preview renders notation
   ↓
@@ -130,6 +131,76 @@ Recipient opens link on mobile
   ↓
 SSR delivers score immediately
 ```
+
+## Notation Formats
+
+The platform supports three notation formats with full bidirectional conversion:
+
+### Supported Formats
+
+**ABC Notation** (`data_format: 'abc'`)
+- Text-based music notation format
+- Popular in folk and traditional music communities
+- Human-readable and easy to edit
+- Supports: pitches, durations, accidentals, rests, dotted notes
+- Automatic mapping to shakuhachi fingerings (D shakuhachi, 1.8 shaku)
+
+**JSON** (`data_format: 'json'`)
+- Native ScoreData format
+- Direct representation of score structure
+- Used internally by renderer
+- Compact and type-safe
+
+**MusicXML** (`data_format: 'musicxml'`)
+- Industry-standard Western notation format
+- Interoperability with notation software (Finale, Sibelius, MuseScore)
+- Supports import/export
+
+### Format Conversion
+
+**Architecture:** Decoupled utility in `src/utils/format-converter.ts`
+
+**Conversion Matrix:**
+```
+        ABC    JSON   MusicXML
+ABC      -      ✓        ✓
+JSON     ✓      -        ✓
+MusicXML ✓      ✓        -
+```
+
+**Implementation:**
+- All conversions use ScoreData as intermediate format
+- Parsers: ABCParser, MusicXMLParser, JSON.parse
+- Serializers: ABCSerializer, MusicXMLSerializer, JSON.stringify
+- Automatic conversion when switching formats in editor
+
+**Parser/Serializer Locations:**
+- `src/parser/ABCParser.ts` - ABC → ScoreData
+- `src/parser/ABCSerializer.ts` - ScoreData → ABC
+- `src/parser/MusicXMLParser.ts` - MusicXML → ScoreData
+- `src/parser/MusicXMLSerializer.ts` - ScoreData → MusicXML
+- `src/utils/format-converter.ts` - Orchestrates all conversions
+
+**ABC Pitch Mapping:**
+- `src/constants/abc-pitch-map.ts` - Maps ABC notation to shakuhachi fingerings
+- Default key: D major (D shakuhachi)
+- Automatic meri handling: ABC accidentals (^, _, =) → shakuhachi meri variants
+- Octave support: uppercase (otsu), lowercase (kan), apostrophe (dai-kan)
+
+### Format Selection in Editor
+
+**UX Pattern:** Radio buttons with automatic conversion
+
+**Behavior:**
+1. User selects different format (e.g., ABC → JSON)
+2. Editor attempts automatic conversion using format-converter
+3. On success: Content converted, format switched
+4. On failure: Prompt user to clear content or cancel switch
+
+**Why automatic conversion:**
+- Preserves user's work when exploring formats
+- Enables seamless format switching workflow
+- Reduces friction for users unfamiliar with specific formats
 
 ## Authentication
 

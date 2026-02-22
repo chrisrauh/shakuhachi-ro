@@ -2,6 +2,7 @@ import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
 import { authState } from '../api/authState';
 import { renderIcon, initIcons } from '../utils/icons';
+import { ABCParser } from '../parser/ABCParser';
 import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -128,6 +129,11 @@ export class ScoreEditor {
         JSON.parse(this.scoreData);
         this.validationError = null;
         return true;
+      } else if (this.dataFormat === 'abc') {
+        // Validate ABC syntax
+        ABCParser.parse(this.scoreData);
+        this.validationError = null;
+        return true;
       } else {
         // Basic XML validation
         const parser = new DOMParser();
@@ -156,16 +162,41 @@ export class ScoreEditor {
     this.updatePreview();
   }
 
-  private handleFormatChange(format: ScoreDataFormat): void {
+  private async handleFormatChange(format: ScoreDataFormat): Promise<void> {
     if (this.scoreData.trim() && this.dataFormat !== format) {
-      const confirmChange = confirm(
-        'Switching formats will clear the current editor content. Continue?',
-      );
-      if (!confirmChange) return;
-      this.scoreData = '';
+      try {
+        // Import format converter
+        const { convertFormat } = await import('../utils/format-converter');
+
+        // Convert current content to new format
+        this.scoreData = convertFormat(this.scoreData, this.dataFormat, format);
+
+        // Update format after successful conversion
+        this.dataFormat = format;
+      } catch {
+        // Conversion failed - ask user what to do
+        const clearContent = confirm(
+          `Could not convert ${this.dataFormat} to ${format}. Clear content and switch format?`,
+        );
+        if (!clearContent) {
+          // Revert radio button to previous format
+          const radios = this.container.querySelectorAll(
+            'input[name="format"]',
+          );
+          radios.forEach((radio) => {
+            (radio as HTMLInputElement).checked =
+              (radio as HTMLInputElement).value === this.dataFormat;
+          });
+          return;
+        }
+        this.scoreData = ''; // Clear if user confirms
+        this.dataFormat = format;
+      }
+    } else {
+      // No content or same format - just switch
+      this.dataFormat = format;
     }
 
-    this.dataFormat = format;
     this.render();
   }
 
@@ -186,7 +217,11 @@ export class ScoreEditor {
           <div class="preview-placeholder">
             <p>Preview will appear here</p>
             <p class="preview-hint">Enter valid ${
-              this.dataFormat === 'json' ? 'JSON' : 'MusicXML'
+              this.dataFormat === 'json'
+                ? 'JSON'
+                : this.dataFormat === 'abc'
+                  ? 'ABC'
+                  : 'MusicXML'
             } score data to see the preview</p>
           </div>
         `;
@@ -223,6 +258,24 @@ export class ScoreEditor {
             .trim();
           const debugLabelColor = getComputedStyle(document.documentElement)
             .getPropertyValue('--color-gray-500')
+            .trim();
+
+          const renderer = new ScoreRenderer(externalPreview, {
+            noteColor: noteColor || '#000',
+            debugLabelColor: debugLabelColor || '#999',
+          });
+
+          await renderer.renderFromScoreData(scoreData);
+        } else if (this.dataFormat === 'abc') {
+          // Parse ABC to ScoreData using ABCParser
+          const { ABCParser } = await import('../parser/ABCParser');
+          const scoreData = ABCParser.parse(this.scoreData);
+
+          const noteColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-text-primary')
+            .trim();
+          const debugLabelColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-text-tertiary')
             .trim();
 
           const renderer = new ScoreRenderer(externalPreview, {
@@ -285,15 +338,42 @@ export class ScoreEditor {
         });
 
         await renderer.renderFromScoreData(data);
-      } else {
-        // For MusicXML, we'd need to parse it properly
-        // For now, show a placeholder
-        previewContainer.innerHTML = `
-          <div class="preview-placeholder">
-            <p>MusicXML Preview</p>
-            <p class="preview-hint">MusicXML rendering will be implemented soon</p>
-          </div>
-        `;
+      } else if (this.dataFormat === 'musicxml') {
+        // Parse MusicXML to ScoreData using MusicXMLParser
+        const { MusicXMLParser } = await import('../parser/MusicXMLParser');
+        const scoreData = MusicXMLParser.parse(this.scoreData);
+
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-primary')
+          .trim();
+        const debugLabelColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-tertiary')
+          .trim();
+
+        const renderer = new ScoreRenderer(scorePreview, {
+          noteColor: noteColor || '#000',
+          debugLabelColor: debugLabelColor || '#999',
+        });
+
+        await renderer.renderFromScoreData(scoreData);
+      } else if (this.dataFormat === 'abc') {
+        // Parse ABC to ScoreData using ABCParser
+        const { ABCParser } = await import('../parser/ABCParser');
+        const scoreData = ABCParser.parse(this.scoreData);
+
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-primary')
+          .trim();
+        const debugLabelColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-tertiary')
+          .trim();
+
+        const renderer = new ScoreRenderer(scorePreview, {
+          noteColor: noteColor || '#000',
+          debugLabelColor: debugLabelColor || '#999',
+        });
+
+        await renderer.renderFromScoreData(scoreData);
       }
     } catch (error) {
       previewContainer.innerHTML = `
@@ -419,13 +499,26 @@ export class ScoreEditor {
                   />
                   MusicXML
                 </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="format"
+                    value="abc"
+                    ${this.dataFormat === 'abc' ? 'checked' : ''}
+                  />
+                  ABC
+                </label>
               </div>
             </div>
             <div id="validation-error" class="validation-error"></div>
             <textarea
               id="score-data-input"
               placeholder="Enter ${
-                this.dataFormat === 'json' ? 'JSON' : 'MusicXML'
+                this.dataFormat === 'json'
+                  ? 'JSON'
+                  : this.dataFormat === 'abc'
+                    ? 'ABC'
+                    : 'MusicXML'
               } score data here..."
             >${this.scoreData}</textarea>
           </div>

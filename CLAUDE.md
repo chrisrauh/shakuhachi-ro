@@ -205,6 +205,22 @@ get_network_request({ reqid: 123 })
 evaluate_script({ function: "() => ({ scoreData: window.__SCORE_DATA__, renderState: window.__RENDER_STATE__ })" })
 ```
 
+### Test Account Credentials
+
+When testing authenticated features (score editor, creating scores, forking), use the test account credentials from `.env`:
+
+```typescript
+// Read credentials from environment
+const TEST_EMAIL = process.env.TEST_EMAIL;
+const TEST_PASSWORD = process.env.TEST_PASSWORD;
+```
+
+**Important:**
+- Never hardcode credentials in code or memory files
+- Store in `.env` file (gitignored)
+- Use `.env.example` as template with placeholder values
+- Test credentials are documented in `.env.example` with `TEST_EMAIL` and `TEST_PASSWORD` variables
+
 ## Key Learnings
 
 **Data vs Presentation**
