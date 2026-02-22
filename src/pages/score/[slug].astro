@@ -210,40 +210,6 @@ if (score.forked_from) {
       gap: var(--spacing-3x-small);
     }
 
-    /* GitHub-style fork button with integrated counter */
-    :global(.btn-icon-with-count) {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-x-small);
-      padding: var(--spacing-button) var(--spacing-small);
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-subtle);
-      color: var(--color-text-primary);
-      border-radius: var(--border-radius-medium);
-      font-size: var(--font-size-small);
-      font-weight: var(--font-weight-semibold);
-      transition: all var(--transition-fast);
-      cursor: pointer;
-    }
-
-    :global(.btn-icon-with-count:hover) {
-      background: var(--color-bg-hover);
-      border-color: var(--color-border-hover);
-    }
-
-    :global(.btn-icon-with-count:active) {
-      transform: translateY(1px);
-    }
-
-    :global(.btn-icon-with-count:disabled) {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    :global(.btn-icon-with-count .count) {
-      line-height: var(--line-height-denser);
-    }
-
     :global(.score-header-metadata a) {
       color: var(--color-link);
       text-decoration: none;

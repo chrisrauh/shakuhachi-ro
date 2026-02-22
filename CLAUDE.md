@@ -101,6 +101,16 @@ Run `npm run test:visual` before creating PR. When tests fail:
 - Only update baselines after user approval with `npm run test:visual:update`
 - Unit tests can be updated directly as they don't require visual approval
 
+**Component Test Pages**
+
+Test pages for visual verification during development (available when dev server is running):
+
+- **Buttons**: http://localhost:3003/test/buttons
+  - Shows all button variants (icon, small, standard) with all color options
+  - Displays default and disabled states side-by-side
+  - Use for verifying button styling, sizing, alignment, and hover states
+  - Helpful for visual comparison when making button-related changes
+
 ## Task Tracking
 
 For non-trivial tasks (anything requiring 3+ steps or touching multiple files):
