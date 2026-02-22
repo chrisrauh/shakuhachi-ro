@@ -1,0 +1,306 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Book, Plus, Info } from '@lucide/astro';
+
+const title = 'Button Components';
+---
+
+<Layout title={title} currentPage="browse">
+  <div class="buttons-test-page">
+    <h1>Button Components</h1>
+
+    <!-- Icon Buttons -->
+    <section class="button-section">
+      <h2>Icon Buttons (32x32px)</h2>
+      <p class="description">Layout: <code>.btn-icon</code> - Square buttons with centered icons</p>
+
+      <div class="button-grid">
+        <div class="button-demo">
+          <button class="btn btn-icon" aria-label="Default icon">
+            <Book size={16} />
+          </button>
+          <span class="label">Default (no color class)</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-icon btn-primary" aria-label="Primary icon">
+            <Plus size={16} />
+          </button>
+          <span class="label">.btn-primary</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-icon btn-neutral" aria-label="Neutral icon">
+            <Info size={16} />
+          </button>
+          <span class="label">.btn-neutral</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-icon" disabled aria-label="Disabled icon">
+            <Book size={16} />
+          </button>
+          <span class="label">Disabled</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Small Buttons -->
+    <section class="button-section">
+      <h2>Small Buttons</h2>
+      <p class="description">Layout: <code>.btn-small</code> - Compact buttons for headers and secondary actions</p>
+
+      <div class="button-grid">
+        <div class="button-demo">
+          <button class="btn btn-small btn-primary">
+            Log In
+          </button>
+          <span class="label">.btn-small .btn-primary</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-small btn-neutral">
+            Sign Up
+          </button>
+          <span class="label">.btn-small .btn-neutral</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-small btn-success">
+            Confirm
+          </button>
+          <span class="label">.btn-small .btn-success</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-small btn-ghost">
+            Tertiary Action
+          </button>
+          <span class="label">.btn-small .btn-ghost</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-small btn-primary" disabled>
+            Disabled
+          </button>
+          <span class="label">Disabled</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Standard Buttons -->
+    <section class="button-section">
+      <h2>Standard Buttons</h2>
+      <p class="description">Layout: <code>.btn</code> - Standard padding for dialog/form buttons</p>
+
+      <div class="button-grid">
+        <div class="button-demo">
+          <button class="btn btn-primary">
+            Save
+          </button>
+          <span class="label">.btn .btn-primary</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-secondary">
+            Cancel
+          </button>
+          <span class="label">.btn .btn-secondary</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-success">
+            Confirm Fork
+          </button>
+          <span class="label">.btn .btn-success</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-neutral">
+            Neutral
+          </button>
+          <span class="label">.btn .btn-neutral</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-ghost">
+            Ghost
+          </button>
+          <span class="label">.btn .btn-ghost</span>
+        </div>
+
+        <div class="button-demo">
+          <button class="btn btn-primary" disabled>
+            Disabled
+          </button>
+          <span class="label">Disabled</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Special Variants -->
+    <section class="button-section">
+      <h2>Special Variants</h2>
+      <p class="description">Specialized button styles (to be removed/standardized)</p>
+
+      <div class="button-grid">
+        <div class="button-demo">
+          <button class="btn-icon-with-count">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+            </svg>
+            <span class="count">123</span>
+          </button>
+          <span class="label">.btn-icon-with-count</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- States Comparison -->
+    <section class="button-section">
+      <h2>State Comparison</h2>
+      <p class="description">Hover over buttons to see hover states</p>
+
+      <div class="state-grid">
+        <div class="state-row">
+          <span class="state-label">Primary:</span>
+          <button class="btn btn-primary">Default</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+        </div>
+
+        <div class="state-row">
+          <span class="state-label">Secondary:</span>
+          <button class="btn btn-secondary">Default</button>
+          <button class="btn btn-secondary" disabled>Disabled</button>
+        </div>
+
+        <div class="state-row">
+          <span class="state-label">Success:</span>
+          <button class="btn btn-success">Default</button>
+          <button class="btn btn-success" disabled>Disabled</button>
+        </div>
+
+        <div class="state-row">
+          <span class="state-label">Neutral:</span>
+          <button class="btn btn-neutral">Default</button>
+          <button class="btn btn-neutral" disabled>Disabled</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Button Size Verification -->
+    <section class="button-section">
+      <h2>Size & Alignment Verification</h2>
+      <p class="description">All icon buttons should be 32x32px. Text should be vertically centered.</p>
+
+      <div style="display: flex; gap: var(--spacing-small); align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-icon" aria-label="Icon 1">
+          <Book size={16} />
+        </button>
+        <button class="btn btn-icon" aria-label="Icon 2">
+          <Plus size={16} />
+        </button>
+        <button class="btn btn-icon" aria-label="Icon 3">
+          <Info size={16} />
+        </button>
+        <button class="btn btn-small btn-primary">Small Button</button>
+        <button class="btn btn-primary">Standard Button</button>
+        <button class="btn-icon-with-count">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h6v6M14 10l6.1-6.1M9 21H3v-6m6 0l-6.1 6.1"/>
+          </svg>
+          <span class="count">42</span>
+        </button>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .buttons-test-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-large) var(--spacing-large);
+  }
+
+  h1 {
+    font-size: var(--font-size-3x-large);
+    margin-top: var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+    color: var(--color-text-primary);
+  }
+
+  h2 {
+    font-size: var(--font-size-x-large);
+    margin-bottom: var(--spacing-small);
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--spacing-small);
+  }
+
+  .button-section {
+    margin-bottom: var(--spacing-3x-large);
+  }
+
+  .description {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-large);
+    font-size: var(--font-size-small);
+  }
+
+  .description code {
+    background: var(--color-bg-subtle);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-small);
+    font-family: monospace;
+    font-size: var(--font-size-small);
+    color: var(--color-text-primary);
+  }
+
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-large);
+    margin-top: var(--spacing-large);
+  }
+
+  .button-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: var(--spacing-medium);
+    background: var(--color-bg-subtle);
+    border-radius: var(--border-radius-medium);
+    border: 1px solid var(--color-border);
+  }
+
+  .button-demo .label {
+    font-size: var(--font-size-x-small);
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-family: monospace;
+  }
+
+  .state-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-medium);
+  }
+
+  .state-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-medium);
+    padding: var(--spacing-medium);
+    background: var(--color-bg-subtle);
+    border-radius: var(--border-radius-medium);
+  }
+
+  .state-label {
+    min-width: 100px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+</style>

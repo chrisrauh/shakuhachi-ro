@@ -60,7 +60,7 @@ export class AuthModal {
             <button
               type="submit"
               id="auth-submit"
-              class="btn btn-text btn-success"
+              class="btn btn-small btn-success"
               style="flex: 1;"
             >
               Log In
@@ -68,7 +68,7 @@ export class AuthModal {
             <button
               type="button"
               id="auth-cancel"
-              class="btn btn-text btn-neutral-bordered"
+              class="btn btn-small btn-neutral"
               style="flex: 1;"
             >
               Cancel
@@ -225,7 +225,7 @@ export class AuthWidget {
       this.container.innerHTML = `
         <div style="display: flex; align-items: center; gap: var(--spacing-small);">
           <span style="color: var(--color-text-primary); font-size: var(--font-size-small);">${this.currentUser.email}</span>
-          <button id="auth-logout" class="btn btn-text-bordered btn-neutral-bordered">
+          <button id="auth-logout" class="btn btn-small btn-neutral">
             Log Out
           </button>
         </div>
@@ -236,10 +236,10 @@ export class AuthWidget {
     } else {
       this.container.innerHTML = `
         <div style="display: flex; gap: var(--spacing-small);">
-          <button id="auth-login" class="btn btn-text btn-primary">
+          <button id="auth-login" class="btn btn-small btn-primary">
             Log In
           </button>
-          <button id="auth-signup" class="btn btn-text-bordered btn-neutral-bordered">
+          <button id="auth-signup" class="btn btn-small btn-neutral">
             Sign Up
           </button>
         </div>

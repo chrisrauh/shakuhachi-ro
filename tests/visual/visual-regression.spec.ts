@@ -6,6 +6,7 @@
  *
  * Coverage:
  *   - Landing page and Akatombo score page
+ *   - Button components test page
  *   - Light and dark color schemes
  *   - Desktop (1280x720) and mobile (375x667) viewports
  *
@@ -21,6 +22,7 @@ import { test, expect } from '@playwright/test';
 const pages = [
   { name: 'landing', path: '/' },
   { name: 'akatombo', path: '/score/akatombo' },
+  { name: 'buttons', path: '/test/buttons' },
 ];
 
 const colorSchemes = ['light', 'dark'] as const;

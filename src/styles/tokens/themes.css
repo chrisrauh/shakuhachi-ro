@@ -656,6 +656,7 @@
   --color-button-primary-hover: var(--color-blue-700);     /* Primary button hover */
   --color-button-success: var(--color-green-600);          /* Success button background */
   --color-button-success-hover: var(--color-green-700);    /* Success button hover */
+  --color-button-secondary: var(--color-bg-active);        /* Secondary button background */
   --color-button-secondary-hover: var(--color-gray-300);   /* Secondary button hover */
   --color-button-ghost: var(--color-blue-600);             /* Ghost button text */
 

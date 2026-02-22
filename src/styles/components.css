@@ -17,6 +17,11 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  padding: var(--spacing-x-small) var(--spacing-small);
+  border: var(--input-border-width) solid var(--color-border);
+  font-size: var(--font-size-small);
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 .btn:disabled {
@@ -44,18 +49,8 @@
   transform: translateY(1px);
 }
 
-/* Text button - normal padding for text/labels */
-.btn-text {
-  padding: var(--spacing-x-small) var(--spacing-medium);
-  border: none;
-  font-size: var(--font-size-small);
-  line-height: 1;
-}
-
-/* Text button with border */
-.btn-text-bordered {
-  padding: var(--spacing-x-small) var(--spacing-medium);
-  border: var(--input-border-width) solid var(--color-border);
+/* Small button - compact variant matching icon button height (32px) */
+.btn-small {
   font-size: var(--font-size-small);
   line-height: 1;
 }
@@ -64,28 +59,34 @@
 .btn-primary {
   background: var(--color-button-primary);
   color: var(--color-text-on-dark);
+  border-color: var(--color-button-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--color-button-primary-hover);
+  border-color: var(--color-button-primary-hover);
 }
 
 .btn-success {
   background: var(--color-button-success);
   color: var(--color-text-on-dark);
+  border-color: var(--color-button-success);
 }
 
 .btn-success:hover:not(:disabled) {
   background: var(--color-button-success-hover);
+  border-color: var(--color-button-success-hover);
 }
 
 .btn-neutral {
   background: var(--color-bg-active);
   color: var(--color-text-primary);
+  border-color: var(--color-border);
 }
 
 .btn-neutral:hover:not(:disabled) {
   background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
 }
 
 .btn-neutral-bordered {
@@ -99,13 +100,26 @@
   border-color: var(--color-border-hover);
 }
 
+.btn-secondary {
+  background: var(--color-button-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-button-secondary-hover);
+  border-color: var(--color-border-hover);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--color-button-ghost);
+  border-color: transparent;
 }
 
 .btn-ghost:hover:not(:disabled) {
-  text-decoration: underline;
+  background: var(--color-bg-hover);
+  border-color: transparent;
 }
 
 /* Special styling for floating buttons */
@@ -118,4 +132,42 @@
 
 .btn-floating:hover:not(:disabled) {
   box-shadow: var(--shadow-medium);
+}
+
+/* ============================================
+   BUTTONS - Specialized variants
+   ============================================ */
+
+/* GitHub-style button with integrated counter */
+.btn-icon-with-count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  padding: var(--spacing-button) var(--spacing-small);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  border-radius: var(--border-radius-medium);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.btn-icon-with-count:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+.btn-icon-with-count:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-icon-with-count:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-icon-with-count .count {
+  line-height: var(--line-height-denser);
 }
