@@ -11,10 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Delete score with confirmation
-  - Owner can delete their own scores
-  - Confirmation dialog: "Delete '[title]'? This cannot be undone."
-  - Remove from database and redirect to landing page
+- [ ] Standardize buttons across the app for consistency.
 
 - [ ] Create new score flow
   - Generate random slug (e.g., "flying-circus-catnip")
@@ -32,7 +29,7 @@
   - Friendly error message
   - Link back to library
 
-- [ ] Fix login and fork confirmation dialog layout
+- [ ] Standardize Fix login and fork confirmation dialog layout
 
 - [ ] Edit About page content
   - Review and refine content for clarity
@@ -41,6 +38,13 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] Investigate web component framweworks
+
+- [ ] Delete score with confirmation
+  - Owner can delete their own scores
+  - Confirmation dialog: "Delete '[title]'? This cannot be undone."
+  - Remove from database and redirect to landing page
 
 - [ ] Loading states and spinners
   - During save operations
