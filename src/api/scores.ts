@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 import { getCurrentUser } from './auth';
 import { generateSlug, ensureUniqueSlug } from '../utils/slug';
 
-export type ScoreDataFormat = 'musicxml' | 'json';
+export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
 export interface Score {
   id: string;
