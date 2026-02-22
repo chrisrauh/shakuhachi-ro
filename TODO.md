@@ -41,6 +41,11 @@
   - Friendly error message
   - Link back to library
 
+- [ ] Fix dialog form fields overflow
+  - Form fields in auth dialog are overflowing to the right
+  - Likely box-model issue (padding/border not accounted for in width)
+  - Ensure form inputs fit within dialog width with proper spacing
+
 - [ ] Standardize Fix login and fork confirmation dialog layout
 
 - [ ] Edit About page content
