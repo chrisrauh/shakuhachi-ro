@@ -11,11 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] Standardize buttons across the app for consistency.
-  - Check the types of buttons used
-  - Consolidate the button css for each type
-  - Apply the consolidated css on the buttons
-
 - [ ] Investigate button text vertical alignment
   - Button labels appear ~1px lower than ideal
   - `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` are applied but have no effect
