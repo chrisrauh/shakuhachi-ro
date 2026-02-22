@@ -11,12 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] Create new score flow
-  - Generate random slug (e.g., "flying-circus-catnip")
-  - Create empty score in database
-  - Redirect to `/score/[slug]/edit`
-  - User fills in title, notation, etc.
-
 - [ ] Landing page: My Scores section
   - When user is logged in, show their scores first
   - Then show library scores below
