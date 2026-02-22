@@ -11,19 +11,10 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Investigate button text vertical alignment
-  - Button labels appear ~1px lower than ideal
-  - `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` are applied but have no effect
-  - These properties ARE supported in Chrome (per MDN) and have worked in other contexts (e.g., PageHeader title)
-  - Root cause: Surrounding CSS conditions (flexbox, line-height, padding, or other properties) are preventing text-box-trim from taking effect
-  - Need to identify what's blocking the trim behavior and adjust surrounding styles
-  - Test page for visual verification: http://localhost:3003/test/buttons
-
-- [ ] Improve button test page visual regression coverage
-  - Redesign `/test/buttons` layout to be more condensed
-  - Ensure all button variants are visible in a single viewport
-  - Adjust viewport size in visual regression tests to capture all variations
-  - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
+- [x] Support abc notation on the score editor
+  - Convert between notaiton formats (this should be an decoupled utility)
+  - Only implement the notation features currently in use (YAGNI)
+  - Docs: https://abcnotation.com/
 
 - [ ] Create new score flow
   - Generate random slug (e.g., "flying-circus-catnip")
@@ -55,6 +46,20 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] Investigate button text vertical alignment
+  - Button labels appear ~1px lower than ideal
+  - `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` are applied but have no effect
+  - These properties ARE supported in Chrome (per MDN) and have worked in other contexts (e.g., PageHeader title)
+  - Root cause: Surrounding CSS conditions (flexbox, line-height, padding, or other properties) are preventing text-box-trim from taking effect
+  - Need to identify what's blocking the trim behavior and adjust surrounding styles
+  - Test page for visual verification: http://localhost:3003/test/buttons
+
+- [ ] Improve button test page visual regression coverage
+  - Redesign `/test/buttons` layout to be more condensed
+  - Ensure all button variants are visible in a single viewport
+  - Adjust viewport size in visual regression tests to capture all variations
+  - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
 
 - [ ] Investigate web component framweworks
 
