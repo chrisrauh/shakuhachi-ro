@@ -19,6 +19,12 @@
   - Need to identify what's blocking the trim behavior and adjust surrounding styles
   - Test page for visual verification: http://localhost:3003/test/buttons
 
+- [ ] Improve button test page visual regression coverage
+  - Redesign `/test/buttons` layout to be more condensed
+  - Ensure all button variants are visible in a single viewport
+  - Adjust viewport size in visual regression tests to capture all variations
+  - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
+
 - [ ] Create new score flow
   - Generate random slug (e.g., "flying-circus-catnip")
   - Create empty score in database
