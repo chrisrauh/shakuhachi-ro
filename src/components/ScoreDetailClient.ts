@@ -96,6 +96,11 @@ export class ScoreDetailClient {
         // Parse MusicXML string to ScoreData
         const scoreData = MusicXMLParser.parse(this.score.data);
         await this.renderer.renderFromScoreData(scoreData);
+      } else if (this.score.data_format === 'abc') {
+        // Parse ABC notation to ScoreData
+        const { ABCParser } = await import('../parser/ABCParser');
+        const scoreData = ABCParser.parse(this.score.data);
+        await this.renderer.renderFromScoreData(scoreData);
       } else {
         container.innerHTML = `
           <div style="text-align: center; padding: 40px;">
