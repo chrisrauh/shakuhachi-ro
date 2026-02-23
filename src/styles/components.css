@@ -142,7 +142,7 @@
 .btn-icon-with-count {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem; /* 6px - balanced spacing between icon and counter */
+  gap: var(--spacing-button-icon-gap);
   padding: var(--spacing-button) var(--spacing-x-small);
   border: 1px solid var(--color-border);
   background: var(--color-bg-subtle);
