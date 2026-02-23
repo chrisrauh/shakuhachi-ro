@@ -1,0 +1,13 @@
+---
+// Set 404 status for all unmapped routes
+Astro.response.status = 404;
+
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Error404 from '../components/Error404.astro';
+---
+
+<Layout title="Page Not Found - Shakuhachi.ro" currentPage="browse">
+  <PageHeader slot="header-metadata" title="Page Not Found" />
+  <Error404 />
+</Layout>

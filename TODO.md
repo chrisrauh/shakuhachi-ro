@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] 404 page for nonexistent scores
+- [x] 404 page for nonexistent scores
   - When `/score/[slug]` doesn't exist
   - Friendly error message
   - Link back to library
@@ -30,6 +30,11 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] Investigate letter spacing for font aesthetics and legibility.
+  - For example: letter-spacing: -0.02em;
+  - Invetsigate different values for button vs label vs copy.
+  - Should not apply to score rendered text
 
 - [ ] Optimize ScoreLibrary initial load (duplicate API calls)
   - Currently: `getAllScores()` is called twice on initial page load
