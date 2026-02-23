@@ -1,0 +1,37 @@
+---
+// Shared 404 error page component
+---
+
+<div class="error-page">
+  <p class="error-title">
+    404
+  </p>
+  <p class="error-message">
+    The page you're looking for is not here.
+  </p>
+  <a href="/" class="btn btn-neutral">Back to the Library</a>
+</div>
+
+<style>
+  .error-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-x-large);
+    text-align: center;
+  }
+
+  .error-title {
+    font-size: var(--font-size-x-large);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-medium) 0;
+    line-height: 1.6;
+  }
+
+  .error-message {
+    font-size: var(--font-size-medium);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-x-large) 0;
+    line-height: 1.6;
+  }
+</style>
