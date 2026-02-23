@@ -34,7 +34,7 @@ export class ConfirmDialog {
         <button class="btn btn-secondary confirm-dialog-cancel">
           ${this.escapeHtml(options.cancelText || 'Cancel')}
         </button>
-        <button class="btn btn-success confirm-dialog-confirm">
+        <button class="btn btn-primary confirm-dialog-confirm">
           ${this.escapeHtml(options.confirmText || 'Confirm')}
         </button>
       </div>
@@ -148,7 +148,7 @@ export class ConfirmDialog {
       }
 
       .confirm-dialog-header {
-        padding: var(--spacing-large);
+        padding: 0 var(--spacing-large) var(--spacing-large);
         border-bottom: 1px solid var(--color-border);
       }
 
