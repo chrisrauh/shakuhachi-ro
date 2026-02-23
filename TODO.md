@@ -11,12 +11,9 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Fix dialog form fields overflow
-  - Form fields in auth dialog are overflowing to the right
-  - Likely box-model issue (padding/border not accounted for in width)
-  - Ensure form inputs fit within dialog width with proper spacing
-
-- [ ] Standardize Fix login and fork confirmation dialog layout
+- [ ] Fix icon + counter button
+  - Side padding should be 8px to match the other icon buttons.
+  - The icon to counter gap should be 6px for balance
 
 - [ ] Edit About page content
   - Review and refine content for clarity
@@ -406,6 +403,14 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - `src/parser/MusicXMLParser.ts:153-166` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
 
 #### DRY
+
+- [ ] Refactor AuthModal to use ConfirmDialog (DRY violation)
+  - `src/components/AuthComponents.ts` and `src/components/ConfirmDialog.ts` have significant duplication
+  - Both implement overlay, modal container, escape key handling, click-to-close
+  - **Recommended approach**: Extend ConfirmDialog to accept custom body content
+  - AuthModal uses ConfirmDialog and passes form as custom body
+  - Shares all overlay/container/button logic
+  - Alternative: Create shared BaseDialog component that both extend
 
 - [ ] Deduplicate empty-state grid template in ScoreLibrary
   - `src/components/ScoreLibrary.ts:114-127` and `157-170` — The "No scores found" HTML with the conditional "Clear Filters" button is duplicated verbatim in `render()` and `renderGrid()`. Extract to a private method `renderEmptyState(): string` called from both places.

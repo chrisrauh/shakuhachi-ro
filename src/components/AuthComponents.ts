@@ -34,7 +34,7 @@ export class AuthModal {
         max-width: 400px;
         width: 90%;
       ">
-        <h2 id="auth-modal-title">Log In</h2>
+        <h2 id="auth-modal-title" style="margin-top: 0;">Log In</h2>
         <form id="auth-form">
           <div style="margin: var(--spacing-large) 0;">
             <label style="display: block; margin-bottom: var(--spacing-x-small);">Email</label>
@@ -42,7 +42,7 @@ export class AuthModal {
               type="email"
               id="auth-email"
               required
-              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium);"
+              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium); box-sizing: border-box;"
             />
           </div>
           <div style="margin: var(--spacing-large) 0;">
@@ -52,26 +52,26 @@ export class AuthModal {
               id="auth-password"
               required
               minlength="6"
-              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium);"
+              style="width: 100%; padding: var(--input-spacing-small); border: var(--input-border-width) solid var(--input-border-color); border-radius: var(--input-border-radius-medium); background: var(--input-background-color); color: var(--input-color); font-size: var(--input-font-size-medium); box-sizing: border-box;"
             />
           </div>
           <div id="auth-error" style="color: var(--color-text-danger); margin: var(--spacing-small) 0; display: none;"></div>
-          <div style="display: flex; gap: var(--spacing-small); margin-top: var(--spacing-large);">
-            <button
-              type="submit"
-              id="auth-submit"
-              class="btn btn-small btn-success"
-              style="flex: 1;"
-            >
-              Log In
-            </button>
+          <div style="display: flex; gap: var(--spacing-small); margin: var(--spacing-large) 0;">
             <button
               type="button"
               id="auth-cancel"
-              class="btn btn-small btn-neutral"
+              class="btn btn-secondary"
               style="flex: 1;"
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              id="auth-submit"
+              class="btn btn-primary"
+              style="flex: 1;"
+            >
+              Log In
             </button>
           </div>
           <div style="margin-top: var(--spacing-medium); text-align: center;">
