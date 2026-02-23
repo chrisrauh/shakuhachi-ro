@@ -59,13 +59,15 @@ const { score } = scoreResult;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth state changes (fires immediately with current state)
+    // Set initial auth state (might be null if not ready yet)
+    const initialUser = authState.getUser();
+    if (initialUser) {
+      authWidget.setUser(initialUser);
+    }
+
+    // Subscribe to auth changes (fires on all events)
     authState.subscribe((user) => {
-      if (user) {
-        authWidget.setUser(user);
-      } else {
-        authWidget.setUser(null);
-      }
+      authWidget.setUser(user);
     });
 
     // Helper to generate Lucide icon HTML
@@ -131,7 +133,7 @@ const { score } = scoreResult;
     import { authState } from '../../../api/authState';
 
     // Client-side auth and permission check
-    authState.subscribe((user) => {
+    const checkAuthAndPermissions = (user: any) => {
       const scoreDataEl = document.getElementById('score-data');
       const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent!) : null;
 
@@ -156,6 +158,17 @@ const { score } = scoreResult;
           return;
         }
       }
+    };
+
+    // Check initial auth state
+    const initialUser = authState.getUser();
+    if (initialUser) {
+      checkAuthAndPermissions(initialUser);
+    }
+
+    // Subscribe to auth changes (fires on all events)
+    authState.subscribe((user) => {
+      checkAuthAndPermissions(user);
     });
 
     // Edit mode: pass score ID | Create mode: no ID

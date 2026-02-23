@@ -24,13 +24,17 @@ export class ScoreLibrary {
     }
     this.container = container;
 
-    // Subscribe to auth state (fires immediately with current state, then on changes)
+    // Get initial user (might be null if auth not ready yet)
+    this.currentUser = authState.getUser();
+
+    // Subscribe to auth changes (fires on all events including INITIAL_SESSION)
     this.unsubscribeAuth = authState.subscribe((user) => {
       this.currentUser = user;
       this.loadScores();
     });
 
     this.render();
+    // Note: loadScores() will be called by subscription when INITIAL_SESSION fires
   }
 
   private async loadScores(): Promise<void> {

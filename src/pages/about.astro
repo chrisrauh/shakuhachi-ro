@@ -98,13 +98,15 @@ export const prerender = true;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth state changes (fires immediately with current state)
+    // Set initial auth state (might be null if not ready yet)
+    const initialUser = authState.getUser();
+    if (initialUser) {
+      authWidget.setUser(initialUser);
+    }
+
+    // Subscribe to auth changes (fires on all events)
     authState.subscribe((user) => {
-      if (user) {
-        authWidget.setUser(user);
-      } else {
-        authWidget.setUser(null);
-      }
+      authWidget.setUser(user);
     });
 
     // Helper to generate Lucide icon HTML

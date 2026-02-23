@@ -35,7 +35,13 @@ export class ScoreDetailClient {
       return;
     }
 
-    // Subscribe to auth state to show/hide edit button (fires immediately)
+    // Handle initial auth state
+    const initialUser = authState.getUser();
+    if (initialUser) {
+      this.handleEditButtonVisibility(initialUser);
+    }
+
+    // Subscribe to auth state changes (fires on all events)
     authState.subscribe((user) => {
       this.handleEditButtonVisibility(user);
     });
