@@ -24,10 +24,15 @@ export class AuthStateManager {
     const { user } = await getCurrentUser();
     this.user = user;
 
-    onAuthStateChange((user, session) => {
+    onAuthStateChange((user, session, event) => {
+      // Always update internal state
       this.user = user;
       this.session = session;
-      this.notifyListeners();
+
+      // Only notify listeners for actual auth changes (not initial session load)
+      if (event !== 'INITIAL_SESSION') {
+        this.notifyListeners();
+      }
     });
   }
 
@@ -48,6 +53,7 @@ export class AuthStateManager {
   ): () => void {
     this.listeners.push(callback);
 
+    // Fire immediately with current state
     callback(this.user, this.session);
 
     return () => {

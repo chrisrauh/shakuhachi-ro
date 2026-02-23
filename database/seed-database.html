@@ -158,7 +158,7 @@
 
       addLog('Initializing...', 'info');
 
-      // Wait for auth to initialize by subscribing to auth state
+      // Subscribe to auth state (fires immediately with current state)
       authState.subscribe((user) => {
         if (!user) {
           addLog('❌ Not logged in. Please log in first.', 'error');

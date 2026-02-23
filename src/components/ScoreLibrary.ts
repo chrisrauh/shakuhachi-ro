@@ -24,16 +24,13 @@ export class ScoreLibrary {
     }
     this.container = container;
 
-    // Subscribe to auth state changes
+    // Subscribe to auth state (fires immediately with current state, then on changes)
     this.unsubscribeAuth = authState.subscribe((user) => {
-      const userChanged = this.currentUser?.id !== user?.id;
-      if (userChanged) {
-        this.loadScores();
-      }
+      this.currentUser = user;
+      this.loadScores();
     });
 
     this.render();
-    this.loadScores();
   }
 
   private async loadScores(): Promise<void> {

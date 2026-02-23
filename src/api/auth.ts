@@ -85,12 +85,12 @@ export async function getCurrentUser(): Promise<{
  * Listen to auth state changes
  */
 export function onAuthStateChange(
-  callback: (user: User | null, session: Session | null) => void,
+  callback: (user: User | null, session: Session | null, event: string) => void,
 ) {
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    callback(session?.user ?? null, session);
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    callback(session?.user ?? null, session, event);
   });
 
   return subscription;

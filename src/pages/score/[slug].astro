@@ -94,7 +94,7 @@ if (score?.forked_from) {
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth state changes
+    // Subscribe to auth state changes (fires immediately with current state)
     authState.subscribe((user) => {
       if (user) {
         authWidget.setUser(user);
@@ -180,7 +180,7 @@ if (score?.forked_from) {
         const data = JSON.parse(dataEl.textContent || '{}');
         const score = data.score;
 
-        // Subscribe to auth changes to update mobile menu
+        // Subscribe to auth changes to update mobile menu (fires immediately)
         authState.subscribe((user) => {
           const isOwner = !!(user && score && user.id === score.user_id);
           updateMobileMenuItems(isOwner);

@@ -35,7 +35,7 @@ export class ScoreDetailClient {
       return;
     }
 
-    // Subscribe to auth state changes to show/hide edit button
+    // Subscribe to auth state to show/hide edit button (fires immediately)
     authState.subscribe((user) => {
       this.handleEditButtonVisibility(user);
     });

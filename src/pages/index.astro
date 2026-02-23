@@ -26,7 +26,7 @@ export const prerender = true;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth state changes
+    // Subscribe to auth state changes (fires immediately with current state)
     authState.subscribe((user) => {
       if (user) {
         authWidget.setUser(user);
