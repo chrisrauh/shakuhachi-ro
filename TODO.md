@@ -11,11 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] 404 page for nonexistent scores
-  - When `/score/[slug]` doesn't exist
-  - Friendly error message
-  - Link back to library
-
 - [ ] Fix dialog form fields overflow
   - Form fields in auth dialog are overflowing to the right
   - Likely box-model issue (padding/border not accounted for in width)
