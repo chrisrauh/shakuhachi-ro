@@ -142,8 +142,8 @@
 .btn-icon-with-count {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-small);
-  padding: var(--spacing-button) var(--spacing-small);
+  gap: var(--spacing-button-icon-gap);
+  padding: var(--spacing-button) var(--spacing-x-small);
   border: 1px solid var(--color-border);
   background: var(--color-bg-subtle);
   color: var(--color-text-primary);
