@@ -107,6 +107,7 @@
 - [ ] Improve button test page visual regression coverage
   - Redesign `/test/buttons` layout to be more condensed
   - Ensure all button variants are visible in a single viewport
+  - Icon with counter button is a category, not to be removed). Make sure the example is using the full css needed as the current example is showing with arial font.
   - Adjust viewport size in visual regression tests to capture all variations
   - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
 

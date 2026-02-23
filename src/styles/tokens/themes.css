@@ -16,9 +16,10 @@
  *      green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia,
  *      pink, rose, brown
  *    - Foundation colors for the entire system
- *    - Can be referenced directly for specific use cases (buttons, badges)
+ *    - Should be referenced only by semantic tokens
+ *    - Can be referenced directly for very specific exception use cases
  *
- * 2. PURPOSE-BASED TOKENS (lines 615+)
+ * 2. SEMANTIC TOKENS (lines 615+)
  *    - Application-level color roles organized by usage:
  *      * Text: --color-text-primary, --color-text-secondary, etc.
  *      * Borders: --color-border, --color-border-subtle, etc.
@@ -30,7 +31,7 @@
  *
  * Why Two Layers?
  * - Separation of concerns: colors (what) vs. usage (where)
- * - Flexibility: Purpose tokens for consistency, primitives for specific needs
+ * - Flexibility: Semantic tokens for consistency, primitives for specific needs
  * - Simplicity: Fewer layers, more direct mapping
  */
 
@@ -1020,7 +1021,7 @@
   --shadow-x-large: 0 4px 16px oklch(0 0 0 / 24%);
 
   /* ============================================
-     PURPOSE-BASED SEMANTIC TOKENS - Dark mode
+     SEMANTIC TOKENS - Dark mode
      ============================================ */
 
   /* BACKGROUND - Override for dark mode hover states */
