@@ -11,10 +11,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Fix icon + counter button
-  - Side padding should be 8px to match the other icon buttons.
-  - The icon to counter gap should be 6px for balance
-
 - [ ] Edit About page content
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
