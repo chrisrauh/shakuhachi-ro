@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
 import { GitFork, SquarePen } from '@lucide/astro';
 
@@ -17,17 +18,18 @@ const scoreResult = await getScoreBySlug(slug);
 const { score } = scoreResult;
 
 if (!score) {
-  return Astro.redirect('/');
+  Astro.response.status = 404;
 }
 
 // Fetch parent score if forked
 let parentScore = null;
-if (score.forked_from) {
+if (score?.forked_from) {
   const parentResult = await getScore(score.forked_from);
   parentScore = parentResult.score;
 }
 ---
 
+{score ? (
 <Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true}>
   <!-- Score metadata in header -->
   <PageHeader slot="header-metadata" title={score.title}>
@@ -288,3 +290,9 @@ if (score.forked_from) {
     }
   </style>
 </Layout>
+) : (
+<Layout title="Page Not Found - Shakuhachi.ro" currentPage="score">
+  <PageHeader slot="header-metadata" title="Page Not Found" />
+  <Error404 />
+</Layout>
+)}
