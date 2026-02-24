@@ -70,6 +70,23 @@ if (score?.forked_from) {
 
     <!-- Score renderer container -->
     <div id="score-renderer-container"></div>
+
+    <!-- Attribution section (only for scores with attribution data) -->
+    {(score.source_url || score.rights || score.source_description) && (
+      <section class="score-attribution">
+        <h3>Attribution</h3>
+        {score.source_description && <p class="attribution-description">{score.source_description}</p>}
+        <div class="attribution-meta">
+          {score.rights && <span class="attribution-rights">{score.rights}</span>}
+          {score.source_url && (
+            <a href={score.source_url} target="_blank" rel="noopener noreferrer" class="attribution-link">
+              Source Reference
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+            </a>
+          )}
+        </div>
+      </section>
+    )}
   </div>
 
   <!-- Embed score data for client -->
@@ -235,6 +252,65 @@ if (score?.forked_from) {
 
     :global(#score-renderer-container svg) {
       display: block; /* Remove inline descender space */
+    }
+
+    /* Attribution section */
+    .score-attribution {
+      margin-top: var(--spacing-large);
+      padding: var(--spacing-medium);
+      background: var(--color-surface-elevated);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
+    }
+
+    .score-attribution h3 {
+      margin: 0 0 var(--spacing-small) 0;
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .attribution-description {
+      margin: 0 0 var(--spacing-small) 0;
+      font-size: var(--font-size-small);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    .attribution-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-medium);
+      align-items: center;
+      font-size: var(--font-size-x-small);
+    }
+
+    .attribution-rights {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--spacing-3x-small) var(--spacing-small);
+      background: var(--color-success-background);
+      color: var(--color-success);
+      border-radius: var(--border-radius-small);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .attribution-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-3x-small);
+      color: var(--color-link);
+      text-decoration: none;
+    }
+
+    .attribution-link:hover {
+      text-decoration: underline;
+    }
+
+    .attribution-link svg {
+      flex-shrink: 0;
     }
 
     /* Responsive */
