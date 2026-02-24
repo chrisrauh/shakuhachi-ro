@@ -95,3 +95,32 @@ export function onAuthStateChange(
 
   return subscription;
 }
+
+/**
+ * Subscribe to auth state with deduplication.
+ *
+ * Fires callback on first event (initial state) and whenever user changes.
+ * Ignores TOKEN_REFRESHED and other events where user ID stays the same.
+ *
+ * @param callback Called with user on initial load and when user changes
+ * @returns Subscription to unsubscribe when done
+ */
+export function onAuthReady(callback: (user: User | null) => void) {
+  // undefined = "never initialized" (different from null = "no user")
+  let currentUserId: string | null | undefined = undefined;
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    const user = session?.user ?? null;
+    const newUserId = user?.id ?? null;
+
+    // Fire on first event (undefined) or when user actually changes
+    if (currentUserId === undefined || currentUserId !== newUserId) {
+      currentUserId = newUserId;
+      callback(user);
+    }
+  });
+
+  return subscription;
+}

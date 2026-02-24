@@ -1,7 +1,7 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
-import { onAuthStateChange } from '../api/auth';
+import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 
@@ -16,7 +16,6 @@ export class ScoreLibrary {
   private isLoading: boolean = false;
   private error: Error | null = null;
   private authSubscription?: { unsubscribe: () => void };
-  private hasInitialSession: boolean = false;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -25,24 +24,14 @@ export class ScoreLibrary {
     }
     this.container = container;
 
-    // Subscribe to auth state changes
-    // INITIAL_SESSION fires immediately with current state
-    this.authSubscription = onAuthStateChange((user, _session, event) => {
-      if (event === 'INITIAL_SESSION') {
-        // Initial load - this is the authoritative initial state
-        this.hasInitialSession = true;
-        this.currentUser = user;
+    // Subscribe to auth state changes using onAuthReady
+    // Handles Supabase's quirky event ordering automatically
+    this.authSubscription = onAuthReady((user) => {
+      const userChanged = this.currentUser?.id !== user?.id;
+      this.currentUser = user;
+      if (userChanged || !this.myScores.length) {
         this.loadScores();
-      } else if (this.hasInitialSession) {
-        // Only react to changes AFTER initial session
-        const userChanged = this.currentUser?.id !== user?.id;
-        if (userChanged) {
-          this.currentUser = user;
-          this.loadScores();
-        }
       }
-      // Ignore: events before INITIAL_SESSION (e.g., SIGNED_IN on session restore)
-      // Ignore: TOKEN_REFRESHED, USER_UPDATED (no data reload needed)
     });
 
     this.render();

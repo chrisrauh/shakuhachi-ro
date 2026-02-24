@@ -1,7 +1,7 @@
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
-import { onAuthStateChange, getCurrentUser } from '../api/auth';
+import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
@@ -15,7 +15,6 @@ export class ScoreDetailClient {
   private score: Score | null = null;
   private renderer?: ScoreRenderer;
   private currentUser: User | null = null;
-  private hasInitialSession: boolean = false;
 
   constructor() {
     // Read embedded data
@@ -37,18 +36,13 @@ export class ScoreDetailClient {
       return;
     }
 
-    // Subscribe to auth state changes
-    onAuthStateChange((user, _session, event) => {
-      if (event === 'INITIAL_SESSION') {
-        this.hasInitialSession = true;
-        this.currentUser = user;
+    // Subscribe to auth state changes using onAuthReady
+    // Handles Supabase's quirky event ordering automatically
+    onAuthReady((user) => {
+      const userChanged = this.currentUser?.id !== user?.id;
+      this.currentUser = user;
+      if (userChanged) {
         this.handleEditButtonVisibility(user);
-      } else if (this.hasInitialSession) {
-        const userChanged = this.currentUser?.id !== user?.id;
-        if (userChanged) {
-          this.currentUser = user;
-          this.handleEditButtonVisibility(user);
-        }
       }
     });
 

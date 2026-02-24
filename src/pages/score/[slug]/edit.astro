@@ -49,7 +49,7 @@ const { score } = scoreResult;
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
     import { AuthWidget } from '../../../components/AuthComponents';
-    import { onAuthStateChange } from '../../../api/auth';
+    import { onAuthReady } from '../../../api/auth';
     import { MobileMenu } from '../../../components/MobileMenu';
     import { createEmptyScore } from '../../../utils/create-score-handler';
 
@@ -59,11 +59,9 @@ const { score } = scoreResult;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth changes - INITIAL_SESSION provides initial state
-    onAuthStateChange((user, _session, event) => {
-      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        authWidget.setUser(user);
-      }
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      authWidget.setUser(user);
     });
 
     // Helper to generate Lucide icon HTML
@@ -126,7 +124,7 @@ const { score } = scoreResult;
   <!-- Initialize ScoreEditor (existing component, no changes) -->
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
-    import { onAuthStateChange } from '../../../api/auth';
+    import { onAuthReady } from '../../../api/auth';
 
     // Client-side auth and permission check
     const checkAuthAndPermissions = (user: any) => {
@@ -156,11 +154,9 @@ const { score } = scoreResult;
       }
     };
 
-    // Subscribe to auth changes - INITIAL_SESSION provides initial state
-    onAuthStateChange((user, _session, event) => {
-      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        checkAuthAndPermissions(user);
-      }
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      checkAuthAndPermissions(user);
     });
 
     // Edit mode: pass score ID | Create mode: no ID

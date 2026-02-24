@@ -88,7 +88,7 @@ export const prerender = true;
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
-    import { onAuthStateChange } from '../api/auth';
+    import { onAuthReady } from '../api/auth';
     import { MobileMenu } from '../components/MobileMenu';
     import { createEmptyScore } from '../utils/create-score-handler';
 
@@ -98,11 +98,9 @@ export const prerender = true;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth changes - INITIAL_SESSION provides initial state
-    onAuthStateChange((user, _session, event) => {
-      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        authWidget.setUser(user);
-      }
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      authWidget.setUser(user);
     });
 
     // Helper to generate Lucide icon HTML
