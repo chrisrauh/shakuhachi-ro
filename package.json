@@ -18,6 +18,7 @@
     "test:visual:debug": "playwright test --debug"
   },
   "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
     "@astrojs/netlify": "^6.6.4",
     "@github/relative-time-element": "^5.0.0",
     "@lucide/astro": "^0.563.0",
