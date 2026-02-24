@@ -11,7 +11,7 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] [UI] [High] Convert About page to MDX
+- [x] [UI] [High] Convert About page to MDX
   - Move content from `src/pages/about.astro` to `src/content/about.mdx`
   - Keep existing Layout, PageHeader, and page scripts (theme switcher, auth widget, mobile menu)
   - Style MDX content to match current CSS (headings, paragraphs, links, sections)
