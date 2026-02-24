@@ -663,9 +663,9 @@
   ); /* Primary brand borders */
 
   /* BUTTON COLORS */
-  --color-button-primary: var(--color-blue-600); /* Primary button background */
+  --color-button-primary: var(--color-blue-500); /* Primary button background */
   --color-button-primary-hover: var(
-    --color-blue-700
+    --color-blue-650
   ); /* Primary button hover */
   --color-button-success: var(
     --color-green-600
@@ -716,6 +716,8 @@
      BORDER RADIUS - From Shoelace
      ============================================ */
 
+  --border-radius-2x-small: 0.0625rem; /* 1px */
+  --border-radius-x-small: 0.125rem; /* 2px */
   --border-radius-small: 0.1875rem; /* 3px */
   --border-radius-medium: 0.25rem; /* 4px */
   --border-radius-large: 0.5rem; /* 8px */
@@ -988,6 +990,12 @@
   --color-stone-950: oklch(0.985 0.001 106.424);
   --color-stone-975: oklch(0.992 0.001 106.424);
 
+  /* BUTTON COLORS */
+  --color-button-primary: var(--color-blue-900); /* Primary button background */
+  --color-button-primary-hover: var(
+    --color-blue-750
+  ); /* Primary button hover */
+
   /* INPUTS */
   --input-background-color: var(--color-gray-50);
   --input-background-color-hover: var(--color-gray-50);
@@ -1032,5 +1040,5 @@
   --color-bg-active: var(--color-gray-200); /* Active/pressed states */
 
   /* SPECIAL - Only logo needs override, others auto-adapt via inverted grays */
-  --color-logo: var(--color-gray-600);
+  --color-logo: var(--color-stone-600);
 }
