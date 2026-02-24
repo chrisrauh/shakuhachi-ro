@@ -5,6 +5,7 @@ export class AuthStateManager {
   private static instance: AuthStateManager;
   private user: User | null = null;
   private session: Session | null = null;
+  private isInitialized: boolean = false;
   private listeners: Array<
     (user: User | null, session: Session | null) => void
   > = [];
@@ -23,6 +24,12 @@ export class AuthStateManager {
   private async initialize(): Promise<void> {
     const { user } = await getCurrentUser();
     this.user = user;
+    this.isInitialized = true;
+
+    // Notify any early subscribers who registered before initialization completed
+    if (this.listeners.length > 0) {
+      this.notifyListeners();
+    }
 
     onAuthStateChange((user, session, event) => {
       const userChanged = this.user?.id !== user?.id;
@@ -32,7 +39,6 @@ export class AuthStateManager {
       this.session = session;
 
       // Only notify if state actually changed (prevents duplicate callbacks from INITIAL_SESSION)
-      // subscribe() already fired immediately when registered, so we only notify on real changes
       if (userChanged) {
         this.notifyListeners();
       } else if (event !== 'INITIAL_SESSION') {
@@ -58,11 +64,14 @@ export class AuthStateManager {
   public subscribe(
     callback: (user: User | null, session: Session | null) => void,
   ): () => void {
-    // Fire immediately with current state so components don't miss initial auth state
-    callback(this.user, this.session);
-
-    // Add to listeners for future updates
+    // Add to listeners first
     this.listeners.push(callback);
+
+    // Only fire immediately if already initialized (avoids duplicate calls during init)
+    if (this.isInitialized) {
+      callback(this.user, this.session);
+    }
+    // If not initialized, listener will be notified when initialize() completes
 
     return () => {
       const index = this.listeners.indexOf(callback);
