@@ -1,0 +1,58 @@
+{
+  "title": "Kojo no Tsuki",
+  "style": "kinko",
+  "composer": "Rentaro Taki (1901)",
+  "notes": [
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 4 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 4 },
+
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 8 },
+
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 4 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 4 },
+
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 8 },
+
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 },
+    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 4 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 4 },
+
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 8 },
+
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 4 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 4 },
+
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 2 },
+    { "pitch": { "step": "re", "octave": 0 }, "duration": 8 }
+  ]
+}

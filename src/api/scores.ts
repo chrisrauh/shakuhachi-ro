@@ -15,6 +15,9 @@ export interface Score {
   data: any;
   forked_from: string | null;
   fork_count: number;
+  source_url: string | null;
+  rights: string | null;
+  source_description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -26,6 +29,9 @@ export interface CreateScoreData {
   data_format: ScoreDataFormat;
   data: any;
   forked_from?: string;
+  source_url?: string;
+  rights?: string;
+  source_description?: string;
 }
 
 export interface UpdateScoreData {
@@ -34,6 +40,9 @@ export interface UpdateScoreData {
   description?: string;
   data_format?: ScoreDataFormat;
   data?: any;
+  source_url?: string;
+  rights?: string;
+  source_description?: string;
 }
 
 export interface ScoreResult {
@@ -85,6 +94,9 @@ export async function createScore(
         data_format: scoreData.data_format,
         data: scoreData.data,
         forked_from: scoreData.forked_from || null,
+        source_url: scoreData.source_url || null,
+        rights: scoreData.rights || null,
+        source_description: scoreData.source_description || null,
       })
       .select()
       .single();
@@ -433,5 +445,10 @@ export function getCuratedScoreSlugs(): string[] {
   return [
     'akatombo', // reference: reference/score-data/Akatombo.musicxml
     'love-story', // reference: reference/score-data/love-story.json
+    'sakura-sakura', // reference: reference/score-data/sakura-sakura.json
+    'kojo-no-tsuki', // reference: reference/score-data/kojo-no-tsuki.json
+    'kuroda-bushi', // reference: reference/score-data/kuroda-bushi.json
+    'shika-no-tone', // reference: reference/score-data/shika-no-tone.json
+    'tsuru-no-sugomori', // reference: reference/score-data/tsuru-no-sugomori.json
   ];
 }
