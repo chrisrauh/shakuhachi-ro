@@ -1,6 +1,6 @@
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
-import { authState } from '../api/authState';
+import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../parser/ABCParser';
 import type { ScoreDataFormat } from '../api/scores';
@@ -386,7 +386,8 @@ export class ScoreEditor {
   }
 
   private async handleSave(): Promise<void> {
-    if (!authState.isAuthenticated()) {
+    const { user } = await getCurrentUser();
+    if (!user) {
       alert('Please log in to save scores');
       return;
     }

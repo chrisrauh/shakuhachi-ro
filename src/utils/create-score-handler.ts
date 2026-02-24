@@ -1,5 +1,5 @@
 import { createScore } from '../api/scores';
-import { authState } from '../api/authState';
+import { getCurrentUser } from '../api/auth';
 import { generateUniqueRandomSlug } from './slug';
 
 export interface CreateEmptyScoreResult {
@@ -17,7 +17,8 @@ export interface CreateEmptyScoreResult {
  */
 export async function createEmptyScore(): Promise<CreateEmptyScoreResult> {
   // Check authentication
-  if (!authState.isAuthenticated()) {
+  const { user } = await getCurrentUser();
+  if (!user) {
     return {
       slug: '',
       error: new Error('Please log in to create scores'),

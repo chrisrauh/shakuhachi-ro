@@ -15,7 +15,7 @@ export const prerender = true;
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
-    import { authState } from '../api/authState';
+    import { onAuthReady } from '../api/auth';
     import { ScoreLibrary } from '../components/ScoreLibrary';
     import { MobileMenu } from '../components/MobileMenu';
     import { createEmptyScore } from '../utils/create-score-handler';
@@ -26,13 +26,9 @@ export const prerender = true;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth state changes
-    authState.subscribe((user) => {
-      if (user) {
-        authWidget.setUser(user);
-      } else {
-        authWidget.setUser(null);
-      }
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      authWidget.setUser(user);
     });
 
     // Initialize score library

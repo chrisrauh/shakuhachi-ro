@@ -1,7 +1,7 @@
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
-import { authState } from '../api/authState';
+import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
@@ -14,6 +14,7 @@ interface ScoreData {
 export class ScoreDetailClient {
   private score: Score | null = null;
   private renderer?: ScoreRenderer;
+  private currentUser: User | null = null;
 
   constructor() {
     // Read embedded data
@@ -35,9 +36,14 @@ export class ScoreDetailClient {
       return;
     }
 
-    // Subscribe to auth state changes to show/hide edit button
-    authState.subscribe((user) => {
-      this.handleEditButtonVisibility(user);
+    // Subscribe to auth state changes using onAuthReady
+    // Handles Supabase's quirky event ordering automatically
+    onAuthReady((user) => {
+      const userChanged = this.currentUser?.id !== user?.id;
+      this.currentUser = user;
+      if (userChanged) {
+        this.handleEditButtonVisibility(user);
+      }
     });
 
     // Render score visualization
@@ -144,7 +150,7 @@ export class ScoreDetailClient {
   private async handleFork() {
     if (!this.score) return;
 
-    const user = authState.getUser();
+    const { user } = await getCurrentUser();
     if (!user) {
       alert('Please sign in to fork this score');
       return;
