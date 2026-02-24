@@ -1,0 +1,58 @@
+---
+title: About
+---
+
+## What is Shakuhachi.ro?
+
+Shakuhachi.ro is a website for discovering, sharing, and creating shakuhachi scores. Whether you're learning a new piece or sharing your favorites with other players, this websitr makes it easy to work with shakuhachi notation online.
+
+This project is inspired by [The Sessions](https://thesession.org/), a community website dedicated to Irish traditional music, and Flat.io, a website to compose, collaborate, and publish western notation sheet music online.
+
+## How to Use
+
+### Fork a Score
+
+**What is forking?** Forking creates your own editable copy of a score. This is useful when you want to make personal modifications—like adding your own fingering notes, changing the notation, or adapting the piece for your skill level.
+
+Your forked copy is completely independent. Changes you make won't affect the original score, and you can edit it freely.
+
+To fork a score: view any score and click the "Fork" button. You'll get your own copy that you can edit and share.
+
+## Notation Formats
+
+The platform supports multiple notation input formats including MusicXML, JSON score data, and ABC notation. This flexibility allows you to work with scores from different sources or transcription tools.
+
+## Open Source
+
+Shakuhachi.ro is an open-source project. The code is available on [GitHub](https://github.com/chrisrauh/shakuhachi-ro).
+
+The shakuhachi notation renderer is also available as a standalone library that developers can use in their own projects.
+
+### Using the Renderer
+
+Here's a simple example of how to use the renderer in your own project:
+
+```typescript
+import { ScoreRenderer } from 'shakuhachi-ro';
+
+// Create a renderer instance
+const renderer = new ScoreRenderer(container);
+
+// Render a score from a URL
+await renderer.renderFromURL('/path/to/score.musicxml');
+
+// Or render from score data
+await renderer.renderFromScoreData({
+  key: 'D',
+  style: 'kinko',
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 4 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 4 },
+    // ...more notes
+  ],
+});
+```
+
+## Contact
+
+Questions, feedback, or issues? Reach out via [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) or email [hello@shakuhachi.ro](mailto:hello@shakuhachi.ro).

@@ -1,87 +1,23 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import { getEntry } from 'astro:content';
 
 // Prerender this page at build time (static HTML)
 export const prerender = true;
+
+// Load MDX content
+const aboutPage = await getEntry('pages', 'about');
+const { Content } = await aboutPage.render();
 ---
 
 <Layout title="About - Shakuhachi.ro" currentPage="browse">
   <PageHeader slot="header-metadata" title="About" />
 
   <div class="about-page">
-    <section class="about-section">
-      <h2>What is Shakuhachi.ro?</h2>
-      <p>
-        Shakuhachi.ro is a website for discovering, sharing, and creating shakuhachi scores.
-        Whether you're learning a new piece or sharing your favorites with other players, this
-        websitr makes it easy to work with shakuhachi notation online.
-      </p>
-      <p>
-        This project is inspired by <a href="https://thesession.org/">The Sessions</a>, a community website dedicated to Irish traditional music, and Flat.io, a website to compose, collaborate, and publish western notation sheet music online.
-</p>
-    </section>
-
-    <section class="about-section">
-      <h2>How to Use</h2>
- 
-      <div class="feature">
-        <h3>Fork a Score</h3>
-        <p>
-          <strong>What is forking?</strong> Forking creates your own editable copy of a score.
-          This is useful when you want to make personal modifications—like adding your own
-          fingering notes, changing the notation, or adapting the piece for your skill level.
-        </p>
-        <p>
-          Your forked copy is completely independent. Changes you make won't affect the original
-          score, and you can edit it freely.
-        </p>
-        <p>
-          To fork a score: view any score and click the "Fork" button. You'll get your own copy
-          that you can edit and share.
-        </p>
-      </div>
-
-    </section>
-
-    <section class="about-section">
-      <h2>Notation Formats</h2>
-      <p>
-        The platform supports multiple notation input formats including MusicXML, JSON score data,
-        and ABC notation. This flexibility allows you to work with scores from different
-        sources or transcription tools.
-      </p>
-    </section>
-
-    <section class="about-section">
-      <h2>Open Source</h2>
-      <p>
-        Shakuhachi.ro is an open-source project. The code is available on
-        <a
-          href="https://github.com/chrisrauh/shakuhachi-ro"
-          target="_blank"
-          rel="noopener noreferrer">GitHub</a
-        >.
-      </p>
-      <p>
-        The shakuhachi notation renderer is also available as a standalone library that developers
-        can use in their own projects.
-      </p>
-    </section>
-
-    <section class="about-section">
-      <h2>Contact</h2>
-      <p>
-        Questions, feedback, or issues? Reach out via
-        <a
-          href="https://github.com/chrisrauh/shakuhachi-ro/issues"
-          target="_blank"
-          rel="noopener noreferrer">GitHub Issues</a
-        >
-        or email
-        <a href="mailto:hello@shakuhachi.ro">hello@shakuhachi.ro</a>.
-      </p>
-    </section>
+    <div class="about-section">
+      <Content />
+    </div>
   </div>
 
   <script>
@@ -171,48 +107,76 @@ export const prerender = true;
       margin-bottom: var(--spacing-2x-large);
     }
 
-    .about-section h2 {
+    .about-section :global(h2) {
       font-size: var(--font-size-x-large);
       font-weight: 500;
       margin-bottom: var(--spacing-medium);
       color: var(--color-text-heading);
     }
 
-    .about-section h3 {
+    .about-section :global(h3) {
       font-size: var(--font-size-large);
       font-weight: 500;
       margin-bottom: var(--spacing-small);
       color: var(--color-text-heading);
     }
 
-    .about-section p {
+    .about-section :global(p) {
       font-size: var(--font-size-medium);
       line-height: 1.6;
       color: var(--color-text-secondary);
       margin-bottom: var(--spacing-medium);
     }
 
-    .about-section p:last-child {
+    .about-section :global(p:last-child) {
       margin-bottom: 0;
     }
 
-    .feature {
-      margin-bottom: var(--spacing-large);
-    }
-
-    .feature:last-child {
-      margin-bottom: 0;
-    }
-
-    .about-section a {
+    .about-section :global(a) {
       color: var(--color-link);
       text-decoration: none;
       border-bottom: 1px solid var(--color-link-border);
       transition: border-color var(--transition-fast);
     }
 
-    .about-section a:hover {
+    .about-section :global(a:hover) {
       border-bottom-color: var(--color-link-border-hover);
+    }
+
+    .about-section :global(strong) {
+      font-weight: 600;
+      color: var(--color-text-heading);
+    }
+
+    .about-section :global(pre) {
+      border-radius: var(--border-radius-medium);
+      padding: var(--spacing-medium);
+      margin: var(--spacing-medium) 0;
+      overflow-x: auto;
+      font-size: var(--font-size-small);
+      line-height: 1.5;
+    }
+
+    /* Switch to dark theme colors when in dark mode */
+    :global([data-theme='dark']) .about-section :global(pre) {
+      background-color: var(--shiki-dark-bg) !important;
+      color: var(--shiki-dark) !important;
+    }
+
+    :global([data-theme='dark']) .about-section :global(pre span) {
+      color: var(--shiki-dark) !important;
+    }
+
+    .about-section :global(code) {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    }
+
+    .about-section :global(p code) {
+      background-color: var(--color-background-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-small);
+      padding: 2px 6px;
+      font-size: 0.9em;
     }
 
     @media (max-width: 768px) {
@@ -220,15 +184,15 @@ export const prerender = true;
         padding: 0 var(--spacing-small);
       }
 
-      .about-section h2 {
+      .about-section :global(h2) {
         font-size: var(--font-size-large);
       }
 
-      .about-section h3 {
+      .about-section :global(h3) {
         font-size: var(--font-size-medium);
       }
 
-      .about-section p {
+      .about-section :global(p) {
         font-size: var(--font-size-small);
       }
     }

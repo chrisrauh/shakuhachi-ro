@@ -1,9 +1,19 @@
 import { defineConfig } from 'astro/config';
 import netlify from '@astrojs/netlify';
+import mdx from '@astrojs/mdx';
 
 export default defineConfig({
   output: 'server',
   adapter: netlify(),
+  integrations: [mdx()],
+  markdown: {
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    },
+  },
   root: '.',
   srcDir: './src',
   publicDir: './public',
