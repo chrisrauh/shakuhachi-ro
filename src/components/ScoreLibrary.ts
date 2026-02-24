@@ -1,7 +1,7 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
 import { renderIcon, initIcons } from '../utils/icons';
-import { authState } from '../api/authState';
+import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 
@@ -15,7 +15,7 @@ export class ScoreLibrary {
   private searchQuery: string = '';
   private isLoading: boolean = false;
   private error: Error | null = null;
-  private unsubscribeAuth?: () => void;
+  private authSubscription?: { unsubscribe: () => void };
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -24,25 +24,23 @@ export class ScoreLibrary {
     }
     this.container = container;
 
-    // Subscribe to auth state changes
-    this.unsubscribeAuth = authState.subscribe((user) => {
+    // Subscribe to auth state changes using onAuthReady
+    // Handles Supabase's quirky event ordering automatically
+    this.authSubscription = onAuthReady((user) => {
       const userChanged = this.currentUser?.id !== user?.id;
-      if (userChanged) {
+      this.currentUser = user;
+      if (userChanged || !this.myScores.length) {
         this.loadScores();
       }
     });
 
     this.render();
-    this.loadScores();
   }
 
   private async loadScores(): Promise<void> {
     this.isLoading = true;
     this.error = null;
     this.render();
-
-    // Get current user
-    this.currentUser = authState.getUser();
 
     // Fetch user's scores if logged in
     if (this.currentUser) {
@@ -694,8 +692,8 @@ export class ScoreLibrary {
 
   public destroy(): void {
     // Unsubscribe from auth state changes
-    if (this.unsubscribeAuth) {
-      this.unsubscribeAuth();
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 }

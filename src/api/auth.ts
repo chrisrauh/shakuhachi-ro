@@ -85,12 +85,41 @@ export async function getCurrentUser(): Promise<{
  * Listen to auth state changes
  */
 export function onAuthStateChange(
-  callback: (user: User | null, session: Session | null) => void,
+  callback: (user: User | null, session: Session | null, event: string) => void,
 ) {
   const {
     data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    callback(session?.user ?? null, session, event);
+  });
+
+  return subscription;
+}
+
+/**
+ * Subscribe to auth state with deduplication.
+ *
+ * Fires callback on first event (initial state) and whenever user changes.
+ * Ignores TOKEN_REFRESHED and other events where user ID stays the same.
+ *
+ * @param callback Called with user on initial load and when user changes
+ * @returns Subscription to unsubscribe when done
+ */
+export function onAuthReady(callback: (user: User | null) => void) {
+  // undefined = "never initialized" (different from null = "no user")
+  let currentUserId: string | null | undefined = undefined;
+
+  const {
+    data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
-    callback(session?.user ?? null, session);
+    const user = session?.user ?? null;
+    const newUserId = user?.id ?? null;
+
+    // Fire on first event (undefined) or when user actually changes
+    if (currentUserId === undefined || currentUserId !== newUserId) {
+      currentUserId = newUserId;
+      callback(user);
+    }
   });
 
   return subscription;

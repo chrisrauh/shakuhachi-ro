@@ -357,9 +357,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] Name magic number for duration line baseline ratio
   - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
 
-- [ ] Document authState.subscribe() immediate callback behavior
-  - `src/api/authState.ts:46-51` — `subscribe()` immediately invokes the callback with the current `user` and `session` before returning. This is undocumented and surprising — subscribers may not expect their callback to fire synchronously during registration. Add JSDoc: "Note: The callback is invoked immediately with the current state upon subscription, and again whenever auth state changes."
-
 - [ ] Extract hardcoded editor URL into a route constant
   - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\``in a shared`src/constants/routes.ts` module.
 

@@ -158,7 +158,23 @@
 
       addLog('Initializing...', 'info');
 
-      // Wait for auth to initialize by subscribing to auth state
+      // Check initial auth state (might be null if not ready yet)
+      const initialUser = authState.getUser();
+      if (initialUser) {
+        addLog(`✓ Logged in as: ${initialUser.email}`, 'success');
+        // Enable buttons
+        document.querySelectorAll('button[id]').forEach(btn => {
+          btn.disabled = false;
+        });
+      } else {
+        addLog('❌ Not logged in. Please log in first.', 'error');
+        addLog('   Go to the home page or /editor.html to log in', 'info');
+        document.querySelectorAll('button:not([disabled])').forEach(btn => {
+          btn.disabled = true;
+        });
+      }
+
+      // Subscribe to auth state changes (fires on all events)
       authState.subscribe((user) => {
         if (!user) {
           addLog('❌ Not logged in. Please log in first.', 'error');
