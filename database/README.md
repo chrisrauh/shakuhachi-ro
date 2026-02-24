@@ -1,115 +1,65 @@
 # Database Setup Guide
 
-This guide walks you through setting up the database for slug-based URLs and seeding initial scores.
+This guide walks you through setting up the database for the Shakuhachi Score Library.
 
-## Step 1: Run the Database Migration
+## Quick Start
 
-The migration adds the `slug` field to the `scores` table, which enables human-readable URLs.
+Run these two SQL files in order in your **Supabase Dashboard → SQL Editor**:
 
-### Instructions:
-
-1. **Go to your Supabase Dashboard**
-   - Open your Supabase project
-   - Navigate to **SQL Editor** in the left sidebar
-
-2. **Run the migration**
-   - Copy the contents of `migrations/add_slug_to_scores.sql`
-   - Paste into the SQL Editor
-   - Click **Run** or press `Cmd/Ctrl + Enter`
-
-3. **Verify the migration**
-   - Go to **Table Editor** → `scores` table
-   - Confirm the `slug` column exists
-   - Check that there's a unique constraint on `slug`
-
-### What the migration does:
-- Adds `slug TEXT` column
-- Generates slugs for existing scores
-- Makes `slug` NOT NULL
-- Adds unique constraint `scores_slug_unique`
-- Creates index `idx_scores_slug` for fast lookups
-
-## Step 2: Seed Initial Scores
-
-After running the migration, add the Akatombo score to the database.
-
-### Instructions:
-
-1. **Make sure you're logged in**
-   - Go to the app and sign in
-   - The seed script requires authentication
-
-2. **Open the seed page**
-   - Navigate to `/seed-database.html` in your browser
-   - e.g., `http://localhost:3001/seed-database.html`
-
-3. **Add Akatombo**
-   - Click **"Add Akatombo to Database"**
-   - Wait for confirmation in the log
-   - The score will be available at `/score.html?slug=akatombo`
-
-4. **Clean up test entries (optional)**
-   - Click **"Clean Up Test Entries"**
-   - This removes any test/example scores from development
-
-## Step 3: Verify Everything Works
-
-1. **Test the library page**
-   - Go to `/` (or `/index.html`)
-   - You should see Akatombo listed
-
-2. **Test the score detail page**
-   - Click on Akatombo
-   - Should navigate to `/score.html?slug=akatombo`
-   - The score should render with all metadata
-
-3. **Test creating a new score**
-   - Go to `/editor.html`
-   - Create a new score
-   - Verify it gets a slug automatically
-
-## Troubleshooting
-
-### "Score not found" error
-- Make sure the migration ran successfully
-- Check that the score has a `slug` field in the database
-
-### "Must be logged in" error
-- Sign in to the app first
-- The seeding requires a valid user session
-
-### Duplicate slug error
-- The app automatically handles duplicates by appending numbers
-- e.g., "akatombo", "akatombo-2", "akatombo-3"
-
-## Next Steps: Love Story
-
-The Love Story score is available as an image (`reference/scores-pictures/Love story.jpg`) but needs to be:
-1. Transcribed to MusicXML or JSON format
-2. Added to the database using the seed page
-
-This requires either:
-- Manual transcription
-- OCR tool (future enhancement)
-- Visual score editor (Phase 2 enhancement)
+1. `migrations/add_attribution_to_scores.sql` - Adds attribution fields to scores table
+2. `migrations/seed_scores.sql` - Seeds 7 shakuhachi songs into the library
 
 ## Database Schema
 
-After migration, the `scores` table has:
+After running migrations, the `scores` table has:
 
 ```sql
 CREATE TABLE scores (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) NOT NULL,
   title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,  -- New field
+  slug TEXT NOT NULL UNIQUE,
   composer TEXT,
   description TEXT,
   data_format TEXT NOT NULL,
   data JSONB NOT NULL,
   forked_from UUID REFERENCES scores(id),
   fork_count INTEGER DEFAULT 0,
+  source_url TEXT,           -- Reference URL for source material
+  rights TEXT,               -- License or rights (e.g., Public Domain)
+  source_description TEXT,   -- Human-readable attribution text
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
+
+## Migrations
+
+| Migration | Description |
+|-----------|-------------|
+| `add_slug_to_scores.sql` | Adds slug field for human-readable URLs |
+| `add_attribution_to_scores.sql` | Adds source_url, rights, source_description fields |
+| `remove_difficulty_from_scores.sql` | Removes unused difficulty field |
+| `remove_tags_from_scores.sql` | Removes unused tags field |
+| `remove_view_count_from_scores.sql` | Removes unused view_count field |
+| `seed_scores.sql` | Seeds 7 shakuhachi songs with full attribution |
+
+## Seeded Songs
+
+The seed script adds these songs to your library:
+
+1. **Akatombo** - Traditional folk song (beginner)
+2. **Love Story** - Unknown composer
+3. **Sakura Sakura** - Traditional Edo period folk song
+4. **Kojo no Tsuki** - Rentaro Taki (1901)
+5. **Kuroda Bushi** - Traditional Chikuzen folk song
+6. **Shika no Tone** - Traditional Kinko-ryu honkyoku
+7. **Tsuru no Sugomori** - Traditional Dokyoku honkyoku (Voyager Golden Record)
+
+## Troubleshooting
+
+### "No users found" error when seeding
+Create an account through the web app first, then run the seed script.
+
+### Duplicate slug error
+The seed script uses fixed slugs. If a score already exists with that slug, you may need to delete it first or skip that INSERT.

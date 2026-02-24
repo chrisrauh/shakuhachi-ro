@@ -332,6 +332,11 @@ export class ScoreLibrary {
                 ? this.escapeHtml(score.composer)
                 : 'Unknown composer'
             }
+            ${
+              score.rights
+                ? `<span class="badge-public-domain">${this.escapeHtml(score.rights)}</span>`
+                : ''
+            }
           </p>
 
           ${
@@ -585,6 +590,23 @@ export class ScoreLibrary {
         color: var(--color-text-secondary);
         margin: 0 0 var(--spacing-small) 0;
         font-style: italic;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-small);
+      }
+
+      .badge-public-domain {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--spacing-3x-small) var(--spacing-x-small);
+        background: var(--color-success-background);
+        color: var(--color-success);
+        border-radius: var(--border-radius-small);
+        font-size: var(--font-size-x-small);
+        font-weight: var(--font-weight-medium);
+        font-style: normal;
+        white-space: nowrap;
       }
 
       .score-description {
