@@ -24,20 +24,26 @@ export class ScoreLibrary {
     }
     this.container = container;
 
+    console.log('[ScoreLibrary] constructor called');
+
     // Get initial user (might be null if auth not ready yet)
     this.currentUser = authState.getUser();
 
-    // Subscribe to auth changes (fires on all events including INITIAL_SESSION)
+    // Subscribe to auth changes (fires immediately with current state, then on real changes)
     this.unsubscribeAuth = authState.subscribe((user) => {
+      console.log(
+        '[ScoreLibrary] subscription callback fired, user:',
+        user?.email || 'null',
+      );
       this.currentUser = user;
       this.loadScores();
     });
 
     this.render();
-    // Note: loadScores() will be called by subscription when INITIAL_SESSION fires
   }
 
   private async loadScores(): Promise<void> {
+    console.log('[ScoreLibrary] loadScores() called');
     this.isLoading = true;
     this.error = null;
     this.render();
@@ -62,7 +68,13 @@ export class ScoreLibrary {
     }
 
     // Fetch all scores
+    console.log('[ScoreLibrary] calling getAllScores()');
     const result = await getAllScores();
+    console.log(
+      '[ScoreLibrary] getAllScores() returned:',
+      result.scores?.length || 0,
+      'scores',
+    );
 
     this.isLoading = false;
 

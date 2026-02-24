@@ -23,14 +23,40 @@ export class AuthStateManager {
   private async initialize(): Promise<void> {
     const { user } = await getCurrentUser();
     this.user = user;
+    console.log(
+      '[AuthStateManager] initialize() completed, user:',
+      user?.email || 'null',
+    );
 
-    onAuthStateChange((user, session) => {
-      // Update internal state
+    onAuthStateChange((user, session, event) => {
+      console.log(
+        '[AuthStateManager] onAuthStateChange event:',
+        event,
+        'new user:',
+        user?.email || 'null',
+      );
+      const userChanged = this.user?.id !== user?.id;
+
+      // Always update internal state
       this.user = user;
       this.session = session;
 
-      // Notify all listeners (including INITIAL_SESSION)
-      this.notifyListeners();
+      // Only notify if state actually changed (prevents duplicate callbacks from INITIAL_SESSION)
+      // subscribe() already fired immediately when registered, so we only notify on real changes
+      if (userChanged) {
+        console.log('[AuthStateManager] user changed, notifying listeners');
+        this.notifyListeners();
+      } else if (event !== 'INITIAL_SESSION') {
+        // If user didn't change but it's not INITIAL_SESSION, still notify (e.g., TOKEN_REFRESHED)
+        console.log(
+          '[AuthStateManager] state changed (not INITIAL_SESSION), notifying listeners',
+        );
+        this.notifyListeners();
+      } else {
+        console.log(
+          '[AuthStateManager] skipping notification (INITIAL_SESSION, no user change)',
+        );
+      }
     });
   }
 
@@ -49,6 +75,13 @@ export class AuthStateManager {
   public subscribe(
     callback: (user: User | null, session: Session | null) => void,
   ): () => void {
+    console.log(
+      '[AuthStateManager] subscribe() called, firing immediately with current state',
+    );
+    // Fire immediately with current state so components don't miss initial auth state
+    callback(this.user, this.session);
+
+    // Add to listeners for future updates
     this.listeners.push(callback);
 
     return () => {
@@ -60,6 +93,12 @@ export class AuthStateManager {
   }
 
   private notifyListeners(): void {
+    console.log(
+      '[AuthStateManager] notifyListeners() called, user:',
+      this.user?.email,
+      'listeners count:',
+      this.listeners.length,
+    );
     this.listeners.forEach((callback) => callback(this.user, this.session));
   }
 }
