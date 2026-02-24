@@ -22,6 +22,11 @@
   - Style MDX content to match current CSS (headings, paragraphs, links, sections)
   - Result: Content is editable as markdown, layout/styling unchanged
 
+- [ ] [Content] [A:High] Add 5 popular shakuhachi songs to the score library
+  - Research songs online
+  - Make sure the songs are not copyrighted
+  - Make correct attribution, including url where it was retrieved from (need to add this field from the database, as well as rights field)
+
 - [ ] [Content] Edit About page content
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
