@@ -85,7 +85,7 @@ if (score?.forked_from) {
     import { createElement, Book, Plus, Info, SunMoon, SquarePen } from 'lucide';
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
-    import { authState } from '../../api/authState';
+    import { onAuthStateChange } from '../../api/auth';
     import { MobileMenu, type MenuItem } from '../../components/MobileMenu';
 
     // Initialize theme switcher
@@ -94,15 +94,11 @@ if (score?.forked_from) {
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Set initial auth state (might be null if not ready yet)
-    const initialUser = authState.getUser();
-    if (initialUser) {
-      authWidget.setUser(initialUser);
-    }
-
-    // Subscribe to auth changes (fires on all events)
-    authState.subscribe((user) => {
-      authWidget.setUser(user);
+    // Subscribe to auth changes - INITIAL_SESSION provides initial state
+    onAuthStateChange((user, _session, event) => {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        authWidget.setUser(user);
+      }
     });
 
     // Helper to generate Lucide icon HTML
@@ -182,17 +178,12 @@ if (score?.forked_from) {
         const data = JSON.parse(dataEl.textContent || '{}');
         const score = data.score;
 
-        // Set initial mobile menu state
-        const initialUser = authState.getUser();
-        if (initialUser) {
-          const isOwner = !!(score && initialUser.id === score.user_id);
-          updateMobileMenuItems(isOwner);
-        }
-
-        // Subscribe to auth changes to update mobile menu (fires on all events)
-        authState.subscribe((user) => {
-          const isOwner = !!(user && score && user.id === score.user_id);
-          updateMobileMenuItems(isOwner);
+        // Subscribe to auth changes - INITIAL_SESSION provides initial state
+        onAuthStateChange((user, _session, event) => {
+          if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            const isOwner = !!(user && score && user.id === score.user_id);
+            updateMobileMenuItems(isOwner);
+          }
         });
       } catch (error) {
         console.error('Failed to parse score data for menu:', error);

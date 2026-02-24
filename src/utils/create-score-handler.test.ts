@@ -3,7 +3,7 @@ import { createEmptyScore } from './create-score-handler';
 
 // Mock dependencies
 vi.mock('../api/scores');
-vi.mock('../api/authState');
+vi.mock('../api/auth');
 vi.mock('./slug');
 
 describe('createEmptyScore', () => {
@@ -12,8 +12,8 @@ describe('createEmptyScore', () => {
   });
 
   it('returns error when user is not authenticated', async () => {
-    const { authState } = await import('../api/authState');
-    vi.spyOn(authState, 'isAuthenticated').mockReturnValue(false);
+    const { getCurrentUser } = await import('../api/auth');
+    vi.mocked(getCurrentUser).mockResolvedValue({ user: null, error: null });
 
     const { slug, error } = await createEmptyScore();
 
@@ -23,10 +23,13 @@ describe('createEmptyScore', () => {
   });
 
   it('returns error when slug generation fails', async () => {
-    const { authState } = await import('../api/authState');
+    const { getCurrentUser } = await import('../api/auth');
     const { generateUniqueRandomSlug } = await import('./slug');
 
-    vi.spyOn(authState, 'isAuthenticated').mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: 'user-123' } as any,
+      error: null,
+    });
     vi.mocked(generateUniqueRandomSlug).mockResolvedValue({
       slug: '',
       error: new Error('Slug generation failed'),
@@ -40,11 +43,14 @@ describe('createEmptyScore', () => {
   });
 
   it('returns error when score creation fails', async () => {
-    const { authState } = await import('../api/authState');
+    const { getCurrentUser } = await import('../api/auth');
     const { generateUniqueRandomSlug } = await import('./slug');
     const { createScore } = await import('../api/scores');
 
-    vi.spyOn(authState, 'isAuthenticated').mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: 'user-123' } as any,
+      error: null,
+    });
     vi.mocked(generateUniqueRandomSlug).mockResolvedValue({
       slug: 'test-slug',
       error: null,
@@ -62,11 +68,14 @@ describe('createEmptyScore', () => {
   });
 
   it('creates empty score successfully and returns slug', async () => {
-    const { authState } = await import('../api/authState');
+    const { getCurrentUser } = await import('../api/auth');
     const { generateUniqueRandomSlug } = await import('./slug');
     const { createScore } = await import('../api/scores');
 
-    vi.spyOn(authState, 'isAuthenticated').mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: 'user-123' } as any,
+      error: null,
+    });
     vi.mocked(generateUniqueRandomSlug).mockResolvedValue({
       slug: 'flowing-peaceful-crane',
       error: null,

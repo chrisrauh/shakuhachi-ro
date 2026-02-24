@@ -15,7 +15,7 @@ export const prerender = true;
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
     import { AuthWidget } from '../components/AuthComponents';
-    import { authState } from '../api/authState';
+    import { onAuthStateChange } from '../api/auth';
     import { ScoreLibrary } from '../components/ScoreLibrary';
     import { MobileMenu } from '../components/MobileMenu';
     import { createEmptyScore } from '../utils/create-score-handler';
@@ -26,15 +26,11 @@ export const prerender = true;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Set initial auth state (might be null if not ready yet)
-    const initialUser = authState.getUser();
-    if (initialUser) {
-      authWidget.setUser(initialUser);
-    }
-
-    // Subscribe to auth changes (fires on all events)
-    authState.subscribe((user) => {
-      authWidget.setUser(user);
+    // Subscribe to auth changes - INITIAL_SESSION provides initial state
+    onAuthStateChange((user, _session, event) => {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        authWidget.setUser(user);
+      }
     });
 
     // Initialize score library
