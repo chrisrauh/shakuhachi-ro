@@ -1,19 +1,371 @@
-# Duplicate API Calls - Test Plan
+# Duplicate API Calls - Test-Driven Fix
 
-**Status: Tests PASSING with Broken Implementation ✓**
+**Status: ✅ COMPLETE - All Tests Passing**
 
-## Summary
-- Test file created: `src/api/authState.test.ts`
-- 4 tests written verifying broken behavior
-- All tests currently PASS (as expected with broken code)
+## TDD Workflow Summary
+
+### Phase 1: Specification ✅
+- Created comprehensive test plan with unit tests and DevTools flows
+- Documented broken vs fixed behavior expectations
+- Identified key scenarios to verify
+
+### Phase 2: Tests Written (Broken Implementation) ✅
+- Created `src/api/authState.test.ts` with 9 comprehensive tests
+- Tests initially ran against broken implementation
+- Tests documented the problematic behavior:
+  - `subscribe()` does NOT fire immediately (broken)
+  - `INITIAL_SESSION` fires all subscribers without filtering
+  - Multiple subscribers each get called
+
+### Phase 3: Implementation Fixed ✅
+- Updated `src/api/authState.ts`:
+  - `subscribe()` now fires immediately with current state
+  - `onAuthStateChange` filters `INITIAL_SESSION` duplicates
+  - Tracks user changes to prevent unnecessary notifications
+- Updated `src/components/ScoreLibrary.ts` to use fixed subscribe behavior
+
+### Phase 4: Tests Pass (Fixed Implementation) ✅
+- All 9 auth state tests now PASS with fixed implementation
 - Tests verify:
-  1. subscribe() does NOT fire immediately
-  2. INITIAL_SESSION fires all subscribers
-  3. Multiple subscribers each get called
-  4. Internal state updates correctly
+  - `subscribe()` fires immediately ✅
+  - No duplicate calls on `INITIAL_SESSION` when user unchanged ✅
+  - Multiple subscribers fire immediately without duplication ✅
+  - State management works correctly ✅
+  - Unsubscribe removes listeners ✅
 
-## Overview
-This document specifies all tests and DevTools flows required to verify the duplicate API calls fix is working correctly.
+### Test Results
+```
+✓ src/api/authState.test.ts (9 tests) 396ms
+Test Files  13 passed (13)
+Tests  228 passed (228)  [+9 new auth tests]
+```
+
+---
+
+## Unit Tests - Implementation Details
+
+**File:** `src/api/authState.test.ts`
+
+### Test 1: subscribe() Fires Immediately
+```
+✓ subscribe() fires immediately with current auth state
+  - Verifies callback fires synchronously when subscribe() is called
+  - Ensures components get initial state without waiting
+```
+
+### Test 2: subscribe() Fires Immediately with User
+```
+✓ subscribe() fires immediately with user from initialization
+  - Verifies callback includes pre-loaded user from getCurrentUser()
+  - Ensures no race conditions with async initialization
+```
+
+### Test 3: INITIAL_SESSION Does Not Duplicate
+```
+✓ INITIAL_SESSION does not fire callback if user unchanged
+  - Verifies no duplicate notification when user null→null (no change)
+  - Tests the core fix: preventing INITIAL_SESSION duplicates
+```
+
+### Test 4: Other Events Still Notify
+```
+✓ Other events still notify (TOKEN_REFRESHED, etc)
+  - Verifies SIGNED_IN events still trigger callbacks
+  - Ensures non-INITIAL_SESSION events work correctly
+```
+
+### Test 5: Multiple Subscribers Fire Immediately
+```
+✓ all subscribers fire immediately
+  - Verifies all registered listeners get initial state
+  - Prevents early subscribers from missing auth state
+```
+
+### Test 6: No Duplicates with Multiple Subscribers
+```
+✓ no duplicate calls on INITIAL_SESSION
+  - Tests that even with multiple subscribers, INITIAL_SESSION doesn't cause duplicates
+  - Demonstrates fix works at scale
+```
+
+### Test 7-9: State Management & Unsubscribe
+```
+✓ getUser() returns current state
+✓ isAuthenticated() reflects state
+✓ unsubscribe removes listener
+  - Verify state queries work correctly
+  - Verify cleanup removes listeners from notifications
+```
+
+---
+
+## Manual DevTools Testing Flows
+
+### Prerequisites
+- Start dev server: `npm run dev`
+- Open Chrome DevTools on page
+- Use Network tab to filter: `fetch/xhr`
+- Use Console tab to check for errors
+
+### Test 1: Fresh Page Load (Logged Out)
+**Expected: 2 requests total**
+
+```
+Steps:
+1. Open incognito window
+2. Navigate to http://localhost:3003
+3. Wait for page to fully load
+4. Check Network tab
+
+Expected Requests:
+├── GET /auth/v1/user (200, no user)
+└── GET /scores (getAllScores)
+
+Success Criteria:
+✓ Exactly 2 requests
+✓ No duplicate getAllScores
+✓ Page shows "Log In" / "Sign Up" buttons
+✓ Console has no auth errors
+```
+
+### Test 2: Fresh Page Load (Logged In)
+**Expected: 3 requests total**
+
+```
+Steps:
+1. Login first (or use existing session)
+2. Open DevTools → Network tab
+3. Navigate to http://localhost:3003 (fresh page)
+4. Wait for load
+
+Expected Requests:
+├── GET /auth/v1/user (200, with user)
+├── GET /scores?user_id=... (getUserScores)
+└── GET /scores (getAllScores)
+
+Success Criteria:
+✓ Exactly 3 requests
+✓ No duplicate calls
+✓ Page immediately shows user email
+✓ "My Scores" section appears
+```
+
+### Test 3: Page Reload (Logged In)
+**Expected: 3 requests, session persists**
+
+```
+Steps:
+1. Login and navigate to home page
+2. Open DevTools → Network tab
+3. Hard refresh (Cmd+Shift+R / Ctrl+Shift+R)
+4. Wait for load
+
+Expected Requests:
+├── GET /auth/v1/user (validates session from cookies)
+├── GET /scores?user_id=...
+└── GET /scores
+
+Success Criteria:
+✓ Exactly 3 requests (same as fresh logged-in load)
+✓ NO flicker from logged-out to logged-in
+✓ User immediately appears in UI
+✓ Session cookie used (no new login needed)
+```
+
+### Test 4: Login Flow
+**Expected: Clean sequence without duplicates**
+
+```
+Steps:
+1. Open DevTools → Network tab
+2. On home page (logged out), click "Log In"
+3. Enter test credentials:
+   Email: chris+shakuhachi+test@rauh.net
+   Password: computer
+4. Submit and observe network
+
+Expected Sequence:
+├── POST /auth/v1/token (login request)
+├── GET /scores?user_id=... (getUserScores)
+└── GET /scores (getAllScores)
+
+Success Criteria:
+✓ 1 login request
+✓ 2 load requests (getUserScores + getAllScores)
+✓ No duplicate getAllScores calls
+✓ UI immediately updates (no flickering)
+✓ "My Scores" section appears after login
+```
+
+### Test 5: Navigation Between Pages (Logged In)
+**Expected: 1 auth check per new page, 0 duplicate score calls**
+
+```
+Steps:
+1. Login on home page
+2. Open DevTools → Network tab, clear it
+3. Navigate: Home → About → Score Detail → Home
+4. Count requests per navigation
+
+Expected Pattern (per page navigation):
+Each navigation:
+├── GET /auth/v1/user (1 per page, revalidates session)
+└── [Page-specific API calls]
+
+Success Criteria:
+✓ 1 auth check per page load
+✓ No duplicate getAllScores across pages
+✓ No extra API calls from auth state changes
+```
+
+### Test 6: Multiple Tabs (Same Session)
+**Expected: Auth syncs without duplicate calls**
+
+```
+Steps:
+1. Open 2 tabs to http://localhost:3003
+2. Open DevTools on both → Network tabs
+3. Login in Tab 1
+4. Observe Tab 2 (should auto-update)
+
+Expected Behavior:
+Tab 1:
+├── GET /auth/v1/user → login
+├── POST /auth/v1/token
+├── GET /scores?user_id=...
+└── GET /scores
+
+Tab 2:
+├── GET /auth/v1/user → detects login via session
+├── GET /scores?user_id=...
+└── GET /scores
+
+Success Criteria:
+✓ Both tabs update to logged-in state
+✓ No duplicate requests in either tab
+✓ Auth synced via cookies (not duplicate API calls)
+✓ "My Scores" appears on both tabs
+```
+
+---
+
+## Console Logging (If Debug Mode Enabled)
+
+The implementation can be instrumented with console logs to verify call sequences:
+
+**Healthy Log Pattern:**
+```
+[AuthStateManager] subscribe() called, firing immediately
+[ScoreLibrary] subscription callback fired
+[ScoreLibrary] loadScores() called
+[ScoreLibrary] calling getAllScores()
+[ScoreLibrary] getAllScores() returned: X scores
+```
+
+**Unhealthy Pattern (would indicate bugs):**
+```
+// Bad: Multiple loadScores() calls
+[ScoreLibrary] loadScores() called
+[ScoreLibrary] loadScores() called  // ❌ DUPLICATE
+
+// Bad: Multiple getAllScores() calls
+[ScoreLibrary] calling getAllScores()
+[ScoreLibrary] calling getAllScores()  // ❌ DUPLICATE
+```
+
+---
+
+## Architecture Benefits
+
+The TDD approach revealed and fixed the core architectural issue:
+
+**The Problem:**
+- `subscribe()` did NOT fire immediately → components didn't get initial state
+- `INITIAL_SESSION` fired for all subscribers → duplicate notifications
+- This created a two-path problem:
+  - Some components get state from `getUser()` (synchronous)
+  - Some components get state from `subscribe()` callback (asynchronous)
+  - Race conditions and duplicates resulted
+
+**The Solution:**
+- `subscribe()` fires immediately → single path for all components
+- `INITIAL_SESSION` filtered if user unchanged → no duplicates
+- Clear, simple contract:
+  - Subscribe = get current state immediately + future updates
+  - No race conditions, no duplicate callbacks
+
+**The Benefit:**
+- Components use one consistent pattern
+- No guards needed (`if (userChanged)`)
+- Session persists correctly on reload
+- No duplicate API calls
+- Cleaner, more maintainable code
+
+---
+
+## Files Modified
+
+1. **src/api/authState.ts** (Implementation)
+   - subscribe() fires immediately
+   - onAuthStateChange filters INITIAL_SESSION
+
+2. **src/api/authState.test.ts** (Tests - NEW)
+   - 9 comprehensive unit tests
+   - Tests document expected behavior
+
+3. **src/components/ScoreLibrary.ts** (Usage)
+   - Removed double-call guard
+   - Simplified to rely on subscribe()
+
+4. **docs/DUPLICATE-API-CALLS-TEST-PLAN.md** (Documentation - NEW)
+   - Complete test specification
+   - DevTools manual test flows
+   - Architecture rationale
+
+---
+
+## Verification Checklist
+
+- [x] Unit tests written (9 tests)
+- [x] Tests PASS with fixed implementation (228 total)
+- [x] No regression in other tests
+- [x] Type checking passes
+- [x] Linting passes
+- [ ] Manual DevTools testing (next phase)
+- [ ] Production deployment verification
+
+---
+
+## Next Steps
+
+1. **Manual Verification** (Use DevTools Flows Above)
+   - Run Test 1: Fresh page load (logged out)
+   - Run Test 2: Fresh page load (logged in)
+   - Run Test 3: Page reload (logged in)
+   - Run Test 4: Login flow
+   - Run Test 5: Navigation between pages
+   - Run Test 6: Multiple tabs
+
+2. **Performance Measurement**
+   - Compare before/after LCP, TTFB metrics
+   - Verify getAllScores called exactly once per load
+
+3. **Code Review**
+   - Review architecture improvements
+   - Verify no security implications
+
+4. **Merge & Deploy**
+   - Merge feature branch to main
+   - Deploy and monitor production
+
+---
+
+## References
+
+- Test file: `src/api/authState.test.ts`
+- Implementation: `src/api/authState.ts`
+- Usage example: `src/components/ScoreLibrary.ts`
+
 
 ## Unit Tests (Vitest)
 
