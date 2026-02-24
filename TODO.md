@@ -30,13 +30,11 @@
   - Invetsigate different values for button vs label vs copy.
   - Should not apply to score rendered text
 
-- [ ] [Backend] [High] Optimize ScoreLibrary initial load (duplicate API calls)
-  - Currently: `getAllScores()` is called twice on initial page load
-  - First call: Triggered by auth subscription callback in constructor
-  - Second call: Triggered by constructor's own `loadScores()` call
-  - **Impact**: Minor - causes duplicate network request but doesn't break functionality
-  - **Fix**: Add loading state check to prevent redundant API calls when data is already being fetched
-  - **Example**: `if (this.isLoading) return;` guard in `loadScores()` or defer initial load until after auth state resolves
+- [x] [Backend] [High] Optimize ScoreLibrary initial load (duplicate API calls)
+  - Fixed by `onAuthReady` helper which deduplicates auth state callbacks
+  - Previously: SIGNED_IN + INITIAL_SESSION both triggered loadScores()
+  - Now: onAuthReady only fires once per user change, eliminating duplicate API calls
+  - Verified with comprehensive test matrix - all scenarios show correct API call counts
 
 - [ ] [UI] [High] Replace alert() dialogs with in-app notifications
   - Currently using browser alert() for error messages and success confirmations
