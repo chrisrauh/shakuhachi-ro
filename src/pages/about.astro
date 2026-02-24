@@ -148,6 +148,37 @@ const { Content } = await aboutPage.render();
       color: var(--color-text-heading);
     }
 
+    .about-section :global(pre) {
+      border-radius: var(--border-radius-medium);
+      padding: var(--spacing-medium);
+      margin: var(--spacing-medium) 0;
+      overflow-x: auto;
+      font-size: var(--font-size-small);
+      line-height: 1.5;
+    }
+
+    /* Switch to dark theme colors when in dark mode */
+    :global([data-theme='dark']) .about-section :global(pre) {
+      background-color: var(--shiki-dark-bg) !important;
+      color: var(--shiki-dark) !important;
+    }
+
+    :global([data-theme='dark']) .about-section :global(pre span) {
+      color: var(--shiki-dark) !important;
+    }
+
+    .about-section :global(code) {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    }
+
+    .about-section :global(p code) {
+      background-color: var(--color-background-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-small);
+      padding: 2px 6px;
+      font-size: 0.9em;
+    }
+
     @media (max-width: 768px) {
       .about-page {
         padding: 0 var(--spacing-small);

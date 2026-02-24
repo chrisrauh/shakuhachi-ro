@@ -28,6 +28,31 @@ Shakuhachi.ro is an open-source project. The code is available on [GitHub](https
 
 The shakuhachi notation renderer is also available as a standalone library that developers can use in their own projects.
 
+### Using the Renderer
+
+Here's a simple example of how to use the renderer in your own project:
+
+```typescript
+import { ScoreRenderer } from 'shakuhachi-ro';
+
+// Create a renderer instance
+const renderer = new ScoreRenderer(container);
+
+// Render a score from a URL
+await renderer.renderFromURL('/path/to/score.musicxml');
+
+// Or render from score data
+await renderer.renderFromScoreData({
+  key: 'D',
+  style: 'kinko',
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 4 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 4 },
+    // ...more notes
+  ],
+});
+```
+
 ## Contact
 
 Questions, feedback, or issues? Reach out via [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) or email [hello@shakuhachi.ro](mailto:hello@shakuhachi.ro).

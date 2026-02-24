@@ -6,6 +6,14 @@ export default defineConfig({
   output: 'server',
   adapter: netlify(),
   integrations: [mdx()],
+  markdown: {
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    },
+  },
   root: '.',
   srcDir: './src',
   publicDir: './public',
