@@ -22,7 +22,7 @@
   - Check tone and messaging
   - Verify all information is accurate
 
-- [ ] [Backend] [A:High] Create embeddable score renderer web component
+- [x] [Backend] [A:High] Create embeddable score renderer web component
   - Create `<shakuhachi-score>` web component class that wraps ScoreRenderer
   - Component accepts JSON score data via element content or `data-score` attribute
   - Uses Shadow DOM for style encapsulation
