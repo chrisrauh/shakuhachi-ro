@@ -119,6 +119,19 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         padding: 0;
       }
 
+      /* On mobile, revert to natural document scrolling */
+      @media (max-width: 768px) {
+        body.full-height {
+          height: auto;
+          min-height: 100vh;
+        }
+
+        body.full-height main {
+          flex: none;
+          overflow: visible;
+        }
+      }
+
       header {
         padding: var(--spacing-medium) var(--spacing-medium);
         display: flex;
