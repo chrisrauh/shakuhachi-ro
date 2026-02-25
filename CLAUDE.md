@@ -41,6 +41,14 @@
 
 Single meta-principle: **optimize for humans, not machines**. Everything else flows from that.
 
+## CSS/Styling Guidelines
+
+- **NEVER use `!important`** - This is a code smell indicating underlying architectural problems with CSS specificity or cascade order. If you need `!important`, fix the root cause instead:
+  - Refactor CSS specificity (use more specific selectors)
+  - Reorder stylesheets or style declarations
+  - Review component styling architecture
+  - Check for conflicting global styles
+
 ## Dev Workflow
 
 ⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
