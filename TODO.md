@@ -16,17 +16,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] [UI] [A:High] Convert About page to MDX
-  - Move content from `src/pages/about.astro` to `src/content/about.mdx`
-  - Keep existing Layout, PageHeader, and page scripts (theme switcher, auth widget, mobile menu)
-  - Style MDX content to match current CSS (headings, paragraphs, links, sections)
-  - Result: Content is editable as markdown, layout/styling unchanged
-
-- [x] [Content] [A:High] Add 5 popular shakuhachi songs to the score library
-  - Research songs online
-  - Make sure the songs are not copyrighted
-  - Make correct attribution, including url where it was retrieved from (need to add this field from the database, as well as rights field)
-
 - [ ] [Content] Edit About page content
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
@@ -64,12 +53,6 @@
   - For example: letter-spacing: -0.02em;
   - Invetsigate different values for button vs label vs copy.
   - Should not apply to score rendered text
-
-- [x] [Backend] [High] Optimize ScoreLibrary initial load (duplicate API calls)
-  - Fixed by `onAuthReady` helper which deduplicates auth state callbacks
-  - Previously: SIGNED_IN + INITIAL_SESSION both triggered loadScores()
-  - Now: onAuthReady only fires once per user change, eliminating duplicate API calls
-  - Verified with comprehensive test matrix - all scenarios show correct API call counts
 
 - [ ] [UI] [A:High] Replace alert() dialogs with in-app notifications
   - Currently using browser alert() for error messages and success confirmations
