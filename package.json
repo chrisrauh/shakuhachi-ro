@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:embed": "vite build --config vite.embed.config.ts",
     "preview": "astro preview",
     "type-check": "tsc --noEmit && astro check",
     "lint": "eslint src tests *.{js,ts}",

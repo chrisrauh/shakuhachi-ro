@@ -7,6 +7,7 @@
  * Coverage:
  *   - Landing page and Akatombo score page
  *   - Button components test page
+ *   - Score renderer test examples (15 test cases × 2 themes)
  *   - Light and dark color schemes
  *   - Desktop (1280x720) and mobile (375x667) viewports
  *
@@ -72,4 +73,25 @@ test.describe('Visual Regression', () => {
       }
     }
   }
+
+  // Shakuhachi-score web component test page - single full-page screenshot
+  // (Page already includes both light/dark themes side-by-side)
+  test('shakuhachi-score - full page', async ({ page }) => {
+    // Set viewport wide enough to fit the 1000px fixed-width page
+    await page.setViewportSize({
+      width: 1280,
+      height: 2000, // Tall enough to capture all 3 examples
+    });
+
+    // Navigate to page
+    await page.goto('/test/shakuhachi-score.html');
+
+    // Wait for rendering to complete
+    await page.waitForTimeout(1000);
+
+    // Take full-page screenshot
+    await expect(page).toHaveScreenshot('shakuhachi-score-full-page.png', {
+      fullPage: true,
+    });
+  });
 });
