@@ -30,28 +30,56 @@ The shakuhachi notation renderer is also available as a standalone library that 
 
 ### Using the Renderer
 
-Here's a simple example of how to use the renderer in your own project:
+The easiest way to embed shakuhachi notation on any website is using the `<shakuhachi-score>` web component.
+
+For developers using npm packages, you can also import the ScoreRenderer class directly:
 
 ```typescript
 import { ScoreRenderer } from 'shakuhachi-ro';
 
-// Create a renderer instance
 const renderer = new ScoreRenderer(container);
-
-// Render a score from a URL
-await renderer.renderFromURL('/path/to/score.musicxml');
-
-// Or render from score data
-await renderer.renderFromScoreData({
-  key: 'D',
-  style: 'kinko',
-  notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: 4 },
-    { pitch: { step: 'tsu', octave: 0 }, duration: 4 },
-    // ...more notes
-  ],
-});
+await renderer.renderFromScoreData({ /* score data */ });
 ```
+
+### Live Example
+
+Below is a live example showing the opening phrase of "Akatombo" (Red Dragonfly), a beloved Japanese folk song. The code shows exactly how to embed shakuhachi notation on any website:
+
+```html
+<!-- Include the script once in your HTML -->
+<script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
+
+<!-- Use the web component with score data -->
+<shakuhachi-score single-column="true" data-score='{
+  "title": "Akatombo (Opening Phrase)",
+  "style": "kinko",
+  "notes": [
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2, "dotted": true },
+    { "pitch": { "step": "chi", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "ri", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "u", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "hi", "octave": 1 }, "duration": 1 },
+    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 }
+  ]
+}'>
+</shakuhachi-score>
+```
+
+**Live result:**
+
+<div class="score-example">
+  <shakuhachi-score class="score-viz" single-column="true" data-score='{"title":"Akatombo (Opening Phrase)","style":"kinko","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
+  <div class="score-comments">
+    **What you're seeing:**
+    - **Vertical reading**: Notes read top to bottom, then move to the next column
+    - **Octave markers**: The 乙 (otsu, lower octave) and 甲 (kan, upper octave) characters above notes indicate which register to play in
+    - **Duration dots**: The dot below the third note extends its duration by half (like western notation)
+    - **Traditional characters**: Shakuhachi uses Japanese katakana-based characters (ロ、ツ、レ、チ、リ、ウ、ヒ) to represent finger holes
+  </div>
+</div>
 
 ## Contact
 
