@@ -68,8 +68,8 @@ if (score?.forked_from) {
   <!-- Score content -->
   <div class="score-detail-container">
 
-    <!-- Score renderer container -->
-    <div id="score-renderer-container"></div>
+    <!-- Score renderer using web component -->
+    <shakuhachi-score id="score-renderer"></shakuhachi-score>
 
     <!-- Attribution section (only for scores with attribution data) -->
     {(score.source_url || score.rights || score.source_description) && (
@@ -91,6 +91,9 @@ if (score?.forked_from) {
 
   <!-- Embed score data for client -->
   <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score, parentScore })}></script>
+
+  <!-- Load web component for score rendering -->
+  <script is:inline src="/embed/shakuhachi-score.js"></script>
 
   <!-- Initialize relative-time web component -->
   <script>
@@ -236,6 +239,7 @@ if (score?.forked_from) {
 
     /* Page content styling */
     .score-detail-container {
+      width: 100%; /* Fill viewport width */
       max-width: 1200px;
       margin: 0 auto;
       padding: var(--spacing-large) var(--spacing-large) 0;
@@ -243,15 +247,18 @@ if (score?.forked_from) {
       flex: 1;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box; /* Include padding in width calculation */
     }
 
-    #score-renderer-container {
+    #score-renderer {
+      /* Flex child - fills available space in parent flex container */
       flex: 1;
-      min-height: 0; /* Important for flex child with overflow */
-    }
-
-    :global(#score-renderer-container svg) {
-      display: block; /* Remove inline descender space */
+      /* Needed for custom elements to participate in flex layout */
+      display: block;
+      min-height: 0; /* Allow flex shrinking */
+      /* Fill parent dimensions (parent is flex container) */
+      width: 100%;
+      align-self: stretch; /* Stretch to fill cross axis */
     }
 
     /* Attribution section */
