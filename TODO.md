@@ -16,6 +16,14 @@
 
 ## Alpha Release (Must-Haves)
 
+- [ ] [Backend] [A:High] Continue platform migration to web component
+  - Follow migration checklist: [SCORERENDERER_MIGRATION_CHECKLIST.md](./docs/SCORERENDERER_MIGRATION_CHECKLIST.md)
+  - ✅ Test page migrated and deployed
+  - ✅ About page migrated and deployed
+  - Next: Score detail page (`/src/pages/score/[slug].astro`)
+  - Then: Score editor (`/src/components/ScoreEditor.ts`)
+  - Strategy: One page per PR, validate each step
+
 - [ ] [Content] Edit About page content
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
