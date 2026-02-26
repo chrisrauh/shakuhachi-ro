@@ -22,31 +22,6 @@
   - Check tone and messaging
   - Verify all information is accurate
 
-- [x] [Backend] [A:High] Create embeddable score renderer web component
-  - Create `<shakuhachi-score>` web component class that wraps ScoreRenderer
-  - Component accepts JSON score data via element content or `data-score` attribute
-  - Uses Shadow DOM for style encapsulation
-  - Theme-aware via CSS custom properties (`--shakuhachi-note-color`)
-  - Supports attributes: `debug`, `single-column`, `note-color`
-  - Set up build configuration (`vite.config.embed.ts`) to bundle as standalone IIFE
-  - Build to `/public/embed/embed.js` for external website usage
-  - Create standalone test page (`/public/embed-test.html`) to verify independence
-  - Test: Component renders scores correctly, works without platform dependencies
-  - **Result**: Developers can embed shakuhachi scores on any website with simple `<script>` + `<shakuhachi-score>` tags
-  - **Reference plan**: `/Users/crauh/.claude/plans/virtual-hopping-lollipop.md`
-
-- [x] [UI] [A:High] Add score renderer examples to About page
-  - Add "Live Examples" section to `/src/content/pages/about.mdx` after "Using the Renderer" section
-  - Include 1-2 song snippet examples (8-12 notes) showing notation features in context
-  - Use side-by-side layout (score visualization + explanatory comments)
-  - Load web component in `/src/pages/about.astro` via `<script src="/embed/embed.js">`
-  - Add CSS styling for `.score-example` containers (side-by-side on desktop, stacked on mobile)
-  - Comments should explain: octave marks, meri/kari modifiers, duration dots, vertical reading
-  - Include usage instructions showing how external developers can use the component
-  - Visual verification with chrome-devtools-mcp (light/dark themes, mobile/desktop)
-  - **Result**: About page demonstrates live renderer usage, serves as documentation and test
-  - **Reference plan**: `/Users/crauh/.claude/plans/virtual-hopping-lollipop.md`
-
 ## Fast Follow (Post-Alpha)
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
