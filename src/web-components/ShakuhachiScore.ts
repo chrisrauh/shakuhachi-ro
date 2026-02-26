@@ -16,6 +16,7 @@
  *   --shakuhachi-note-font-size: Font size of notes (default: 28px)
  *   --shakuhachi-note-font-weight: Font weight of notes (default: 400)
  *   --shakuhachi-note-font-family: Font family (default: 'Noto Sans JP', sans-serif)
+ *   --shakuhachi-note-vertical-spacing: Vertical spacing between notes (default: 44px)
  */
 
 import { ScoreRenderer } from '../renderer/ScoreRenderer';
@@ -30,6 +31,10 @@ class ShakuhachiScore extends HTMLElement {
   private renderer: ScoreRenderer | null = null;
   private shadow: ShadowRoot;
 
+  static get observedAttributes() {
+    return ['data-score', 'single-column'];
+  }
+
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -37,6 +42,17 @@ class ShakuhachiScore extends HTMLElement {
 
   connectedCallback() {
     this.render();
+  }
+
+  attributeChangedCallback(
+    _name: string,
+    oldValue: string | null,
+    newValue: string | null,
+  ) {
+    // Only re-render if the element is connected and the value actually changed
+    if (this.isConnected && oldValue !== newValue) {
+      this.render();
+    }
   }
 
   disconnectedCallback() {
@@ -47,23 +63,44 @@ class ShakuhachiScore extends HTMLElement {
   }
 
   /**
+   * Public method to force re-render (useful for theme changes)
+   */
+  public forceRender() {
+    this.render();
+  }
+
+  /**
    * Parse score data from data-score attribute or textContent
    * Priority: data-score attribute > textContent
+   * Returns null if no data is available (not an error - component may not be ready yet)
    */
-  private parseScoreData(): ScoreData {
+  private parseScoreData(): ScoreData | null {
     // Try data-score attribute first
     const dataScore = this.getAttribute('data-score');
     if (dataScore) {
-      return JSON.parse(dataScore);
+      try {
+        return JSON.parse(dataScore);
+      } catch (error) {
+        throw new Error(
+          `Invalid JSON in data-score attribute: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
     }
 
     // Fallback to textContent
     const content = this.textContent?.trim();
     if (content) {
-      return JSON.parse(content);
+      try {
+        return JSON.parse(content);
+      } catch (error) {
+        throw new Error(
+          `Invalid JSON in textContent: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
     }
 
-    throw new Error('No score data provided');
+    // No data available yet - not an error, component may still be initializing
+    return null;
   }
 
   /**
@@ -172,6 +209,7 @@ class ShakuhachiScore extends HTMLElement {
     noteFontSize: number;
     noteFontWeight: number;
     noteFontFamily: string;
+    noteVerticalSpacing: number;
   } {
     const computedStyle = getComputedStyle(this);
 
@@ -191,6 +229,10 @@ class ShakuhachiScore extends HTMLElement {
         computedStyle
           .getPropertyValue('--shakuhachi-note-font-family')
           .trim() || 'Noto Sans JP, sans-serif',
+      noteVerticalSpacing:
+        parseInt(
+          computedStyle.getPropertyValue('--shakuhachi-note-vertical-spacing'),
+        ) || 44,
     };
   }
 
@@ -201,6 +243,11 @@ class ShakuhachiScore extends HTMLElement {
   private render() {
     try {
       const scoreData = this.parseScoreData();
+
+      // No data available yet - wait for attribute to be set
+      if (!scoreData) {
+        return;
+      }
 
       // Parse notes to calculate dimensions
       const notes = ScoreParser.parse(scoreData);
@@ -222,14 +269,17 @@ class ShakuhachiScore extends HTMLElement {
       const style = document.createElement('style');
       style.textContent = `
         :host {
-          display: inline-block;
+          display: block;
           --shakuhachi-note-color: #000;
           --shakuhachi-note-font-size: 28px;
           --shakuhachi-note-font-weight: 400;
           --shakuhachi-note-font-family: 'Noto Sans JP', sans-serif;
+          --shakuhachi-note-vertical-spacing: 44px;
         }
         .shakuhachi-score-container {
           overflow: visible;
+          width: 100%;
+          height: 100%;
         }
       `;
 
@@ -246,25 +296,44 @@ class ShakuhachiScore extends HTMLElement {
         ...themeOptions,
       };
 
-      // For single-column: only set height (intrinsic), let width be determined by container
-      // Exception: if intrinsic-width attribute is set, calculate and use intrinsic width
-      // For multi-column: set both width and height explicitly
+      // Sizing strategy:
+      // - Single-column: Intrinsic height (content-based), explicit width (for centering)
+      // - Multi-column: Explicit width and height (parent-based)
       if (isSingleColumn) {
+        // Intrinsic height: calculate from content for scrolling pages
         renderOptions.height = this.calculateIntrinsicHeight(notes);
+
+        // Explicit width: use width attribute if provided (for proper centering)
+        const widthAttr = this.getAttribute('width');
+        if (widthAttr) {
+          renderOptions.width = parseInt(widthAttr);
+        }
+        // Otherwise, renderer will read from container.getBoundingClientRect()
 
         // Optional: use intrinsic width (opt-in via attribute)
         if (this.hasAttribute('intrinsic-width')) {
           renderOptions.width = this.calculateIntrinsicWidth(notes);
-        } else {
-          // Default: set minimum container width, let ScoreRenderer use container dimensions
-          container.style.minWidth = '120px';
         }
       } else {
-        // Multi-column requires explicit dimensions
+        // Extrinsic sizing: use dimensions from parent
+        // Check for explicit width/height attributes first
         const widthAttr = this.getAttribute('width');
         const heightAttr = this.getAttribute('height');
-        renderOptions.width = widthAttr ? parseInt(widthAttr) : 500;
-        renderOptions.height = heightAttr ? parseInt(heightAttr) : 600;
+
+        // Use explicit attributes if provided
+        if (widthAttr) {
+          renderOptions.width = parseInt(widthAttr);
+        } else {
+          // Read from host element (sized by parent via CSS)
+          renderOptions.width = this.clientWidth || 800;
+        }
+
+        if (heightAttr) {
+          renderOptions.height = parseInt(heightAttr);
+        } else {
+          // Read from host element (sized by parent via CSS)
+          renderOptions.height = this.clientHeight || 600;
+        }
       }
 
       // Render using ScoreRenderer

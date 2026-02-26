@@ -109,6 +109,14 @@ Run `npm run test:visual` before creating PR. When tests fail:
 - Only update baselines after user approval with `npm run test:visual:update`
 - Unit tests can be updated directly as they don't require visual approval
 
+**CRITICAL: NEVER proceed with failing tests**
+
+- If ANY test fails, STOP and investigate
+- NEVER update baselines without user approval
+- NEVER decide a failing test is "acceptable" - always ask the user
+- Do not proceed to next steps, create PRs, or mark tasks complete while tests are failing
+- The user decides what is acceptable, not you
+
 **Component Test Pages**
 
 Test pages for visual verification during development (available when dev server is running):
