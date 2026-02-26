@@ -20,6 +20,9 @@ const { Content } = await aboutPage.render();
     </div>
   </div>
 
+  <!-- Load web component for score examples -->
+  <script is:inline src="/embed/shakuhachi-score.js"></script>
+
   <script>
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
     import { ThemeSwitcher } from '../components/ThemeSwitcher';
@@ -179,6 +182,46 @@ const { Content } = await aboutPage.render();
       font-size: 0.9em;
     }
 
+    /* Score Example Styling */
+    .about-section :global(.score-example) {
+      margin: var(--spacing-large) 0;
+      padding: var(--spacing-large);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-medium);
+      background-color: var(--color-background-elevated);
+      display: flex;
+      gap: var(--spacing-large);
+      align-items: flex-start;
+    }
+
+    .about-section :global(.score-viz) {
+      flex: 0 0 auto;
+      min-width: 120px;
+      --shakuhachi-note-color: var(--color-text-primary);
+    }
+
+    .about-section :global(.score-comments) {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: var(--font-size-small);
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+    }
+
+    .about-section :global(.score-comments strong) {
+      font-weight: 600;
+      color: var(--color-text-heading);
+    }
+
+    .about-section :global(.score-comments ul) {
+      margin: var(--spacing-small) 0;
+      padding-left: var(--spacing-medium);
+    }
+
+    .about-section :global(.score-comments li) {
+      margin-bottom: var(--spacing-x-small);
+    }
+
     @media (max-width: 768px) {
       .about-page {
         padding: 0 var(--spacing-small);
@@ -194,6 +237,15 @@ const { Content } = await aboutPage.render();
 
       .about-section :global(p) {
         font-size: var(--font-size-small);
+      }
+
+      .about-section :global(.score-example) {
+        flex-direction: column;
+        padding: var(--spacing-medium);
+      }
+
+      .about-section :global(.score-viz) {
+        width: 100%;
       }
     }
   </style>

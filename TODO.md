@@ -35,7 +35,7 @@
   - **Result**: Developers can embed shakuhachi scores on any website with simple `<script>` + `<shakuhachi-score>` tags
   - **Reference plan**: `/Users/crauh/.claude/plans/virtual-hopping-lollipop.md`
 
-- [ ] [UI] [A:High] Add score renderer examples to About page
+- [x] [UI] [A:High] Add score renderer examples to About page
   - Add "Live Examples" section to `/src/content/pages/about.mdx` after "Using the Renderer" section
   - Include 1-2 song snippet examples (8-12 notes) showing notation features in context
   - Use side-by-side layout (score visualization + explanatory comments)
