@@ -67,10 +67,10 @@ Track the gradual migration from direct `ScoreRenderer` usage to the `<shakuhach
 - [x] Run visual regression tests (shakuhachi-score-full-page.png)
 
 **Deployment:**
-- [ ] Create PR with screenshots
-- [ ] Get review approval
-- [ ] Merge and deploy
-- [ ] Verify in production
+- [x] Create PR with screenshots (PR #123)
+- [x] Get review approval
+- [x] Merge and deploy
+- [x] Verify in production
 
 **Notes:**
 - Fixed alignment and duration line rendering during migration
@@ -79,11 +79,46 @@ Track the gradual migration from direct `ScoreRenderer` usage to the `<shakuhach
 
 ### 🚧 In Progress
 
-- [ ] (None currently)
+#### About Page Migration (`/src/content/pages/about.mdx` + `/src/pages/about.astro`)
+
+**Pre-migration:**
+- [x] Take screenshot (before state)
+- [x] Identify ScoreRenderer usage (code example in MDX)
+- [x] Note custom options (none - just example code)
+
+**Migration:**
+- [x] Replace ScoreRenderer code example with web component example
+- [x] Add "Live Example" section with Akatombo first phrase
+- [x] Load web component script in about.astro with `is:inline` directive
+- [x] Add CSS styling for score example (side-by-side layout)
+- [x] Test in dev server
+
+**Validation:**
+- [x] Take screenshot (after state)
+- [x] Compare before/after visually
+- [x] Test light/dark themes
+- [x] Test responsive behavior (mobile stacks vertically)
+- [x] Verify no console errors (clean!)
+- [ ] User review and approval
+- [ ] Run visual regression tests
+
+**Deployment:**
+- [ ] Create PR with before/after screenshots
+- [ ] Get review approval
+- [ ] Merge and deploy
+- [ ] Verify in production
+
+**Notes:**
+- Used `data-score` attribute with inline JSON for simplicity
+- Added `single-column="true"` attribute for vertical layout
+- Score example shows opening phrase of Akatombo (9 notes)
+- Includes educational comments explaining notation features
+- Mobile layout stacks score above comments (flexbox column direction)
 
 ### 📋 TODO
 
-- [ ] All pages listed in "Usage Audit" above
+- [ ] `/src/pages/score/[slug].astro` - Score detail viewer
+- [ ] All other pages listed in "Usage Audit" above
 
 ---
 
