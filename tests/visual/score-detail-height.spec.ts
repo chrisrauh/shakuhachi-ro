@@ -26,7 +26,7 @@ test.describe('Score Detail Page - Height', () => {
       .first()
       .boundingBox();
     const rendererBox = await page
-      .locator('#score-renderer-container')
+      .locator('#score-renderer')
       .boundingBox();
 
     // Verify renderer exists and has dimensions
@@ -41,7 +41,7 @@ test.describe('Score Detail Page - Height', () => {
 
     // Verify renderer container has flex properties
     const rendererStyles = await page
-      .locator('#score-renderer-container')
+      .locator('#score-renderer')
       .evaluate((el) => {
         const computed = window.getComputedStyle(el);
         return {
@@ -120,7 +120,7 @@ test.describe('Score Detail Page - Height', () => {
       .first()
       .boundingBox();
     const rendererBox = await page
-      .locator('#score-renderer-container')
+      .locator('#score-renderer')
       .boundingBox();
 
     expect(rendererBox).not.toBeNull();
@@ -142,7 +142,7 @@ test.describe('Score Detail Page - Height', () => {
       .first()
       .boundingBox();
     const rendererBox = await page
-      .locator('#score-renderer-container')
+      .locator('#score-renderer')
       .boundingBox();
 
     expect(rendererBox).not.toBeNull();
@@ -164,7 +164,7 @@ test.describe('Score Detail Page - Height', () => {
       .first()
       .boundingBox();
     const rendererBox = await page
-      .locator('#score-renderer-container')
+      .locator('#score-renderer')
       .boundingBox();
 
     expect(rendererBox).not.toBeNull();

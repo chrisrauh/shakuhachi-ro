@@ -16,13 +16,19 @@
 
 ## Alpha Release (Must-Haves)
 
+- [ ] Update the favicon to match the new logo
+
 - [ ] [Backend] [A:High] Continue platform migration to web component
   - Follow migration checklist: [SCORERENDERER_MIGRATION_CHECKLIST.md](./docs/SCORERENDERER_MIGRATION_CHECKLIST.md)
   - ✅ Test page migrated and deployed
   - ✅ About page migrated and deployed
-  - Next: Score detail page (`/src/pages/score/[slug].astro`)
-  - Then: Score editor (`/src/components/ScoreEditor.ts`)
+  - ✅ Score detail page migrated and deployed
+  - Next: Score editor (`/src/components/ScoreEditor.ts`)
   - Strategy: One page per PR, validate each step
+
+- [ ] Move all the shakuhachi score to the web-component folder
+  - Keep the directory structure
+  - Validate that the shakuhachi score doesn't have any dependencies on the platform and vice versa
 
 - [ ] [Content] Edit About page content
   - Review and refine content for clarity
@@ -31,6 +37,15 @@
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
+  - Research how other web components handle sizing modes (e.g., `<video>`, `<img>`, `<iframe>`)
+  - Study CSS standard patterns for intrinsic sizing (content-based) vs extrinsic sizing (container-based)
+  - Document how standard HTML elements switch between these modes
+  - Current issue: Web component doesn't properly fill parent container in extrinsic mode (multi-column layout)
+  - Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
+  - Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
+  - Test with Shadow DOM constraints and ensure container dimensions are properly read
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - For example: letter-spacing: -0.02em;

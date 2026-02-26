@@ -1,10 +1,10 @@
-import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
+import type { ScoreData as RendererScoreData } from '../types/ScoreData';
 
 interface ScoreData {
   score: Score;
@@ -13,7 +13,6 @@ interface ScoreData {
 
 export class ScoreDetailClient {
   private score: Score | null = null;
-  private renderer?: ScoreRenderer;
   private currentUser: User | null = null;
 
   constructor() {
@@ -69,51 +68,65 @@ export class ScoreDetailClient {
   }
 
   private async renderScore() {
-    const container = document.getElementById('score-renderer-container');
+    const container = document.getElementById('score-renderer') as HTMLElement;
     if (!container || !this.score) return;
 
     try {
-      // Read theme-aware colors from CSS variables
-      const noteColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-text-primary')
-        .trim();
-      const debugLabelColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-text-tertiary')
-        .trim();
-
-      // Detect mobile viewport
-      const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-      this.renderer = new ScoreRenderer(container, {
-        showDebugLabels: false,
-        noteColor: noteColor || '#000', // Fallback to black
-        debugLabelColor: debugLabelColor || '#999', // Fallback to gray
-        // Mobile-specific options
-        singleColumn: isMobile,
-        autoResize: true, // Keep enabled - handles orientation changes automatically
-        noteVerticalSpacing: isMobile ? 40 : 44, // Slightly tighter on mobile
-        // Use viewport width on mobile for proper sizing
-        width: isMobile ? window.innerWidth - 32 : undefined, // Account for padding
-      });
+      // Convert score data to ScoreData format based on data_format
+      let scoreData: RendererScoreData;
 
       if (this.score.data_format === 'json') {
-        await this.renderer.renderFromScoreData(this.score.data);
+        scoreData = this.score.data as RendererScoreData;
       } else if (this.score.data_format === 'musicxml') {
         // Parse MusicXML string to ScoreData
-        const scoreData = MusicXMLParser.parse(this.score.data);
-        await this.renderer.renderFromScoreData(scoreData);
+        scoreData = MusicXMLParser.parse(this.score.data as string);
       } else if (this.score.data_format === 'abc') {
         // Parse ABC notation to ScoreData
         const { ABCParser } = await import('../parser/ABCParser');
-        const scoreData = ABCParser.parse(this.score.data);
-        await this.renderer.renderFromScoreData(scoreData);
+        scoreData = ABCParser.parse(this.score.data as string);
       } else {
         container.innerHTML = `
           <div style="text-align: center; padding: 40px;">
             <p>Unsupported format: ${this.score.data_format}</p>
           </div>
         `;
+        return;
       }
+
+      // Detect mobile viewport
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+      // Read theme-aware colors from CSS variables
+      const noteColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-text-primary')
+        .trim();
+
+      // Set CSS variables for theme colors BEFORE setting attributes
+      // (setting data-score attribute triggers render, so CSS vars must be ready)
+      container.style.setProperty(
+        '--shakuhachi-note-color',
+        noteColor || '#000',
+      );
+      container.style.setProperty(
+        '--shakuhachi-note-vertical-spacing',
+        isMobile ? '40px' : '44px',
+      );
+
+      if (isMobile) {
+        // Mobile: single-column mode with intrinsic height (fits content for scrolling)
+        container.setAttribute('single-column', 'true');
+        // Pass width for proper centering (height is calculated intrinsically)
+        container.setAttribute('width', String(container.clientWidth));
+      } else {
+        // Desktop: multi-column mode with explicit dimensions (VexFlow pattern)
+        container.setAttribute('single-column', 'false');
+        container.setAttribute('width', String(container.clientWidth));
+        container.setAttribute('height', String(container.clientHeight));
+      }
+
+      // Set web component attributes (triggers render)
+      // This MUST come after width/height attributes are set
+      container.setAttribute('data-score', JSON.stringify(scoreData));
     } catch (error) {
       container.innerHTML = `
         <div style="text-align: center; padding: 40px; color: var(--color-text-danger);">
@@ -129,8 +142,19 @@ export class ScoreDetailClient {
     // Use MutationObserver to watch for theme attribute changes on <html>
     const observer = new MutationObserver(() => {
       // Re-render score when theme changes
-      if (this.score) {
-        this.renderScore();
+      const container = document.getElementById('score-renderer') as any;
+      if (container && container.forceRender) {
+        // Update CSS variable first
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-primary')
+          .trim();
+        container.style.setProperty(
+          '--shakuhachi-note-color',
+          noteColor || '#000',
+        );
+
+        // Force web component to re-render with new theme
+        container.forceRender();
       }
     });
 
