@@ -16,8 +16,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] Update the favicon to match the new logo
-
 - [ ] on package.json, define a script for building just the web component and a script to build just the platform. Then update the build script to use these together. This way we can build all or build each part dpeending on the need.
 
 - [ ] [Backend] [A:High] Continue platform migration to web component
