@@ -18,6 +18,8 @@
 
 - [ ] Update the favicon to match the new logo
 
+- [ ] on package.json, define a script for building just the web component and a script to build just the platform. Then update the build script to use these together. This way we can build all or build each part dpeending on the need.
+
 - [ ] [Backend] [A:High] Continue platform migration to web component
   - Follow migration checklist: [SCORERENDERER_MIGRATION_CHECKLIST.md](./docs/SCORERENDERER_MIGRATION_CHECKLIST.md)
   - ✅ Test page migrated and deployed
@@ -255,10 +257,15 @@ These are important improvements but not needed for initial alpha release.
   - [ ] Score detail page - light & dark mode screenshots
   - [ ] Add appropriate wait times for theme transitions
   - [ ] Ensure score rendering completes before capturing
-- [ ] [UI] [A:High] Add visual regression tests for Editor page (/editor)
-  - [ ] Test default empty state
-  - [ ] Test with score data entered
-  - [ ] Test viewport and full page screenshots
+- [ ] [UI] [A:High] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
+  - [ ] Determine authentication approach for visual tests (use test credentials from .env)
+  - [ ] Test external preview mode (side-by-side desktop layout)
+  - [ ] Test internal preview mode if still used
+  - [ ] Test with all three data formats (JSON, MusicXML, ABC)
+  - [ ] Test empty state (no score data)
+  - [ ] Test light and dark themes
+  - [ ] Test desktop and mobile viewports
+  - [ ] Test mobile toggle between editor and preview panels
 - [ ] [UI] [A:High] Add visual regression tests for Score page (/score)
   - [ ] Test score rendering (full page and viewport)
   - [ ] Test debug mode
