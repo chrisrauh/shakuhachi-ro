@@ -69,6 +69,24 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 For multi-phase work, create separate PR for each phase.
 
+**Build Process**
+
+The web component renderer lives in a separate package and must be built:
+
+- **Build command:** `npm run build:wc`
+- **Output:** `public/embed/shakuhachi-score.js`
+- **When to rebuild:** After any changes to renderer package code
+
+**Integration points:**
+- Edit page: `<script is:inline src="/embed/shakuhachi-score.js">`
+- Detail page: `<script is:inline src="/embed/shakuhachi-score.js">`
+
+**Testing workflow:**
+1. Make renderer changes
+2. Run `npm run build:wc`
+3. Refresh browser (dev server serves from `public/`)
+4. Verify changes with chrome-devtools-mcp
+
 ## Testing
 
 - Unit tests (Vitest): Logic, validation, transformations
@@ -126,6 +144,38 @@ Test pages for visual verification during development (available when dev server
   - Displays default and disabled states side-by-side
   - Use for verifying button styling, sizing, alignment, and hover states
   - Helpful for visual comparison when making button-related changes
+
+**Test Fixtures**
+
+When implementing or testing features that require test data:
+
+- Create permanent test fixtures for common testing scenarios
+- Document test fixtures in this file so they're discoverable
+- Use the test account (credentials in `.env`) to create test data
+- Give fixtures descriptive, memorable names/slugs
+
+Example:
+- Test score for editor testing: `/score/test` (slug: `test`)
+- Owned by test account, contains simple 3-note JSON data
+- Use for testing editor features without creating temporary test data each time
+
+**Evaluating Visual Regression Test Coverage**
+
+After migrations, refactors, or new UI features:
+
+1. Check if existing visual regression tests cover the affected areas
+2. Don't assume coverage is adequate - verify explicitly
+3. Review TODO.md for pending test tasks
+4. If coverage is missing, add a task to TODO.md before marking work complete
+
+Example: After migrating ScoreEditor to web component, verify that visual regression tests exist for the editor page. If not, add a task before closing the PR.
+
+**What to test:**
+- Critical user paths (viewing, editing, creating scores)
+- Component states (loading, empty, error, populated)
+- Responsive behavior (mobile, tablet, desktop)
+- Theme variations (light, dark)
+- Interactive features (buttons, forms, modals)
 
 ## Task Tracking
 

@@ -30,12 +30,14 @@ Track the gradual migration from direct `ScoreRenderer` usage to the `<shakuhach
 
 **Public Pages:**
 - [ ] `/src/pages/about.astro` - About page examples (if applicable)
-- [ ] `/src/pages/score/[slug].astro` - Score detail viewer
+- [x] `/src/pages/score/[slug].astro` - Score detail viewer (migrated PR #126)
+- [x] `/src/pages/score/[slug]/edit.astro` - Score editor page (migrated PR #127)
 - [ ] `/src/pages/index.astro` - Homepage (if applicable)
 
 **Components:**
 - [ ] `/src/components/ScorePreview.astro` - Library score cards
-- [ ] `/src/components/ScoreEditor.tsx` - Editor preview (React)
+- [x] `/src/components/ScoreDetailClient.ts` - Score detail interactions (migrated PR #126)
+- [x] `/src/components/ScoreEditor.ts` - Editor preview (migrated PR #127)
 - [ ] (Add more as discovered via `grep -r "ScoreRenderer" src/`)
 
 ---
@@ -115,9 +117,59 @@ Track the gradual migration from direct `ScoreRenderer` usage to the `<shakuhach
 - Includes educational comments explaining notation features
 - Mobile layout stacks score above comments (flexbox column direction)
 
+#### Score Detail Page Migration (`/src/pages/score/[slug].astro`) ✅
+
+**Pre-migration:**
+- [x] Take screenshot (before state)
+- [x] Identify ScoreRenderer usage (ScoreDetailClient.ts)
+
+**Migration:**
+- [x] Replaced ScoreRenderer with web component in ScoreDetailClient.ts
+- [x] Added web component script tag to score detail page
+- [x] Updated theme listener to watch data-theme attribute
+- [x] Fixed dimension reading to use parent container (PR #126)
+
+**Validation:**
+- [x] Verified light/dark themes
+- [x] Tested with chrome-devtools-mcp
+- [x] Verified no console errors
+- [x] Ran visual regression tests
+
+**Deployment:**
+- [x] Created PR #126
+- [x] Merged and deployed
+
+**Notes:**
+- Fixed dimension reading bug: read from `.score-detail-container` parent instead of web component
+
+#### Score Editor Page Migration (`/src/pages/score/[slug]/edit.astro`) ✅
+
+**Pre-migration:**
+- [x] Take screenshot (before state)
+- [x] Identify ScoreRenderer usage (ScoreEditor.ts - both external and internal preview modes)
+
+**Migration:**
+- [x] Replaced ScoreRenderer with web component in ScoreEditor.ts
+- [x] Added web component script tag to edit page
+- [x] Updated theme listener to watch data-theme attribute
+- [x] Fixed dimension reading for both preview modes (PR #127)
+
+**Validation:**
+- [x] Verified light/dark themes
+- [x] Tested both external (desktop) and internal (mobile) preview modes
+- [x] Tested with chrome-devtools-mcp and test account
+- [x] Verified no console errors
+
+**Deployment:**
+- [x] Created PR #127
+- [x] Merged and deployed
+
+**Notes:**
+- Fixed dimension reading bug: read from parent containers (`externalPreview`, `previewContainer`) instead of web component
+- Authenticated using test credentials to create test score for verification
+
 ### 📋 TODO
 
-- [ ] `/src/pages/score/[slug].astro` - Score detail viewer
 - [ ] All other pages listed in "Usage Audit" above
 
 ---
@@ -158,6 +210,18 @@ Use this checklist for each page migration:
 **Notes:**
 - (Any special considerations, issues encountered, etc.)
 ```
+
+### Quick Reference Checklist
+
+When migrating TypeScript components (not static pages):
+
+1. **Add web component script** - Include `<script is:inline src="/embed/shakuhachi-score.js">` in the Astro page
+2. **Build web component** - Run `npm run build:wc` before testing
+3. **Update theme listener** - Watch `data-theme` attribute, not class changes
+4. **Fix dimension reading** - Read from parent container, not the web component (see Common Issues below)
+5. **Test both modes** - Verify light and dark themes with chrome-devtools-mcp
+6. **Verify console** - Check `list_console_messages()` for JavaScript errors
+7. **Run visual tests** - Execute `npm run test:visual` and verify no regressions
 
 ---
 
@@ -265,6 +329,38 @@ function ScoreView({ scoreData }) {
 
 ---
 
+## Common Issues
+
+### Dimension Reading Pattern
+
+**Problem:** Custom elements return `clientWidth/clientHeight = 0` until laid out by the browser.
+
+**Why this happens:** The web component's `connectedCallback()` fires before CSS layout. The parent container already has dimensions from CSS, but the newly created web component doesn't yet.
+
+**Solution:** Always read dimensions from the PARENT container, never from the web component itself.
+
+**Example:**
+```typescript
+// ❌ WRONG - reads from web component (returns 0)
+const container = document.createElement('shakuhachi-score');
+const width = container.clientWidth; // Returns 0
+
+// ✅ CORRECT - reads from parent container
+const parent = document.getElementById('preview-panel');
+const width = parent.clientWidth; // Returns actual width from CSS
+```
+
+**Pattern applies to:**
+- Score detail page: Read from `.score-detail-container`
+- Score editor: Read from `.preview-panel` or internal preview container
+- Any page using the web component: Read from the parent DIV that has CSS dimensions
+
+**Encountered in:**
+- PR #126 (Score Detail)
+- PR #127 (Score Editor)
+
+---
+
 ## Issues & Resolutions
 
 ### Issue 1: [Example Issue]
@@ -278,8 +374,13 @@ function ScoreView({ scoreData }) {
 
 **Progress:**
 - Total pages with ScoreRenderer: 5+ (from usage audit)
-- Migrated: 1 (test page)
-- Remaining: 4+ (About, score detail, components)
+- Migrated: 3 (test page, score detail, score editor)
+- Remaining: 2+ (About, components)
+
+**Completed Migrations:**
+- Test page (PR #123)
+- Score detail page (PR #126)
+- Score editor page (PR #127)
 
 **Bundle Impact:**
 - Web component bundle: 23.96 kB / 7.19 kB gzipped
