@@ -1,7 +1,7 @@
 import { createScore, updateScore, getScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
-import { ABCParser } from '../parser/ABCParser';
+import { ABCParser } from '../web-component/parser/ABCParser';
 import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -236,10 +236,12 @@ export class ScoreEditor {
         if (this.dataFormat === 'json') {
           scoreData = JSON.parse(this.scoreData);
         } else if (this.dataFormat === 'musicxml') {
-          const { MusicXMLParser } = await import('../parser/MusicXMLParser');
+          const { MusicXMLParser } =
+            await import('../web-component/parser/MusicXMLParser');
           scoreData = MusicXMLParser.parse(this.scoreData);
         } else if (this.dataFormat === 'abc') {
-          const { ABCParser } = await import('../parser/ABCParser');
+          const { ABCParser } =
+            await import('../web-component/parser/ABCParser');
           scoreData = ABCParser.parse(this.scoreData);
         }
 
@@ -322,10 +324,11 @@ export class ScoreEditor {
       if (this.dataFormat === 'json') {
         scoreData = JSON.parse(this.scoreData);
       } else if (this.dataFormat === 'musicxml') {
-        const { MusicXMLParser } = await import('../parser/MusicXMLParser');
+        const { MusicXMLParser } =
+          await import('../web-component/parser/MusicXMLParser');
         scoreData = MusicXMLParser.parse(this.scoreData);
       } else if (this.dataFormat === 'abc') {
-        const { ABCParser } = await import('../parser/ABCParser');
+        const { ABCParser } = await import('../web-component/parser/ABCParser');
         scoreData = ABCParser.parse(this.scoreData);
       }
 

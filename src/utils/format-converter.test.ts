@@ -8,7 +8,7 @@ import {
   parseFormat,
   serializeFormat,
 } from './format-converter';
-import type { ScoreData } from '../types/ScoreData';
+import type { ScoreData } from '../web-component/types/ScoreData';
 
 describe('format-converter', () => {
   const sampleScoreData: ScoreData = {

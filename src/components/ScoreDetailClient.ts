@@ -1,10 +1,10 @@
-import { MusicXMLParser } from '../parser/MusicXMLParser';
+import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 import { forkScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
-import type { ScoreData as RendererScoreData } from '../types/ScoreData';
+import type { ScoreData as RendererScoreData } from '../web-component/types/ScoreData';
 
 interface ScoreData {
   score: Score;
@@ -82,7 +82,7 @@ export class ScoreDetailClient {
         scoreData = MusicXMLParser.parse(this.score.data as string);
       } else if (this.score.data_format === 'abc') {
         // Parse ABC notation to ScoreData
-        const { ABCParser } = await import('../parser/ABCParser');
+        const { ABCParser } = await import('../web-component/parser/ABCParser');
         scoreData = ABCParser.parse(this.score.data as string);
       } else {
         container.innerHTML = `
