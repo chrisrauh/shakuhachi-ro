@@ -87,6 +87,28 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes with chrome-devtools-mcp
 
+**Bash Command Execution**
+
+Use sequential Bash tool calls instead of command chaining to avoid authorization prompts.
+
+- **Problem:** Claude Code's permission system treats `cmd1 && cmd2` as distinct from individual commands for security
+- **Solution:** Make separate Bash calls instead of using `&&`, `|`, or `;` operators
+- **Performance:** Negligible impact (~10-50ms overhead per call)
+
+Examples:
+
+```bash
+# ❌ Avoid - triggers authorization prompt
+git add . && git commit -m "message" && git push
+
+# ✅ Prefer - each command approved independently
+git add .
+git commit -m "message"
+git push
+```
+
+Exception: Use chaining when the logical relationship requires it (e.g., `cd dir && npm test` to ensure test runs in correct directory, though prefer absolute paths instead).
+
 ## Testing
 
 - Unit tests (Vitest): Logic, validation, transformations
