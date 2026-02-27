@@ -6,8 +6,9 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run build:embed && cp dist/embed/shakuhachi-score.js public/embed/shakuhachi-score.js && astro build",
-    "build:embed": "vite build --config vite.embed.config.ts",
+    "build": "npm run build:wc && npm run build:platform",
+    "build:wc": "vite build --config vite.embed.config.ts && cp dist/embed/shakuhachi-score.js public/embed/shakuhachi-score.js",
+    "build:platform": "astro build",
     "preview": "astro preview",
     "type-check": "tsc --noEmit && astro check",
     "lint": "eslint src tests *.{js,ts}",
