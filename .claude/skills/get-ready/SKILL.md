@@ -35,11 +35,6 @@ Read the architecture documents to understand the system:
 - Data flow and authentication
 - Notation format support (ABC, JSON, MusicXML)
 
-**Migration Checklist** (if working on migrations): `/Users/crauh/dev/shakuhachi-ro/docs/SCORERENDERER_MIGRATION_CHECKLIST.md`
-- Web component migration progress
-- Common issues and patterns
-- Dimension reading pattern
-
 ### 3. Review Current Tasks (TODO.md)
 Read `/Users/crauh/dev/shakuhachi-ro/TODO.md` to see:
 - Current priorities

@@ -16,10 +16,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [x] Move all the shakuhachi score to the web-component folder
-  - Keep the directory structure
-  - Validate that the shakuhachi score doesn't have any dependencies on the platform and vice versa
-
 - [ ] [Content] Edit About page content
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
