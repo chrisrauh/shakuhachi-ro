@@ -58,16 +58,24 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 1. Create feature branch
 2. Make changes and test
 3. **Ask user to review changes before committing**
-4. Commit locally (no push yet, no "Co-Authored-By")
+4. Commit locally (no push yet)
 5. Mark completed tasks in TODO.md with [x]
 6. Ask user if you should create PR
-7. Push and `gh pr create` (no "Generated with Claude Code" in description)
+7. Push and create PR
 8. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
 9. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
 10. Remove completed tasks from TODO.md
 11. Look for next task in TODO.md and ask user if you should work on it
 
 For multi-phase work, create separate PR for each phase.
+
+**CRITICAL: Git Commit and PR Messages**
+
+⚠️ **NEVER add attribution/co-authoring text to commits or PRs:**
+- ❌ NO "Co-Authored-By: Claude" in commit messages
+- ❌ NO "Generated with Claude Code" in PR descriptions
+- ❌ NO any other Claude attribution text in repo messages
+- ✅ Clean, professional commit messages only
 
 **Build Process**
 
