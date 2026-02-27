@@ -9,12 +9,12 @@
  * Provides bidirectional conversion: all 6 format combinations are supported.
  */
 
-import type { ScoreData } from '../types/ScoreData';
+import type { ScoreData } from '../web-component/types/ScoreData';
 import type { ScoreDataFormat } from '../api/scores';
-import { ABCParser } from '../parser/ABCParser';
-import { ABCSerializer } from '../parser/ABCSerializer';
-import { MusicXMLParser } from '../parser/MusicXMLParser';
-import { MusicXMLSerializer } from '../parser/MusicXMLSerializer';
+import { ABCParser } from '../web-component/parser/ABCParser';
+import { ABCSerializer } from '../web-component/parser/ABCSerializer';
+import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
+import { MusicXMLSerializer } from '../web-component/parser/MusicXMLSerializer';
 
 /**
  * Convert score data from one format to another
