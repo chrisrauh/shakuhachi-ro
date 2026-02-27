@@ -1,4 +1,3 @@
-import { ScoreRenderer } from '../renderer/ScoreRenderer';
 import { createScore, updateScore, getScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
@@ -44,7 +43,7 @@ export class ScoreEditor {
   }
 
   private setupThemeListener(): void {
-    // Use MutationObserver to watch for theme class changes on <html>
+    // Use MutationObserver to watch for theme attribute changes on <html>
     const observer = new MutationObserver(() => {
       // Re-render preview when theme changes
       this.updatePreview();
@@ -52,7 +51,7 @@ export class ScoreEditor {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['data-theme'],
     });
   }
 
@@ -229,62 +228,61 @@ export class ScoreEditor {
       }
 
       try {
-        externalPreview.innerHTML = ''; // Clear existing content
+        // Determine if mobile layout
+        const isMobile = window.innerWidth < 768;
 
+        // Parse score data based on format
+        let scoreData;
         if (this.dataFormat === 'json') {
-          const data = JSON.parse(this.scoreData);
-
-          // Read theme-aware colors from CSS variables
-          const noteColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-text-primary')
-            .trim();
-          const debugLabelColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-text-tertiary')
-            .trim();
-
-          const renderer = new ScoreRenderer(externalPreview, {
-            noteColor: noteColor || '#000',
-            debugLabelColor: debugLabelColor || '#999',
-          });
-
-          await renderer.renderFromScoreData(data);
+          scoreData = JSON.parse(this.scoreData);
         } else if (this.dataFormat === 'musicxml') {
-          // Parse MusicXML to ScoreData using MusicXMLParser
           const { MusicXMLParser } = await import('../parser/MusicXMLParser');
-          const scoreData = MusicXMLParser.parse(this.scoreData);
-
-          const noteColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-gray-700')
-            .trim();
-          const debugLabelColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-gray-500')
-            .trim();
-
-          const renderer = new ScoreRenderer(externalPreview, {
-            noteColor: noteColor || '#000',
-            debugLabelColor: debugLabelColor || '#999',
-          });
-
-          await renderer.renderFromScoreData(scoreData);
+          scoreData = MusicXMLParser.parse(this.scoreData);
         } else if (this.dataFormat === 'abc') {
-          // Parse ABC to ScoreData using ABCParser
           const { ABCParser } = await import('../parser/ABCParser');
-          const scoreData = ABCParser.parse(this.scoreData);
-
-          const noteColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-text-primary')
-            .trim();
-          const debugLabelColor = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-text-tertiary')
-            .trim();
-
-          const renderer = new ScoreRenderer(externalPreview, {
-            noteColor: noteColor || '#000',
-            debugLabelColor: debugLabelColor || '#999',
-          });
-
-          await renderer.renderFromScoreData(scoreData);
+          scoreData = ABCParser.parse(this.scoreData);
         }
+
+        // Create web component element
+        externalPreview.innerHTML =
+          '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
+        const container = externalPreview.querySelector(
+          'shakuhachi-score',
+        ) as HTMLElement;
+
+        if (!container) return;
+
+        // Read theme-aware colors from CSS variables
+        const noteColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-text-primary')
+          .trim();
+
+        // Set CSS variables for theme colors BEFORE setting attributes
+        container.style.setProperty(
+          '--shakuhachi-note-color',
+          noteColor || '#000',
+        );
+        container.style.setProperty(
+          '--shakuhachi-note-vertical-spacing',
+          isMobile ? '40px' : '44px',
+        );
+
+        if (isMobile) {
+          // Mobile: single-column mode with intrinsic height
+          container.setAttribute('single-column', 'true');
+          container.setAttribute('width', String(externalPreview.clientWidth));
+        } else {
+          // Desktop: multi-column mode with explicit dimensions
+          container.setAttribute('single-column', 'false');
+          container.setAttribute('width', String(externalPreview.clientWidth));
+          container.setAttribute(
+            'height',
+            String(externalPreview.clientHeight),
+          );
+        }
+
+        // Set score data (triggers render)
+        container.setAttribute('data-score', JSON.stringify(scoreData));
       } catch (error) {
         externalPreview.innerHTML = `
           <div class="preview-error">
@@ -316,65 +314,58 @@ export class ScoreEditor {
     }
 
     try {
-      previewContainer.innerHTML = '<div id="score-preview"></div>';
-      const scorePreview = document.getElementById('score-preview');
+      // Determine if mobile layout
+      const isMobile = window.innerWidth < 768;
 
-      if (!scorePreview) return;
-
+      // Parse score data based on format
+      let scoreData;
       if (this.dataFormat === 'json') {
-        const data = JSON.parse(this.scoreData);
-
-        // Read theme-aware colors from CSS variables
-        const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-primary')
-          .trim();
-        const debugLabelColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-tertiary')
-          .trim();
-
-        const renderer = new ScoreRenderer(scorePreview, {
-          noteColor: noteColor || '#000',
-          debugLabelColor: debugLabelColor || '#999',
-        });
-
-        await renderer.renderFromScoreData(data);
+        scoreData = JSON.parse(this.scoreData);
       } else if (this.dataFormat === 'musicxml') {
-        // Parse MusicXML to ScoreData using MusicXMLParser
         const { MusicXMLParser } = await import('../parser/MusicXMLParser');
-        const scoreData = MusicXMLParser.parse(this.scoreData);
-
-        const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-primary')
-          .trim();
-        const debugLabelColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-tertiary')
-          .trim();
-
-        const renderer = new ScoreRenderer(scorePreview, {
-          noteColor: noteColor || '#000',
-          debugLabelColor: debugLabelColor || '#999',
-        });
-
-        await renderer.renderFromScoreData(scoreData);
+        scoreData = MusicXMLParser.parse(this.scoreData);
       } else if (this.dataFormat === 'abc') {
-        // Parse ABC to ScoreData using ABCParser
         const { ABCParser } = await import('../parser/ABCParser');
-        const scoreData = ABCParser.parse(this.scoreData);
-
-        const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-primary')
-          .trim();
-        const debugLabelColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-tertiary')
-          .trim();
-
-        const renderer = new ScoreRenderer(scorePreview, {
-          noteColor: noteColor || '#000',
-          debugLabelColor: debugLabelColor || '#999',
-        });
-
-        await renderer.renderFromScoreData(scoreData);
+        scoreData = ABCParser.parse(this.scoreData);
       }
+
+      // Create web component element
+      previewContainer.innerHTML =
+        '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
+      const container = previewContainer.querySelector(
+        'shakuhachi-score',
+      ) as HTMLElement;
+
+      if (!container) return;
+
+      // Read theme-aware colors from CSS variables
+      const noteColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-text-primary')
+        .trim();
+
+      // Set CSS variables for theme colors BEFORE setting attributes
+      container.style.setProperty(
+        '--shakuhachi-note-color',
+        noteColor || '#000',
+      );
+      container.style.setProperty(
+        '--shakuhachi-note-vertical-spacing',
+        isMobile ? '40px' : '44px',
+      );
+
+      if (isMobile) {
+        // Mobile: single-column mode with intrinsic height
+        container.setAttribute('single-column', 'true');
+        container.setAttribute('width', String(previewContainer.clientWidth));
+      } else {
+        // Desktop: multi-column mode with explicit dimensions
+        container.setAttribute('single-column', 'false');
+        container.setAttribute('width', String(previewContainer.clientWidth));
+        container.setAttribute('height', String(previewContainer.clientHeight));
+      }
+
+      // Set score data (triggers render)
+      container.setAttribute('data-score', JSON.stringify(scoreData));
     } catch (error) {
       previewContainer.innerHTML = `
         <div class="preview-error">

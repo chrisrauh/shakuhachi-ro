@@ -25,9 +25,7 @@ test.describe('Score Detail Page - Height', () => {
       .locator('header[data-astro-cid-sckkx6r4]')
       .first()
       .boundingBox();
-    const rendererBox = await page
-      .locator('#score-renderer')
-      .boundingBox();
+    const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     // Verify renderer exists and has dimensions
     expect(rendererBox).not.toBeNull();
@@ -119,9 +117,7 @@ test.describe('Score Detail Page - Height', () => {
       .locator('header[data-astro-cid-sckkx6r4]')
       .first()
       .boundingBox();
-    const rendererBox = await page
-      .locator('#score-renderer')
-      .boundingBox();
+    const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();
     const expectedMinHeight =
@@ -141,9 +137,7 @@ test.describe('Score Detail Page - Height', () => {
       .locator('header[data-astro-cid-sckkx6r4]')
       .first()
       .boundingBox();
-    const rendererBox = await page
-      .locator('#score-renderer')
-      .boundingBox();
+    const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();
     const expectedMinHeight =
@@ -163,9 +157,7 @@ test.describe('Score Detail Page - Height', () => {
       .locator('header[data-astro-cid-sckkx6r4]')
       .first()
       .boundingBox();
-    const rendererBox = await page
-      .locator('#score-renderer')
-      .boundingBox();
+    const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();
     const expectedMinHeight =
