@@ -405,16 +405,25 @@ export class ScoreEditor {
     }
 
     try {
-      const data =
-        this.dataFormat === 'json'
-          ? JSON.parse(this.scoreData)
-          : this.scoreData;
+      // Auto-convert ABC to JSON before saving (DB constraint only allows json/musicxml)
+      let data: unknown;
+      let saveFormat: ScoreDataFormat;
+      if (this.dataFormat === 'abc') {
+        data = ABCParser.parse(this.scoreData);
+        saveFormat = 'json';
+      } else if (this.dataFormat === 'json') {
+        data = JSON.parse(this.scoreData);
+        saveFormat = 'json';
+      } else {
+        data = this.scoreData;
+        saveFormat = this.dataFormat;
+      }
 
       const scoreData = {
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         description: this.metadata.description || undefined,
-        data_format: this.dataFormat,
+        data_format: saveFormat,
         data: data,
       };
 
