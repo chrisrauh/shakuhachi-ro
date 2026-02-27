@@ -16,14 +16,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] [Backend] [A:High] Continue platform migration to web component
-  - Follow migration checklist: [SCORERENDERER_MIGRATION_CHECKLIST.md](./docs/SCORERENDERER_MIGRATION_CHECKLIST.md)
-  - ✅ Test page migrated and deployed
-  - ✅ About page migrated and deployed
-  - ✅ Score detail page migrated and deployed
-  - Next: Score editor (`/src/components/ScoreEditor.ts`)
-  - Strategy: One page per PR, validate each step
-
 - [ ] Move all the shakuhachi score to the web-component folder
   - Keep the directory structure
   - Validate that the shakuhachi score doesn't have any dependencies on the platform and vice versa
