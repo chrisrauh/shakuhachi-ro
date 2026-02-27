@@ -6,52 +6,55 @@
  */
 
 // Core Renderer API (Phases 1-5)
-export { ScoreRenderer } from './renderer/ScoreRenderer';
-export { renderScoreFromURL, renderScore } from './renderer/convenience';
-export type { RenderOptions } from './renderer/RenderOptions';
+export { ScoreRenderer } from './web-component/renderer/ScoreRenderer';
+export {
+  renderScoreFromURL,
+  renderScore,
+} from './web-component/renderer/convenience';
+export type { RenderOptions } from './web-component/renderer/RenderOptions';
 export {
   mergeWithDefaults,
   DEFAULT_RENDER_OPTIONS,
-} from './renderer/RenderOptions';
+} from './web-component/renderer/RenderOptions';
 
 // Layout Components
-export { ModifierConfigurator } from './renderer/ModifierConfigurator';
-export { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
+export { ModifierConfigurator } from './web-component/renderer/ModifierConfigurator';
+export { ColumnLayoutCalculator } from './web-component/renderer/ColumnLayoutCalculator';
 export type {
   ColumnLayout,
   ColumnInfo,
   NotePosition,
-} from './renderer/ColumnLayoutCalculator';
+} from './web-component/renderer/ColumnLayoutCalculator';
 
 // Low-level Renderer exports
-export { SVGRenderer } from './renderer/SVGRenderer';
-export { Formatter } from './renderer/Formatter';
-export type { FormatterOptions } from './renderer/Formatter';
-export { VerticalSystem } from './renderer/VerticalSystem';
-export type { VerticalSystemOptions } from './renderer/VerticalSystem';
+export { SVGRenderer } from './web-component/renderer/SVGRenderer';
+export { Formatter } from './web-component/renderer/Formatter';
+export type { FormatterOptions } from './web-component/renderer/Formatter';
+export { VerticalSystem } from './web-component/renderer/VerticalSystem';
+export type { VerticalSystemOptions } from './web-component/renderer/VerticalSystem';
 
 // Parser exports
-export { ScoreParser } from './parser/ScoreParser';
+export { ScoreParser } from './web-component/parser/ScoreParser';
 
 // Note exports
-export { ShakuNote } from './notes/ShakuNote';
+export { ShakuNote } from './web-component/notes/ShakuNote';
 export type {
   ShakuNoteOptions,
   NoteDuration,
   BoundingBox,
-} from './notes/ShakuNote';
+} from './web-component/notes/ShakuNote';
 
 // Modifier exports
-export { Modifier } from './modifiers/Modifier';
-export type { ModifierPosition } from './modifiers/Modifier';
-export { TestModifier } from './modifiers/TestModifier';
-export { OctaveMarksModifier } from './modifiers/OctaveMarksModifier';
-export { MeriKariModifier } from './modifiers/MeriKariModifier';
-export type { MeriKariType } from './modifiers/MeriKariModifier';
-export { AtariModifier } from './modifiers/AtariModifier';
-export type { AtariStyle } from './modifiers/AtariModifier';
-export { DurationDotModifier } from './modifiers/DurationDotModifier';
-export { DurationLineModifier } from './modifiers/DurationLineModifier';
+export { Modifier } from './web-component/modifiers/Modifier';
+export type { ModifierPosition } from './web-component/modifiers/Modifier';
+export { TestModifier } from './web-component/modifiers/TestModifier';
+export { OctaveMarksModifier } from './web-component/modifiers/OctaveMarksModifier';
+export { MeriKariModifier } from './web-component/modifiers/MeriKariModifier';
+export type { MeriKariType } from './web-component/modifiers/MeriKariModifier';
+export { AtariModifier } from './web-component/modifiers/AtariModifier';
+export type { AtariStyle } from './web-component/modifiers/AtariModifier';
+export { DurationDotModifier } from './web-component/modifiers/DurationDotModifier';
+export { DurationLineModifier } from './web-component/modifiers/DurationLineModifier';
 
 // Data exports
 export {
@@ -66,14 +69,14 @@ export {
   meriKariSymbols,
   techniqueSymbols,
   octaveDots,
-} from './constants/kinko-symbols';
+} from './web-component/constants/kinko-symbols';
 export type {
   KinkoSymbol,
   Octave,
   PitchAlteration,
   Technique,
   Fingering,
-} from './constants/kinko-symbols';
+} from './web-component/constants/kinko-symbols';
 
 // Score Data types
 export type {
@@ -82,6 +85,6 @@ export type {
   Pitch,
   PitchStep,
   NotationStyle,
-} from './types/ScoreData';
+} from './web-component/types/ScoreData';
 
 // Uncomment exports as we implement each component
