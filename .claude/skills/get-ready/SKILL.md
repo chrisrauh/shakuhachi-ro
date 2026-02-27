@@ -20,8 +20,6 @@ Read `/Users/crauh/dev/shakuhachi-ro/CLAUDE.md` to understand:
 - Build process for web components
 - Test fixtures and visual regression testing
 
-**Focus on**: Recent additions (Build Process, Test Fixtures, Visual Regression Test Coverage)
-
 ### 2. Review Architecture
 
 Read the architecture documents to understand the system:
