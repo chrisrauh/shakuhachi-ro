@@ -175,14 +175,14 @@ MusicXML ✓      ✓        -
 - Automatic conversion when switching formats in editor
 
 **Parser/Serializer Locations:**
-- `src/parser/ABCParser.ts` - ABC → ScoreData
-- `src/parser/ABCSerializer.ts` - ScoreData → ABC
-- `src/parser/MusicXMLParser.ts` - MusicXML → ScoreData
-- `src/parser/MusicXMLSerializer.ts` - ScoreData → MusicXML
+- `src/web-component/parser/ABCParser.ts` - ABC → ScoreData
+- `src/web-component/parser/ABCSerializer.ts` - ScoreData → ABC
+- `src/web-component/parser/MusicXMLParser.ts` - MusicXML → ScoreData
+- `src/web-component/parser/MusicXMLSerializer.ts` - ScoreData → MusicXML
 - `src/utils/format-converter.ts` - Orchestrates all conversions
 
 **ABC Pitch Mapping:**
-- `src/constants/abc-pitch-map.ts` - Maps ABC notation to shakuhachi fingerings
+- `src/web-component/constants/abc-pitch-map.ts` - Maps ABC notation to shakuhachi fingerings
 - Default key: D major (D shakuhachi)
 - Automatic meri handling: ABC accidentals (^, _, =) → shakuhachi meri variants
 - Octave support: uppercase (otsu), lowercase (kan), apostrophe (dai-kan)

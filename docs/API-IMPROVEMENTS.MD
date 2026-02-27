@@ -16,20 +16,20 @@ Currently exports **55+ items** from `index.ts`, mixing:
 **Tier 1 - Primary API (keep as default exports):**
 ```typescript
 // What 95% of users need
-export { ScoreRenderer } from './renderer/ScoreRenderer';
-export { renderScoreFromURL, renderScore } from './renderer/convenience';
-export type { RenderOptions } from './renderer/RenderOptions';
-export { mergeWithDefaults, DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+export { ScoreRenderer } from './web-component/renderer/ScoreRenderer';
+export { renderScoreFromURL, renderScore } from './web-component/renderer/convenience';
+export type { RenderOptions } from './web-component/renderer/RenderOptions';
+export { mergeWithDefaults, DEFAULT_RENDER_OPTIONS } from './web-component/renderer/RenderOptions';
 ```
 
 **Tier 2 - Advanced API (explicit import path):**
 ```typescript
 // For power users who need low-level control
 // Import via: import { ScoreParser } from 'shakuhachi-ro/advanced'
-export { ScoreParser } from './parser/ScoreParser';
-export { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
-export { ModifierConfigurator } from './renderer/ModifierConfigurator';
-export { SVGRenderer } from './renderer/SVGRenderer';
+export { ScoreParser } from './web-component/parser/ScoreParser';
+export { ColumnLayoutCalculator } from './web-component/renderer/ColumnLayoutCalculator';
+export { ModifierConfigurator } from './web-component/renderer/ModifierConfigurator';
+export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 ```
 
 **Tier 3 - Internal/Unstable (remove from public API):**
