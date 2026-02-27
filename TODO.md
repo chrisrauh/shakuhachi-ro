@@ -80,17 +80,6 @@
     - Only auto-save for authenticated users
   - **UI feedback**: Add status indicator showing last saved time
 
-- [ ] [Backend] [A:High] Fix ABC notation format not saveable to database
-  - Database constraint only allows `data_format: 'json'` and `'musicxml'`
-  - Editor UI offers ABC as a format option (with auto-conversion)
-  - When user enters ABC notation and tries to save, get error: "new row for relation 'scores' violates check constraint 'scores_data_format_check'"
-  - **Current workaround**: User must switch to JSON format before saving (ABC is auto-converted)
-  - **Options**:
-    1. Add 'abc' to database constraint and store ABC as string (like MusicXML)
-    2. Remove ABC option from editor UI (force users to use JSON/MusicXML only)
-    3. Auto-convert ABC to JSON on save (transparent to user - already implemented in code, just needs to happen on save)
-  - **Recommendation**: Option 3 (auto-convert) - simplest and preserves ABC editing UX
-
 - [ ] [Backend] [A:Medium] Consider slug update behavior when title changes
   - Currently: Slug is set on creation and never changes, even if title is updated
   - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
