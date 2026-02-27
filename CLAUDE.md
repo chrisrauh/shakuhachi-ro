@@ -223,8 +223,18 @@ evaluate_script({ function: "() => ({ scoreData: window.__SCORE_DATA__, renderSt
 
 ### Test Account Credentials
 
-When testing authenticated features (score editor, creating scores, forking), use the test account credentials from `.env`:
+When testing authenticated features (score editor, creating scores, forking):
 
+**For visual testing with chrome-devtools-mcp:**
+- Authenticate directly in the browser using credentials from `.env` file
+- Use `fill()` tool to enter email and password in login form
+- Access credentials via: `source .env && echo $TEST_EMAIL && echo $TEST_PASSWORD`
+- Example:
+  ```bash
+  source .env && echo "Email: $TEST_EMAIL" && echo "Password: $TEST_PASSWORD"
+  ```
+
+**For automated tests:**
 ```typescript
 // Read credentials from environment
 const TEST_EMAIL = process.env.TEST_EMAIL;
@@ -236,6 +246,12 @@ const TEST_PASSWORD = process.env.TEST_PASSWORD;
 - Store in `.env` file (gitignored)
 - Use `.env.example` as template with placeholder values
 - Test credentials are documented in `.env.example` with `TEST_EMAIL` and `TEST_PASSWORD` variables
+
+**Test Score for Editor Testing:**
+- A test score titled "Test" is available at `/score/test` (slug: `test`)
+- Owned by the test account for editor testing
+- Contains simple JSON data with 3 notes (ro, tsu, re)
+- Use this score to test the editor functionality: `http://localhost:3001/score/test/edit`
 
 ## Key Learnings
 

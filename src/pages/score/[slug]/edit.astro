@@ -44,6 +44,9 @@ const { score } = scoreResult;
     <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
   )}
 
+  <!-- Load web component -->
+  <script is:inline src="/embed/shakuhachi-score.js"></script>
+
   <!-- Initialize theme switcher, auth widget, and mobile menu -->
   <script>
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
