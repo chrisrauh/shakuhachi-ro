@@ -19,13 +19,13 @@
  *   --shakuhachi-note-vertical-spacing: Vertical spacing between notes (default: 44px)
  */
 
-import { ScoreRenderer } from '../renderer/ScoreRenderer';
-import { ScoreParser } from '../parser/ScoreParser';
-import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-import type { ScoreData } from '../types/ScoreData';
-import type { ShakuNote } from '../notes/ShakuNote';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
-import type { Modifier } from '../modifiers/Modifier';
+import { ScoreRenderer } from './renderer/ScoreRenderer';
+import { ScoreParser } from './parser/ScoreParser';
+import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+import type { ScoreData } from './types/ScoreData';
+import type { ShakuNote } from './notes/ShakuNote';
+import { DurationDotModifier } from './modifiers/DurationDotModifier';
+import type { Modifier } from './modifiers/Modifier';
 
 class ShakuhachiScore extends HTMLElement {
   private renderer: ScoreRenderer | null = null;

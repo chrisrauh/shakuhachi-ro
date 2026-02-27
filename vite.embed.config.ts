@@ -10,7 +10,7 @@ export default defineConfig({
   publicDir: false, // Don't copy public directory to dist/embed
   build: {
     lib: {
-      entry: 'src/web-components/ShakuhachiScore.ts',
+      entry: 'src/web-component/ShakuhachiScore.ts',
       name: 'ShakuhachiScore',
       formats: ['iife'],
       fileName: () => 'shakuhachi-score.js',
