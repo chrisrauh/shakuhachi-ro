@@ -9,7 +9,7 @@
 - ✅ IIFE bundle: 23.96 kB / 7.19 kB gzipped (< 50KB target)
 - ✅ Test page: `/public/test/shakuhachi-score.html` (3 examples, light/dark themes)
 - ✅ Visual regression: Pixel-perfect equivalence to ScoreRenderer
-- ✅ Build config: `vite.embed.config.ts` with `npm run build:embed`
+- ✅ Build config: `vite.embed.config.ts` with `npm run build:wc`
 
 **Key Implementation Details:**
 - **Sizing**: Intrinsic height for single-column + container width (not intrinsic width by default)
