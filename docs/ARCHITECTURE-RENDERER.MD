@@ -4,6 +4,90 @@
 
 This document explains the design and architecture of the standalone shakuhachi notation renderer, following VexFlow-inspired patterns for music notation rendering.
 
+## Directory Structure
+
+All renderer library code lives in `src/web-component/`:
+
+```
+src/web-component/
+├── ShakuhachiScore.ts      # Web component wrapper (entry point)
+├── renderer/               # High-level rendering API
+│   ├── ScoreRenderer.ts    # Main orchestrator
+│   ├── RenderOptions.ts    # Configuration
+│   ├── ColumnLayoutCalculator.ts
+│   ├── ModifierConfigurator.ts
+│   ├── SVGRenderer.ts      # Low-level SVG drawing
+│   └── convenience.ts      # Factory functions
+├── parser/                 # Data parsing
+│   ├── ScoreParser.ts      # ScoreData → ShakuNote[]
+│   ├── MusicXMLParser.ts   # MusicXML → ScoreData
+│   ├── ABCParser.ts        # ABC notation → ScoreData
+│   └── *Serializer.ts      # Reverse conversions
+├── notes/
+│   └── ShakuNote.ts        # Note primitive
+├── modifiers/              # Visual decorations
+│   ├── Modifier.ts         # Base class
+│   ├── OctaveMarksModifier.ts
+│   ├── MeriKariModifier.ts
+│   └── DurationDotModifier.ts
+├── types/
+│   └── ScoreData.ts        # Core data types
+└── constants/              # Kinko symbols, mappings
+```
+
+**Why this structure:**
+- All renderer code in one place for future npm package extraction
+- Clear separation from platform code (`src/api/`, `src/components/`, `src/pages/`)
+- No dependencies on platform code (one-way dependency: platform → renderer)
+
+## Web Component
+
+The renderer is wrapped as a custom element `<shakuhachi-score>` for easy embedding:
+
+```html
+<shakuhachi-score
+  score-data='{"title":"Test","style":"kinko","notes":[...]}'
+  show-octave-marks="true"
+  notes-per-column="10">
+</shakuhachi-score>
+```
+
+**Implementation:** `src/web-component/ShakuhachiScore.ts`
+
+**Features:**
+- Custom element that renders shakuhachi notation
+- Reactive attributes (changes trigger re-render)
+- Auto-resize with ResizeObserver
+- Supports both JSON data and ScoreData objects
+
+**Build Output:** `public/embed/shakuhachi-score.js` (IIFE bundle, ~25KB)
+
+**Build Command:** `npm run build:wc`
+
+## Two Usage Patterns
+
+### 1. NPM Package (for developers)
+
+```typescript
+import { ScoreRenderer, renderScoreFromURL } from 'shakuhachi-ro';
+
+const renderer = new ScoreRenderer(container, options);
+await renderer.renderFromScoreData(scoreData);
+```
+
+**Entry point:** `src/index.ts` (re-exports from `src/web-component/`)
+
+### 2. Standalone Script (for embedding)
+
+```html
+<script src="/embed/shakuhachi-score.js"></script>
+<shakuhachi-score score-data="..."></shakuhachi-score>
+```
+
+**Entry point:** `src/web-component/ShakuhachiScore.ts`
+
+Both patterns use the same underlying renderer code.
+
 ## Overview
 
 The renderer is organized into distinct layers, each with a single responsibility:
@@ -251,7 +335,7 @@ initIcons();
 1. Extend `Modifier` base class
 2. Implement `render()` method
 3. Add configuration to `ModifierConfigurator` if needed
-4. Export from `src/index.ts`
+4. Export from `src/index.ts` (which re-exports from `src/web-component/`)
 
 ### Adding New Layout Algorithms
 
