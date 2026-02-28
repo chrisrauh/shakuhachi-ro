@@ -2,6 +2,7 @@ import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
+import { showNotification } from './Notification';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
 import type { ScoreData as RendererScoreData } from '../web-component/types/ScoreData';
@@ -203,7 +204,10 @@ export class ScoreDetailClient {
 
     const result = await deleteScore(this.score.id);
     if (result.error) {
-      alert(`Error deleting score: ${result.error.message}`);
+      showNotification(
+        `Error deleting score: ${result.error.message}`,
+        'error',
+      );
       if (deleteBtn) deleteBtn.disabled = false;
       return;
     }
@@ -217,7 +221,7 @@ export class ScoreDetailClient {
 
     const { user } = await getCurrentUser();
     if (!user) {
-      alert('Please sign in to fork this score');
+      showNotification('Please sign in to fork this score', 'error');
       return;
     }
 
@@ -255,7 +259,10 @@ export class ScoreDetailClient {
     try {
       const result = await forkScore(this.score.id);
       if (result.error) {
-        alert(`Error forking score: ${result.error.message}`);
+        showNotification(
+          `Error forking score: ${result.error.message}`,
+          'error',
+        );
         if (forkBtn && originalContent) {
           forkBtn.disabled = false;
           forkBtn.innerHTML = originalContent;
@@ -268,7 +275,7 @@ export class ScoreDetailClient {
         window.location.href = `/editor.html?id=${result.score.id}`;
       }
     } catch {
-      alert('Failed to fork score');
+      showNotification('Failed to fork score', 'error');
       if (forkBtn && originalContent) {
         forkBtn.disabled = false;
         forkBtn.innerHTML = originalContent;

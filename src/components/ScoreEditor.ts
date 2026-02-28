@@ -2,6 +2,7 @@ import { createScore, updateScore, getScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
+import { showNotification } from './Notification';
 import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -67,8 +68,9 @@ export class ScoreEditor {
     const result = await getScore(scoreId);
 
     if (result.error || !result.score) {
-      alert(
+      showNotification(
         `Error loading score: ${result.error?.message || 'Score not found'}`,
+        'error',
       );
       return;
     }
@@ -393,7 +395,7 @@ export class ScoreEditor {
   private async handleSave(): Promise<void> {
     const { user } = await getCurrentUser();
     if (!user) {
-      alert('Please log in to save scores');
+      showNotification('Please log in to save scores', 'error');
       return;
     }
 
@@ -403,7 +405,7 @@ export class ScoreEditor {
     }
 
     if (!this.validateScoreData()) {
-      alert('Please fix validation errors before saving');
+      showNotification('Please fix validation errors before saving', 'error');
       return;
     }
 
@@ -446,22 +448,27 @@ export class ScoreEditor {
       }
 
       if (result.error) {
-        alert(`Error saving score: ${result.error.message}`);
+        showNotification(
+          `Error saving score: ${result.error.message}`,
+          'error',
+        );
       } else {
         // Clear autosave
         localStorage.removeItem('shakuhachi-editor-autosave');
         this.hasUnsavedChanges = false;
 
-        alert(`Score ${this.isEditing ? 'updated' : 'created'} successfully!`);
+        showNotification(
+          `Score ${this.isEditing ? 'updated' : 'created'} successfully!`,
+          'success',
+        );
 
         // Redirect to library
         window.location.href = '/';
       }
     } catch (error) {
-      alert(
-        `Error saving score: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
+      showNotification(
+        `Error saving score: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error',
       );
     } finally {
       if (saveBtn) {
