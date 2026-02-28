@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
-import { GitFork, SquarePen } from '@lucide/astro';
+import { GitFork, SquarePen, Trash2 } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
 // (getStaticPaths not used - all score URLs render on-demand)
@@ -55,6 +55,14 @@ if (score?.forked_from) {
       <SquarePen size={16} />
     </a>
 
+    <!-- Owner-only delete button -->
+    <button id="delete-btn"
+            class="btn btn-icon"
+            aria-label="Delete score"
+            style="display: none;">
+      <Trash2 size={16} />
+    </button>
+
     <!-- Fork button -->
     <button id="fork-btn"
             class="btn btn-icon-with-count"
@@ -102,7 +110,7 @@ if (score?.forked_from) {
 
   <!-- Initialize theme switcher and auth widget -->
   <script>
-    import { createElement, Book, Plus, Info, SunMoon, SquarePen } from 'lucide';
+    import { createElement, Book, Plus, Info, SunMoon, SquarePen, Trash2 } from 'lucide';
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
     import { onAuthReady } from '../../api/auth';
@@ -164,7 +172,7 @@ if (score?.forked_from) {
         },
       ];
 
-      // Add edit button if user owns the score
+      // Add edit and delete buttons if user owns the score
       if (isOwner) {
         const editBtn = document.getElementById('edit-btn') as HTMLAnchorElement;
         if (editBtn) {
@@ -173,9 +181,16 @@ if (score?.forked_from) {
             label: 'Edit score',
             href: editBtn.href,
             icon: getIconHTML(SquarePen),
-            dividerAfter: true,
+            dividerAfter: false,
           });
         }
+        baseItems.push({
+          id: 'delete',
+          label: 'Delete score',
+          action: () => (document.getElementById('delete-btn') as HTMLButtonElement)?.click(),
+          icon: getIconHTML(Trash2),
+          dividerAfter: true,
+        });
       }
 
       baseItems.push({

@@ -104,7 +104,7 @@
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
 
-- [ ] [Both] [A:High] Delete score with confirmation
+- [x] [Both] [A:High] Delete score with confirmation
   - Owner can delete their own scores
   - Confirmation dialog: "Delete '[title]'? This cannot be undone."
   - Remove from database and redirect to landing page
