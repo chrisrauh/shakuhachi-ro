@@ -1,5 +1,5 @@
 import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
-import { forkScore } from '../api/scores';
+import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import type { Score } from '../api/scores';
@@ -58,12 +58,16 @@ export class ScoreDetailClient {
   private handleEditButtonVisibility(user: User | null) {
     if (!this.score) return;
 
-    const editBtn = document.getElementById('edit-btn') as HTMLElement;
+    const isOwner = !!(user && user.id === this.score.user_id);
 
-    if (editBtn && user && user.id === this.score.user_id) {
-      editBtn.style.display = 'inline-flex';
-    } else if (editBtn) {
-      editBtn.style.display = 'none';
+    const editBtn = document.getElementById('edit-btn') as HTMLElement;
+    if (editBtn) {
+      editBtn.style.display = isOwner ? 'inline-flex' : 'none';
+    }
+
+    const deleteBtn = document.getElementById('delete-btn') as HTMLElement;
+    if (deleteBtn) {
+      deleteBtn.style.display = isOwner ? 'inline-flex' : 'none';
     }
   }
 
@@ -169,6 +173,43 @@ export class ScoreDetailClient {
     if (forkBtn) {
       forkBtn.addEventListener('click', () => this.handleFork());
     }
+
+    const deleteBtn = document.getElementById('delete-btn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => this.handleDelete());
+    }
+  }
+
+  private handleDelete() {
+    if (!this.score) return;
+
+    const dialog = new ConfirmDialog();
+    dialog.show({
+      title: 'Delete score',
+      message: `Delete '${this.score.title}'? This cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => this.performDelete(),
+    });
+  }
+
+  private async performDelete() {
+    if (!this.score) return;
+
+    const deleteBtn = document.getElementById(
+      'delete-btn',
+    ) as HTMLButtonElement;
+    if (deleteBtn) deleteBtn.disabled = true;
+
+    const result = await deleteScore(this.score.id);
+    if (result.error) {
+      alert(`Error deleting score: ${result.error.message}`);
+      if (deleteBtn) deleteBtn.disabled = false;
+      return;
+    }
+
+    sessionStorage.setItem('score-deleted', this.score.title);
+    window.location.href = '/';
   }
 
   private async handleFork() {
