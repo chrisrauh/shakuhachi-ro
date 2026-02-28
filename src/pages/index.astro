@@ -9,7 +9,29 @@ export const prerender = true;
 <Layout title="Shakuhachi Score Library" currentPage="browse">
   <PageHeader slot="header-metadata" title="Shakuhachi.ro" />
 
+  <div id="delete-banner" style="display: none;" class="delete-banner">
+    <span id="delete-banner-message"></span>
+    <button id="delete-banner-close" class="delete-banner-close" aria-label="Dismiss">✕</button>
+  </div>
+
   <div id="score-library"></div>
+
+  <script is:inline>
+    // Show deletion confirmation banner if redirected after deleting a score
+    const deleted = sessionStorage.getItem('score-deleted');
+    if (deleted) {
+      sessionStorage.removeItem('score-deleted');
+      const banner = document.getElementById('delete-banner');
+      const msg = document.getElementById('delete-banner-message');
+      if (banner && msg) {
+        msg.textContent = '\u201c' + deleted + '\u201d was deleted.';
+        banner.style.display = 'flex';
+      }
+      document.getElementById('delete-banner-close')?.addEventListener('click', () => {
+        if (banner) banner.style.display = 'none';
+      });
+    }
+  </script>
 
   <script>
     import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
@@ -90,4 +112,27 @@ export const prerender = true;
       },
     ]);
   </script>
+  <style>
+    .delete-banner {
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-small);
+      padding: var(--spacing-small) var(--spacing-medium);
+      background: var(--color-success-background);
+      color: var(--color-success);
+      border-bottom: 1px solid var(--color-success);
+      font-size: var(--font-size-small);
+    }
+
+    .delete-banner-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      padding: 0;
+      font-size: var(--font-size-base);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+  </style>
 </Layout>
