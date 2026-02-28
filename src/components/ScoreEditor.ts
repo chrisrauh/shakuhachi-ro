@@ -23,6 +23,7 @@ export class ScoreEditor {
   private isEditing: boolean = false;
   private editingScoreId: string | null = null;
   private autoSaveInterval: number | null = null;
+  private hasUnsavedChanges: boolean = false;
 
   constructor(containerId: string, scoreId?: string) {
     const container = document.getElementById(containerId);
@@ -40,6 +41,13 @@ export class ScoreEditor {
     this.render();
     this.setupAutoSave();
     this.setupThemeListener();
+
+    window.addEventListener('beforeunload', (e) => {
+      if (this.hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
   }
 
   private setupThemeListener(): void {
@@ -155,6 +163,7 @@ export class ScoreEditor {
   }
 
   private handleDataChange(newData: string): void {
+    this.hasUnsavedChanges = true;
     this.scoreData = newData;
     this.validateScoreData();
     this.renderValidation();
@@ -196,10 +205,12 @@ export class ScoreEditor {
       this.dataFormat = format;
     }
 
+    this.hasUnsavedChanges = true;
     this.render();
   }
 
   private handleMetadataChange(field: keyof ScoreMetadata, value: any): void {
+    this.hasUnsavedChanges = true;
     (this.metadata as any)[field] = value;
     // Don't re-render - just update internal state
   }
@@ -439,6 +450,7 @@ export class ScoreEditor {
       } else {
         // Clear autosave
         localStorage.removeItem('shakuhachi-editor-autosave');
+        this.hasUnsavedChanges = false;
 
         alert(`Score ${this.isEditing ? 'updated' : 'created'} successfully!`);
 
