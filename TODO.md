@@ -16,14 +16,24 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] [Content] Edit About page content
-  - **NOTE: User needs to do first pass manually before this task can be worked on**
+- [ ] [Content] [A:Low] Edit About page content
+  - **Requires user review and approval before marking complete**
   - Review and refine content for clarity
   - Ensure explanations are clear for shakuhachi musicians
   - Check tone and messaging
   - Verify all information is accurate
 
 ## Fast Follow (Post-Alpha)
+
+- [ ] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
+  - [x] `calculateIntrinsicWidth()` and `calculateIntrinsicHeight()` implemented
+  - [x] `intrinsic-width` attribute supported
+  - [ ] Web component doesn't properly fill parent container in extrinsic mode (multi-column layout) — still unresolved
+  - [ ] Research how other web components handle sizing modes (e.g., `<video>`, `<img>`, `<iframe>`)
+  - [ ] Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
+  - [ ] Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
+  - [ ] Test with Shadow DOM constraints and ensure container dimensions are properly read
+
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 1: Experimentation Tool** ✅ COMPLETE
@@ -52,26 +62,12 @@
     - Control panel only renders in dev mode (zero production impact)
 
 - [ ] [UI] [A:High] Replace alert() dialogs with in-app notifications
-  - Currently using browser alert() for error messages and success confirmations
-  - Examples:
-    - "Please log in to create scores"
-    - "Score updated successfully!"
-    - "Error saving score: [message]"
-    - "Please enter a title for the score"
-  - **Implementation**:
-    - Create notification/toast component
-    - Support different types: success, error, warning, info
-    - Auto-dismiss after timeout (configurable, e.g., 3-5 seconds)
-    - Allow manual dismiss with close button
-    - Stack multiple notifications if needed
-    - Non-blocking (don't stop user workflow like alert() does)
-  - **Locations to update**:
-    - Score creation flow (auth errors, creation errors)
-    - Score editor (save success/failure, validation errors)
-    - Fork flow (success/failure messages)
-    - Authentication (login/signup success/errors)
+  - [x] Created `Notification.ts` component with `showNotification()` (success/error/warning/info, auto-dismiss, manual close)
+  - [x] Replaced `alert()` error/success calls in `ScoreEditor` with `showNotification()`
+  - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
+  - [ ] One `confirm()` remains in `ScoreEditor:188` (format conversion) — replace with in-app dialog
 
-- [ ] [Both] [A:High] Fix auth state on score detail page
+- [x] [Both] [A:High] Fix auth state on score detail page
   - When viewing a score detail page, user appears logged out even though they were logged in
   - Edit button doesn't appear for score owner (should show if user owns the score)
   - Auth widget shows "Log In" / "Sign Up" instead of user email and "Log Out"
@@ -101,18 +97,17 @@
   - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
 - [ ] [UI] [A:Medium] Investigate button text vertical alignment
-  - Button labels appear ~1px lower than ideal
-  - `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` are applied but have no effect
-  - These properties ARE supported in Chrome (per MDN) and have worked in other contexts (e.g., PageHeader title)
-  - Root cause: Surrounding CSS conditions (flexbox, line-height, padding, or other properties) are preventing text-box-trim from taking effect
-  - Need to identify what's blocking the trim behavior and adjust surrounding styles
+  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS
+  - [ ] Properties not taking effect (button labels appear ~1px lower than ideal)
+  - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
   - Test page for visual verification: http://localhost:3003/test/buttons
 
 - [ ] [UI] [A:High] Improve button test page visual regression coverage
-  - Redesign `/test/buttons` layout to be more condensed
-  - Ensure all button variants are visible in a single viewport
-  - Icon with counter button is a category, not to be removed). Make sure the example is using the full css needed as the current example is showing with arial font.
-  - Adjust viewport size in visual regression tests to capture all variations
+  - [x] Test page `/test/buttons` exists with icon, small, and standard button variants
+  - [x] Visual regression tests exist for buttons (light/dark, desktop/mobile)
+  - [ ] Layout not condensed — not all variants visible in a single viewport
+  - [ ] Counter button example using wrong font (Arial instead of proper CSS)
+  - [ ] Adjust viewport size in visual regression tests to capture all variations
   - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
@@ -123,17 +118,17 @@
   - Remove from database and redirect to landing page
 
 - [ ] [UI] [A:High] Loading states and spinners
-  - During save operations
-  - During score creation
-  - During fork operations
-  - During delete operations
+  - [x] Fork operation: spinner animation in fork button
+  - [x] Save operation: "Saving..." text + button disabled
+  - [ ] Score creation: no loading state
+  - [ ] Delete operation: no visual indicator beyond button disabled
 
 - [ ] [UI] [A:Medium] Notation format help in editor
   - Examples of valid notation
   - Links to documentation
   - Format validation and helpful error messages
 
-- [ ] [UI] [A:High] Unsaved changes warning
+- [x] [UI] [A:High] Unsaved changes warning
   - Detect unsaved changes in editor
   - Warn before navigating away
   - "You have unsaved changes. Are you sure you want to leave?"
@@ -298,7 +293,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] [UI] [A:High] ScoreEditor: notify user when autosave restore fails
   - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
 
-- [ ] [Backend] [A:High] AuthStateManager: document or fix the async initialization race condition
+- [x] [Backend] [A:High] AuthStateManager: document or fix the async initialization race condition
   - `src/api/authState.ts:12-14` — The constructor calls `this.initialize()` which is async, but constructors can't await. Any code that calls `authState.getUser()` synchronously right after import gets `null` even if the user is logged in, because `getCurrentUser()` hasn't resolved yet. Either (a) document this behavior with a JSDoc warning, (b) provide an `onReady()` promise, or (c) have components always use `subscribe()` which fires on resolution.
 
 - [ ] [Backend] [A:High] forkScore: check error on fork count increment
@@ -308,7 +303,8 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
 
 - [ ] [Backend] [A:High] ScoreDetailClient.handleFork: preserve error context in catch block
-  - `src/components/ScoreDetailClient.ts:166` — The catch block `catch { alert('Failed to fork score'); }` discards the original error entirely. Add `console.error('Fork failed:', error)` so debugging context isn't lost.
+  - [x] Replaced `alert('Failed to fork score')` with `showNotification()`
+  - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
 
 - [ ] [Backend] [A:High] AuthComponents.show(): remove pointless double toggleMode() call
   - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
@@ -327,7 +323,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] [Backend] [A:High] Extract auto-save logic out of ScoreEditor
   - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
 
-- [ ] [Backend] [A:High] Extract createScore slug generation into its own function
+- [x] [Backend] [A:High] Extract createScore slug generation into its own function
   - `src/api/scores.ts:62-83` — `createScore()` mixes two responsibilities: generating a unique slug and inserting the score into the database. The slug generation logic (lines 62-83) queries existing slugs, calls `generateSlug()`, and appends a numeric suffix for uniqueness. Extract to a standalone `generateUniqueSlug(title: string): Promise<string>` function. This makes slug generation testable independently and reusable if other entities need unique slugs.
 
 #### Separation of Concerns
@@ -342,7 +338,9 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - `src/components/ScoreDetailClient.ts:79-84` — The UI component directly imports `MusicXMLParser` and calls `MusicXMLParser.parse()` to convert stored data before rendering. This parsing concern should live in a shared utility (e.g., `parseScoreByFormat(data, format)`) so that every component that renders a score doesn't need to know about format-specific parsing.
 
 - [ ] [UI] [A:Medium] Standardize error UX across components
-  - Three different error patterns are used: ScoreEditor uses `alert()` (lines 241, 246, 251, 285, 290, 297), ScoreLibrary renders inline error UI with a retry button (lines 82-94), ScoreDetailClient uses `console.error` with no user feedback (lines 25, 33). Pick one pattern (inline error UI is the best UX) and apply it consistently. At minimum, replace `alert()` calls in ScoreEditor with inline messages near the relevant form controls.
+  - [x] `ScoreEditor` no longer uses `alert()` for errors — uses `showNotification()`
+  - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
+  - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
 
 #### Explicit Over Implicit
 
@@ -361,7 +359,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] [Backend] [A:High] Name the auto-save interval constant in ScoreEditor
   - `src/components/ScoreEditor.ts:105-107` — `window.setInterval(() => ..., 30000)` uses a bare number. Define `const AUTO_SAVE_INTERVAL_MS = 30_000;` at the top of the file or in a constants module.
 
-- [ ] [Backend] [A:High] Document MIDI tick values in Formatter.ts
+- [x] [Backend] [A:High] Document MIDI tick values in Formatter.ts
   - `src/renderer/Formatter.ts:16-23` — `DURATION_TICKS` maps note durations to values like 4096, 2048, 1024, etc. Add a one-line comment: "Based on standard MIDI resolution: quarter note = 1024 ticks, each subdivision halves the value."
 
 - [ ] [Backend] [A:High] Name magic number for rest vertical centering in ShakuNote
