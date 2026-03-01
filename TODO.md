@@ -67,16 +67,6 @@
   - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
   - [ ] One `confirm()` remains in `ScoreEditor:188` (format conversion) — replace with in-app dialog
 
-- [x] [Both] [A:High] Fix auth state on score detail page
-  - When viewing a score detail page, user appears logged out even though they were logged in
-  - Edit button doesn't appear for score owner (should show if user owns the score)
-  - Auth widget shows "Log In" / "Sign Up" instead of user email and "Log Out"
-  - Likely issues:
-    - Auth state not initializing on score detail page
-    - Race condition where page renders before auth state loads
-    - Mobile menu not showing Edit option for owned scores
-  - Test: Create score → view detail page → verify Edit button appears and user shows as logged in
-
 - [ ] [Backend] [A:Medium] Auto-save to database
   - Currently: Auto-save only saves to localStorage every 30 seconds
   - User must manually click "Save" to persist to database
@@ -112,11 +102,6 @@
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
 
-- [x] [Both] [A:High] Delete score with confirmation
-  - Owner can delete their own scores
-  - Confirmation dialog: "Delete '[title]'? This cannot be undone."
-  - Remove from database and redirect to landing page
-
 - [ ] [UI] [A:High] Loading states and spinners
   - [x] Fork operation: spinner animation in fork button
   - [x] Save operation: "Saving..." text + button disabled
@@ -127,11 +112,6 @@
   - Examples of valid notation
   - Links to documentation
   - Format validation and helpful error messages
-
-- [x] [UI] [A:High] Unsaved changes warning
-  - Detect unsaved changes in editor
-  - Warn before navigating away
-  - "You have unsaved changes. Are you sure you want to leave?"
 
 ## Future Enhancements (Post-Alpha)
 
@@ -293,9 +273,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] [UI] [A:High] ScoreEditor: notify user when autosave restore fails
   - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
 
-- [x] [Backend] [A:High] AuthStateManager: document or fix the async initialization race condition
-  - `src/api/authState.ts:12-14` — The constructor calls `this.initialize()` which is async, but constructors can't await. Any code that calls `authState.getUser()` synchronously right after import gets `null` even if the user is logged in, because `getCurrentUser()` hasn't resolved yet. Either (a) document this behavior with a JSDoc warning, (b) provide an `onReady()` promise, or (c) have components always use `subscribe()` which fires on resolution.
-
 - [ ] [Backend] [A:High] forkScore: check error on fork count increment
   - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
 
@@ -322,9 +299,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] [Backend] [A:High] Extract auto-save logic out of ScoreEditor
   - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
-
-- [x] [Backend] [A:High] Extract createScore slug generation into its own function
-  - `src/api/scores.ts:62-83` — `createScore()` mixes two responsibilities: generating a unique slug and inserting the score into the database. The slug generation logic (lines 62-83) queries existing slugs, calls `generateSlug()`, and appends a numeric suffix for uniqueness. Extract to a standalone `generateUniqueSlug(title: string): Promise<string>` function. This makes slug generation testable independently and reusable if other entities need unique slugs.
 
 #### Separation of Concerns
 
@@ -358,9 +332,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 - [ ] [Backend] [A:High] Name the auto-save interval constant in ScoreEditor
   - `src/components/ScoreEditor.ts:105-107` — `window.setInterval(() => ..., 30000)` uses a bare number. Define `const AUTO_SAVE_INTERVAL_MS = 30_000;` at the top of the file or in a constants module.
-
-- [x] [Backend] [A:High] Document MIDI tick values in Formatter.ts
-  - `src/renderer/Formatter.ts:16-23` — `DURATION_TICKS` maps note durations to values like 4096, 2048, 1024, etc. Add a one-line comment: "Based on standard MIDI resolution: quarter note = 1024 ticks, each subdivision halves the value."
 
 - [ ] [Backend] [A:High] Name magic number for rest vertical centering in ShakuNote
   - `src/notes/ShakuNote.ts:144` — `this.y - this.fontSize * 0.4` uses an unexplained `0.4` multiplier to position the rest circle relative to the note baseline. Extract to a named constant like `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` with a comment explaining that Japanese characters are typically centered around 40% above the baseline.
