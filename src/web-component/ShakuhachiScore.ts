@@ -32,7 +32,7 @@ class ShakuhachiScore extends HTMLElement {
   private shadow: ShadowRoot;
 
   static get observedAttributes() {
-    return ['data-score', 'single-column'];
+    return ['data-score', 'columns', 'auto-resize'];
   }
 
   constructor() {
@@ -101,6 +101,33 @@ class ShakuhachiScore extends HTMLElement {
 
     // No data available yet - not an error, component may still be initializing
     return null;
+  }
+
+  /**
+   * Parse columns attribute
+   * Returns 'auto' for auto-detection or a positive number for explicit column count
+   */
+  private parseColumnsAttribute(): 'auto' | number {
+    const columnsAttr = this.getAttribute('columns');
+
+    // Default to auto when no attribute present
+    if (!columnsAttr) {
+      return 'auto';
+    }
+
+    // Parse columns value
+    if (columnsAttr === 'auto') return 'auto';
+
+    const num = parseInt(columnsAttr);
+    if (!isNaN(num) && num > 0) {
+      return num;
+    }
+
+    console.warn(
+      `shakuhachi-score: invalid columns value "${columnsAttr}". ` +
+        'Use "auto" or a positive number. Defaulting to "auto".',
+    );
+    return 'auto';
   }
 
   /**
@@ -251,7 +278,25 @@ class ShakuhachiScore extends HTMLElement {
 
       // Parse notes to calculate dimensions
       const notes = ScoreParser.parse(scoreData);
-      const isSingleColumn = this.getAttribute('single-column') !== 'false';
+      const columns = this.parseColumnsAttribute();
+
+      // Determine layout mode
+      let isSingleColumn: boolean;
+      let notesPerColumn: number | undefined;
+
+      if (columns === 'auto') {
+        // Auto mode: multi-column layout, let renderer calculate based on dimensions
+        isSingleColumn = false;
+        notesPerColumn = undefined; // Renderer will auto-calculate
+      } else if (columns === 1) {
+        // Single column: all notes, intrinsic height
+        isSingleColumn = true;
+        notesPerColumn = undefined;
+      } else {
+        // Explicit column count: multi-column with distribution
+        isSingleColumn = false;
+        notesPerColumn = Math.ceil(notes.length / columns);
+      }
 
       // Get theme options
       const themeOptions = this.getThemeOptions();
@@ -270,6 +315,8 @@ class ShakuhachiScore extends HTMLElement {
       style.textContent = `
         :host {
           display: block;
+          box-sizing: border-box;
+          contain-intrinsic-size: 300px 150px;
           --shakuhachi-note-color: #000;
           --shakuhachi-note-font-size: 28px;
           --shakuhachi-note-font-weight: 400;
@@ -288,53 +335,44 @@ class ShakuhachiScore extends HTMLElement {
       this.shadow.appendChild(style);
       this.shadow.appendChild(container);
 
-      // Build render options
-      const renderOptions: any = {
-        singleColumn: isSingleColumn,
-        showDebugLabels: this.hasAttribute('debug'),
-        autoResize: false,
-        ...themeOptions,
-      };
+      // Calculate dimensions
+      let width: number | undefined;
+      let height: number | undefined;
 
-      // Sizing strategy:
-      // - Single-column: Intrinsic height (content-based), explicit width (for centering)
-      // - Multi-column: Explicit width and height (parent-based)
       if (isSingleColumn) {
-        // Intrinsic height: calculate from content for scrolling pages
-        renderOptions.height = this.calculateIntrinsicHeight(notes);
+        // Single column: calculate intrinsic height from content
+        height = this.calculateIntrinsicHeight(notes);
 
-        // Explicit width: use width attribute if provided (for proper centering)
+        // Width from attribute or auto-detect
         const widthAttr = this.getAttribute('width');
         if (widthAttr) {
-          renderOptions.width = parseInt(widthAttr);
-        }
-        // Otherwise, renderer will read from container.getBoundingClientRect()
-
-        // Optional: use intrinsic width (opt-in via attribute)
-        if (this.hasAttribute('intrinsic-width')) {
-          renderOptions.width = this.calculateIntrinsicWidth(notes);
+          width = parseInt(widthAttr);
+        } else if (this.hasAttribute('intrinsic-width')) {
+          width = this.calculateIntrinsicWidth(notes);
+        } else {
+          const rect = this.getBoundingClientRect();
+          width = rect.width > 0 ? rect.width : 300;
         }
       } else {
-        // Extrinsic sizing: use dimensions from parent
-        // Check for explicit width/height attributes first
+        // Multi-column: use host dimensions from parent
         const widthAttr = this.getAttribute('width');
         const heightAttr = this.getAttribute('height');
 
-        // Use explicit attributes if provided
-        if (widthAttr) {
-          renderOptions.width = parseInt(widthAttr);
-        } else {
-          // Read from host element (sized by parent via CSS)
-          renderOptions.width = this.clientWidth || 800;
-        }
-
-        if (heightAttr) {
-          renderOptions.height = parseInt(heightAttr);
-        } else {
-          // Read from host element (sized by parent via CSS)
-          renderOptions.height = this.clientHeight || 600;
-        }
+        // Use explicit attributes if provided, otherwise read from element
+        width = widthAttr ? parseInt(widthAttr) : this.clientWidth || 300;
+        height = heightAttr ? parseInt(heightAttr) : this.clientHeight || 150;
       }
+
+      // Build render options
+      const renderOptions: any = {
+        singleColumn: isSingleColumn,
+        notesPerColumn,
+        showDebugLabels: this.hasAttribute('debug'),
+        autoResize: this.getAttribute('auto-resize') !== 'false',
+        width,
+        height,
+        ...themeOptions,
+      };
 
       // Render using ScoreRenderer
       this.renderer = new ScoreRenderer(container, renderOptions);

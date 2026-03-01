@@ -63,8 +63,11 @@ Below is a live example showing the opening phrase of "Akatombo" (Red Dragonfly)
 <!-- Include the script once in your HTML -->
 <script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
 
-<!-- Use the web component with score data -->
-<shakuhachi-score single-column="true" data-score='{
+<!-- Default: auto-detect columns based on container height -->
+<shakuhachi-score data-score='{...}'></shakuhachi-score>
+
+<!-- Single column with intrinsic height -->
+<shakuhachi-score columns="1" data-score='{
   "title": "Akatombo (Opening Phrase)",
   "style": "kinko",
   "notes": [
@@ -80,12 +83,15 @@ Below is a live example showing the opening phrase of "Akatombo" (Red Dragonfly)
   ]
 }'>
 </shakuhachi-score>
+
+<!-- Explicit column count (6 columns) -->
+<shakuhachi-score columns="6" data-score='{...}'></shakuhachi-score>
 ```
 
 **Live result:**
 
 <div class="score-example">
-  <shakuhachi-score class="score-viz" single-column="true" data-score='{"title":"Akatombo (Opening Phrase)","style":"kinko","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
+  <shakuhachi-score class="score-viz" columns="1" data-score='{"title":"Akatombo (Opening Phrase)","style":"kinko","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
   <div class="score-comments">
     **What you're seeing:**
     - **Vertical reading**: Notes read top to bottom, then move to the next column

@@ -45,20 +45,35 @@ src/web-component/
 The renderer is wrapped as a custom element `<shakuhachi-score>` for easy embedding:
 
 ```html
-<shakuhachi-score
-  score-data='{"title":"Test","style":"kinko","notes":[...]}'
-  show-octave-marks="true"
-  notes-per-column="10">
-</shakuhachi-score>
+<!-- Default: auto-detect columns based on container height -->
+<shakuhachi-score data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+
+<!-- Single column with intrinsic height -->
+<shakuhachi-score columns="1" data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+
+<!-- Explicit column count -->
+<shakuhachi-score columns="6" data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+
+<!-- Disable auto-resize for performance -->
+<shakuhachi-score auto-resize="false" data-score='...'></shakuhachi-score>
 ```
 
 **Implementation:** `src/web-component/ShakuhachiScore.ts`
 
+**Attributes:**
+- `data-score` - JSON score data (required)
+- `columns` - Layout mode: `"auto"` (default), `"1"` (single column), or number (explicit column count)
+- `auto-resize` - Enable ResizeObserver (default: `true`, set to `"false"` to disable)
+- `width`/`height` - Explicit dimensions (optional, overrides CSS)
+- `debug` - Show debug labels (optional)
+
 **Features:**
 - Custom element that renders shakuhachi notation
 - Reactive attributes (changes trigger re-render)
-- Auto-resize with ResizeObserver
+- Auto-resize with ResizeObserver (enabled by default)
 - Supports both JSON data and ScoreData objects
+- Works with CSS sizing (flex, grid, percentages)
+- Default 300×150 fallback dimensions
 
 **Build Output:** `public/embed/shakuhachi-score.js` (IIFE bundle, ~25KB)
 

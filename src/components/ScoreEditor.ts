@@ -284,16 +284,13 @@ export class ScoreEditor {
 
         if (isMobile) {
           // Mobile: single-column mode with intrinsic height
-          container.setAttribute('single-column', 'true');
-          container.setAttribute('width', String(externalPreview.clientWidth));
+          container.setAttribute('columns', '1');
+          container.style.width = '100%';
         } else {
-          // Desktop: multi-column mode with explicit dimensions
-          container.setAttribute('single-column', 'false');
-          container.setAttribute('width', String(externalPreview.clientWidth));
-          container.setAttribute(
-            'height',
-            String(externalPreview.clientHeight),
-          );
+          // Desktop: auto-detect columns based on panel height
+          container.setAttribute('columns', 'auto');
+          container.style.width = '100%';
+          container.style.height = '100%';
         }
 
         // Set score data (triggers render)
@@ -371,13 +368,13 @@ export class ScoreEditor {
 
       if (isMobile) {
         // Mobile: single-column mode with intrinsic height
-        container.setAttribute('single-column', 'true');
-        container.setAttribute('width', String(previewContainer.clientWidth));
+        container.setAttribute('columns', '1');
+        container.style.width = '100%';
       } else {
-        // Desktop: multi-column mode with explicit dimensions
-        container.setAttribute('single-column', 'false');
-        container.setAttribute('width', String(previewContainer.clientWidth));
-        container.setAttribute('height', String(previewContainer.clientHeight));
+        // Desktop: auto-detect columns based on panel height
+        container.setAttribute('columns', 'auto');
+        container.style.width = '100%';
+        container.style.height = '100%';
       }
 
       // Set score data (triggers render)
