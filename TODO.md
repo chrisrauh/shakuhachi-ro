@@ -34,8 +34,6 @@
   - Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
   - Test with Shadow DOM constraints and ensure container dimensions are properly read
 
-- [ ] the shakuhachi-score component should not require any metadata to render (title, authors, description, etc.), just notes should be suficient for it to display. It should even accept just an array of notes.
-
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - For example: letter-spacing: -0.02em;
   - Invetsigate different values for button vs label vs copy.
