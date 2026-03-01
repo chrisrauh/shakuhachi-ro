@@ -45,23 +45,34 @@ src/web-component/
 The renderer is wrapped as a custom element `<shakuhachi-score>` for easy embedding:
 
 ```html
-<!-- Default: auto-detect columns based on container height -->
-<shakuhachi-score data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+<!-- Minimal data - just notes (recommended for simple use cases) -->
+<shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
+
+<!-- With optional metadata -->
+<shakuhachi-score data-score='{
+  "title": "Test",
+  "style": "kinko",
+  "composer": "Traditional",
+  "notes": [...]
+}'></shakuhachi-score>
 
 <!-- Single column with intrinsic height -->
-<shakuhachi-score columns="1" data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+<shakuhachi-score columns="1" data-score='{"notes":[...]}'></shakuhachi-score>
 
 <!-- Explicit column count -->
-<shakuhachi-score columns="6" data-score='{"title":"Test","style":"kinko","notes":[...]}'></shakuhachi-score>
+<shakuhachi-score columns="6" data-score='{"notes":[...]}'></shakuhachi-score>
 
 <!-- Disable auto-resize for performance -->
 <shakuhachi-score auto-resize="false" data-score='...'></shakuhachi-score>
 ```
 
+**Minimal data requirement:**
+Only the `notes` array is required. All other fields (`title`, `style`, `composer`, etc.) are optional metadata.
+
 **Implementation:** `src/web-component/ShakuhachiScore.ts`
 
 **Attributes:**
-- `data-score` - JSON score data (required)
+- `data-score` - JSON score data (required, must contain `notes` array)
 - `columns` - Layout mode: `"auto"` (default), `"1"` (single column), or number (explicit column count)
 - `auto-resize` - Enable ResizeObserver (default: `true`, set to `"false"` to disable)
 - `width`/`height` - Explicit dimensions (optional, overrides CSS)

@@ -93,9 +93,8 @@ renderer.resize(1200, 800);
 ```javascript
 import { renderScore } from 'shakuhachi-ro';
 
-const scoreData = {
-  title: 'My Score',
-  style: 'kinko',
+// Minimal - just notes
+const minimalScore = {
   notes: [
     { pitch: { step: 'ro', octave: 0 }, duration: 1 },
     { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
@@ -103,7 +102,21 @@ const scoreData = {
   ],
 };
 
-await renderScore(container, scoreData);
+await renderScore(container, minimalScore);
+
+// With optional metadata
+const fullScore = {
+  title: 'My Score',
+  style: 'kinko',
+  composer: 'Traditional',
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
+    { pitch: { step: 'chi', octave: 1 }, duration: 2 },
+  ],
+};
+
+await renderScore(container, fullScore);
 ```
 
 ### Web Component (Embed on Any Website)
@@ -114,17 +127,29 @@ The easiest way to embed shakuhachi notation on any website:
 <!-- Include the script once -->
 <script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
 
-<!-- Use the web component -->
+<!-- Minimal usage - just notes -->
 <shakuhachi-score data-score='{
-  "title": "My Score",
-  "style": "kinko",
   "notes": [
     { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 }
   ]
 }'></shakuhachi-score>
+
+<!-- With optional metadata -->
+<shakuhachi-score data-score='{
+  "title": "My Score",
+  "style": "kinko",
+  "composer": "Traditional",
+  "notes": [...]
+}'></shakuhachi-score>
 ```
+
+**Data Format:**
+- `notes` (required) - Array of note objects
+- `title` (optional) - Score title for display
+- `style` (optional) - Notation style: "kinko" or "tozan"
+- `composer`, `tempo`, `key` (optional) - Additional metadata
 
 **Attributes:**
 - `columns="auto"` (default) - Auto-detect layout based on container height
