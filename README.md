@@ -106,6 +106,41 @@ const scoreData = {
 await renderScore(container, scoreData);
 ```
 
+### Web Component (Embed on Any Website)
+
+The easiest way to embed shakuhachi notation on any website:
+
+```html
+<!-- Include the script once -->
+<script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
+
+<!-- Use the web component -->
+<shakuhachi-score data-score='{
+  "title": "My Score",
+  "style": "kinko",
+  "notes": [
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 }
+  ]
+}'></shakuhachi-score>
+```
+
+**Attributes:**
+- `columns="auto"` (default) - Auto-detect layout based on container height
+- `columns="1"` - Single column with intrinsic height
+- `columns="6"` - Exactly 6 columns
+- `auto-resize="false"` - Disable ResizeObserver (enabled by default)
+- `width`/`height` - Explicit dimensions (overrides CSS)
+
+**Styling with CSS:**
+```css
+shakuhachi-score {
+  width: 100%;
+  height: 500px;
+}
+```
+
 ## Configuration Options
 
 Full list of available options:

@@ -141,11 +141,16 @@
         const component = document.createElement('shakuhachi-score');
         component.setAttribute('data-score', JSON.stringify(scoreData));
 
-        // Set explicit dimensions for multi-column example
+        // Examples 1 and 2: single column with intrinsic height
+        if (i === 0 || i === 1) {
+          component.setAttribute('columns', '1');
+        }
+
+        // Example 3: multi-column with explicit dimensions
         if (i === 2) {
           component.setAttribute('width', '350');
           component.setAttribute('height', '600');
-          component.setAttribute('single-column', 'false');
+          component.setAttribute('columns', 'auto');
         }
 
         container.appendChild(component);
@@ -158,11 +163,16 @@
         component.setAttribute('data-score', JSON.stringify(scoreData));
         component.style.setProperty('--shakuhachi-note-color', '#fff');
 
-        // Set explicit dimensions for multi-column example
+        // Examples 1 and 2: single column with intrinsic height
+        if (i === 0 || i === 1) {
+          component.setAttribute('columns', '1');
+        }
+
+        // Example 3: multi-column with explicit dimensions
         if (i === 2) {
           component.setAttribute('width', '350');
           component.setAttribute('height', '600');
-          component.setAttribute('single-column', 'false');
+          component.setAttribute('columns', 'auto');
         }
 
         container.appendChild(component);

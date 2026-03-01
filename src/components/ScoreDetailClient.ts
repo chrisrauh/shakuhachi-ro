@@ -114,14 +114,13 @@ export class ScoreDetailClient {
 
       if (isMobile) {
         // Mobile: single-column mode with intrinsic height (fits content for scrolling)
-        container.setAttribute('single-column', 'true');
-        // Pass width for proper centering (height is calculated intrinsically)
-        container.setAttribute('width', String(container.clientWidth));
+        container.setAttribute('columns', '1');
+        container.style.width = '100%';
       } else {
-        // Desktop: multi-column mode with explicit dimensions (VexFlow pattern)
-        container.setAttribute('single-column', 'false');
-        container.setAttribute('width', String(container.clientWidth));
-        container.setAttribute('height', String(container.clientHeight));
+        // Desktop: auto-detect columns based on viewport height
+        container.setAttribute('columns', 'auto');
+        container.style.width = '100%';
+        container.style.height = '100%';
       }
 
       // Set web component attributes (triggers render)
