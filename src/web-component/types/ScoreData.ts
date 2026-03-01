@@ -59,11 +59,11 @@ export interface ScoreNote {
  * Complete score data structure
  */
 export interface ScoreData {
-  /** Score title */
-  title: string;
+  /** Score title (optional metadata) */
+  title?: string;
 
-  /** Notation style */
-  style: NotationStyle;
+  /** Notation style (optional metadata) */
+  style?: NotationStyle;
 
   /** Flat array of notes in performance order */
   notes: ScoreNote[];
