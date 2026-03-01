@@ -169,3 +169,62 @@ describe('ShakuhachiScore Web Component - Columns Attribute', () => {
     consoleSpy.mockRestore();
   });
 });
+
+describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
+  let container: HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    container.style.width = '800px';
+    container.style.height = '600px';
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+  });
+
+  it('renders with minimal data (only notes)', async () => {
+    const minimalData = {
+      notes: [
+        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+        { pitch: { step: 're', octave: 0 }, duration: 1 },
+      ],
+    };
+
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalData));
+    component.setAttribute('columns', '1');
+    container.appendChild(component);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+
+    // Verify notes were rendered
+    const noteElements = component.shadowRoot?.querySelectorAll('text');
+    expect(noteElements?.length).toBeGreaterThan(0);
+  });
+
+  it('still works with full metadata (backward compatibility)', async () => {
+    const fullData = {
+      title: 'Test Score',
+      style: 'kinko' as const,
+      notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
+      composer: 'Test Composer',
+      tempo: '120 BPM',
+    };
+
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(fullData));
+    component.setAttribute('columns', '1');
+    container.appendChild(component);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+  });
+});
