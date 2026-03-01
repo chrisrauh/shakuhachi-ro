@@ -203,32 +203,18 @@ describe('ScoreParser', () => {
       );
     });
 
-    it('should throw error if title is missing', () => {
-      const scoreData = {
-        style: 'kinko',
-        notes: [],
+    it('should parse minimal data without title or style', () => {
+      const minimalData = {
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
       } as any;
 
-      expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Score title is required',
-      );
-    });
-
-    it('should throw error if style is missing', () => {
-      const scoreData = {
-        title: 'Test',
-        notes: [],
-      } as any;
-
-      expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Score style is required',
-      );
+      const parsed = ScoreParser.parse(minimalData);
+      expect(parsed).toHaveLength(1);
+      expect(parsed[0].getKana()).toBe('ロ');
     });
 
     it('should throw error if notes is not an array', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: 'not an array',
       } as any;
 
@@ -238,11 +224,9 @@ describe('ScoreParser', () => {
     });
 
     it('should throw error if notes array is empty', () => {
-      const scoreData: ScoreData = {
-        title: 'Test',
-        style: 'kinko',
+      const scoreData = {
         notes: [],
-      };
+      } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
         'Score must contain at least one note',
@@ -251,8 +235,6 @@ describe('ScoreParser', () => {
 
     it('should throw error if note is missing pitch', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: [{ duration: 1 }],
       } as any;
 
@@ -263,8 +245,6 @@ describe('ScoreParser', () => {
 
     it('should throw error if note is missing pitch.step', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: [{ pitch: { octave: 0 }, duration: 1 }],
       } as any;
 
@@ -275,8 +255,6 @@ describe('ScoreParser', () => {
 
     it('should throw error if note is missing pitch.octave', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: [{ pitch: { step: 'ro' }, duration: 1 }],
       } as any;
 
@@ -287,8 +265,6 @@ describe('ScoreParser', () => {
 
     it('should throw error if note is missing duration', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: [{ pitch: { step: 'ro', octave: 0 } }],
       } as any;
 
@@ -347,8 +323,6 @@ describe('ScoreParser', () => {
 
     it('should throw error if rest note is missing duration', () => {
       const scoreData = {
-        title: 'Test',
-        style: 'kinko',
         notes: [{ rest: true }],
       } as any;
 
@@ -358,11 +332,9 @@ describe('ScoreParser', () => {
     });
 
     it('should allow rest notes without pitch', () => {
-      const scoreData: ScoreData = {
-        title: 'Test',
-        style: 'kinko',
+      const scoreData = {
         notes: [{ rest: true, duration: 2 }],
-      };
+      } as any;
 
       // Should not throw
       const notes = ScoreParser.parse(scoreData);

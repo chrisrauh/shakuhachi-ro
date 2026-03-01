@@ -50,7 +50,7 @@ export class MusicXMLSerializer {
     // Work (title)
     parts.push('  <work>');
     parts.push(
-      `    <work-title>${this.escapeXml(scoreData.title)}</work-title>`,
+      `    <work-title>${this.escapeXml(scoreData.title || 'Untitled')}</work-title>`,
     );
     parts.push('  </work>');
 

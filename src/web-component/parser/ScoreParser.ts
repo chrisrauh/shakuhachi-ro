@@ -253,14 +253,6 @@ export class ScoreParser {
       throw new Error('Score data is required');
     }
 
-    if (!scoreData.title) {
-      throw new Error('Score title is required');
-    }
-
-    if (!scoreData.style) {
-      throw new Error('Score style is required');
-    }
-
     if (!Array.isArray(scoreData.notes)) {
       throw new Error('Score notes must be an array');
     }
