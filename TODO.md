@@ -25,15 +25,6 @@
 
 ## Fast Follow (Post-Alpha)
 
-- [ ] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
-  - Research how other web components handle sizing modes (e.g., `<video>`, `<img>`, `<iframe>`)
-  - Study CSS standard patterns for intrinsic sizing (content-based) vs extrinsic sizing (container-based)
-  - Document how standard HTML elements switch between these modes
-  - Current issue: Web component doesn't properly fill parent container in extrinsic mode (multi-column layout)
-  - Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
-  - Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
-  - Test with Shadow DOM constraints and ensure container dimensions are properly read
-
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - For example: letter-spacing: -0.02em;
   - Invetsigate different values for button vs label vs copy.
