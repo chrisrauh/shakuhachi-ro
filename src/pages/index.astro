@@ -45,6 +45,13 @@ export const prerender = true;
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
 
+    // Initialize letter spacing control (dev only)
+    if (import.meta.env.DEV) {
+      import('../components/LetterSpacingControl').then(({ LetterSpacingControl }) => {
+        new LetterSpacingControl('letter-spacing-control');
+      });
+    }
+
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 

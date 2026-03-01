@@ -26,9 +26,30 @@
 ## Fast Follow (Post-Alpha)
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
-  - For example: letter-spacing: -0.02em;
-  - Invetsigate different values for button vs label vs copy.
-  - Should not apply to score rendered text
+  - **Phase 1: Experimentation Tool** ✅ COMPLETE
+    - [x] Implemented dev-only control panel for experimentation
+    - [x] Range: -0.1em to 0.15em with 0.001em granularity
+    - [x] Persists to localStorage across sessions
+    - [x] See CLAUDE.md for usage instructions
+  - **Phase 2: Determine Optimal Values** (User-driven)
+    - [ ] Use control panel to test different letter spacing values
+    - [ ] Identify optimal value for body copy
+    - [ ] Identify optimal value for buttons
+    - [ ] Identify optimal value for form inputs
+    - [ ] Identify optimal value for labels/small text
+    - [ ] Identify optimal value for headings
+    - [ ] Document final values (e.g., copy: -0.02em, buttons: -0.015em, etc.)
+  - **Phase 3: Apply to Codebase** (After user determines values)
+    - [ ] Update CSS design tokens with finalized values
+    - [ ] Update button styles to use determined letter-spacing
+    - [ ] Update form input styles to use determined letter-spacing
+    - [ ] Update body copy styles to use determined letter-spacing
+    - [ ] Update heading styles to use determined letter-spacing
+    - [ ] Remove dev control panel or convert to production feature toggle
+    - [ ] Run visual regression tests to verify changes
+  - **Notes**:
+    - Should not apply to SVG-rendered score notation (already isolated)
+    - Control panel only renders in dev mode (zero production impact)
 
 - [ ] [UI] [A:High] Replace alert() dialogs with in-app notifications
   - Currently using browser alert() for error messages and success confirmations
