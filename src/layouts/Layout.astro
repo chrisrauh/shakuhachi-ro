@@ -78,6 +78,11 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       <slot />
     </main>
 
+    <!-- Dev Tools (only rendered in dev mode) -->
+    {import.meta.env.DEV && (
+      <div id="letter-spacing-control" class="dev-panel"></div>
+    )}
+
     <style is:global>
       @import '../styles/tokens/themes.css';
       @import '../styles/components.css';
@@ -103,6 +108,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
+        letter-spacing: var(--letter-spacing-override, normal);
       }
 
       body.full-height {
@@ -228,6 +234,34 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       .btn.loading {
         opacity: 0.6;
         pointer-events: none;
+      }
+
+      /* Dev panel - floating bottom-right */
+      .dev-panel {
+        position: fixed;
+        bottom: var(--spacing-medium);
+        right: var(--spacing-medium);
+        z-index: 100;
+        max-width: 280px;
+      }
+
+      /* Tweakpane theme integration */
+      .dev-panel :global(.tp-dfwv) {
+        min-width: 240px;
+      }
+
+      .dev-panel :global(.tp-rotv_c) {
+        background-color: var(--color-bg-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius-medium);
+      }
+
+      .dev-panel :global(.tp-lblv_l) {
+        color: var(--color-text-primary);
+      }
+
+      .dev-panel :global(.tp-brkv) {
+        background-color: var(--color-bg-active);
       }
     </style>
 
