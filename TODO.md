@@ -12,6 +12,7 @@
 ## Task Tags
 
 **Area:** `[UI]` `[Backend]` `[Both]` `[Content]` `[Research]`
+
 **Autonomy:** `[A:High]` = Can work independently | `[A:Medium]` = May need guidance | `[A:Low]` = Requires collaboration
 
 ## Alpha Release (Must-Haves)
