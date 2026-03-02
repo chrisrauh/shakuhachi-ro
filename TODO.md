@@ -30,7 +30,8 @@
   - [x] `calculateIntrinsicWidth()` and `calculateIntrinsicHeight()` implemented
   - [x] `intrinsic-width` attribute supported
   - [ ] Web component doesn't properly fill parent container in extrinsic mode (multi-column layout) — still unresolved
-  - [ ] Research how other web components handle sizing modes (e.g., `<video>`, `<img>`, `<iframe>`)
+  - **Root cause** (`ShakuhachiScore.ts:362-363`): multi-column mode reads `this.clientWidth || 300` and `this.clientHeight || 150` synchronously inside `connectedCallback` → `render()`. The browser hasn't performed layout yet at this point, so both values are 0 and the fallback 300×150 is used for the initial render. `ScoreRenderer`'s `ResizeObserver` eventually corrects this on first resize, but the initial render is wrong.
+  - [ ] Fix: use a `ResizeObserver` on the host element (`this`) in the web component itself to defer the first extrinsic render until after layout. Pattern: observe `this`, fire render once on first callback, then unobserve (or keep observing if `auto-resize` is on). This is how `<video>` and `<canvas>`-based web components handle it.
   - [ ] Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
   - [ ] Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
   - [ ] Test with Shadow DOM constraints and ensure container dimensions are properly read
