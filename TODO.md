@@ -104,11 +104,18 @@
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
 
-- [ ] [UI] [A:High] Loading states and spinners
+- [x] [UI] [A:High] Loading states and spinners
   - [x] Fork operation: spinner animation in fork button
   - [x] Save operation: "Saving..." text + button disabled
-  - [ ] Score creation: no loading state
-  - [ ] Delete operation: no visual indicator beyond button disabled
+  - [x] Score creation: animated spinner during creation
+  - [x] Delete operation: animated spinner with "Deleting…" text
+
+- [ ] [UI] [A:Medium] Consolidate loading spinner implementations
+  - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
+  - Create reusable spinner utility or component
+  - Standardize spinner size, animation, and appearance
+  - Consider creating `src/utils/loading-spinner.ts` with `showLoadingSpinner(button, text?)` helper
+  - Apply DRY principle to reduce code duplication
 
 - [ ] [UI] [A:Medium] Notation format help in editor
   - Examples of valid notation
