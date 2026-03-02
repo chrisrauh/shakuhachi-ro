@@ -110,27 +110,44 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes with chrome-devtools-mcp
 
-**Bash Command Execution**
+## Bash Commands - Avoid Authorization Prompts
 
-Use sequential Bash tool calls instead of command chaining to avoid authorization prompts.
+**Use dedicated tools instead of Bash for file operations and text processing.**
 
-- **Problem:** Claude Code's permission system treats `cmd1 && cmd2` as distinct from individual commands for security
-- **Solution:** Make separate Bash calls instead of using `&&`, `|`, or `;` operators
-- **Performance:** Negligible impact (~10-50ms overhead per call)
+Why: Avoiding authorization prompts enables more autonomous, efficient work without interruptions. Claude can work faster when using dedicated tools that don't require per-command approval.
 
-Examples:
+Claude Code has specialized tools that work better than shell commands:
+- Read files → Use **Read** tool (not `cat`)
+- Write files → Use **Write** tool (not `echo >` or `cat <<EOF`)
+- Edit files → Use **Edit** tool (not `sed`)
+- Search content → Use **Grep** tool (not `grep` or `rg`)
+- Find files → Use **Glob** tool (not `find`)
 
+**For Bash commands, use simple syntax only:**
+
+Avoid shell features that trigger authorization prompts:
+- ❌ Command chaining: `cmd1 && cmd2` (use sequential Bash calls instead)
+- ❌ Pipes: `cmd | grep` (use Grep tool instead)
+- ❌ Command substitution: `$(...)` (use Read tool then process)
+- ❌ Redirection: `echo > file` (use Write tool)
+- ❌ Heredocs: `cat <<EOF` (use Write tool)
+- ❌ Background: `cmd &` (use `run_in_background` parameter)
+
+**Multi-step operations:**
+Make separate Bash calls instead of chaining:
 ```bash
-# ❌ Avoid - triggers authorization prompt
-git add . && git commit -m "message" && git push
+# ❌ Triggers prompt
+git add . && git commit -m "msg" && git push
 
-# ✅ Prefer - each command approved independently
+# ✅ Sequential calls
 git add .
-git commit -m "message"
+git commit -m "msg"
 git push
 ```
 
-Exception: Use chaining when the logical relationship requires it (e.g., `cd dir && npm test` to ensure test runs in correct directory, though prefer absolute paths instead).
+**Acceptable exceptions:**
+- `source .env && echo $VAR` - Required because .env is locked and shells don't persist
+- `cd dir && npm test` - When absolute paths aren't practical (though prefer absolute paths)
 
 ## Testing
 
@@ -353,11 +370,11 @@ When testing authenticated features (score editor, creating scores, forking):
 **For visual testing with chrome-devtools-mcp:**
 - Authenticate directly in the browser using credentials from `.env` file
 - Use `fill()` tool to enter email and password in login form
-- Access credentials via: `source .env && echo $TEST_EMAIL && echo $TEST_PASSWORD`
-- Example:
+- Access credentials using `source .env && echo $VAR` command (requires one-time authorization per session):
   ```bash
   source .env && echo "Email: $TEST_EMAIL" && echo "Password: $TEST_PASSWORD"
   ```
+- **Note:** This is an acceptable exception to the "avoid &&" guideline since `.env` cannot be read directly and each Bash call is a separate shell session
 
 **For automated tests:**
 ```typescript
