@@ -199,12 +199,28 @@ export class ScoreDetailClient {
     const deleteBtn = document.getElementById(
       'delete-btn',
     ) as HTMLButtonElement;
-    if (deleteBtn) deleteBtn.disabled = true;
+    const originalContent = deleteBtn?.innerHTML;
+
+    if (deleteBtn) {
+      deleteBtn.disabled = true;
+      // Show loading spinner
+      deleteBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" stroke-dasharray="15.7" stroke-dashoffset="0">
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <span>Deleting…</span>
+      `;
+    }
 
     const result = await deleteScore(this.score.id);
     if (result.error) {
       toast.error(`Error deleting score: ${result.error.message}`);
-      if (deleteBtn) deleteBtn.disabled = false;
+      if (deleteBtn && originalContent) {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalContent;
+      }
       return;
     }
 
