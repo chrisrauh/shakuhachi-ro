@@ -63,11 +63,11 @@
     - Should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
-- [ ] [UI] [A:High] Replace alert() dialogs with in-app notifications
+- [x] [UI] [A:High] Replace alert() dialogs with in-app notifications
   - [x] Created `Notification.ts` component with `showNotification()` (success/error/warning/info, auto-dismiss, manual close)
   - [x] Replaced `alert()` error/success calls in `ScoreEditor` with `showNotification()`
   - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
-  - [ ] One `confirm()` remains in `ScoreEditor:188` (format conversion) — replace with in-app dialog
+  - [x] Replaced `confirm()` in `ScoreEditor` (format conversion) with `ConfirmDialog` component
 
 - [ ] [Backend] [A:Medium] Auto-save to database
   - Currently: Auto-save only saves to localStorage every 30 seconds
