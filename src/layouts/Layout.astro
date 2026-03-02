@@ -267,6 +267,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
 
     <script>
       import { createEmptyScore } from '../utils/create-score-handler';
+      import { toast } from '../components/Toast';
 
       document.addEventListener('DOMContentLoaded', () => {
         const createBtn = document.querySelector('a[aria-label="Create new score"]');
@@ -282,14 +283,14 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
             const result = await createEmptyScore();
 
             if (result.error) {
-              alert(result.error.message);
+              toast.error(result.error.message, { duration: Infinity });
               return;
             }
 
             // Redirect to edit page
             window.location.href = `/score/${result.slug}/edit`;
           } catch (error) {
-            alert('Failed to create score. Please try again.');
+            toast.error('Failed to create score. Please try again.', { duration: Infinity });
           } finally {
             createBtn.classList.remove('loading');
             createBtn.setAttribute('aria-busy', 'false');

@@ -1,0 +1,501 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = true;
+---
+
+<Layout title="Toast System Test" currentPage="browse" fullHeight={false}>
+  <div class="test-page">
+    <header class="test-header">
+      <h1>Toast System Test</h1>
+      <p>Visual regression testing and interactive toast demonstrations</p>
+    </header>
+
+    <section class="test-section">
+      <h2>Interactive Controls</h2>
+      <p>Trigger toasts with different variants and durations</p>
+
+      <div class="control-grid">
+        <div class="control-group">
+          <h3>Variants</h3>
+          <button data-toast="success" data-duration="4000" class="test-button success">
+            Success (4s)
+          </button>
+          <button data-toast="error" data-duration="4000" class="test-button error">
+            Error (4s)
+          </button>
+          <button data-toast="warning" data-duration="4000" class="test-button warning">
+            Warning (4s)
+          </button>
+          <button data-toast="info" data-duration="4000" class="test-button info">
+            Info (4s)
+          </button>
+        </div>
+
+        <div class="control-group">
+          <h3>Durations</h3>
+          <button data-toast="error" data-duration="2000" class="test-button">
+            Error (2s)
+          </button>
+          <button data-toast="success" data-duration="6000" class="test-button">
+            Success (6s)
+          </button>
+          <button data-toast="warning" data-duration="Infinity" class="test-button">
+            Warning (Persistent)
+          </button>
+          <button data-toast="info" data-duration="Infinity" class="test-button">
+            Info (Persistent)
+          </button>
+        </div>
+
+        <div class="control-group">
+          <h3>Stacking Behavior</h3>
+          <button id="stack-test" class="test-button">
+            Trigger 3 Toasts
+          </button>
+          <button id="rapid-test" class="test-button">
+            Rapid Fire (5 toasts)
+          </button>
+          <button id="long-message-test" class="test-button">
+            Long Message
+          </button>
+          <button id="clear-all" class="test-button secondary">
+            Clear All Toasts
+          </button>
+        </div>
+
+        <div class="control-group">
+          <h3>Mobile Simulation</h3>
+          <p class="hint">Resize window to &lt;600px to test mobile vertical animations</p>
+          <button id="mobile-test" class="test-button">
+            Test Mobile Toast
+          </button>
+          <button id="desktop-test" class="test-button">
+            Test Desktop Toast
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <h2>Visual Regression Reference</h2>
+      <p>Static examples for visual testing (screenshot these for regression tests)</p>
+
+      <div class="regression-grid">
+        <div class="regression-item">
+          <h3>Success</h3>
+          <div class="toast-static toast toast--success">
+            <span class="toast-message">Operation completed successfully</span>
+            <button class="toast-close" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+
+        <div class="regression-item">
+          <h3>Error</h3>
+          <div class="toast-static toast toast--error">
+            <span class="toast-message">An error occurred</span>
+            <button class="toast-close" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+
+        <div class="regression-item">
+          <h3>Warning</h3>
+          <div class="toast-static toast toast--warning">
+            <span class="toast-message">This is a warning message</span>
+            <button class="toast-close" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+
+        <div class="regression-item">
+          <h3>Info</h3>
+          <div class="toast-static toast toast--info">
+            <span class="toast-message">Informational message</span>
+            <button class="toast-close" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+
+        <div class="regression-item">
+          <h3>Multi-line Message</h3>
+          <div class="toast-static toast toast--error">
+            <span class="toast-message">This is a longer message that wraps to multiple lines to demonstrate how the toast handles text overflow and maintains proper spacing</span>
+            <button class="toast-close" aria-label="Dismiss">&times;</button>
+          </div>
+        </div>
+
+        <div class="regression-item">
+          <h3>Stacked Toasts</h3>
+          <div class="toast-stack-preview">
+            <div class="toast-static toast toast--success">
+              <span class="toast-message">First toast</span>
+              <button class="toast-close" aria-label="Dismiss">&times;</button>
+            </div>
+            <div class="toast-static toast toast--warning">
+              <span class="toast-message">Second toast</span>
+              <button class="toast-close" aria-label="Dismiss">&times;</button>
+            </div>
+            <div class="toast-static toast toast--info">
+              <span class="toast-message">Third toast</span>
+              <button class="toast-close" aria-label="Dismiss">&times;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="test-section">
+      <h2>Specifications</h2>
+      <dl class="specs-list">
+        <dt>Width (Desktop)</dt>
+        <dd>356px</dd>
+
+        <dt>Width (Mobile)</dt>
+        <dd>Full width minus 32px (16px margins each side)</dd>
+
+        <dt>Padding</dt>
+        <dd>16px uniform</dd>
+
+        <dt>Gap (Internal)</dt>
+        <dd>14px between message and close button</dd>
+
+        <dt>Gap (Stacking)</dt>
+        <dd>14px between stacked toasts</dd>
+
+        <dt>Border Radius</dt>
+        <dd>8px</dd>
+
+        <dt>Shadow</dt>
+        <dd>0px 4px 12px rgba(0, 0, 0, 0.1)</dd>
+
+        <dt>Font Size</dt>
+        <dd>14px</dd>
+
+        <dt>Line Height</dt>
+        <dd>1.4</dd>
+
+        <dt>Font Weight</dt>
+        <dd>500 (medium)</dd>
+
+        <dt>Animation Duration</dt>
+        <dd>250ms</dd>
+
+        <dt>Desktop Animation</dt>
+        <dd>Horizontal slide from right (translateX)</dd>
+
+        <dt>Mobile Animation</dt>
+        <dd>Vertical slide from top (translateY)</dd>
+
+        <dt>Default Duration</dt>
+        <dd>4000ms (4 seconds)</dd>
+      </dl>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .test-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-large);
+  }
+
+  .test-header {
+    margin-bottom: var(--spacing-x-large);
+  }
+
+  .test-header h1 {
+    margin: 0 0 var(--spacing-small) 0;
+    color: var(--color-text-primary);
+  }
+
+  .test-header p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .test-section {
+    margin-bottom: var(--spacing-x-large);
+    padding-bottom: var(--spacing-x-large);
+    border-bottom: 1px solid var(--panel-border-color);
+  }
+
+  .test-section:last-child {
+    border-bottom: none;
+  }
+
+  .test-section h2 {
+    margin: 0 0 var(--spacing-small) 0;
+    color: var(--color-text-primary);
+  }
+
+  .test-section > p {
+    margin: 0 0 var(--spacing-large) 0;
+    color: var(--color-text-secondary);
+  }
+
+  .control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-large);
+  }
+
+  .control-group {
+    background: var(--panel-background-color);
+    border: 1px solid var(--panel-border-color);
+    border-radius: var(--border-radius-large);
+    padding: var(--spacing-medium);
+  }
+
+  .control-group h3 {
+    margin: 0 0 var(--spacing-medium) 0;
+    font-size: var(--font-size-medium);
+    color: var(--color-text-primary);
+  }
+
+  .control-group .hint {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-medium) 0;
+    line-height: 1.4;
+  }
+
+  .test-button {
+    width: 100%;
+    padding: var(--spacing-small) var(--spacing-medium);
+    margin-bottom: var(--spacing-small);
+    background: var(--button-background-color);
+    color: var(--button-text-color);
+    border: 1px solid var(--button-border-color);
+    border-radius: var(--border-radius-medium);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .test-button:last-child {
+    margin-bottom: 0;
+  }
+
+  .test-button:hover {
+    background: var(--button-background-hover-color);
+    border-color: var(--button-border-hover-color);
+  }
+
+  .test-button.success {
+    background: var(--color-bg-success);
+    color: var(--color-text-success);
+    border-color: var(--color-border-success);
+  }
+
+  .test-button.error {
+    background: var(--color-bg-danger);
+    color: var(--color-text-danger);
+    border-color: var(--color-border-danger);
+  }
+
+  .test-button.warning {
+    background: var(--color-bg-warning);
+    color: var(--color-text-warning);
+    border-color: var(--color-border-warning);
+  }
+
+  .test-button.info {
+    background: var(--panel-background-color);
+    color: var(--color-text-secondary);
+    border-color: var(--panel-border-color);
+  }
+
+  .test-button.secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px dashed var(--panel-border-color);
+  }
+
+  .regression-grid {
+    display: grid;
+    gap: var(--spacing-large);
+  }
+
+  .regression-item h3 {
+    margin: 0 0 var(--spacing-small) 0;
+    font-size: var(--font-size-medium);
+    color: var(--color-text-primary);
+  }
+
+  /* Static toasts for visual regression - include toast styles inline */
+  .toast-static {
+    position: static !important;
+    animation: none !important;
+    margin-bottom: var(--spacing-small);
+
+    /* Base toast styles */
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  /* Toast variants */
+  .toast--success {
+    background: var(--color-bg-success);
+    color: var(--color-text-success);
+    border-color: var(--color-border-success);
+  }
+
+  .toast--error {
+    background: var(--color-bg-danger);
+    color: var(--color-text-danger);
+    border-color: var(--color-border-danger);
+  }
+
+  .toast--warning {
+    background: var(--color-bg-warning);
+    color: var(--color-text-warning);
+    border-color: var(--color-border-warning);
+  }
+
+  .toast--info {
+    background: var(--panel-background-color);
+    color: var(--color-text-secondary);
+    border-color: var(--panel-border-color);
+  }
+
+  .toast-message {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toast-close:hover {
+    opacity: 1;
+  }
+
+  .toast-stack-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 14px; /* Match actual toast stacking gap */
+    max-width: 356px; /* Match desktop toast width */
+  }
+
+  .specs-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-small) var(--spacing-large);
+    background: var(--panel-background-color);
+    border: 1px solid var(--panel-border-color);
+    border-radius: var(--border-radius-large);
+    padding: var(--spacing-medium);
+  }
+
+  .specs-list dt {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  .specs-list dd {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-family: monospace;
+  }
+
+  @media (max-width: 600px) {
+    .control-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .specs-list {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-x-small);
+    }
+
+    .specs-list dd {
+      margin-bottom: var(--spacing-small);
+    }
+  }
+</style>
+
+<script>
+  import { toast } from '../../components/Toast';
+
+  // Handle variant and duration buttons
+  document.querySelectorAll('[data-toast]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const variant = button.getAttribute('data-toast') as 'success' | 'error' | 'warning' | 'info';
+      const durationStr = button.getAttribute('data-duration');
+      const duration = durationStr === 'Infinity' ? Infinity : parseInt(durationStr || '4000', 10);
+
+      const messages = {
+        success: 'Operation completed successfully!',
+        error: 'An error occurred while processing your request',
+        warning: 'Please review your changes before saving',
+        info: 'Your session will expire in 5 minutes',
+      };
+
+      toast[variant](messages[variant], { duration });
+    });
+  });
+
+  // Stack test - trigger 3 toasts sequentially
+  document.getElementById('stack-test')?.addEventListener('click', () => {
+    toast.success('First toast - Success');
+    setTimeout(() => toast.warning('Second toast - Warning'), 200);
+    setTimeout(() => toast.info('Third toast - Info'), 400);
+  });
+
+  // Rapid fire test
+  document.getElementById('rapid-test')?.addEventListener('click', () => {
+    for (let i = 1; i <= 5; i++) {
+      setTimeout(() => {
+        toast.info(`Toast #${i} of 5`);
+      }, (i - 1) * 100);
+    }
+  });
+
+  // Long message test
+  document.getElementById('long-message-test')?.addEventListener('click', () => {
+    toast.error(
+      'This is a longer message that demonstrates how the toast system handles text that wraps to multiple lines. The layout should remain clean and readable even with extended content.',
+      { duration: 6000 }
+    );
+  });
+
+  // Clear all toasts
+  document.getElementById('clear-all')?.addEventListener('click', () => {
+    document.querySelectorAll('.toast').forEach((toast) => {
+      toast.remove();
+    });
+  });
+
+  // Mobile test
+  document.getElementById('mobile-test')?.addEventListener('click', () => {
+    toast.info('Resize window to <600px to see vertical animation', { duration: 6000 });
+  });
+
+  // Desktop test
+  document.getElementById('desktop-test')?.addEventListener('click', () => {
+    toast.success('Desktop horizontal slide animation (>600px width)', { duration: 6000 });
+  });
+</script>
