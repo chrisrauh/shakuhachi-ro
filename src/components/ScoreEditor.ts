@@ -3,6 +3,7 @@ import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
 import { toast } from './Toast';
+import { ConfirmDialog } from './ConfirmDialog';
 import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -183,22 +184,29 @@ export class ScoreEditor {
         this.dataFormat = format;
       } catch {
         // Conversion failed - ask user what to do
-        const clearContent = confirm(
-          `Could not convert ${this.dataFormat} to ${format}. Clear content and switch format?`,
-        );
-        if (!clearContent) {
-          // Revert radio button to previous format
-          const radios = this.container.querySelectorAll(
-            'input[name="format"]',
-          );
-          radios.forEach((radio) => {
-            (radio as HTMLInputElement).checked =
-              (radio as HTMLInputElement).value === this.dataFormat;
-          });
-          return;
-        }
-        this.scoreData = ''; // Clear if user confirms
-        this.dataFormat = format;
+        new ConfirmDialog().show({
+          title: 'Format Conversion Failed',
+          message: `Could not convert ${this.dataFormat} to ${format}. Clear content and switch format?`,
+          confirmText: 'Clear and Switch',
+          cancelText: 'Keep Current Format',
+          onConfirm: () => {
+            this.scoreData = ''; // Clear content
+            this.dataFormat = format;
+            this.hasUnsavedChanges = true;
+            this.render();
+          },
+          onCancel: () => {
+            // Revert radio button to previous format
+            const radios = this.container.querySelectorAll(
+              'input[name="format"]',
+            );
+            radios.forEach((radio) => {
+              (radio as HTMLInputElement).checked =
+                (radio as HTMLInputElement).value === this.dataFormat;
+            });
+          },
+        });
+        return; // Don't continue - dialog callbacks handle the rest
       }
     } else {
       // No content or same format - just switch
