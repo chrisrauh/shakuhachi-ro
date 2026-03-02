@@ -41,6 +41,7 @@ export const prerender = true;
     import { ScoreLibrary } from '../components/ScoreLibrary';
     import { MobileMenu } from '../components/MobileMenu';
     import { createEmptyScore } from '../utils/create-score-handler';
+    import { toast } from '../components/Toast';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -95,7 +96,7 @@ export const prerender = true;
         action: async () => {
           const result = await createEmptyScore();
           if (result.error) {
-            alert(result.error.message);
+            toast.error(result.error.message, { duration: Infinity });
           } else {
             window.location.href = `/score/${result.slug}/edit`;
           }

@@ -55,6 +55,7 @@ const { score } = scoreResult;
     import { onAuthReady } from '../../../api/auth';
     import { MobileMenu } from '../../../components/MobileMenu';
     import { createEmptyScore } from '../../../utils/create-score-handler';
+    import { toast } from '../../../components/Toast';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -106,7 +107,7 @@ const { score } = scoreResult;
         action: async () => {
           const result = await createEmptyScore();
           if (result.error) {
-            alert(result.error.message);
+            toast.error(result.error.message, { duration: Infinity });
           } else {
             window.location.href = `/score/${result.slug}/edit`;
           }
@@ -135,6 +136,7 @@ const { score } = scoreResult;
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { onAuthReady } from '../../../api/auth';
+    import { toast } from '../../../components/Toast';
 
     // Client-side auth and permission check
     const checkAuthAndPermissions = (user: any) => {
@@ -151,8 +153,10 @@ const { score } = scoreResult;
 
         if (user.id !== scoreData.score.user_id) {
           // Not owner - redirect to view page
-          alert('You do not have permission to edit this score.');
-          window.location.href = `/score/${scoreData.score.slug}`;
+          toast.error('You do not have permission to edit this score.', { duration: 2000 });
+          setTimeout(() => {
+            window.location.href = `/score/${scoreData.score.slug}`;
+          }, 2000);
           return;
         }
       } else {
