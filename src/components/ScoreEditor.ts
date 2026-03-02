@@ -2,7 +2,7 @@ import { createScore, updateScore, getScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
-import { showNotification } from './Notification';
+import { toast } from './Toast';
 import type { ScoreDataFormat } from '../api/scores';
 
 interface ScoreMetadata {
@@ -46,7 +46,6 @@ export class ScoreEditor {
     window.addEventListener('beforeunload', (e) => {
       if (this.hasUnsavedChanges) {
         e.preventDefault();
-        e.returnValue = '';
       }
     });
   }
@@ -68,9 +67,8 @@ export class ScoreEditor {
     const result = await getScore(scoreId);
 
     if (result.error || !result.score) {
-      showNotification(
+      toast.error(
         `Error loading score: ${result.error?.message || 'Score not found'}`,
-        'error',
       );
       return;
     }
@@ -392,7 +390,7 @@ export class ScoreEditor {
   private async handleSave(): Promise<void> {
     const { user } = await getCurrentUser();
     if (!user) {
-      showNotification('Please log in to save scores', 'error');
+      toast.error('Please log in to save scores');
       return;
     }
 
@@ -402,7 +400,7 @@ export class ScoreEditor {
     }
 
     if (!this.validateScoreData()) {
-      showNotification('Please fix validation errors before saving', 'error');
+      toast.error('Please fix validation errors before saving');
       return;
     }
 
@@ -445,27 +443,22 @@ export class ScoreEditor {
       }
 
       if (result.error) {
-        showNotification(
-          `Error saving score: ${result.error.message}`,
-          'error',
-        );
+        toast.error(`Error saving score: ${result.error.message}`);
       } else {
         // Clear autosave
         localStorage.removeItem('shakuhachi-editor-autosave');
         this.hasUnsavedChanges = false;
 
-        showNotification(
+        toast.success(
           `Score ${this.isEditing ? 'updated' : 'created'} successfully!`,
-          'success',
         );
 
         // Redirect to library
         window.location.href = '/';
       }
     } catch (error) {
-      showNotification(
+      toast.error(
         `Error saving score: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'error',
       );
     } finally {
       if (saveBtn) {

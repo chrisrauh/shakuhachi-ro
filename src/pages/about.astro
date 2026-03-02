@@ -30,6 +30,7 @@ const { Content } = await aboutPage.render();
     import { onAuthReady } from '../api/auth';
     import { MobileMenu } from '../components/MobileMenu';
     import { createEmptyScore } from '../utils/create-score-handler';
+    import { toast } from '../components/Toast';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -81,7 +82,7 @@ const { Content } = await aboutPage.render();
         action: async () => {
           const result = await createEmptyScore();
           if (result.error) {
-            alert(result.error.message);
+            toast.error(result.error.message, { duration: Infinity });
           } else {
             window.location.href = `/score/${result.slug}/edit`;
           }
