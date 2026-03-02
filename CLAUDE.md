@@ -53,21 +53,36 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 ⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
 
+**CRITICAL: Always check branch state when starting work:**
+- At the beginning of any work session
+- After context compaction or session resumption
+- Before making any code changes
+- Run `git branch --show-current` to verify you're on a feature branch
+
 **Standard workflow:**
 
-1. Create feature branch
-2. Make changes and test
-3. **Ask user to review changes before committing**
-4. Commit locally (no push yet)
-5. Mark completed tasks in TODO.md with [x]
-6. Ask user if you should create PR
-7. Push and create PR
-8. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
-9. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
-10. Remove completed tasks from TODO.md
-11. Look for next task in TODO.md and ask user if you should work on it
+1. **Check current branch** - If on main, create feature branch before any work
+2. Create feature branch (if not already on one)
+3. Make changes and test
+4. **Ask user to review changes before committing**
+5. Commit locally (no push yet)
+6. Mark completed tasks in TODO.md with [x]
+7. Ask user if you should create PR
+8. Push and create PR
+9. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
+10. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
+11. Remove completed tasks from TODO.md
+12. Look for next task in TODO.md and ask user if you should work on it
 
 For multi-phase work, create separate PR for each phase.
+
+**Recovery from accidental work on main:**
+If you discover you've been working on main (via `git branch --show-current`):
+1. Don't panic - changes can be recovered
+2. Create feature branch from current state: `git checkout -b feature/descriptive-name`
+3. Stage and commit all changes to the feature branch
+4. Push and create PR normally
+5. The work is preserved and properly isolated
 
 **CRITICAL: Git Commit and PR Messages**
 
@@ -125,6 +140,36 @@ Exception: Use chaining when the logical relationship requires it (e.g., `cd dir
 - **When you find an error during development, implement a unit test that would have caught that error**
 - **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
+
+**CRITICAL: Reading Test Output**
+
+When running `npm test`, you MUST carefully read the ENTIRE output before reporting results:
+
+1. **Check type-check results**: Look for "0 errors, 0 warnings, 0 hints"
+2. **Check lint results**: Verify eslint completed without errors
+3. **Check unit test results**: Verify all tests passed (green checkmarks)
+4. **Never assume success**: If you see any errors, STOP and fix them before proceeding
+5. **Report accurately**: Only say "all tests passing" if ALL three steps (type-check, lint, tests) succeeded
+
+**Common mistake pattern:**
+- ❌ Seeing unit tests pass and reporting "all tests passing" without reading lint output
+- ❌ Missing lint failures because you only looked at the bottom of the output
+- ✅ Read the full output line by line, verify each step passed
+
+**After creating new files:**
+- Always run `npm test` to catch formatting/linting errors in new code
+- New files often have formatting issues even if existing code is clean
+- Run `npx eslint <file> --fix` to auto-fix formatting before committing
+
+**Example of what to check:**
+```bash
+> npm test
+# ... type-check output (must show "0 errors, 0 warnings")
+# ... lint output (must complete without errors)
+# ... vitest output (must show all tests passed)
+```
+
+If ANY step fails, fix it before reporting results to the user.
 
 **Writing Tests**
 
