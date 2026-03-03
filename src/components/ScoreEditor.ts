@@ -4,7 +4,12 @@ import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
 import { toast } from './Toast';
 import { ConfirmDialog } from './ConfirmDialog';
+import { debounce } from '../utils/debounce';
 import type { ScoreDataFormat } from '../api/scores';
+
+const AUTO_SAVE_LOCALSTORAGE_INTERVAL_MS = 30_000; // 30s
+const AUTO_SAVE_DATABASE_DEBOUNCE_MS = 5_000; // 5s inactivity
+const AUTO_SAVE_DATABASE_MAX_WAIT_MS = 120_000; // 2min max
 
 interface ScoreMetadata {
   title: string;
@@ -26,6 +31,9 @@ export class ScoreEditor {
   private editingScoreId: string | null = null;
   private autoSaveInterval: number | null = null;
   private hasUnsavedChanges: boolean = false;
+  private debouncedAutoSave: (() => void) | null = null;
+  private isSaving = false;
+  private lastSuccessfulSaveTime: Date | null = null;
 
   constructor(containerId: string, scoreId?: string) {
     const container = document.getElementById(containerId);
@@ -35,7 +43,9 @@ export class ScoreEditor {
     this.container = container;
 
     if (scoreId) {
-      this.loadExistingScore(scoreId);
+      this.loadExistingScore(scoreId).then(() => {
+        this.setupDatabaseAutoSave();
+      });
     } else {
       this.loadFromLocalStorage();
     }
@@ -110,10 +120,97 @@ export class ScoreEditor {
   }
 
   private setupAutoSave(): void {
-    // Auto-save every 30 seconds
+    // Auto-save to localStorage every 30 seconds
     this.autoSaveInterval = window.setInterval(() => {
       this.saveToLocalStorage();
-    }, 30000);
+    }, AUTO_SAVE_LOCALSTORAGE_INTERVAL_MS);
+  }
+
+  private async setupDatabaseAutoSave(): Promise<void> {
+    // Only for existing scores being edited
+    if (!this.isEditing) return;
+
+    // Only for authenticated users
+    const { user } = await getCurrentUser();
+    if (!user) return;
+
+    // Create debounced auto-save
+    this.debouncedAutoSave = debounce(
+      () => this.handleAutoSave(),
+      AUTO_SAVE_DATABASE_DEBOUNCE_MS,
+      AUTO_SAVE_DATABASE_MAX_WAIT_MS,
+    );
+  }
+
+  private async handleAutoSave(): Promise<void> {
+    if (this.isSaving) return; // Skip if already saving
+    if (!this.editingScoreId) return; // Only for existing scores
+
+    const { user } = await getCurrentUser();
+    if (!user) return; // Skip if logged out
+
+    this.isSaving = true;
+    this.updateSaveStatusUI('saving');
+
+    try {
+      // Auto-convert ABC to JSON before saving (DB constraint only allows json/musicxml)
+      let data: unknown;
+      let saveFormat: ScoreDataFormat;
+      if (this.dataFormat === 'abc') {
+        data = ABCParser.parse(this.scoreData);
+        saveFormat = 'json';
+      } else if (this.dataFormat === 'json') {
+        data = JSON.parse(this.scoreData);
+        saveFormat = 'json';
+      } else {
+        data = this.scoreData;
+        saveFormat = this.dataFormat;
+      }
+
+      const result = await updateScore(this.editingScoreId, {
+        title: this.metadata.title,
+        composer: this.metadata.composer || undefined,
+        description: this.metadata.description || undefined,
+        data_format: saveFormat,
+        data: data,
+      });
+
+      if (result.error) {
+        toast.error(`Auto-save failed: ${result.error.message}`, {
+          duration: Infinity,
+        });
+        this.updateSaveStatusUI('error');
+      } else {
+        this.lastSuccessfulSaveTime = new Date();
+        this.updateSaveStatusUI('saved');
+      }
+    } catch (err) {
+      toast.error(
+        `Auto-save failed: ${err instanceof Error ? err.message : 'Network error'}`,
+        { duration: Infinity },
+      );
+      this.updateSaveStatusUI('error');
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  private updateSaveStatusUI(state: 'saved' | 'saving' | 'error'): void {
+    const indicator = document.getElementById('save-status-indicator');
+    if (!indicator) return;
+
+    if (state === 'saving') {
+      indicator.innerHTML =
+        '<span class="save-status save-status--saving">Saving...</span>';
+    } else if (state === 'saved' && this.lastSuccessfulSaveTime) {
+      indicator.innerHTML = `
+        <span class="save-status save-status--saved">
+          Saved <relative-time datetime="${this.lastSuccessfulSaveTime.toISOString()}" format="relative"></relative-time>
+        </span>
+      `;
+    } else {
+      indicator.innerHTML = ''; // Hide on error (error uses toast)
+    }
   }
 
   private saveToLocalStorage(): void {
@@ -169,6 +266,7 @@ export class ScoreEditor {
     this.validateScoreData();
     this.renderValidation();
     this.updatePreview();
+    this.debouncedAutoSave?.();
   }
 
   private async handleFormatChange(format: ScoreDataFormat): Promise<void> {
@@ -215,11 +313,13 @@ export class ScoreEditor {
 
     this.hasUnsavedChanges = true;
     this.render();
+    this.debouncedAutoSave?.();
   }
 
   private handleMetadataChange(field: keyof ScoreMetadata, value: any): void {
     this.hasUnsavedChanges = true;
     (this.metadata as any)[field] = value;
+    this.debouncedAutoSave?.();
     // Don't re-render - just update internal state
   }
 
@@ -596,6 +696,10 @@ export class ScoreEditor {
             rows="3"
           >${this.escapeHtml(this.metadata.description)}</textarea>
         </div>
+
+        <div class="metadata-field metadata-field-full">
+          <div id="save-status-indicator"></div>
+        </div>
       </div>
     `;
   }
@@ -883,6 +987,22 @@ export class ScoreEditor {
 
       .preview-error {
         color: var(--color-text-danger);
+      }
+
+      .save-status {
+        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-x-small);
+      }
+
+      .save-status--saving {
+        color: var(--color-primary);
+      }
+
+      .save-status--saved {
+        color: var(--color-success);
       }
 
       #score-preview {
