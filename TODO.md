@@ -52,12 +52,6 @@
     - Should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
-- [x] [UI] [A:High] Replace alert() dialogs with in-app notifications
-  - [x] Created `Notification.ts` component with `showNotification()` (success/error/warning/info, auto-dismiss, manual close)
-  - [x] Replaced `alert()` error/success calls in `ScoreEditor` with `showNotification()`
-  - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
-  - [x] Replaced `confirm()` in `ScoreEditor` (format conversion) with `ConfirmDialog` component
-
 - [ ] [UI] [A:Low] Revisit auto-save indicator placement and design
   - Current implementation: "Saved X ago" appears below description field
   - Consider alternative placements: floating badge, header area, inline with save button
@@ -87,12 +81,6 @@
   - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
-
-- [x] [UI] [A:High] Loading states and spinners
-  - [x] Fork operation: spinner animation in fork button
-  - [x] Save operation: "Saving..." text + button disabled
-  - [x] Score creation: animated spinner during creation
-  - [x] Delete operation: animated spinner with "Deleting…" text
 
 - [ ] [UI] [A:Medium] Consolidate loading spinner implementations
   - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
