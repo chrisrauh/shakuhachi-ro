@@ -58,19 +58,6 @@
   - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
   - [x] Replaced `confirm()` in `ScoreEditor` (format conversion) with `ConfirmDialog` component
 
-- [x] [Backend] [A:Medium] Auto-save to database
-  - Currently: Auto-save only saves to localStorage every 30 seconds
-  - User must manually click "Save" to persist to database
-  - Risk: User might close browser/tab and lose work if they haven't saved
-  - **Implementation considerations**:
-    - Debounce database saves (e.g., 2-3 minutes of inactivity)
-    - Show "Saving..." / "All changes saved" indicator
-    - Handle save conflicts gracefully
-    - Keep localStorage backup as failsafe
-    - Only auto-save for authenticated users
-  - **UI feedback**: Add status indicator showing last saved time
-  - **Completed**: Auto-save implemented with 5s debounce, 2min max wait, "Saved X ago" indicator
-
 - [ ] [UI] [A:Low] Revisit auto-save indicator placement and design
   - Current implementation: "Saved X ago" appears below description field
   - Consider alternative placements: floating badge, header area, inline with save button
