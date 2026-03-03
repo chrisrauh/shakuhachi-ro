@@ -27,11 +27,12 @@
 ## Alpha Release alpha.1
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
-  - **Phase 1: Experimentation Tool** ✅ COMPLETE
+  - **Phase 1: Experimentation Tool** ✅ COMPLETE [Claude validated]
     - [x] Implemented dev-only control panel for experimentation
     - [x] Range: -0.1em to 0.15em with 0.001em granularity
     - [x] Persists to localStorage across sessions
     - [x] See CLAUDE.md for usage instructions
+    - [x] Control loaded in dev mode on about page (about.astro:38-43)
   - **Phase 2: Determine Optimal Values** (User-driven)
     - [ ] Use control panel to test different letter spacing values
     - [ ] Identify optimal value for body copy
@@ -67,7 +68,7 @@
   - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
 - [ ] [UI] [A:Medium] Investigate button text vertical alignment
-  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS
+  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS [Claude validated - components.css:22-24]
   - [ ] Properties not taking effect (button labels appear ~1px lower than ideal)
   - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
   - Test page for visual verification: http://localhost:3003/test/buttons
@@ -76,14 +77,17 @@
   - [x] Test page `/test/buttons` exists with icon, small, and standard button variants
   - [x] Visual regression tests exist for buttons (light/dark, desktop/mobile)
   - [ ] Layout not condensed — not all variants visible in a single viewport
-  - [ ] Counter button example using wrong font (Arial instead of proper CSS)
+  - [x] Counter button example using wrong font (Arial instead of proper CSS) [Claude validated - FIXED in buttons.astro:256-259]
   - [ ] Adjust viewport size in visual regression tests to capture all variations
   - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
 
 - [ ] [Research] [A:Low] Investigate web component framweworks
 
-- [ ] [UI] [A:Medium] Consolidate loading spinner implementations
+- [ ] [UI] [A:Medium] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
   - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
+    - Layout.astro:284-289 (create button)
+    - ScoreDetailClient.ts:262-268 (fork button)
+    - ScoreDetailClient.ts:208-212 (delete button)
   - Create reusable spinner utility or component
   - Standardize spinner size, animation, and appearance
   - Consider creating `src/utils/loading-spinner.ts` with `showLoadingSpinner(button, text?)` helper
@@ -236,18 +240,18 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 #### Fail Fast, Fail Loud
 
-- [ ] [Backend] [A:High] SVGRenderer.closeGroup(): throw on unmatched group instead of console.warn
-  - `src/renderer/SVGRenderer.ts:228-231` — `closeGroup()` logs `console.warn` and returns silently when called with no open groups. This is a programmer error (mismatched open/close calls) that corrupts the SVG group hierarchy. Change to `throw new Error(...)` so the bug surfaces immediately during development instead of producing silently broken SVG output.
+- [ ] [Backend] [A:High] SVGRenderer.closeGroup(): throw on unmatched group instead of console.warn [Claude validated]
+  - `src/web-component/renderer/SVGRenderer.ts:228-231` — `closeGroup()` logs `console.warn` and returns silently when called with no open groups. This is a programmer error (mismatched open/close calls) that corrupts the SVG group hierarchy. Change to `throw new Error(...)` so the bug surfaces immediately during development instead of producing silently broken SVG output.
 
-- [ ] [Backend] [A:High] MusicXMLParser: warn on skipped notes instead of silent return
-  - `src/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
+- [ ] [Backend] [A:High] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
+  - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
   - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
 
 - [ ] [Backend] [A:High] ScoreRenderer.renderDebugLabel(): replace silent null check with assertion
   - `src/renderer/ScoreRenderer.ts:154` — `if (!this.renderer) return;` silently skips rendering. After construction, `this.renderer` should always exist when `renderDebugLabel` is called (it's only called inside `renderNotes` which creates the renderer). Replace with a dev assertion or remove the guard since the invariant is guaranteed by the calling code.
 
-- [ ] [Both] [A:High] ScoreDetailClient: show error UI instead of console.error on failed data parse
-  - `src/components/ScoreDetailClient.ts:20-27` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 31-33 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
+- [ ] [Both] [A:High] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated]
+  - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
 
 - [ ] [UI] [A:High] ScoreEditor: notify user when autosave restore fails
   - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
@@ -262,13 +266,13 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - [x] Replaced `alert('Failed to fork score')` with `showNotification()`
   - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
 
-- [ ] [Backend] [A:High] AuthComponents.show(): remove pointless double toggleMode() call
+- [ ] [Backend] [A:High] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
   - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
 
 #### Single Responsibility
 
-- [ ] [UI] [A:High] Extract ScoreEditor inline CSS into a stylesheet
-  - `src/components/ScoreEditor.ts:494-770` — The `addStyles()` method injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
+- [ ] [UI] [A:High] Extract ScoreEditor inline CSS into a stylesheet [Claude validated]
+  - `src/components/ScoreEditor.ts:789+` — The `addStyles()` method at line 789 injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
 
 - [ ] [UI] [A:High] Extract ScoreLibrary inline CSS into a stylesheet
   - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
@@ -337,22 +341,22 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 #### Loose Coupling
 
-- [ ] [Both] [A:High] Replace MutationObserver theme detection with a custom event
-  - `src/components/ScoreDetailClient.ts:103-115` and `src/components/ScoreEditor.ts:45-56` — Both components use `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then re-render. This is overcomplicated, duplicated, and couples components to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
+- [ ] [Both] [A:High] Replace MutationObserver theme detection with a custom event [Claude validated]
+  - `src/components/ScoreDetailClient.ts:148` and `src/components/ScoreEditor.ts:66` — Both components use `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then re-render. This is overcomplicated, duplicated, and couples components to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
 
-- [ ] [Backend] [A:Medium] Decouple ColumnLayoutCalculator from DurationDotModifier
-  - `src/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
+- [ ] [Backend] [A:Medium] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
+  - `src/web-component/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` at lines 190, 307 when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
 
 - [ ] [Backend] [A:High] Move MusicXMLParser out of ScoreRenderer
   - `src/renderer/ScoreRenderer.ts` imports `MusicXMLParser` for the `renderFromURL()` method. The renderer's job is to render `ScoreData`, not to fetch and parse XML files. Move `renderFromURL()` to the convenience functions module (`src/renderer/convenience.ts`) where it already lives as `renderScoreFromURL()`. This makes `ScoreRenderer` depend only on `ScoreData`, not on parsing.
 
 #### Abstraction with Intent
 
-- [ ] [Backend] [A:High] Remove TestModifier from public API exports
-  - `src/index.ts:47` — `TestModifier` is a testing utility, not a library feature. Exporting it as part of the public API makes it contractual — consumers may depend on it, preventing removal. Remove the export from `index.ts`. Test files can import directly from the source path.
+- [ ] [Backend] [A:High] Remove TestModifier from public API exports [Claude validated]
+  - `src/index.ts:50` — `TestModifier` is a testing utility, not a library feature. Exporting it as part of the public API makes it contractual — consumers may depend on it, preventing removal. Remove the export from `index.ts`. Test files can import directly from the source path.
 
-- [ ] [Backend] [A:Medium] Evaluate whether Formatter and VerticalSystem should be public API
-  - `src/index.ts:28-31` — `Formatter` and `VerticalSystem` are exported but appear to be alternative/experimental layout components not used by the main `ScoreRenderer` pipeline (which uses `ColumnLayoutCalculator`). If they are internal or experimental, remove from `index.ts` to reduce the public API surface. If they are intentionally public, add JSDoc explaining their purpose and relationship to `ColumnLayoutCalculator`.
+- [ ] [Backend] [A:Medium] Evaluate whether Formatter and VerticalSystem should be public API [Claude validated]
+  - `src/index.ts:31-34` — `Formatter` and `VerticalSystem` are exported but appear to be alternative/experimental layout components not used by the main `ScoreRenderer` pipeline (which uses `ColumnLayoutCalculator`). If they are internal or experimental, remove from `index.ts` to reduce the public API surface. If they are intentionally public, add JSDoc explaining their purpose and relationship to `ColumnLayoutCalculator`.
 
 - [ ] [Backend] [A:High] Move toJSON/convertToJSON off MusicXMLParser
   - `src/parser/MusicXMLParser.ts:153-166` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
@@ -379,8 +383,8 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 - [ ] [Backend] [A:High] Extract repeated error wrapping pattern in scores.ts
   - `src/api/scores.ts` — Six functions (`createScore`, `getUserScores`, `getScoreBySlug`, `updateScore`, `deleteScore`, `forkScore`) all share the same try/catch + `{ score: null, error: ... }` wrapping pattern. Each catch block has identical `error instanceof Error ? error : new Error('Unknown error ...')` logic. Extract a helper like `wrapScoreResult<T>(fn: () => Promise<T>): Promise<ScoreResult<T>>` to eliminate the repetition and ensure consistent error handling across all CRUD operations.
 
-- [ ] [Backend] [A:High] Move curated score slugs to a configuration file
-  - `src/api/scores.ts:432-437` — `getCuratedScoreSlugs()` returns a hardcoded array `['akatombo', 'love-story']`. Adding a new curated score requires editing TypeScript source code and redeploying. Move to a JSON config file (e.g., `src/data/curated-scores.json`) or read from the database, so the score catalog can be updated without code changes.
+- [ ] [Backend] [A:High] Move curated score slugs to a configuration file [Claude validated]
+  - `src/api/scores.ts:444-454` — `getCuratedScoreSlugs()` returns a hardcoded array `['akatombo', 'love-story', 'sakura-sakura', 'kojo-no-tsuki', 'kuroda-bushi', 'shika-no-tone', 'tsuru-no-sugomori']`. Adding a new curated score requires editing TypeScript source code and redeploying. Move to a JSON config file (e.g., `src/data/curated-scores.json`) or read from the database, so the score catalog can be updated without code changes.
 
 #### Test Coverage
 
