@@ -26,15 +26,14 @@
 
 ## Alpha Release alpha.1
 
-- [ ] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
+- [x] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
   - [x] `calculateIntrinsicWidth()` and `calculateIntrinsicHeight()` implemented
   - [x] `intrinsic-width` attribute supported
-  - [ ] Web component doesn't properly fill parent container in extrinsic mode (multi-column layout) — still unresolved
-  - **Root cause** (`ShakuhachiScore.ts:362-363`): multi-column mode reads `this.clientWidth || 300` and `this.clientHeight || 150` synchronously inside `connectedCallback` → `render()`. The browser hasn't performed layout yet at this point, so both values are 0 and the fallback 300×150 is used for the initial render. `ScoreRenderer`'s `ResizeObserver` eventually corrects this on first resize, but the initial render is wrong.
-  - [ ] Fix: use a `ResizeObserver` on the host element (`this`) in the web component itself to defer the first extrinsic render until after layout. Pattern: observe `this`, fire render once on first callback, then unobserve (or keep observing if `auto-resize` is on). This is how `<video>` and `<canvas>`-based web components handle it.
-  - [ ] Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
-  - [ ] Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
-  - [ ] Test with Shadow DOM constraints and ensure container dimensions are properly read
+  - [x] Web component properly fills parent container in extrinsic mode (fixed by ResizeObserver)
+  - [x] ResizeObserver pattern implemented to defer render until layout complete (ShakuhachiScore.ts:42-74)
+  - [x] CSS properties investigated and implemented (`contain-intrinsic-size`)
+  - [x] Auto-detection via `columns` attribute chosen over explicit `sizing` attribute (KISS principle)
+  - [x] Shadow DOM constraints tested with comprehensive test coverage (ShakuhachiScore.test.ts)
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 1: Experimentation Tool** ✅ COMPLETE
