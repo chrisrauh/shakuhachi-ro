@@ -24,6 +24,10 @@
   - Check tone and messaging
   - Verify all information is accurate
 
+- [ ] [Content] [A:Low] Create a contact email address for the site
+  - Add it to the Contributing section of the About page
+  - Currently pointing to GitHub discussions and Mastodon DMs as interim contact
+
 ## Alpha Release alpha.1
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.

@@ -2,105 +2,42 @@
 title: About
 ---
 
-## What is Shakuhachi.ro?
+Hi there! I'm Christian.
 
-Shakuhachi.ro is a website for discovering, sharing, and creating shakuhachi scores. Whether you're learning a new piece or sharing your favorites with other players, this website makes it easy to work with shakuhachi notation online.
+I am a shakuhachi student and web developer building this website: shakuhachi.ro.
 
-This project is inspired by [The Sessions](https://thesession.org/), a community website dedicated to Irish traditional music, and [Flat.io](https://flat.io/), a website to compose, collaborate, and publish western notation sheet music online.
+This is a place to discover, create and share shakuhachi scores. It's inspired by [The Sessions](https://thesession.org/), Flat.io and vexflow/vextab, but for shakuhachi.
 
-## How to Use
+## Forking
 
-### Browse Scores
+If you've used GitHub or similar tools, forking will be familiar. If not, any score here can be forked, which gives you your own editable copy. Handy when you want to edit, transpose, or adapt a piece. Your version is independent; it's linked to the original, but you won't affect it. it's handy to create versions of the same song. 
 
-The library on the home page shows all available scores. You can search by title or composer to find what you're looking for.
+## The web component
 
-### Create a Score
-
-Click "Create score" to start a new score. Enter your notation, give it a title, and save to publish it. The score renders live as you type so you can see what it looks like immediately.
-
-### Fork a Score
-
-**What is forking?** Forking creates your own editable copy of a score. This is useful when you want to make personal modifications—like adding your own fingering notes, changing the notation, or adapting the piece for your skill level.
-
-Your forked copy is completely independent. Changes you make won't affect the original score, and you can edit it freely.
-
-To fork a score: view any score and click the "Fork" button. You'll get your own copy that you can edit and share.
-
-## Notation Formats
-
-The platform supports three input formats:
-
-- **JSON** — The native format for this platform. A structured way to describe each note's pitch, octave, and duration directly.
-- **MusicXML** — Industry-standard format used by notation software like Finale, Sibelius, and MuseScore. Useful for importing existing scores.
-- **ABC notation** — A text-based music notation format popular in folk and traditional music communities.
-
-All three formats are interchangeable in the editor—you can switch between them and the content will be automatically converted.
-
-## Open Source
-
-Shakuhachi.ro is an open-source project. The code is available on [GitHub](https://github.com/chrisrauh/shakuhachi-ro).
-
-The shakuhachi notation renderer is also available as a standalone library that developers can use in their own projects.
-
-### Using the Renderer
-
-The easiest way to embed shakuhachi notation on any website is using the `<shakuhachi-score>` web component.
-
-For developers using npm packages, you can also import the ScoreRenderer class directly:
-
-```typescript
-import { ScoreRenderer } from 'shakuhachi-ro';
-
-const renderer = new ScoreRenderer(container);
-await renderer.renderFromScoreData({ /* score data */ });
-```
-
-### Live Example
-
-Below is a live example showing the opening phrase of "Akatombo" (Red Dragonfly), a beloved Japanese folk song. The code shows exactly how to embed shakuhachi notation on any website:
-
-```html
-<!-- Include the script once in your HTML -->
-<script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
-
-<!-- Default: auto-detect columns based on container height -->
-<shakuhachi-score data-score='{...}'></shakuhachi-score>
-
-<!-- Single column with intrinsic height -->
-<shakuhachi-score columns="1" data-score='{
-  "title": "Akatombo (Opening Phrase)",
-  "style": "kinko",
-  "notes": [
-    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2, "dotted": true },
-    { "pitch": { "step": "chi", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "ri", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "ro", "octave": 1 }, "duration": 1 },
-    { "pitch": { "step": "u", "octave": 1 }, "duration": 1 },
-    { "pitch": { "step": "hi", "octave": 1 }, "duration": 1 },
-    { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 }
-  ]
-}'>
-</shakuhachi-score>
-
-<!-- Explicit column count (6 columns) -->
-<shakuhachi-score columns="6" data-score='{...}'></shakuhachi-score>
-```
-
-**Live result:**
+A big part of why I built this is the score renderer — a standalone web component for displaying shakuhachi notation on any webpage. This live example shows it in action:
 
 <div class="score-example">
-  <shakuhachi-score class="score-viz" columns="1" data-score='{"title":"Akatombo (Opening Phrase)","style":"kinko","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
-  <div class="score-comments">
-    **What you're seeing:**
-    - **Vertical reading**: Notes read top to bottom, then move to the next column
-    - **Octave markers**: The 乙 (otsu, lower octave) and 甲 (kan, upper octave) characters above notes indicate which register to play in
-    - **Duration dots**: The dot below the third note extends its duration by half (like western notation)
-    - **Traditional characters**: Shakuhachi uses Japanese katakana-based characters (ロ、ツ、レ、チ、リ、ウ、ヒ) to represent finger holes
-  </div>
+  <shakuhachi-score class="score-viz" columns="1" data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
 </div>
 
-## Contact
+It's designed so anyone can embed scores in a blog post, a comment, or their own tool. More in the [GitHub project](https://github.com/chrisrauh/shakuhachi-ro).
 
-Questions, feedback, or issues? Reach out via [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) or email [hello@shakuhachi.ro](mailto:hello@shakuhachi.ro).
+## On AI
+
+To be honest, this site wouldn't exist without it. I'd had the idea for years but never enough time. Claude Code let me turn the small pockets of time I have into something real.
+
+I understand that's not neutral ground for everyone. The technology raises genuine questions and I don't dismiss them. So I want to be upfront about how this was made.
+
+## Contributing
+
+This is an open source project and I could use help with:
+
+- Adding scores to the library
+- Feedback on features: what's great, what's confusing and what's missing. 
+- Shakuhachi notation knowledge
+- Japanese cultural sensibilities — I want the site to be respectful of the culture and traditions it's based on. 
+- Design and UX help
+- Testing the site
+- Coding
+
+Reach out via [GitHub](https://github.com/chrisrauh/shakuhachi-ro) or [Mastodon](https://mastodon.social/@chrisrauh) (posts or DMs)
