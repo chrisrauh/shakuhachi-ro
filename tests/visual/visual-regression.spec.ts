@@ -29,8 +29,8 @@ const pages = [
 const colorSchemes = ['light', 'dark'] as const;
 
 const viewports = [
-  { name: 'desktop', width: 1280, height: 720 },
-  { name: 'mobile', width: 375, height: 667 },
+  { name: 'desktop', width: 1280, height: 700 },
+  { name: 'mobile', width: 375, height: 1450 },
 ];
 
 test.describe('Visual Regression', () => {
