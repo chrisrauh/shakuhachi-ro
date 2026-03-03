@@ -26,15 +26,6 @@
 
 ## Alpha Release alpha.1
 
-- [x] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
-  - [x] `calculateIntrinsicWidth()` and `calculateIntrinsicHeight()` implemented
-  - [x] `intrinsic-width` attribute supported
-  - [x] Web component properly fills parent container in extrinsic mode (fixed by ResizeObserver)
-  - [x] ResizeObserver pattern implemented to defer render until layout complete (ShakuhachiScore.ts:42-74)
-  - [x] CSS properties investigated and implemented (`contain-intrinsic-size`)
-  - [x] Auto-detection via `columns` attribute chosen over explicit `sizing` attribute (KISS principle)
-  - [x] Shadow DOM constraints tested with comprehensive test coverage (ShakuhachiScore.test.ts)
-
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 1: Experimentation Tool** ✅ COMPLETE
     - [x] Implemented dev-only control panel for experimentation
@@ -67,7 +58,7 @@
   - [x] `ScoreDetailClient` uses `showNotification()` for fork/delete errors
   - [x] Replaced `confirm()` in `ScoreEditor` (format conversion) with `ConfirmDialog` component
 
-- [ ] [Backend] [A:Medium] Auto-save to database
+- [x] [Backend] [A:Medium] Auto-save to database
   - Currently: Auto-save only saves to localStorage every 30 seconds
   - User must manually click "Save" to persist to database
   - Risk: User might close browser/tab and lose work if they haven't saved
@@ -78,6 +69,14 @@
     - Keep localStorage backup as failsafe
     - Only auto-save for authenticated users
   - **UI feedback**: Add status indicator showing last saved time
+  - **Completed**: Auto-save implemented with 5s debounce, 2min max wait, "Saved X ago" indicator
+
+- [ ] [UI] [A:Low] Revisit auto-save indicator placement and design
+  - Current implementation: "Saved X ago" appears below description field
+  - Consider alternative placements: floating badge, header area, inline with save button
+  - Evaluate visual hierarchy and prominence
+  - Test on mobile viewports for readability
+  - Consider adding subtle animation when save completes
 
 - [ ] [Backend] [A:Medium] Consider slug update behavior when title changes
   - Currently: Slug is set on creation and never changes, even if title is updated
