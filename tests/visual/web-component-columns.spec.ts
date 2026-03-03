@@ -53,6 +53,62 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
     ],
   };
 
+  // Longer score for 6-column test (36 notes = 6 notes per column)
+  // Uses varied data with different octaves, durations, and melodic patterns
+  const longScoreData = {
+    title: 'Long Test Score',
+    style: 'kinko',
+    notes: [
+      // Column 1 (6 notes) - Low octave section
+      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 2 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 2 },
+
+      // Column 2 (6 notes) - Transition to mid
+      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 0 }, duration: 2 },
+      { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+      { pitch: { step: 'u', octave: 1 }, duration: 1 },
+
+      // Column 3 (6 notes) - High octave section
+      { pitch: { step: 're', octave: 1 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 1 }, duration: 1 },
+      { pitch: { step: 're', octave: 1 }, duration: 2 },
+      { pitch: { step: 'chi', octave: 1 }, duration: 1 },
+      { pitch: { step: 'ri', octave: 1 }, duration: 1 },
+      { pitch: { step: 'u', octave: 1 }, duration: 1 },
+
+      // Column 4 (6 notes) - Descending pattern
+      { pitch: { step: 'ri', octave: 1 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 1 }, duration: 1 },
+      { pitch: { step: 're', octave: 1 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 2 },
+      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+      { pitch: { step: 'u', octave: 0 }, duration: 1 },
+
+      // Column 5 (6 notes) - Middle section
+      { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 0 }, duration: 2 },
+      { pitch: { step: 're', octave: 0 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+
+      // Column 6 (6 notes) - Ending phrase
+      { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+      { pitch: { step: 'u', octave: 0 }, duration: 2 },
+      { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 2 },
+      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    ],
+  };
+
   test('default (no columns attribute) uses auto mode', async ({ page }) => {
     await page.setViewportSize({ width: 800, height: 600 });
 
@@ -112,8 +168,8 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
         <head>
           <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
           <style>
-            body { margin: 0; padding: 20px; }
-            .container { width: 300px; border: 1px solid #ccc; }
+            body { margin: 0; padding: 20px; display: flex; justify-content: center; }
+            .container { border: 1px solid #ccc; }
           </style>
         </head>
         <body>
@@ -147,7 +203,9 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
     expect(parseInt(svgHeight || '0')).toBeGreaterThan(500);
   });
 
-  test('columns="2" creates exactly 2 columns', async ({ page }) => {
+  test('columns="2" creates exactly 2 columns with intrinsic sizing', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 800, height: 600 });
 
     await page.setContent(`
@@ -157,14 +215,14 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
           <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
-            .container { width: 600px; height: 400px; border: 1px solid #ccc; }
+            /* Container just provides context, doesn't constrain size */
+            .container { border: 1px solid #ccc; display: inline-block; }
           </style>
         </head>
         <body>
           <div class="container">
             <shakuhachi-score
               columns="2"
-              style="width: 100%; height: 100%;"
               data-score='${JSON.stringify(sampleScoreData)}'>
             </shakuhachi-score>
           </div>
@@ -172,8 +230,24 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
     await waitForWebComponent(page);
+
+    // Verify component calculated its own dimensions
+    const dimensions = await page.evaluate(() => {
+      const component = document.querySelector('shakuhachi-score');
+      const svg = component?.shadowRoot?.querySelector('svg');
+      return {
+        width: svg?.getAttribute('width'),
+        height: svg?.getAttribute('height'),
+      };
+    });
+
+    // With 2 columns: width = (2 × 100px) + (1 × 35px) + 40px padding = 275px
+    expect(parseInt(dimensions.width || '0')).toBeGreaterThan(250);
+
+    // With 12 notes ÷ 2 columns = 6 notes per column
+    // Height = 34px top + (6 × 44px) + 20px bottom = 318px
+    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(300);
 
     // Take screenshot of 2-column layout
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -181,7 +255,9 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
     );
   });
 
-  test('columns="6" creates exactly 6 columns', async ({ page }) => {
+  test('columns="6" creates exactly 6 columns with intrinsic sizing', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1200, height: 600 });
 
     await page.setContent(`
@@ -191,22 +267,39 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
           <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
-            .container { width: 1000px; height: 400px; border: 1px solid #ccc; }
+            /* Container just provides context, doesn't constrain size */
+            .container { border: 1px solid #ccc; display: inline-block; }
           </style>
         </head>
         <body>
           <div class="container">
             <shakuhachi-score
               columns="6"
-              style="width: 100%; height: 100%;"
-              data-score='${JSON.stringify(sampleScoreData)}'>
+              data-score='${JSON.stringify(longScoreData)}'>
             </shakuhachi-score>
           </div>
         </body>
       </html>
     `);
 
-    await page.waitForTimeout(500);
+    await waitForWebComponent(page);
+
+    // Verify component calculated its own dimensions
+    const dimensions = await page.evaluate(() => {
+      const component = document.querySelector('shakuhachi-score');
+      const svg = component?.shadowRoot?.querySelector('svg');
+      return {
+        width: svg?.getAttribute('width'),
+        height: svg?.getAttribute('height'),
+      };
+    });
+
+    // With 6 columns: width = (6 × 100px) + (5 × 35px) + 40px padding = 815px
+    expect(parseInt(dimensions.width || '0')).toBeGreaterThan(800);
+
+    // With 36 notes ÷ 6 columns = 6 notes per column
+    // Height = 34px top + (6 × 44px) + 20px bottom = 318px
+    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(300);
 
     // Take screenshot of 6-column layout
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -334,7 +427,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
         <head>
           <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
           <style>
-            body { margin: 0; padding: 20px; }
+            body { margin: 0; padding: 20px; display: flex; justify-content: center; background: white; }
             .container { width: 600px; height: 400px; border: 1px solid #ccc; }
           </style>
         </head>
@@ -342,7 +435,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
           <div class="container">
             <shakuhachi-score
               columns="2"
-              style="width: 100%; height: 100%;"
+              style="width: 100%; height: 100%; --shakuhachi-note-color: #000;"
               data-score='${JSON.stringify(sampleScoreData)}'>
             </shakuhachi-score>
           </div>
@@ -359,8 +452,17 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       'theme-light-mode.png',
     );
 
-    // Take screenshot in dark mode
+    // Take screenshot in dark mode - update colors
     await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() => {
+      const component = document.querySelector('shakuhachi-score') as any;
+      if (component) {
+        component.style.setProperty('--shakuhachi-note-color', '#fff');
+        component.forceRender(); // Force re-render with new theme
+      }
+      document.body.style.background = '#1a1a1a';
+    });
+    await page.waitForTimeout(100); // Wait for re-render
     await expect(page.locator('.container')).toHaveScreenshot(
       'theme-dark-mode.png',
     );

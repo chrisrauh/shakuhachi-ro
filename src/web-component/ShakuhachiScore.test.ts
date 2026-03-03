@@ -228,3 +228,203 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     expect(svg).toBeTruthy();
   });
 });
+
+describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => {
+  let container: HTMLElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    container.style.width = '800px';
+    container.style.height = '600px';
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+  });
+
+  const minimalScoreData = {
+    notes: [
+      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+      { pitch: { step: 're', octave: 0 }, duration: 1 },
+    ],
+  };
+
+  it('should defer initial render in multi-column mode until dimensions are available', async () => {
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', 'auto');
+
+    container.appendChild(component);
+
+    // Wait for ResizeObserver to fire
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Should be rendered (in test environment, uses fallback dimensions)
+    // Note: JSDOM doesn't compute layout, so clientWidth is 0 and fallback is used
+    // In production, this would use actual container dimensions
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(parseInt(svg?.getAttribute('width') || '0')).toBeGreaterThan(0);
+    expect(parseInt(svg?.getAttribute('height') || '0')).toBeGreaterThan(0);
+  });
+
+  it('should render single-column mode correctly', async () => {
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', '1');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Should use intrinsic height
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+    // Height is calculated from note count, not container
+    // 3 notes * 44px + 34px top + 20px bottom ≈ 186px
+    expect(parseInt(svg?.getAttribute('height') || '0')).toBeGreaterThan(150);
+  });
+
+  it('should use explicit dimensions when provided', async () => {
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', 'auto');
+    component.setAttribute('width', '600');
+    component.setAttribute('height', '400');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(svg?.getAttribute('width')).toBe('600');
+    expect(svg?.getAttribute('height')).toBe('400');
+  });
+
+  it('should fallback to immediate render if ResizeObserver is unavailable', async () => {
+    // Temporarily disable ResizeObserver
+    const originalResizeObserver = (global as any).ResizeObserver;
+    (global as any).ResizeObserver = undefined;
+
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', 'auto');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Should still render (using fallback path)
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+
+    // Restore
+    (global as any).ResizeObserver = originalResizeObserver;
+  });
+
+  it('should show warning when dimensions are 0 (test environment limitation)', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', 'auto');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // In test environments (JSDOM), dimensions are always 0, so warning is expected
+    // In production browsers, this warning should not appear
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'ShakuhachiScore: dimensions are 0 after layout (unexpected)',
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('explicit column count (columns="3") uses intrinsic sizing', async () => {
+    const component = document.createElement('shakuhachi-score');
+
+    // 6 notes divided by 3 columns = 2 notes per column
+    const scoreDataSixNotes = {
+      notes: [
+        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+        { pitch: { step: 're', octave: 0 }, duration: 1 },
+        { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+        { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+        { pitch: { step: 'u', octave: 0 }, duration: 1 },
+      ],
+    };
+
+    component.setAttribute('data-score', JSON.stringify(scoreDataSixNotes));
+    component.setAttribute('columns', '3');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+
+    // Width for 3 columns: (3 × 100) + (2 × 35) + 40 = 410px
+    expect(svg?.getAttribute('width')).toBe('410');
+
+    // Height for 2 notes per column (6 ÷ 3)
+    // 34 + (2 × 44) + 20 = 142px
+    const height = parseInt(svg?.getAttribute('height') || '0');
+    expect(height).toBeCloseTo(142, -1); // Allow ~10px tolerance
+  });
+
+  it('auto mode (columns="auto") uses extrinsic sizing', async () => {
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
+    component.setAttribute('columns', 'auto');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+
+    // Should use container dimensions (800×600) or fallback to 300×150 in JSDOM
+    // In JSDOM, clientWidth/clientHeight are 0, so it falls back to 300×150
+    const width = parseInt(svg?.getAttribute('width') || '0');
+    const height = parseInt(svg?.getAttribute('height') || '0');
+
+    // Verify it's using fallback dimensions (not intrinsic calculation)
+    expect(width).toBe(300); // Fallback width in JSDOM
+    expect(height).toBe(150); // Fallback height in JSDOM
+  });
+
+  it('columns="1" uses unified intrinsic sizing (same as multi-column)', async () => {
+    const component = document.createElement('shakuhachi-score');
+
+    // 6 notes in single column
+    const scoreDataSixNotes = {
+      notes: [
+        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+        { pitch: { step: 're', octave: 0 }, duration: 1 },
+        { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+        { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+        { pitch: { step: 'u', octave: 0 }, duration: 1 },
+      ],
+    };
+
+    component.setAttribute('data-score', JSON.stringify(scoreDataSixNotes));
+    component.setAttribute('columns', '1');
+
+    container.appendChild(component);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const svg = component.shadowRoot?.querySelector('svg');
+    expect(svg).toBeTruthy();
+
+    // Width for 1 column: (1 × 100) + (0 × 35) + 40 = 140px
+    expect(svg?.getAttribute('width')).toBe('140');
+
+    // Height for 6 notes in single column
+    // 34 + (6 × 44) + 20 = 318px
+    const height = parseInt(svg?.getAttribute('height') || '0');
+    expect(height).toBeCloseTo(318, -1); // Allow ~10px tolerance
+  });
+});
