@@ -118,9 +118,10 @@ export class ScoreDetailClient {
       );
 
       if (isMobile) {
-        // Mobile: single-column mode with intrinsic height (fits content for scrolling)
+        // Mobile: single-column mode with intrinsic sizing
         container.setAttribute('columns', '1');
-        container.style.width = '100%';
+        // Don't set width - let component use intrinsic width (140px)
+        // Parent container centers it with flexbox align-items: center
       } else {
         // Desktop: auto-detect columns based on viewport height
         container.setAttribute('columns', 'auto');

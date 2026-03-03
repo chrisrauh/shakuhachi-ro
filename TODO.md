@@ -24,7 +24,7 @@
   - Check tone and messaging
   - Verify all information is accurate
 
-## Fast Follow (Post-Alpha)
+## Alpha Release alpha.1
 
 - [ ] [Backend] [A:Medium] Revisit intrinsic vs extrinsic sizing for shakuhachi-score web component
   - [x] `calculateIntrinsicWidth()` and `calculateIntrinsicHeight()` implemented
@@ -35,7 +35,6 @@
   - [ ] Investigate CSS properties like `contain-intrinsic-size`, `aspect-ratio`, and how they interact with flex layouts
   - [ ] Consider adding explicit sizing mode attribute (e.g., `sizing="intrinsic|extrinsic"`) vs auto-detection
   - [ ] Test with Shadow DOM constraints and ensure container dimensions are properly read
-
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 1: Experimentation Tool** ✅ COMPLETE
@@ -122,9 +121,7 @@
   - Links to documentation
   - Format validation and helpful error messages
 
-## Future Enhancements (Post-Alpha)
-
-These are important improvements but not needed for initial alpha release.
+## Future Enhancements (priority to be determined)
 
 ### API & Architecture Improvements
 

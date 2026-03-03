@@ -1,0 +1,275 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const title = 'Web Component Sizing';
+
+// Short score for testing intrinsic sizing
+const shortScoreData = {
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+  ],
+};
+
+// Long score for testing multi-column layout (30 notes)
+const longScoreData = {
+  notes: [
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+    { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+    { pitch: { step: 're', octave: 0 }, duration: 1 },
+    { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+    { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+    { pitch: { step: 'u', octave: 0 }, duration: 1 },
+  ],
+};
+---
+
+<Layout title={title} currentPage="browse">
+  <div class="sizing-test-page">
+    <h1>Web Component Sizing Test</h1>
+    <p class="description">
+      Testing ResizeObserver-based initial render timing fix for multi-column mode.
+      Open DevTools console to check for warnings.
+    </p>
+
+    <!-- Multi-column mode in large container -->
+    <section class="test-section">
+      <h2>Multi-Column Mode (auto) - 1200×800 Container</h2>
+      <p class="test-description">
+        Should fill container on first render (no 300×150 fallback, no flicker)
+      </p>
+      <div class="test-container large-container">
+        <shakuhachi-score
+          columns="auto"
+          data-score={JSON.stringify(longScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Multi-column mode in small container -->
+    <section class="test-section">
+      <h2>Multi-Column Mode (auto) - 400×300 Container</h2>
+      <p class="test-description">
+        Should fill container on first render
+      </p>
+      <div class="test-container small-container">
+        <shakuhachi-score
+          columns="auto"
+          data-score={JSON.stringify(longScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Single-column mode -->
+    <section class="test-section">
+      <h2>Single-Column Mode - 400×auto Container</h2>
+      <p class="test-description">
+        Should use intrinsic height (based on note count), width from container
+      </p>
+      <div class="test-container single-column-container">
+        <shakuhachi-score
+          columns="1"
+          data-score={JSON.stringify(shortScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Explicit dimensions -->
+    <section class="test-section">
+      <h2>Explicit Dimensions - 600×400</h2>
+      <p class="test-description">
+        Should render immediately with explicit dimensions (bypasses ResizeObserver)
+      </p>
+      <div class="test-container flex-container">
+        <shakuhachi-score
+          columns="auto"
+          width="600"
+          height="400"
+          data-score={JSON.stringify(longScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Explicit column count -->
+    <section class="test-section">
+      <h2>Explicit Column Count (columns="3") - Intrinsic Sizing</h2>
+      <p class="test-description">
+        Should distribute notes across 3 columns using intrinsic sizing (component calculates its own dimensions)
+      </p>
+      <div class="test-container flex-container">
+        <shakuhachi-score
+          columns="3"
+          data-score={JSON.stringify(longScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Explicit column count: 6 columns -->
+    <section class="test-section">
+      <h2>Explicit Column Count (columns="6") - Intrinsic Sizing</h2>
+      <p class="test-description">
+        Should create exactly 6 columns using intrinsic sizing
+      </p>
+      <div class="test-container flex-container">
+        <shakuhachi-score
+          columns="6"
+          data-score={JSON.stringify(longScoreData)}
+        ></shakuhachi-score>
+      </div>
+    </section>
+
+    <!-- Debug instructions -->
+    <section class="test-section">
+      <h2>Visual Verification Checklist</h2>
+      <ul class="checklist">
+        <li>✓ No "dimensions are 0" warnings in console</li>
+        <li>✓ No visual flicker or layout shift on page load</li>
+        <li>✓ Multi-column scores fill their containers (not 300×150)</li>
+        <li>✓ Single-column mode uses intrinsic height</li>
+        <li>✓ Explicit dimensions work correctly</li>
+        <li>✓ Resize browser window - scores should adapt smoothly</li>
+      </ul>
+    </section>
+  </div>
+</Layout>
+
+<script is:inline src="/embed/shakuhachi-score.js"></script>
+
+<style>
+  .sizing-test-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-large);
+  }
+
+  h1 {
+    font-size: var(--font-size-3x-large);
+    margin-top: var(--spacing-large);
+    margin-bottom: var(--spacing-medium);
+    color: var(--color-text-primary);
+  }
+
+  .description {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-3x-large);
+    font-size: var(--font-size-medium);
+  }
+
+  h2 {
+    font-size: var(--font-size-x-large);
+    margin-bottom: var(--spacing-small);
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--spacing-small);
+  }
+
+  .test-section {
+    margin-bottom: var(--spacing-3x-large);
+  }
+
+  .test-description {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-medium);
+    font-size: var(--font-size-small);
+    font-style: italic;
+  }
+
+  .test-container {
+    border: 2px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    border-radius: var(--border-radius-medium);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .test-container::before {
+    content: attr(data-size);
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--color-bg-overlay);
+    color: var(--color-text-secondary);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-x-small);
+    font-family: monospace;
+    z-index: 10;
+  }
+
+  .large-container {
+    width: 1200px;
+    height: 800px;
+  }
+
+  .small-container {
+    width: 400px;
+    height: 300px;
+  }
+
+  .single-column-container {
+    width: 400px;
+    /* Height auto - let component determine */
+  }
+
+  .medium-container {
+    width: 800px;
+    height: 600px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+  }
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+
+  .checklist li {
+    padding: var(--spacing-small);
+    margin-bottom: var(--spacing-x-small);
+    background: var(--color-bg-subtle);
+    border-radius: var(--border-radius-small);
+    border-left: 3px solid var(--color-border);
+    font-family: monospace;
+    font-size: var(--font-size-small);
+  }
+
+  shakuhachi-score {
+    display: block;
+    width: 100%;
+    height: 100%;
+    --shakuhachi-note-color: var(--color-text-primary);
+  }
+</style>

@@ -25,7 +25,6 @@ import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
 import type { ScoreData } from './types/ScoreData';
 import type { ShakuNote } from './notes/ShakuNote';
 import { DurationDotModifier } from './modifiers/DurationDotModifier';
-import type { Modifier } from './modifiers/Modifier';
 
 class ShakuhachiScore extends HTMLElement {
   private renderer: ScoreRenderer | null = null;
@@ -41,7 +40,37 @@ class ShakuhachiScore extends HTMLElement {
   }
 
   connectedCallback() {
-    this.render();
+    // Check if ResizeObserver is available (not available in some test environments)
+    if (typeof ResizeObserver === 'undefined') {
+      // Fallback for tests: render immediately
+      this.render();
+      return;
+    }
+
+    // Defer initial render until browser completes layout
+    // At connectedCallback time, clientWidth/clientHeight are 0
+    // ResizeObserver fires after layout, giving us correct dimensions
+    let hasRendered = false;
+
+    // Timeout fallback for environments where ResizeObserver doesn't fire
+    // (e.g., some test environments, hidden containers)
+    const timeoutId = window.setTimeout(() => {
+      if (!hasRendered) {
+        hasRendered = true;
+        this.render();
+      }
+    }, 50);
+
+    const observer = new ResizeObserver(() => {
+      if (!hasRendered) {
+        hasRendered = true;
+        clearTimeout(timeoutId);
+        this.render();
+        observer.disconnect(); // Only needed for initial layout timing
+      }
+    });
+
+    observer.observe(this);
   }
 
   attributeChangedCallback(
@@ -147,84 +176,73 @@ class ShakuhachiScore extends HTMLElement {
    *        = ~35px + 22px + 28px + 20px = ~105px (when both modifiers present)
    *        = ~62px (minimal, no modifiers)
    */
-  private calculateIntrinsicWidth(notes: ShakuNote[]): number {
-    let maxLeftExtent = 0; // Furthest left any modifier extends
-    let maxRightExtent = 0; // Furthest right any modifier extends
+  /**
+   * Calculate intrinsic width for multi-column layout
+   * @param columnCount - Number of columns to display
+   * @returns Width in pixels needed to fit N columns
+   */
+  private calculateMultiColumnIntrinsicWidth(columnCount: number): number {
+    const columnWidth = DEFAULT_RENDER_OPTIONS.columnWidth; // 100px
+    const columnSpacing = DEFAULT_RENDER_OPTIONS.columnSpacing; // 35px
+    const HORIZONTAL_PADDING = 20; // Safety margin per side
 
-    // Scan all notes for modifiers
-    notes.forEach((note) => {
-      const modifiers = note.getModifiers();
-
-      // Meri/Kari marks (left of note)
-      // offsetX = -22px, fontSize = 14px, width ≈ 13px (fontSize * 0.8 + margin)
-      const meriMod = modifiers.find(
-        (m: Modifier) => m.constructor.name === 'MeriKariModifier',
-      );
-      if (meriMod) {
-        const extent = 22 + 13; // abs(offsetX) + width
-        maxLeftExtent = Math.max(maxLeftExtent, extent); // ~35px
-      }
-
-      // Octave marks (right/above note)
-      // offsetX = 18px, fontSize = 12px, width ≈ 10px (fontSize * 0.8)
-      const octaveMod = modifiers.find(
-        (m: Modifier) => m.constructor.name === 'OctaveMarksModifier',
-      );
-      if (octaveMod) {
-        const extent = 18 + 10; // offsetX + width
-        maxRightExtent = Math.max(maxRightExtent, extent); // ~28px
-      }
-    });
-
-    // Base note width (Japanese characters are roughly 0.8 * fontSize)
-    const noteFontSize = DEFAULT_RENDER_OPTIONS.noteFontSize; // 28px
-    const noteWidth = noteFontSize * 0.8; // ~22px
-
-    // Total width with safety padding
-    const HORIZONTAL_PADDING = 10; // Safety margin per side
+    // Total width = (N columns × width) + ((N-1) spacing) + padding
     const intrinsicWidth =
-      maxLeftExtent + // ~35px (if meri present), 0 otherwise
-      noteWidth + // ~22px
-      maxRightExtent + // ~28px (if octave present), 0 otherwise
-      HORIZONTAL_PADDING * 2; // 20px
+      columnCount * columnWidth +
+      (columnCount - 1) * columnSpacing +
+      HORIZONTAL_PADDING * 2;
 
-    return Math.ceil(intrinsicWidth); // ~62-105px depending on modifiers
+    return intrinsicWidth;
   }
 
   /**
-   * Calculate intrinsic height using single-column logic
-   * Matches ScoreRenderer.calculateSingleColumnHeight() algorithm
+   * Calculate intrinsic height for multi-column layout
+   * @param notes - All notes to be rendered
+   * @param columnCount - Number of columns to distribute notes across
+   * @returns Height in pixels needed for the TALLEST column
    *
-   * Calculation:
-   *   - Start with topMargin (34px)
-   *   - For each note: add noteVerticalSpacing (44px)
-   *   - If note has duration dot: add durationDotExtraSpacing (12px)
-   *   - Add bottom padding (20px) for last note's modifiers
+   * Note: Different columns can have different heights if they contain
+   * different numbers of duration-dotted notes (which add extra spacing).
+   * We must calculate all columns and return the maximum height.
    */
-  private calculateIntrinsicHeight(notes: ShakuNote[]): number {
-    let height = DEFAULT_RENDER_OPTIONS.topMargin; // 34px
+  private calculateMultiColumnIntrinsicHeight(
+    notes: ShakuNote[],
+    columnCount: number,
+  ): number {
+    const notesPerColumn = Math.ceil(notes.length / columnCount);
+    const topMargin = DEFAULT_RENDER_OPTIONS.topMargin; // 34px
+    const verticalSpacing = DEFAULT_RENDER_OPTIONS.noteVerticalSpacing; // 44px
+    const durationDotExtraSpacing =
+      DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing; // 12px
+    const BOTTOM_PADDING = 20;
 
-    notes.forEach((note) => {
-      const hasDurationDot = note
-        .getModifiers()
-        .some((mod) => mod instanceof DurationDotModifier);
+    let maxHeight = 0;
 
-      const noteHeight =
-        DEFAULT_RENDER_OPTIONS.noteVerticalSpacing +
-        (hasDurationDot ? DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing : 0);
+    // Calculate height for each column and find the tallest
+    for (let col = 0; col < columnCount; col++) {
+      let columnHeight = topMargin;
 
-      height += noteHeight;
-    });
+      // Notes for this column: from (col × notesPerColumn) to ((col + 1) × notesPerColumn)
+      const startIdx = col * notesPerColumn;
+      const endIdx = Math.min((col + 1) * notesPerColumn, notes.length);
 
-    height += 20; // Bottom padding
+      for (let i = startIdx; i < endIdx; i++) {
+        const note = notes[i];
+        const hasDurationDot = note
+          .getModifiers()
+          .some((mod) => mod instanceof DurationDotModifier);
 
-    // Allow attribute override
-    const heightAttr = this.getAttribute('height');
-    if (heightAttr) {
-      return parseInt(heightAttr);
+        columnHeight += verticalSpacing;
+        if (hasDurationDot) {
+          columnHeight += durationDotExtraSpacing;
+        }
+      }
+
+      columnHeight += BOTTOM_PADDING;
+      maxHeight = Math.max(maxHeight, columnHeight);
     }
 
-    return height;
+    return maxHeight;
   }
 
   /**
@@ -281,21 +299,20 @@ class ShakuhachiScore extends HTMLElement {
       const columns = this.parseColumnsAttribute();
 
       // Determine layout mode
-      let isSingleColumn: boolean;
+      let isExplicitColumnCount = false;
+      let columnCount: number | undefined;
       let notesPerColumn: number | undefined;
 
       if (columns === 'auto') {
-        // Auto mode: multi-column layout, let renderer calculate based on dimensions
-        isSingleColumn = false;
-        notesPerColumn = undefined; // Renderer will auto-calculate
-      } else if (columns === 1) {
-        // Single column: all notes, intrinsic height
-        isSingleColumn = true;
-        notesPerColumn = undefined;
+        // Auto mode: extrinsic sizing, auto-fit columns
+        notesPerColumn = undefined; // Renderer will auto-calculate based on height
+        isExplicitColumnCount = false;
       } else {
-        // Explicit column count: multi-column with distribution
-        isSingleColumn = false;
+        // Explicit column count (1, 2, 3, 6, etc.): intrinsic sizing
+        // All numeric values use the same algorithm
         notesPerColumn = Math.ceil(notes.length / columns);
+        isExplicitColumnCount = true;
+        columnCount = columns;
       }
 
       // Get theme options
@@ -312,11 +329,19 @@ class ShakuhachiScore extends HTMLElement {
 
       // Create component styles
       const style = document.createElement('style');
+
+      // For intrinsic sizing, set explicit width on :host to match SVG
+      const hostWidth =
+        isExplicitColumnCount && columnCount
+          ? `width: ${this.calculateMultiColumnIntrinsicWidth(columnCount)}px;`
+          : '';
+
       style.textContent = `
         :host {
           display: block;
           box-sizing: border-box;
           contain-intrinsic-size: 300px 150px;
+          ${hostWidth}
           --shakuhachi-note-color: #000;
           --shakuhachi-note-font-size: 28px;
           --shakuhachi-note-font-weight: 400;
@@ -336,36 +361,38 @@ class ShakuhachiScore extends HTMLElement {
       this.shadow.appendChild(container);
 
       // Calculate dimensions
-      let width: number | undefined;
-      let height: number | undefined;
+      let width: number;
+      let height: number;
 
-      if (isSingleColumn) {
-        // Single column: calculate intrinsic height from content
-        height = this.calculateIntrinsicHeight(notes);
+      const widthAttr = this.getAttribute('width');
+      const heightAttr = this.getAttribute('height');
 
-        // Width from attribute or auto-detect
-        const widthAttr = this.getAttribute('width');
-        if (widthAttr) {
-          width = parseInt(widthAttr);
-        } else if (this.hasAttribute('intrinsic-width')) {
-          width = this.calculateIntrinsicWidth(notes);
-        } else {
-          const rect = this.getBoundingClientRect();
-          width = rect.width > 0 ? rect.width : 300;
-        }
+      if (isExplicitColumnCount && columnCount) {
+        // Intrinsic sizing for ALL numeric column values (1, 2, 3, 6, etc.)
+        width = widthAttr
+          ? parseInt(widthAttr)
+          : this.calculateMultiColumnIntrinsicWidth(columnCount);
+
+        height = heightAttr
+          ? parseInt(heightAttr)
+          : this.calculateMultiColumnIntrinsicHeight(notes, columnCount);
       } else {
-        // Multi-column: use host dimensions from parent
-        const widthAttr = this.getAttribute('width');
-        const heightAttr = this.getAttribute('height');
+        // Auto mode: extrinsic sizing
+        width = widthAttr ? parseInt(widthAttr) : this.clientWidth;
+        height = heightAttr ? parseInt(heightAttr) : this.clientHeight;
 
-        // Use explicit attributes if provided, otherwise read from element
-        width = widthAttr ? parseInt(widthAttr) : this.clientWidth || 300;
-        height = heightAttr ? parseInt(heightAttr) : this.clientHeight || 150;
+        // Defensive fallback
+        if (width === 0 || height === 0) {
+          console.warn(
+            'ShakuhachiScore: dimensions are 0 after layout (unexpected)',
+          );
+          width = width || 300;
+          height = height || 150;
+        }
       }
 
       // Build render options
       const renderOptions: any = {
-        singleColumn: isSingleColumn,
         notesPerColumn,
         showDebugLabels: this.hasAttribute('debug'),
         autoResize: this.getAttribute('auto-resize') !== 'false',

@@ -226,7 +226,6 @@ describe('RenderOptions', () => {
         width: 1200,
         height: 800,
         autoResize: true,
-        singleColumn: false,
       };
       const result = mergeWithDefaults(options);
 
