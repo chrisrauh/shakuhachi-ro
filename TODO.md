@@ -73,14 +73,6 @@
   - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
   - Test page for visual verification: http://localhost:3003/test/buttons
 
-- [ ] [UI] [A:High] Improve button test page visual regression coverage
-  - [x] Test page `/test/buttons` exists with icon, small, and standard button variants
-  - [x] Visual regression tests exist for buttons (light/dark, desktop/mobile)
-  - [ ] Layout not condensed — not all variants visible in a single viewport
-  - [x] Counter button example using wrong font (Arial instead of proper CSS) [Claude validated - FIXED in buttons.astro:256-259]
-  - [ ] Adjust viewport size in visual regression tests to capture all variations
-  - Goal: Single screenshot should show all button types (icon, small, standard) with all color variants (primary, secondary, success, neutral, ghost) and states (default, hover, disabled)
-
 - [ ] [Research] [A:Low] Investigate web component framweworks
 
 - [ ] [UI] [A:Medium] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
