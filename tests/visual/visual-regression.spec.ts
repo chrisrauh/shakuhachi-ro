@@ -9,7 +9,7 @@
  *   - Button components test page
  *   - Score renderer test examples (15 test cases × 2 themes)
  *   - Light and dark color schemes
- *   - Desktop (1280x720) and mobile (375x667) viewports
+ *   - Desktop (1280x780) and mobile (375x1450) viewports
  *
  * Usage:
  *   npm run test:visual              # Run visual regression tests
@@ -29,7 +29,7 @@ const pages = [
 const colorSchemes = ['light', 'dark'] as const;
 
 const viewports = [
-  { name: 'desktop', width: 1280, height: 700 },
+  { name: 'desktop', width: 1280, height: 780 },
   { name: 'mobile', width: 375, height: 1450 },
 ];
 
