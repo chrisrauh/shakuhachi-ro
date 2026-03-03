@@ -370,6 +370,16 @@ if (score?.forked_from) {
         overflow: visible; /* Allow content to overflow viewport */
         padding: var(--spacing-medium) var(--spacing-small) 0;
         max-width: 100%; /* Constrain to viewport width */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center intrinsic-width components (columns="1" uses 140px intrinsic width) */
+      }
+
+      #score-renderer {
+        /* Remove width constraint to allow intrinsic sizing */
+        width: auto;
+        flex: none;
+        align-self: auto; /* Don't stretch - let intrinsic width work */
       }
 
       #score-renderer-container {
