@@ -241,13 +241,12 @@ const { Content } = await aboutPage.render();
     /* Score Example Styling */
     .about-section :global(.score-example) {
       margin: var(--spacing-large) 0;
-      padding: var(--spacing-large);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-medium);
-      background-color: var(--color-background-elevated);
       display: flex;
-      gap: var(--spacing-large);
-      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .about-section :global(.score-example shakuhachi-score) {
+      --shakuhachi-note-color: var(--color-text-primary);
     }
 
     .about-section :global(.score-viz) {
