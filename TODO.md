@@ -433,6 +433,23 @@ Structural issues identified by module-level analysis (dependency graph, informa
 
 ## Content Acquisition
 
+- [ ] [Research] [A:Medium] Research and identify shakuhachi score sources
+  - Survey publicly available shakuhachi score repositories (websites, archives, blogs, academic sources)
+  - Identify sources with digital scores in machine-readable formats (MusicXML, ABC, MIDI, PDF)
+  - Note each source's language, format, scope (honkyoku, minyo, Western adaptations, etc.)
+  - Assess volume and quality of available scores per source
+  - Document findings to guide prioritization of scraping/import tasks
+
+- [ ] [Both] [A:High] Handle score license requirements
+  - Audit license types likely encountered: public domain, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, all-rights-reserved
+  - Implement license metadata field on scores (store SPDX identifier or license name + URL)
+  - Display license badge/notice on score detail page (required by CC licenses)
+  - For CC BY: show author name with link to original source
+  - For CC BY-SA: show license notice and link; any derivative works must use same license
+  - For CC BY-NC: show non-commercial restriction notice
+  - Ensure user-created scores can also declare a license
+  - Block or warn on import of all-rights-reserved content without explicit permission
+
 - [ ] [Content] [A:Medium] Scrape scores from https://imslp.org/wiki/
   - Investigate IMSLP's API or data availability for shakuhachi-relevant scores
   - Determine licensing compatibility (IMSLP uses various Creative Commons and public domain licenses — verify per score)
