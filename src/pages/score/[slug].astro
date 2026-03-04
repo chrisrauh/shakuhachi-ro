@@ -110,11 +110,12 @@ if (score?.forked_from) {
 
   <!-- Initialize theme switcher and auth widget -->
   <script>
-    import { createElement, Book, Plus, Info, SunMoon, SquarePen, Trash2 } from 'lucide';
+    import { createElement, Book, Plus, Info, SunMoon, SquarePen, Trash2, LogIn, LogOut, User, UserPlus } from 'lucide';
     import { ThemeSwitcher } from '../../components/ThemeSwitcher';
     import { AuthWidget } from '../../components/AuthComponents';
-    import { onAuthReady } from '../../api/auth';
+    import { onAuthReady, signOut } from '../../api/auth';
     import { MobileMenu, type MenuItem } from '../../components/MobileMenu';
+    import type { User as SupabaseUser } from '@supabase/supabase-js';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -128,6 +129,9 @@ if (score?.forked_from) {
 
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
+
+    // Get reference to auth modal for mobile menu
+    const authModal = authWidget.getAuthModal();
 
     // Subscribe to auth changes - onAuthReady handles deduplication
     onAuthReady((user) => {
@@ -153,8 +157,8 @@ if (score?.forked_from) {
 
     const mobileMenu = new MobileMenu('mobile-menu');
 
-    // Function to update mobile menu items based on auth state
-    const updateMobileMenuItems = (isOwner: boolean) => {
+    // Function to update mobile menu items based on auth state and ownership
+    const updateMobileMenuItems = (user: SupabaseUser | null, isOwner: boolean) => {
       const baseItems: MenuItem[] = [
         {
           id: 'browse',
@@ -200,6 +204,45 @@ if (score?.forked_from) {
         });
       }
 
+      // Add auth items
+      const authItems = user
+        ? [
+            {
+              id: 'account',
+              label: user.email || 'Account',
+              action: () => {},
+              icon: getIconHTML(User),
+              dividerAfter: false,
+            },
+            {
+              id: 'logout',
+              label: 'Log Out',
+              action: async () => {
+                await signOut();
+              },
+              icon: getIconHTML(LogOut),
+              dividerAfter: true,
+            },
+          ]
+        : [
+            {
+              id: 'login',
+              label: 'Log In',
+              action: () => authModal.show('login'),
+              icon: getIconHTML(LogIn),
+              dividerAfter: false,
+            },
+            {
+              id: 'signup',
+              label: 'Sign Up',
+              action: () => authModal.show('signup'),
+              icon: getIconHTML(UserPlus),
+              dividerAfter: true,
+            },
+          ];
+
+      baseItems.push(...authItems);
+
       baseItems.push({
         id: 'theme',
         label: 'Toggle theme',
@@ -220,15 +263,16 @@ if (score?.forked_from) {
 
         // Subscribe to auth changes - onAuthReady handles deduplication
         onAuthReady((user) => {
+          authWidget.setUser(user);
           const isOwner = !!(user && score && user.id === score.user_id);
-          updateMobileMenuItems(isOwner);
+          updateMobileMenuItems(user, isOwner);
         });
       } catch (error) {
         console.error('Failed to parse score data for menu:', error);
-        updateMobileMenuItems(false);
+        updateMobileMenuItems(null, false);
       }
     } else {
-      updateMobileMenuItems(false);
+      updateMobileMenuItems(null, false);
     }
   </script>
 

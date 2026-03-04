@@ -13,7 +13,7 @@ Follow this sequence to get context:
 
 ### 1. Review Guidelines (CLAUDE.md)
 
-Read `/Users/crauh/dev/shakuhachi-ro/CLAUDE.md` to understand:
+Read `./CLAUDE.md` to understand:
 
 - Software engineering principles
 - Dev workflow and git practices
@@ -26,13 +26,13 @@ Read `/Users/crauh/dev/shakuhachi-ro/CLAUDE.md` to understand:
 
 Read the architecture documents to understand the system:
 
-**Renderer Library**: `/Users/crauh/dev/shakuhachi-ro/docs/ARCHITECTURE-RENDERER.MD`
+**Renderer Library**: `./docs/ARCHITECTURE-RENDERER.MD`
 
 - How the shakuhachi notation renderer works
 - ScoreData format and rendering pipeline
 - Web component implementation
 
-**Platform**: `/Users/crauh/dev/shakuhachi-ro/docs/ARCHITECTURE-PLATFORM.MD`
+**Platform**: `./docs/ARCHITECTURE-PLATFORM.MD`
 
 - How shakuhachi.ro platform works
 - Key pages (browse, detail, edit)
@@ -41,7 +41,7 @@ Read the architecture documents to understand the system:
 
 ### 3. Review Current Tasks (TODO.md)
 
-Read `/Users/crauh/dev/shakuhachi-ro/TODO.md` to see:
+Read `./TODO.md` to see:
 
 - Current priorities
 - Pending tasks organized by category

@@ -9,6 +9,7 @@
 # Playwright
 /tests/visual/reports
 /tests/visual/test-results
+/tests/visual/.auth
 /playwright-report
 /.playwright
 

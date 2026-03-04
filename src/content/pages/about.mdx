@@ -2,42 +2,66 @@
 title: About
 ---
 
-Hi there! I'm Christian.
+# Hi there! I'm Chris.
 
-I am a shakuhachi student and web developer building this website: shakuhachi.ro.
+I’m building **shakuhachi.ro**.
 
-This is a place to discover, create and share shakuhachi scores. It's inspired by [The Sessions](https://thesession.org/), Flat.io and vexflow/vextab, but for shakuhachi.
+I’m a shakuhachi student and web developer, and I wanted a simple way to share scores online, with friends or on r/shakuhachi, and to connect different versions of the same song.
+
+**shakuhachi.ro** is a place to discover, edit and share shakuhachi scores. It’s inspired by [The Session](https://thesession.org/), Flat.io and vexflow/vextab, but built specifically for shakuhachi.
 
 ## Forking
 
-If you've used GitHub or similar tools, forking will be familiar. If not, any score here can be forked, which gives you your own editable copy. Handy when you want to edit, transpose, or adapt a piece. Your version is independent; it's linked to the original, but you won't affect it. it's handy to create versions of the same song. 
+If you’ve used GitHub or similar tools, **forking** will feel familiar.
+
+If not, forking just means creating your own copy of the score.
+
+Forking is useful when you want to edit, transpose, or adapt a piece without losing the original. Your new version stays independent. It links to the original for reference, but your changes won’t affect it.
+
+You can also fork the same score multiple times. It's a great way to try variations.
 
 ## Embedding scores
 
-A big part of why I built this is the score renderer — a standalone web component for displaying shakuhachi notation on any webpage. This live example shows it in action:
+One big reason I'm building this site is the score renderer... I wanted to drop a shakuhachi snippet into a blog post and comment on it directly, but I couldn’t find a good way to do that.
+
+So I built a standalone web component for displaying shakuhachi notation on any webpage.
+
+The live example below shows it in action:
 
 <div class="score-example">
-  <shakuhachi-score class="score-viz" columns="1" data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'></shakuhachi-score>
+  <shakuhachi-score
+    class="score-viz"
+    columns="1"
+    data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'
+  ></shakuhachi-score>
 </div>
 
-It's designed so anyone can embed scores in a blog post, a comment, or their own tool. More in the [GitHub project](https://github.com/chrisrauh/shakuhachi-ro).
+That’s the idea: scores should be as easy to share as a screenshot... or easier.
+
+If you want to embed scores in your own site or tool, the details are in the [GitHub project](https://github.com/chrisrauh/shakuhachi-ro).
 
 ## On AI
 
-To be honest, this site wouldn't exist without it. I'd had the idea for years but never enough time. Claude Code let me turn the small pockets of time I have into something real.
+I’d had the idea for years, but never the time to build it.
 
-I understand that's not neutral ground for everyone. The technology raises genuine questions and I don't dismiss them. So I want to be upfront about how this was made.
+Claude Code helped me turn small pockets of time into something real. The reality is that this site wouldn’t exist without AI, specifically LLMs.
+
+I know this technology raises valid concerns and I don’t dismiss them.
+
+And I want to be transparent about how the site was made.
 
 ## Contributing
 
 This is an open source project and I could use help with:
 
 - Adding scores to the library
-- Feedback on features: what's great, what's confusing and what's missing. 
-- Shakuhachi notation knowledge
-- Japanese cultural sensitivity — helping ensure the site is respectful and accurate to shakuhachi tradition
-- Design and UX help
-- Testing the site
+- Feature feedback: what works, what’s confusing, and what’s missing
+- Shakuhachi notation expertise
+- Japanese cultural guidance — helping ensure the site respects and reflects shakuhachi tradition
+- Design and UX
+- Testing
 - Coding
 
-Reach out via [GitHub](https://github.com/chrisrauh/shakuhachi-ro) or [Mastodon](https://mastodon.social/@chrisrauh) (posts or DMs)
+If any of this interests you, I’d love to hear from you.
+
+Reach out on [GitHub](https://github.com/chrisrauh/shakuhachi-ro) or [Mastodon](https://mastodon.social/@chrisrauh) (posts or DMs)
