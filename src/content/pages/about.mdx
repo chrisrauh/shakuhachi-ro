@@ -8,7 +8,7 @@ I’m building **shakuhachi.ro**.
 
 I’m a shakuhachi student and web developer, and I wanted a simple way to share scores online, with friends or on r/shakuhachi, and to connect different versions of the same song.
 
-**shakuhachi.ro** is a place to discover, edit and share shakuhachi scores. It’s inspired by [The Session](https://thesession.org/), Flat.io and vexflow/vextab, but built specifically for shakuhachi.
+**shakuhachi.ro** is a place to discover, edit and share shakuhachi scores. It’s inspired by [The Session](https://thesession.org/), [Flat.io](https://flat.io) and [vexflow](https://github.com/0xfe/vexflow)/[vextab](https://github.com/0xfe/vextab), but built specifically for shakuhachi.
 
 ## Forking
 
@@ -30,11 +30,20 @@ The live example below shows it in action:
 
 <div class="score-example">
   <shakuhachi-score
-    class="score-viz"
     columns="1"
     data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'
   ></shakuhachi-score>
 </div>
+
+Here's how you can embed it in your own site:
+
+```html
+<script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
+<shakuhachi-score
+  columns="1"
+  data-score='{"title":"Akatombo (Opening Phrase)","notes":[...]}'
+></shakuhachi-score>
+```
 
 That’s the idea: scores should be as easy to share as a screenshot... or easier.
 
