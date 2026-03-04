@@ -54,13 +54,14 @@ const { score } = scoreResult;
 
   <!-- Initialize theme switcher, auth widget, and mobile menu -->
   <script>
-    import { createElement, Book, Plus, Info, SunMoon } from 'lucide';
+    import { createElement, Book, Plus, Info, SunMoon, LogIn, LogOut, User, UserPlus } from 'lucide';
     import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
     import { AuthWidget } from '../../../components/AuthComponents';
-    import { onAuthReady } from '../../../api/auth';
+    import { onAuthReady, signOut } from '../../../api/auth';
     import { MobileMenu } from '../../../components/MobileMenu';
     import { createEmptyScore } from '../../../utils/create-score-handler';
     import { toast } from '../../../components/Toast';
+    import type { User as SupabaseUser } from '@supabase/supabase-js';
 
     // Initialize theme switcher
     new ThemeSwitcher('theme-switcher');
@@ -75,10 +76,8 @@ const { score } = scoreResult;
     // Initialize auth widget
     const authWidget = new AuthWidget('auth-widget');
 
-    // Subscribe to auth changes - onAuthReady handles deduplication
-    onAuthReady((user) => {
-      authWidget.setUser(user);
-    });
+    // Get reference to auth modal for mobile menu
+    const authModal = authWidget.getAuthModal();
 
     // Helper to generate Lucide icon HTML
     const getIconHTML = (iconComponent: typeof Book) => {
@@ -98,43 +97,92 @@ const { score } = scoreResult;
     };
 
     const mobileMenu = new MobileMenu('mobile-menu');
-    mobileMenu.setItems([
-      {
-        id: 'browse',
-        label: 'Library',
-        href: '/',
-        icon: getIconHTML(Book),
-        dividerAfter: false,
-      },
-      {
-        id: 'create',
-        label: 'Create score',
-        action: async () => {
-          const result = await createEmptyScore();
-          if (result.error) {
-            toast.error(result.error.message, { duration: Infinity });
-          } else {
-            window.location.href = `/score/${result.slug}/edit`;
-          }
+
+    // Function to update menu items based on auth state
+    const updateMobileMenu = (user: SupabaseUser | null) => {
+      const baseItems = [
+        {
+          id: 'browse',
+          label: 'Library',
+          href: '/',
+          icon: getIconHTML(Book),
+          dividerAfter: false,
         },
-        icon: getIconHTML(Plus),
-        dividerAfter: false,
-      },
-      {
-        id: 'about',
-        label: 'About',
-        href: '/about',
-        icon: getIconHTML(Info),
-        dividerAfter: true,
-      },
-      {
+        {
+          id: 'create',
+          label: 'Create score',
+          action: async () => {
+            const result = await createEmptyScore();
+            if (result.error) {
+              toast.error(result.error.message, { duration: Infinity });
+            } else {
+              window.location.href = `/score/${result.slug}/edit`;
+            }
+          },
+          icon: getIconHTML(Plus),
+          dividerAfter: false,
+        },
+        {
+          id: 'about',
+          label: 'About',
+          href: '/about',
+          icon: getIconHTML(Info),
+          dividerAfter: true,
+        },
+      ];
+
+      const authItems = user
+        ? [
+            {
+              id: 'account',
+              label: user.email || 'Account',
+              action: () => {},
+              icon: getIconHTML(User),
+              dividerAfter: false,
+            },
+            {
+              id: 'logout',
+              label: 'Log Out',
+              action: async () => {
+                await signOut();
+              },
+              icon: getIconHTML(LogOut),
+              dividerAfter: true,
+            },
+          ]
+        : [
+            {
+              id: 'login',
+              label: 'Log In',
+              action: () => authModal.show('login'),
+              icon: getIconHTML(LogIn),
+              dividerAfter: false,
+            },
+            {
+              id: 'signup',
+              label: 'Sign Up',
+              action: () => authModal.show('signup'),
+              icon: getIconHTML(UserPlus),
+              dividerAfter: true,
+            },
+          ];
+
+      const themeItem = {
         id: 'theme',
         label: 'Toggle theme',
         action: toggleTheme,
         icon: getIconHTML(SunMoon),
         dividerAfter: false,
-      },
-    ]);
+      };
+
+      mobileMenu.setItems([...baseItems, ...authItems, themeItem]);
+    };
+
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      authWidget.setUser(user);
+      updateMobileMenu(user);
+    });
   </script>
 
   <!-- Initialize ScoreEditor (existing component, no changes) -->
