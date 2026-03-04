@@ -57,6 +57,14 @@
     - Should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
+- [ ] [UI] [A:Low] Revisit mobile menu action order
+  - Current order: Library, Create score, About, [divider], Auth items, [divider], Toggle theme
+  - Consider grouping by action type (navigation vs account vs settings)
+  - Evaluate whether auth actions should be higher priority (top of menu)
+  - Consider if theme toggle belongs at bottom or integrated with other settings
+  - Test with users to determine most intuitive ordering
+  - Current implementation works but may not be optimal for common workflows
+
 - [ ] [UI] [A:Low] Revisit auto-save indicator placement and design
   - Current implementation: "Saved X ago" appears below description field
   - Consider alternative placements: floating badge, header area, inline with save button
@@ -204,8 +212,8 @@
   - [x] Test light and dark themes
   - [x] Test desktop viewport (1280x720)
   - [x] Test empty notation (minimal score data)
-  - [ ] Test mobile viewport (375x667) - deferred (auth widget in hamburger menu)
-  - [ ] Test mobile toggle between editor and preview panels - deferred
+  - [x] Test mobile viewport (375x667)
+  - [x] Test mobile toggle between editor and preview panels
 - [ ] [UI] [A:High] Add visual regression tests for Score page (/score)
   - [ ] Test score rendering (full page and viewport)
   - [ ] Test debug mode

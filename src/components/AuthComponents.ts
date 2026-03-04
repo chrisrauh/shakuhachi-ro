@@ -220,6 +220,11 @@ export class AuthWidget {
     }) as EventListener);
   }
 
+  // Expose authModal for mobile menu
+  public getAuthModal(): AuthModal {
+    return this.authModal;
+  }
+
   private render(): void {
     if (this.currentUser) {
       this.container.innerHTML = `
