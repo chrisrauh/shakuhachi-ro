@@ -85,7 +85,6 @@ async function waitForEditor(page: any) {
 }
 
 test.describe('Score Editor Visual Regression', () => {
-  // Authenticate once before all tests
   test.beforeEach(async ({ page }) => {
     if (!TEST_EMAIL || !TEST_PASSWORD) {
       throw new Error('TEST_EMAIL and TEST_PASSWORD must be set in .env file');
@@ -136,12 +135,24 @@ test.describe('Score Editor Visual Regression', () => {
     });
   });
 
-  // TODO: Mobile viewport tests require mobile-specific authentication flow
-  // The auth widget is hidden in mobile menu, making these tests more complex
-  // Desktop tests provide comprehensive coverage for now
+  // Note: Mobile viewport tests deferred
+  // Challenge: Auth widget hidden on mobile (in hamburger menu on production)
+  // Desktop tests provide comprehensive coverage for editor functionality
+  // Mobile-specific layout tests can be added when auth flow is simplified
   /*
   test.describe('Mobile Viewport (375x667)', () => {
-    test.use({ viewport: { width: 375, height: 667 }, timeout: 60000 });
+    test.use({ viewport: { width: 375, height: 667 } });
+
+    // Mobile tests authenticate on desktop first, then use that session
+    // This works around the auth widget being hidden on mobile viewports
+    test.beforeEach(async ({ page }) => {
+      // Set viewport to desktop temporarily for authentication
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await authenticate(page);
+
+      // Switch back to mobile viewport for the test
+      await page.setViewportSize({ width: 375, height: 667 });
+    });
 
     test('Light mode - Editor panel default', async ({ page }) => {
       await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
@@ -254,6 +265,24 @@ test.describe('Score Editor Visual Regression', () => {
 
   test.describe('Editor States', () => {
     test.use({ viewport: { width: 1280, height: 720 } });
+
+    test('Empty notation - Minimal score data', async ({ page }) => {
+      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
+      await setTheme(page, 'light');
+      await waitForEditor(page);
+
+      // Clear the notation textarea to show empty state
+      const notationTextarea = page.locator('#score-data-input');
+      await notationTextarea.clear();
+      await notationTextarea.fill('{"notes":[]}');
+
+      // Wait for preview to update
+      await page.waitForTimeout(500);
+
+      await expect(page).toHaveScreenshot('editor-empty-notation.png', {
+        fullPage: false,
+      });
+    });
 
     test('Metadata fields visible', async ({ page }) => {
       await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
