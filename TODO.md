@@ -17,13 +17,6 @@
 
 ## Alpha Release (Must-Haves)
 
-- [ ] [Content] [A:Low] Edit About page content
-  - **Requires user review and approval before marking complete**
-  - Review and refine content for clarity
-  - Ensure explanations are clear for shakuhachi musicians
-  - Check tone and messaging
-  - Verify all information is accurate
-
 - [ ] [Content] [A:Low] Create a contact email address for the site
   - Add it to the Contributing section of the About page
   - Currently pointing to GitHub discussions and Mastodon DMs as interim contact
