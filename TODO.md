@@ -15,8 +15,6 @@
 
 **Autonomy:** `[A:High]` = Can work independently | `[A:Medium]` = May need guidance | `[A:Low]` = Requires collaboration
 
-## Alpha Release (Must-Haves)
-
 ## Alpha Release alpha.1
 
 - [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
