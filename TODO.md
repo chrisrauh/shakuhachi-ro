@@ -464,6 +464,14 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - Convert extracted data to the platform's JSON/MusicXML format
   - Import scores into the platform with correct metadata (title, attribution)
 
+- [ ] [UI] [A:Medium] Add license selector field to score editor
+  - Add a license dropdown to the score metadata section of the editor
+  - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
+  - Show a brief description of each license to help users choose appropriately
+  - Store selection as SPDX identifier in score metadata
+  - Default to All Rights Reserved for new scores
+  - Display selected license on score detail page
+
 - [ ] [Both] [A:Medium] Revisit attribution modules design and placement
   - Review how attribution (composer, source, license) is currently stored and displayed
   - Evaluate whether attribution belongs in score metadata, a separate DB field, or a dedicated module
