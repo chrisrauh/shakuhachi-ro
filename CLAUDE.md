@@ -2,6 +2,7 @@
 
 - Tasks: [TODO.md](./TODO.md)
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
+- Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 
 ## Project Context
 
@@ -51,12 +52,9 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
 
 ## Runtime Environment
 
-This project runs in **Claude Code on the Web** (claude.ai/code) — a hosted environment with managed git access. Key constraints:
+This project is used in two environments: a local terminal and **Claude Code on the Web** (claude.ai/code). The guidelines in this file are written for the terminal environment.
 
-- **Cannot push to `main`** — always results in 403. Only `claude/`-prefixed branches are writable.
-- **Branch naming**: `claude/<description>-<sessionId>` — the session ID is the suffix provided in the task instructions (e.g. `claude/study-guidelines-YxAzk`).
-- **Merging is done externally** — PRs are merged by the user via GitHub UI; never use `gh pr merge`.
-- **Stop hook** (`~/.claude/stop-hook-git-check.sh`) requires all changes to be committed and pushed before session ends.
+**If you are running in the claude.ai/code environment**, read [docs/ENVIRONMENT-WEB.md](./docs/ENVIRONMENT-WEB.md) for constraints and workflow differences that apply there.
 
 ## Dev Workflow
 
