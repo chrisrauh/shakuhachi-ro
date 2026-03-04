@@ -226,8 +226,9 @@ export class SVGRenderer {
    */
   closeGroup(): void {
     if (this.groups.length === 0) {
-      console.warn('closeGroup() called but no groups are open');
-      return;
+      throw new Error(
+        'closeGroup() called but no groups are open — mismatched openGroup/closeGroup calls',
+      );
     }
 
     // Pop current group
