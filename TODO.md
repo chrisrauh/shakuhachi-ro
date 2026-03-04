@@ -431,6 +431,54 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
   - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
 
+## Content Acquisition
+
+- [ ] [Research] [A:Medium] Research and identify shakuhachi score sources
+  - Survey publicly available shakuhachi score repositories (websites, archives, blogs, academic sources)
+  - Identify sources with digital scores in machine-readable formats (MusicXML, ABC, MIDI, PDF)
+  - Note each source's language, format, scope (honkyoku, minyo, Western adaptations, etc.)
+  - Assess volume and quality of available scores per source
+  - Document findings to guide prioritization of scraping/import tasks
+
+- [ ] [Both] [A:High] Handle score license requirements
+  - Audit license types likely encountered: public domain, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, all-rights-reserved
+  - Implement license metadata field on scores (store SPDX identifier or license name + URL)
+  - Display license badge/notice on score detail page (required by CC licenses)
+  - For CC BY: show author name with link to original source
+  - For CC BY-SA: show license notice and link; any derivative works must use same license
+  - For CC BY-NC: show non-commercial restriction notice
+  - Ensure user-created scores can also declare a license
+  - Block or warn on import of all-rights-reserved content without explicit permission
+
+- [ ] [Content] [A:Medium] Scrape scores from https://imslp.org/wiki/
+  - Investigate IMSLP's API or data availability for shakuhachi-relevant scores
+  - Determine licensing compatibility (IMSLP uses various Creative Commons and public domain licenses — verify per score)
+  - Build or adapt a scraper to extract score data and metadata
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores with correct attribution and license metadata
+
+- [ ] [Content] [A:Medium] Scrape scores from https://shin-itchiro.seesaa.net/
+  - Investigate available score data format and structure on the site
+  - Determine licensing/permission before importing any content
+  - Build or adapt a scraper to extract shakuhachi score data
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores into the platform with correct metadata (title, attribution)
+
+- [ ] [UI] [A:Medium] Add license selector field to score editor
+  - Add a license dropdown to the score metadata section of the editor
+  - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
+  - Show a brief description of each license to help users choose appropriately
+  - Store selection as SPDX identifier in score metadata
+  - Default to All Rights Reserved for new scores
+  - Display selected license on score detail page
+
+- [ ] [Both] [A:Medium] Revisit attribution modules design and placement
+  - Review how attribution (composer, source, license) is currently stored and displayed
+  - Evaluate whether attribution belongs in score metadata, a separate DB field, or a dedicated module
+  - Consider display placement: score detail page, score card in library, score header, footer
+  - Ensure design scales to support imported scores (IMSLP, shin-itchiro) with varied attribution requirements
+  - Align with any licensing obligations (e.g., CC license notices must be visible)
+
 ## Renderer Enhancements (Future)
 
 - [ ] [UI] [A:Medium] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
