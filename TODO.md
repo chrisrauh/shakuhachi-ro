@@ -433,6 +433,13 @@ Structural issues identified by module-level analysis (dependency graph, informa
 
 ## Content Acquisition
 
+- [ ] [Content] [A:Medium] Scrape scores from https://imslp.org/wiki/
+  - Investigate IMSLP's API or data availability for shakuhachi-relevant scores
+  - Determine licensing compatibility (IMSLP uses various Creative Commons and public domain licenses — verify per score)
+  - Build or adapt a scraper to extract score data and metadata
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores with correct attribution and license metadata
+
 - [ ] [Content] [A:Medium] Scrape scores from https://shin-itchiro.seesaa.net/
   - Investigate available score data format and structure on the site
   - Determine licensing/permission before importing any content
