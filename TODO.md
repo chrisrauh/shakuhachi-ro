@@ -447,6 +447,13 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - Convert extracted data to the platform's JSON/MusicXML format
   - Import scores into the platform with correct metadata (title, attribution)
 
+- [ ] [Both] [A:Medium] Revisit attribution modules design and placement
+  - Review how attribution (composer, source, license) is currently stored and displayed
+  - Evaluate whether attribution belongs in score metadata, a separate DB field, or a dedicated module
+  - Consider display placement: score detail page, score card in library, score header, footer
+  - Ensure design scales to support imported scores (IMSLP, shin-itchiro) with varied attribution requirements
+  - Align with any licensing obligations (e.g., CC license notices must be visible)
+
 ## Renderer Enhancements (Future)
 
 - [ ] [UI] [A:Medium] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
