@@ -197,15 +197,15 @@
   - [ ] Score detail page - light & dark mode screenshots
   - [ ] Add appropriate wait times for theme transitions
   - [ ] Ensure score rendering completes before capturing
-- [ ] [UI] [A:High] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
-  - [ ] Determine authentication approach for visual tests (use test credentials from .env)
-  - [ ] Test external preview mode (side-by-side desktop layout)
-  - [ ] Test internal preview mode if still used
-  - [ ] Test with all three data formats (JSON, MusicXML, ABC)
-  - [ ] Test empty state (no score data)
-  - [ ] Test light and dark themes
-  - [ ] Test desktop and mobile viewports
-  - [ ] Test mobile toggle between editor and preview panels
+- [x] [UI] [A:High] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
+  - [x] Determine authentication approach for visual tests (use test credentials from .env)
+  - [x] Test external preview mode (side-by-side desktop layout)
+  - [x] Test with all three data formats (JSON, MusicXML, ABC)
+  - [x] Test light and dark themes
+  - [x] Test desktop viewport (1280x720)
+  - [x] Test empty notation (minimal score data)
+  - [ ] Test mobile viewport (375x667) - deferred (auth widget in hamburger menu)
+  - [ ] Test mobile toggle between editor and preview panels - deferred
 - [ ] [UI] [A:High] Add visual regression tests for Score page (/score)
   - [ ] Test score rendering (full page and viewport)
   - [ ] Test debug mode
