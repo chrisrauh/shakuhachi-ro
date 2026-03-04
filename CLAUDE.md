@@ -49,6 +49,15 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
   - Review component styling architecture
   - Check for conflicting global styles
 
+## Runtime Environment
+
+This project runs in **Claude Code on the Web** (claude.ai/code) — a hosted environment with managed git access. Key constraints:
+
+- **Cannot push to `main`** — always results in 403. Only `claude/`-prefixed branches are writable.
+- **Branch naming**: `claude/<description>-<sessionId>` — the session ID is the suffix provided in the task instructions (e.g. `claude/study-guidelines-YxAzk`).
+- **Merging is done externally** — PRs are merged by the user via GitHub UI; never use `gh pr merge`.
+- **Stop hook** (`~/.claude/stop-hook-git-check.sh`) requires all changes to be committed and pushed before session ends.
+
 ## Dev Workflow
 
 ⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
