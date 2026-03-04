@@ -236,9 +236,6 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
 
 #### Fail Fast, Fail Loud
 
-- [ ] [Backend] [A:High] SVGRenderer.closeGroup(): throw on unmatched group instead of console.warn [Claude validated]
-  - `src/web-component/renderer/SVGRenderer.ts:228-231` — `closeGroup()` logs `console.warn` and returns silently when called with no open groups. This is a programmer error (mismatched open/close calls) that corrupts the SVG group hierarchy. Change to `throw new Error(...)` so the bug surfaces immediately during development instead of producing silently broken SVG output.
-
 - [ ] [Backend] [A:High] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
   - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
   - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
@@ -391,7 +388,7 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - `src/components/ScoreEditor.ts` has 0 tests. The `validateScoreData()` method (lines 120-150) handles JSON and XML parsing with error messages — test valid/invalid inputs for both formats. The `handleSave()` method (lines 238-307) has branching for create vs update, error handling, and localStorage cleanup — test each path.
 
 - [ ] [Backend] [A:High] Add unit tests for SVGRenderer group management
-  - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws (after the fail-fast fix above), multiple groups at same level work.
+  - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws, multiple groups at same level work.
 
 - [ ] [Backend] [A:High] Add unit tests for modifier rendering logic
   - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
