@@ -2,6 +2,7 @@
 
 - Tasks: [TODO.md](./TODO.md)
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
+- Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 
 ## Project Context
 
@@ -48,6 +49,12 @@ Single meta-principle: **optimize for humans, not machines**. Everything else fl
   - Reorder stylesheets or style declarations
   - Review component styling architecture
   - Check for conflicting global styles
+
+## Runtime Environment
+
+This project is used in two environments: a local terminal and **Claude Code on the Web** (claude.ai/code). The guidelines in this file are written for the terminal environment.
+
+**If you are running in the claude.ai/code environment**, read [docs/ENVIRONMENT-WEB.md](./docs/ENVIRONMENT-WEB.md) for constraints and workflow differences that apply there.
 
 ## Dev Workflow
 
