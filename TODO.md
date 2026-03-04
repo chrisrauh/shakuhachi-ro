@@ -431,6 +431,15 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
   - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
 
+## Content Acquisition
+
+- [ ] [Content] [A:Medium] Scrape scores from https://shin-itchiro.seesaa.net/
+  - Investigate available score data format and structure on the site
+  - Determine licensing/permission before importing any content
+  - Build or adapt a scraper to extract shakuhachi score data
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores into the platform with correct metadata (title, attribution)
+
 ## Renderer Enhancements (Future)
 
 - [ ] [UI] [A:Medium] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
