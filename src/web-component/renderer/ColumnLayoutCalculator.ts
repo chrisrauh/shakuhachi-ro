@@ -192,9 +192,11 @@ export class ColumnLayoutCalculator {
       const extraSpacing = hasDurationDot ? options.durationDotExtraSpacing : 0;
       const noteHeight = verticalSpacing + extraSpacing;
 
-      // Check if adding this note would exceed available height
+      // Check if this note + bottom padding would exceed available height
       // (but always allow at least one note per column)
-      if (i > currentColumnStart && currentY + noteHeight > svgHeight) {
+      // The last note doesn't need spacing for another note after it, just bottom padding
+      const BOTTOM_PADDING = 20; // From layout constants
+      if (i > currentColumnStart && currentY + BOTTOM_PADDING > svgHeight) {
         // Start a new column
         columnBreaks.push({
           startIndex: currentColumnStart,

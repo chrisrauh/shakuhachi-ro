@@ -57,7 +57,7 @@ describe('ShakuhachiScore Web Component - Columns Attribute', () => {
     const svg = component.shadowRoot?.querySelector('svg');
     expect(svg).toBeTruthy();
     // In single column mode, height should be intrinsic (based on number of notes)
-    // 6 notes * 44px spacing + 34px top margin + 20px bottom ≈ 318px
+    // 6 notes: 34px top + (5 × 44px spacing) + 20px bottom = 274px
     const height = svg?.getAttribute('height');
     expect(parseInt(height || '0')).toBeGreaterThan(250);
   });
@@ -282,8 +282,8 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     const svg = component.shadowRoot?.querySelector('svg');
     expect(svg).toBeTruthy();
     // Height is calculated from note count, not container
-    // 3 notes * 44px + 34px top + 20px bottom ≈ 186px
-    expect(parseInt(svg?.getAttribute('height') || '0')).toBeGreaterThan(150);
+    // 3 notes: 34px top + (2 × 44px spacing) + 20px bottom = 142px
+    expect(parseInt(svg?.getAttribute('height') || '0')).toBeGreaterThan(130);
   });
 
   it('should use explicit dimensions when provided', async () => {
@@ -369,9 +369,9 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     expect(svg?.getAttribute('width')).toBe('410');
 
     // Height for 2 notes per column (6 ÷ 3)
-    // 34 + (2 × 44) + 20 = 142px
+    // 34 + (1 × 44) + 20 = 98px
     const height = parseInt(svg?.getAttribute('height') || '0');
-    expect(height).toBeCloseTo(142, -1); // Allow ~10px tolerance
+    expect(height).toBeCloseTo(98, -1); // Allow ~10px tolerance
   });
 
   it('auto mode (columns="auto") uses extrinsic sizing', async () => {
@@ -423,8 +423,8 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     expect(svg?.getAttribute('width')).toBe('140');
 
     // Height for 6 notes in single column
-    // 34 + (6 × 44) + 20 = 318px
+    // 34 + (5 × 44) + 20 = 274px
     const height = parseInt(svg?.getAttribute('height') || '0');
-    expect(height).toBeCloseTo(318, -1); // Allow ~10px tolerance
+    expect(height).toBeCloseTo(274, -1); // Allow ~10px tolerance
   });
 });

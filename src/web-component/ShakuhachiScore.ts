@@ -232,7 +232,10 @@ class ShakuhachiScore extends HTMLElement {
           .getModifiers()
           .some((mod) => mod instanceof DurationDotModifier);
 
-        columnHeight += verticalSpacing;
+        // Only add spacing between notes (not before first note)
+        if (i > startIdx) {
+          columnHeight += verticalSpacing;
+        }
         if (hasDurationDot) {
           columnHeight += durationDotExtraSpacing;
         }
