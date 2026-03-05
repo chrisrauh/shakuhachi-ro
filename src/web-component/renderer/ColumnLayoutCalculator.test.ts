@@ -47,9 +47,9 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should calculate layout for multiple columns with height-based breaking', () => {
       // Create 25 notes
-      // With topMargin=34, spacing=44, height=600:
-      // Available: 566px, fits ~12 notes per column
-      // Expected: 3 columns (12 + 12 + 1)
+      // With topMargin=34, spacing=44, bottomPadding=20, height=600:
+      // Available: 546px (600 - 34 - 20), fits 13 notes per column
+      // Expected: 2 columns (13 + 12)
       const notes = Array.from(
         { length: 25 },
         () => new ShakuNote({ symbol: 'ro' }),
@@ -67,24 +67,21 @@ describe('ColumnLayoutCalculator', () => {
         options,
       );
 
-      // Should have 3 columns based on height
-      expect(layout.totalColumns).toBe(3);
-      expect(layout.columns.length).toBe(3);
+      // Should have 2 columns based on height
+      expect(layout.totalColumns).toBe(2);
+      expect(layout.columns.length).toBe(2);
 
-      // Check column note ranges (approximately 12 notes per column)
+      // Check column note ranges (13 notes per column)
       expect(layout.columns[0].noteStartIndex).toBe(0);
-      expect(layout.columns[0].noteEndIndex).toBe(12);
+      expect(layout.columns[0].noteEndIndex).toBe(13);
 
-      expect(layout.columns[1].noteStartIndex).toBe(12);
-      expect(layout.columns[1].noteEndIndex).toBe(24);
-
-      expect(layout.columns[2].noteStartIndex).toBe(24);
-      expect(layout.columns[2].noteEndIndex).toBe(25);
+      expect(layout.columns[1].noteStartIndex).toBe(13);
+      expect(layout.columns[1].noteEndIndex).toBe(25);
     });
 
     it('should position columns right-to-left', () => {
-      // With 15 notes, defaults (topMargin=34, spacing=44, height=600):
-      // Should create 2 columns (12 + 3)
+      // With 15 notes, defaults (topMargin=34, spacing=44, bottomPadding=20, height=600):
+      // Should create 2 columns (13 + 2)
       const notes = Array.from(
         { length: 15 },
         () => new ShakuNote({ symbol: 'ro' }),
@@ -210,10 +207,10 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle notes that exactly fill columns', () => {
-      // With defaults (topMargin=34, spacing=44, height=600), 12 notes fit per column
-      // Create exactly 24 notes (2 full columns)
+      // With defaults (topMargin=34, spacing=44, bottomPadding=20, height=600), 13 notes fit per column
+      // Create exactly 26 notes (2 full columns)
       const notes = Array.from(
-        { length: 24 },
+        { length: 26 },
         () => new ShakuNote({ symbol: 'ro' }),
       );
 
@@ -230,13 +227,13 @@ describe('ColumnLayoutCalculator', () => {
       expect(layout.totalColumns).toBe(2);
       expect(layout.columns.length).toBe(2);
 
-      // Each column should have 12 notes
+      // Each column should have 13 notes
       expect(
         layout.columns[0].noteEndIndex - layout.columns[0].noteStartIndex,
-      ).toBe(12);
+      ).toBe(13);
       expect(
         layout.columns[1].noteEndIndex - layout.columns[1].noteStartIndex,
-      ).toBe(12);
+      ).toBe(13);
     });
 
     it('should handle single note', () => {
@@ -277,7 +274,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should preserve noteIndex in positions', () => {
-      // With defaults, 12 notes per column. 15 notes = 2 columns (12 + 3)
+      // With defaults, 13 notes per column. 15 notes = 2 columns (13 + 2)
       const notes = Array.from(
         { length: 15 },
         () => new ShakuNote({ symbol: 'ro' }),
@@ -292,21 +289,21 @@ describe('ColumnLayoutCalculator', () => {
         options,
       );
 
-      // First column: notes 0-11
+      // First column: notes 0-12
       const col0Positions = layout.columns[0].notePositions;
       expect(col0Positions[0].noteIndex).toBe(0);
-      expect(col0Positions[11].noteIndex).toBe(11);
+      expect(col0Positions[12].noteIndex).toBe(12);
 
-      // Second column: notes 12-14
+      // Second column: notes 13-14
       const col1Positions = layout.columns[1].notePositions;
-      expect(col1Positions[0].noteIndex).toBe(12);
-      expect(col1Positions[2].noteIndex).toBe(14);
+      expect(col1Positions[0].noteIndex).toBe(13);
+      expect(col1Positions[1].noteIndex).toBe(14);
     });
 
     it('should use custom column width and spacing', () => {
-      // With defaults, 12 notes per column. 24 notes = 2 columns
+      // With defaults, 13 notes per column. 26 notes = 2 columns
       const notes = Array.from(
-        { length: 24 },
+        { length: 26 },
         () => new ShakuNote({ symbol: 'ro' }),
       );
 
@@ -406,10 +403,10 @@ describe('ColumnLayoutCalculator', () => {
     it('should calculate column count based on available height', () => {
       const testCases = [
         { noteCount: 1, svgHeight: 600, expectedColumns: 1 },
-        { noteCount: 12, svgHeight: 600, expectedColumns: 1 }, // Exactly fits
-        { noteCount: 13, svgHeight: 600, expectedColumns: 2 }, // Needs 2nd column
-        { noteCount: 24, svgHeight: 600, expectedColumns: 2 }, // Exactly 2 columns
-        { noteCount: 25, svgHeight: 600, expectedColumns: 3 }, // Needs 3rd column
+        { noteCount: 13, svgHeight: 600, expectedColumns: 1 }, // Exactly fits
+        { noteCount: 14, svgHeight: 600, expectedColumns: 2 }, // Needs 2nd column
+        { noteCount: 26, svgHeight: 600, expectedColumns: 2 }, // Exactly 2 columns
+        { noteCount: 27, svgHeight: 600, expectedColumns: 3 }, // Needs 3rd column
         { noteCount: 10, svgHeight: 300, expectedColumns: 2 }, // Shorter height = more columns
         { noteCount: 10, svgHeight: 1000, expectedColumns: 1 }, // Taller height = fewer columns
       ];
@@ -434,7 +431,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle large number of columns', () => {
-      // 100 notes with default height (600px, ~12 notes/column) = ~9 columns
+      // 100 notes with default height (600px, ~13 notes/column) = ~8 columns
       const notes = Array.from(
         { length: 100 },
         () => new ShakuNote({ symbol: 'ro' }),
@@ -452,13 +449,13 @@ describe('ColumnLayoutCalculator', () => {
         options,
       );
 
-      // Should have 9 columns (100/12 ≈ 8.33, rounded up)
-      expect(layout.totalColumns).toBe(9);
-      expect(layout.columns.length).toBe(9);
+      // Should have 8 columns (100/13 ≈ 7.69, rounded up)
+      expect(layout.totalColumns).toBe(8);
+      expect(layout.columns.length).toBe(8);
 
-      // Last column should have remaining notes (100 - 8*12 = 4)
-      const lastColumn = layout.columns[8];
-      expect(lastColumn.noteEndIndex - lastColumn.noteStartIndex).toBe(4);
+      // Last column should have remaining notes (100 - 7*13 = 9)
+      const lastColumn = layout.columns[7];
+      expect(lastColumn.noteEndIndex - lastColumn.noteStartIndex).toBe(9);
     });
   });
 });
