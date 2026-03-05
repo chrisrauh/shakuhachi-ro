@@ -32,10 +32,10 @@ export class ConfirmDialog {
       </div>
       <div class="confirm-dialog-footer">
         <button class="btn btn-secondary confirm-dialog-cancel">
-          ${this.escapeHtml(options.cancelText || 'Cancel')}
+          <span class="btn-text">${this.escapeHtml(options.cancelText || 'Cancel')}</span>
         </button>
         <button class="btn btn-primary confirm-dialog-confirm">
-          ${this.escapeHtml(options.confirmText || 'Confirm')}
+          <span class="btn-text">${this.escapeHtml(options.confirmText || 'Confirm')}</span>
         </button>
       </div>
     `;
