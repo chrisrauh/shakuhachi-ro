@@ -13,11 +13,102 @@
 
 **Area:** `[UI]` `[Backend]` `[Both]` `[Content]` `[Research]`
 
+**Section:** Tags like `[Alpha]`, `[Visual-Testing]`, `[Quality-FailFast]`, `[Content]`, etc. indicate the original organizational section
+
 **Autonomy:** `[A:High]` = Can work independently | `[A:Medium]` = May need guidance | `[A:Low]` = Requires collaboration
 
-## Alpha Release alpha.1
+---
 
-- [ ] [UI] [A:Medium] Investigate letter spacing for font aesthetics and legibility.
+## Prioritized Backlog (Sorted by User Impact)
+
+### Tier 1: Critical User-Facing Issues (Fix Now)
+
+- [ ] [Both] [A:High] [Quality-FailFast] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated]
+  - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
+
+- [ ] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails
+  - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
+
+- [ ] [UI] [A:Medium] [Alpha] Investigate button text vertical alignment
+  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS [Claude validated - components.css:22-24]
+  - [ ] Properties not taking effect (button labels appear ~1px lower than ideal)
+  - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
+  - Test page for visual verification: http://localhost:3003/test/buttons
+
+- [ ] [UI] [A:Medium] [Alpha] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
+  - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
+    - Layout.astro:284-289 (create button)
+    - ScoreDetailClient.ts:262-268 (fork button)
+    - ScoreDetailClient.ts:208-212 (delete button)
+  - Create reusable spinner utility or component
+  - Standardize spinner size, animation, and appearance
+  - Consider creating `src/utils/loading-spinner.ts` with `showLoadingSpinner(button, text?)` helper
+  - Apply DRY principle to reduce code duplication
+
+- [ ] [UI] [A:Medium] [Alpha] Notation format help in editor
+  - Examples of valid notation
+  - Links to documentation
+  - Format validation and helpful error messages
+
+- [ ] [Backend] [A:Medium] [Quality-Explicit] Slug utility: handle Unicode characters (Japanese score titles)
+  - `src/utils/slug.ts:16` — `replace(/[^\w\s-]/g, '')` strips all non-ASCII characters. A score titled "赤とんぼ" produces an empty slug; "Ranjo 大師" loses "大師" and becomes just "ranjo". For a shakuhachi app where Japanese titles are common, this silently produces ambiguous or empty slugs. Either transliterate (e.g., use a library like `slugify` with Unicode support) or preserve Unicode word characters in the regex.
+
+### Tier 2: Stability & Quality (Prevent Future Issues)
+
+- [ ] [UI] [A:High] [Visual-Testing] Update existing visual tests to capture both light and dark mode
+  - [ ] Browse page - light & dark mode screenshots
+  - [ ] Editor page - light & dark mode screenshots
+  - [ ] Score detail page - light & dark mode screenshots
+  - [ ] Add appropriate wait times for theme transitions
+  - [ ] Ensure score rendering completes before capturing
+
+- [ ] [UI] [A:High] [Visual-Testing] Add visual regression tests for Score page (/score)
+  - [ ] Test score rendering (full page and viewport)
+  - [ ] Test debug mode
+  - [ ] Test different viewport sizes (desktop, tablet, mobile)
+
+- [ ] [UI] [A:High] [Visual-Testing] Update Browse page visual tests to properly test library view
+  - [ ] Test empty state (no scores)
+  - [ ] Test with scores displayed
+  - [ ] Test search/filter interactions
+
+- [ ] [UI] [A:High] [Visual-Testing] Add cross-viewport testing (desktop 1280x720, tablet 768x1024, mobile 375x667)
+
+- [ ] [UI] [A:High] [Visual-Testing] Add visual tests for different auth states (logged in vs logged out)
+
+- [ ] [UI] [A:High] [Quality-Testing] Replace waitForTimeout with waitForSelector in visual regression tests
+  - `tests/visual/visual-regression.spec.ts:34,47,60,73` — All four tests use `page.waitForTimeout(2000)` which is fragile (slow on CI, may pass prematurely on fast machines). Replace with `page.waitForSelector('svg')` or `page.waitForSelector('[data-testid="score-rendered"]')` to wait for actual score rendering completion.
+
+- [ ] [Backend] [A:High] [Quality-FailFast] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
+  - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
+  - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
+
+- [ ] [Backend] [A:High] [Quality-FailFast] forkScore: check error on fork count increment
+  - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
+
+- [ ] [Backend] [A:High] [Quality-FailFast] forkScore: handle slug query error in createScore
+  - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
+
+- [ ] [Backend] [A:High] [Quality-FailFast] ScoreDetailClient.handleFork: preserve error context in catch block
+  - [x] Replaced `alert('Failed to fork score')` with `showNotification()`
+  - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
+
+- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for MusicXMLParser
+  - `src/parser/MusicXMLParser.ts` has 0 tests. The XML-to-ScoreData pipeline is the primary data entry point for the application. Test: valid MusicXML produces correct ScoreData, missing `<pitch>` elements are handled, unknown pitch mappings are skipped with warning, dotted notes get `dotted: true`, rests produce `rest: true`, `parseFromURL` handles HTTP errors.
+
+- [ ] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreEditor validation and save logic
+  - `src/components/ScoreEditor.ts` has 0 tests. The `validateScoreData()` method (lines 120-150) handles JSON and XML parsing with error messages — test valid/invalid inputs for both formats. The `handleSave()` method (lines 238-307) has branching for create vs update, error handling, and localStorage cleanup — test each path.
+
+- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for scores.ts CRUD operations
+  - `src/api/scores.ts` has 0 tests. Test: `createScore` generates unique slug and inserts record, `getScoreBySlug` returns score or null, `updateScore` updates only specified fields, `deleteScore` removes record, `forkScore` creates copy and increments parent fork count, error wrapping returns consistent `{ score: null, error }` shape.
+
+- [ ] [Both] [A:High] [Architecture] Fix potential theme detection bug: MutationObserver watches wrong attribute
+  - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
+  - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
+
+### Tier 3: User Experience Enhancements
+
+- [ ] [UI] [A:Medium] [Alpha] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 1: Experimentation Tool** ✅ COMPLETE [Claude validated]
     - [x] Implemented dev-only control panel for experimentation
     - [x] Range: -0.1em to 0.15em with 0.001em granularity
@@ -44,7 +135,7 @@
     - Should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
-- [ ] [UI] [A:Low] Revisit mobile menu action order
+- [ ] [UI] [A:Low] [Alpha] Revisit mobile menu action order
   - Current order: Library, Create score, About, [divider], Auth items, [divider], Toggle theme
   - Consider grouping by action type (navigation vs account vs settings)
   - Evaluate whether auth actions should be higher priority (top of menu)
@@ -52,310 +143,41 @@
   - Test with users to determine most intuitive ordering
   - Current implementation works but may not be optimal for common workflows
 
-- [ ] [UI] [A:Low] Revisit auto-save indicator placement and design
+- [ ] [UI] [A:Low] [Alpha] Revisit auto-save indicator placement and design
   - Current implementation: "Saved X ago" appears below description field
   - Consider alternative placements: floating badge, header area, inline with save button
   - Evaluate visual hierarchy and prominence
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [ ] [Backend] [A:Medium] Consider slug update behavior when title changes
+- [ ] [Backend] [A:Medium] [Alpha] Consider slug update behavior when title changes
   - Currently: Slug is set on creation and never changes, even if title is updated
   - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
   - **Current behavior may be intentional** for URL stability (avoid breaking bookmarks/links)
   - **Document decision**: If intentional, add comment explaining why slug doesn't update
   - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
-- [ ] [UI] [A:Medium] Investigate button text vertical alignment
-  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS [Claude validated - components.css:22-24]
-  - [ ] Properties not taking effect (button labels appear ~1px lower than ideal)
-  - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
-  - Test page for visual verification: http://localhost:3003/test/buttons
-
-- [ ] [Research] [A:Low] Investigate web component framweworks
-
-- [ ] [UI] [A:Medium] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
-  - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
-    - Layout.astro:284-289 (create button)
-    - ScoreDetailClient.ts:262-268 (fork button)
-    - ScoreDetailClient.ts:208-212 (delete button)
-  - Create reusable spinner utility or component
-  - Standardize spinner size, animation, and appearance
-  - Consider creating `src/utils/loading-spinner.ts` with `showLoadingSpinner(button, text?)` helper
-  - Apply DRY principle to reduce code duplication
-
-- [ ] [UI] [A:Medium] Notation format help in editor
-  - Examples of valid notation
-  - Links to documentation
-  - Format validation and helpful error messages
-
-## Future Enhancements (priority to be determined)
-
-- [ ] [Content] [A:Low] Create a contact email address for the site
-  - Add it to the Contributing section of the About page
-  - Currently pointing to GitHub discussions and Mastodon DMs as interim contact
-
-### API & Architecture Improvements
-
-**Reference**: See [docs/API-IMPROVEMENTS.MD](./docs/API-IMPROVEMENTS.MD) for detailed rationale and implementation examples.
-
-- [ ] [Backend] [A:High] **Add options validation with warnings**
-  - [ ] Validate `notesPerColumn >= 1`
-  - [ ] Validate `columnSpacing >= 0`
-  - [ ] Validate font sizes in reasonable range (1-200)
-  - [ ] Log warnings for invalid values, use defaults
-  - **Rationale**: Prevent silent failures and broken rendering states
-
-- [ ] [Backend] [A:High] **Add typed error classes**
-  - [ ] Create `RendererError` base class
-  - [ ] Add `ParseError` for MusicXML parsing failures
-  - [ ] Add `NetworkError` for fetch failures
-  - [ ] Add `ValidationError` for invalid options
-  - **Rationale**: Better error handling and debugging in user applications
-
-#### High Priority (Breaking - Plan for v2.0)
-
-- [ ] [Backend] [A:Medium] **Clean up public API surface**
-  - [ ] Audit all exports in `src/index.ts` (currently 55+ exports)
-  - [ ] Keep only high-level API: `ScoreRenderer`, `renderScoreFromURL`, `renderScore`, `RenderOptions`
-  - [ ] Move advanced APIs to separate import path: `shakuhachi-ro/advanced`
-  - [ ] Remove internal exports: `TestModifier`, `ScoreParser`, kinko-symbols utilities
-  - [ ] Remove experimental exports: `Formatter`, `VerticalSystem` (not used by main API)
-  - **Rationale**: Clearer API boundaries, better tree-shaking, signals stability
-
-- [ ] [Backend] [A:High] **Fix async API consistency**
-  - [ ] Make `renderFromScoreData()` synchronous (no async work happening)
-  - [ ] Keep `renderFromURL()` async (actually fetches data)
-  - [ ] Add deprecation warning for old async signature
-  - [ ] Update all call sites
-  - **Rationale**: Better performance, more predictable API
-
-- [ ] [Backend] [A:High] **Add fluent API pattern**
-  - [ ] Return `this` from `setOptions()`
-  - [ ] Return `this` from `resize()`
-  - [ ] Return `this` from `clear()`
-  - [ ] Enable method chaining: `renderer.setOptions(...).resize(...).refresh()`
-  - **Rationale**: Better ergonomics, matches VexFlow pattern
-
-#### Medium Priority (Breaking - Plan for v2.0)
-
-- [ ] [Backend] [A:High] **Replace getter methods with property getters**
-  - [ ] Replace `getOptions()` with `get options()`
-  - [ ] Replace `getNotes()` with `get notes()`
-  - [ ] Replace `getScoreData()` with `get scoreData()`
-  - [ ] Update documentation with new syntax
-  - **Rationale**: More idiomatic JavaScript, better DX
-
-- [ ] [Backend] [A:High] **Improve naming consistency**
-  - [ ] Rename `ColumnLayoutCalculator` → `LayoutCalculator` (simpler)
-  - [ ] Rename `ModifierConfigurator` → `ModifierManager` (more conventional)
-  - [ ] Rename `mergeWithDefaults()` → `mergeOptions()` (more descriptive)
-  - **Rationale**: Consistent naming patterns across codebase
-
-#### Low Priority (Nice to Have)
-
-- [ ] [Backend] [A:Medium] **Add event system for lifecycle hooks**
-  - [ ] Design event types: `render:start`, `render:complete`, `render:error`, `options:change`, `resize`
-  - [ ] Implement `on(listener)` method
-  - [ ] Emit events during rendering lifecycle
-  - [ ] Add documentation and examples
-  - **Rationale**: Enables performance monitoring, loading states, error handling in frameworks
-
-- [ ] [Backend] [A:Medium] **Flexible constructor overloads**
-  - [ ] Allow `new ScoreRenderer(options)` without container
-  - [ ] Add `attachTo(container)` method for deferred attachment
-  - [ ] Support rendering before container is available
-  - **Rationale**: Better framework integration (React refs, Vue $refs)
-
-- [ ] [Backend] [A:Medium] **Multi-container support**
-  - [ ] Allow `attachTo()` multiple containers
-  - [ ] Add `detachFrom(container)` method
-  - [ ] Render same score to multiple places
-  - **Rationale**: Reuse renderer across components
-
-- [ ] [Backend] [A:High] **Subpath exports for better tree-shaking**
-  - [ ] Add `package.json` exports map
-  - [ ] Create `shakuhachi-ro/renderer`, `shakuhachi-ro/modifiers`, `shakuhachi-ro/utils`
-  - [ ] Update build configuration
-  - **Rationale**: Better tree-shaking, clearer API boundaries
-
-#### Migration Strategy
-
-- [ ] [Backend] [A:Medium] **Prepare v2.0 release**
-  - [ ] Create migration guide document
-  - [ ] Add deprecation warnings to v1.x for breaking changes
-  - [ ] Maintain v1.x branch for 6-12 months after v2.0 release
-  - [ ] Document all breaking changes with before/after examples
-  - [ ] Provide automated migration tooling (codemod) if possible
-
-### Visual Regression Testing
-
-- [ ] [UI] [A:High] Update existing visual tests to capture both light and dark mode
-  - [ ] Browse page - light & dark mode screenshots
-  - [ ] Editor page - light & dark mode screenshots
-  - [ ] Score detail page - light & dark mode screenshots
-  - [ ] Add appropriate wait times for theme transitions
-  - [ ] Ensure score rendering completes before capturing
-- [x] [UI] [A:High] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
-  - [x] Determine authentication approach for visual tests (use test credentials from .env)
-  - [x] Test external preview mode (side-by-side desktop layout)
-  - [x] Test with all three data formats (JSON, MusicXML, ABC)
-  - [x] Test light and dark themes
-  - [x] Test desktop viewport (1280x720)
-  - [x] Test empty notation (minimal score data)
-  - [x] Test mobile viewport (375x667)
-  - [x] Test mobile toggle between editor and preview panels
-- [ ] [UI] [A:High] Add visual regression tests for Score page (/score)
-  - [ ] Test score rendering (full page and viewport)
-  - [ ] Test debug mode
-  - [ ] Test different viewport sizes (desktop, tablet, mobile)
-- [ ] [UI] [A:High] Update Browse page visual tests to properly test library view
-  - [ ] Test empty state (no scores)
-  - [ ] Test with scores displayed
-  - [ ] Test search/filter interactions
-- [ ] [UI] [A:High] Add cross-viewport testing (desktop 1280x720, tablet 768x1024, mobile 375x667)
-- [ ] [UI] [A:High] Add visual tests for different auth states (logged in vs logged out)
-
-### Phase 8: Navigation & UI Polish
-
-- [ ] [UI] [A:High] Test geometricPrecision on shakuhachi SVG notes
-- [ ] [UI] [A:High] Create site header component (logo, navigation)
-- [ ] [UI] [A:High] Add navigation links: Home | Create Score | My Scores | Profile
-- [ ] [UI] [A:High] Add auth UI: Login/Signup or Username/Logout
-- [ ] [UI] [A:High] Create footer with attribution
-- [ ] [UI] [A:High] Add consistent styling (CSS framework or custom)
-- [ ] [UI] [A:High] Implement responsive design (mobile, tablet, desktop)
-- [ ] [UI] [A:High] Add loading spinners and error states
-- [ ] [UI] [A:High] Polish form validation and error messages
-- [ ] [UI] [A:High] Test across browsers (Chrome, Firefox, Safari)
-
-### Code Quality — Engineering Principles
-
-Tasks identified by auditing `src/` against the engineering principles in CLAUDE.md.
-
-#### Fail Fast, Fail Loud
-
-- [ ] [Backend] [A:High] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
-  - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
-  - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
-
-- [ ] [Backend] [A:High] ScoreRenderer.renderDebugLabel(): replace silent null check with assertion
-  - `src/renderer/ScoreRenderer.ts:154` — `if (!this.renderer) return;` silently skips rendering. After construction, `this.renderer` should always exist when `renderDebugLabel` is called (it's only called inside `renderNotes` which creates the renderer). Replace with a dev assertion or remove the guard since the invariant is guaranteed by the calling code.
-
-- [ ] [Both] [A:High] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated]
-  - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
-
-- [ ] [UI] [A:High] ScoreEditor: notify user when autosave restore fails
-  - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
-
-- [ ] [Backend] [A:High] forkScore: check error on fork count increment
-  - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
-
-- [ ] [Backend] [A:High] forkScore: handle slug query error in createScore
-  - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
-
-- [ ] [Backend] [A:High] ScoreDetailClient.handleFork: preserve error context in catch block
-  - [x] Replaced `alert('Failed to fork score')` with `showNotification()`
-  - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
-
-- [ ] [Backend] [A:High] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
-  - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
-
-#### Single Responsibility
-
-- [ ] [UI] [A:High] Extract ScoreEditor inline CSS into a stylesheet [Claude validated]
-  - `src/components/ScoreEditor.ts:789+` — The `addStyles()` method at line 789 injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
-
-- [ ] [UI] [A:High] Extract ScoreLibrary inline CSS into a stylesheet
-  - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
-
-- [ ] [Backend] [A:High] Extract score data validation out of ScoreEditor into a reusable module
-  - `src/components/ScoreEditor.ts:120-150` — `validateScoreData()` handles JSON parsing, XML parsing via DOMParser, and error message formatting. This validation logic is useful beyond the editor (e.g., API-side validation, import flows). Extract to `src/utils/score-validation.ts` with a function like `validateScoreInput(data: string, format: ScoreDataFormat): { valid: boolean; error?: string }`.
-
-- [ ] [Backend] [A:High] Extract auto-save logic out of ScoreEditor
-  - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
-
-#### Separation of Concerns
-
-- [ ] [Backend] [A:High] Extract auth subscription boilerplate into a shared page initializer
-  - `src/pages/index.astro:26-35`, `src/pages/editor.astro:21-30`, `src/pages/score/[slug].astro:90-99` — All three pages have an identical block: create `AuthWidget`, call `authState.subscribe()`, toggle `setUser()`/`clearUser()`. Extract to a function like `initPageAuth(widgetId: string)` in `src/utils/page-init.ts` and call it from each page.
-
-- [ ] [Both] [A:High] Separate auth check from DOM mutation in ScoreDetailClient.handleEditButtonVisibility
-  - `src/components/ScoreDetailClient.ts:49-57` — One method queries auth state, finds a DOM element, and sets inline styles. Split into: (a) a pure check `isOwner(): boolean` and (b) a DOM updater that uses CSS classes (`editBtn.classList.add('visible')`) instead of inline styles. This makes the authorization logic testable without a DOM.
-
-- [ ] [Backend] [A:High] Move MusicXML parsing out of ScoreDetailClient
-  - `src/components/ScoreDetailClient.ts:79-84` — The UI component directly imports `MusicXMLParser` and calls `MusicXMLParser.parse()` to convert stored data before rendering. This parsing concern should live in a shared utility (e.g., `parseScoreByFormat(data, format)`) so that every component that renders a score doesn't need to know about format-specific parsing.
-
-- [ ] [UI] [A:Medium] Standardize error UX across components
+- [ ] [UI] [A:Medium] [Quality-Separation] Standardize error UX across components
   - [x] `ScoreEditor` no longer uses `alert()` for errors — uses `showNotification()`
   - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
 
-#### Explicit Over Implicit
+- [ ] [Content] [A:Low] [Future-Enhancements] Create a contact email address for the site
+  - Add it to the Contributing section of the About page
+  - Currently pointing to GitHub discussions and Mastodon DMs as interim contact
 
-- [ ] [Backend] [A:Medium] Slug utility: handle Unicode characters (Japanese score titles)
-  - `src/utils/slug.ts:16` — `replace(/[^\w\s-]/g, '')` strips all non-ASCII characters. A score titled "赤とんぼ" produces an empty slug; "Ranjo 大師" loses "大師" and becomes just "ranjo". For a shakuhachi app where Japanese titles are common, this silently produces ambiguous or empty slugs. Either transliterate (e.g., use a library like `slugify` with Unicode support) or preserve Unicode word characters in the regex.
+### Tier 4: Code Quality & Maintainability
 
-- [ ] [Backend] [A:High] Replace hardcoded fallback viewport 800×600 with explicit error or documented default
-  - `src/renderer/ScoreRenderer.ts:207-208` — `width: rect.width || 800, height: rect.height || 600` silently substitutes default dimensions when the container has zero size (common when container is hidden or not yet in the DOM). Either throw an error ("Container has zero dimensions — ensure it is visible before rendering") or define a named constant `DEFAULT_VIEWPORT = { width: 800, height: 600 }` so the fallback is discoverable.
+- [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreEditor inline CSS into a stylesheet [Claude validated]
+  - `src/components/ScoreEditor.ts:789+` — The `addStyles()` method at line 789 injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
 
-- [ ] [Backend] [A:High] Document or name the MusicXMLParser duration mapping thresholds
-  - `src/parser/MusicXMLParser.ts:80-89` — Duration mapping uses `>= 4` → whole, `>= 2` → half, else quarter. The thresholds are undocumented and lossy (a MusicXML duration of 3 maps to half note, but 3 divisions typically means dotted quarter). Add a comment block explaining the mapping decisions and known limitations, or extract to a named function `mapMusicXMLDuration(rawDuration: number): number`.
+- [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
+  - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
 
-- [ ] [Backend] [A:High] Name magic numbers in VerticalSystem separator drawing
-  - `src/renderer/VerticalSystem.ts:160-164` — `this.y - 20`, `this.y + this.columnHeight + 20`, `'#ccc'`, `1` are unexplained. Define named constants like `SEPARATOR_EXTENSION = 20`, `SEPARATOR_COLOR = '#ccc'`, `SEPARATOR_WIDTH = 1`, or better yet, derive from `RenderOptions`.
-
-- [ ] [Backend] [A:High] Name the auto-save interval constant in ScoreEditor
-  - `src/components/ScoreEditor.ts:105-107` — `window.setInterval(() => ..., 30000)` uses a bare number. Define `const AUTO_SAVE_INTERVAL_MS = 30_000;` at the top of the file or in a constants module.
-
-- [ ] [Backend] [A:High] Name magic number for rest vertical centering in ShakuNote
-  - `src/notes/ShakuNote.ts:144` — `this.y - this.fontSize * 0.4` uses an unexplained `0.4` multiplier to position the rest circle relative to the note baseline. Extract to a named constant like `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` with a comment explaining that Japanese characters are typically centered around 40% above the baseline.
-
-- [ ] [Backend] [A:High] Name magic number for duration line baseline ratio
-  - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
-
-- [ ] [Backend] [A:High] Extract hardcoded editor URL into a route constant
-  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\``in a shared`src/constants/routes.ts` module.
-
-#### Type Safety
-
-- [ ] [Backend] [A:Medium] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
-  - `src/types/ScoreData.ts:45-52` — Three optional booleans (`meri`, `chu_meri`, `dai_meri`) allow invalid states: all three can be true simultaneously, which has no musical meaning. Replace with a single field `meriType?: 'meri' | 'chu_meri' | 'dai_meri'` that makes illegal states unrepresentable. This requires updating `ScoreParser`, `MusicXMLParser`, `KINKO_PITCH_MAP`, and all tests that reference these fields. Also fixes the naming inconsistency: `chu_meri` uses snake_case while the rest of the interface uses camelCase.
-
-- [ ] [Backend] [A:Medium] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
-  - `src/api/scores.ts:15,27,36` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
-
-- [ ] [Backend] [A:High] Fix handleMetadataChange double `as any` cast in ScoreEditor
-  - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
-
-- [ ] [Backend] [A:High] Remove `undefined as any` hack from DEFAULT_RENDER_OPTIONS
-  - `src/renderer/RenderOptions.ts:256-257` — `width: undefined as any, height: undefined as any` is used to make these fields exist in the defaults object while keeping them "optional". Instead, separate the type: define `ViewportOptions = { width?: number; height?: number }` and merge it separately, avoiding the `any` cast that breaks `Required<RenderOptions>` semantics.
-
-#### Loose Coupling
-
-- [ ] [Both] [A:High] Replace MutationObserver theme detection with a custom event [Claude validated]
+- [ ] [Both] [A:High] [Quality-Coupling] Replace MutationObserver theme detection with a custom event [Claude validated]
   - `src/components/ScoreDetailClient.ts:148` and `src/components/ScoreEditor.ts:66` — Both components use `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then re-render. This is overcomplicated, duplicated, and couples components to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
 
-- [ ] [Backend] [A:Medium] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
-  - `src/web-component/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` at lines 190, 307 when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
-
-- [ ] [Backend] [A:High] Move MusicXMLParser out of ScoreRenderer
-  - `src/renderer/ScoreRenderer.ts` imports `MusicXMLParser` for the `renderFromURL()` method. The renderer's job is to render `ScoreData`, not to fetch and parse XML files. Move `renderFromURL()` to the convenience functions module (`src/renderer/convenience.ts`) where it already lives as `renderScoreFromURL()`. This makes `ScoreRenderer` depend only on `ScoreData`, not on parsing.
-
-#### Abstraction with Intent
-
-- [ ] [Backend] [A:High] Remove TestModifier from public API exports [Claude validated]
-  - `src/index.ts:50` — `TestModifier` is a testing utility, not a library feature. Exporting it as part of the public API makes it contractual — consumers may depend on it, preventing removal. Remove the export from `index.ts`. Test files can import directly from the source path.
-
-- [ ] [Backend] [A:Medium] Evaluate whether Formatter and VerticalSystem should be public API [Claude validated]
-  - `src/index.ts:31-34` — `Formatter` and `VerticalSystem` are exported but appear to be alternative/experimental layout components not used by the main `ScoreRenderer` pipeline (which uses `ColumnLayoutCalculator`). If they are internal or experimental, remove from `index.ts` to reduce the public API surface. If they are intentionally public, add JSDoc explaining their purpose and relationship to `ColumnLayoutCalculator`.
-
-- [ ] [Backend] [A:High] Move toJSON/convertToJSON off MusicXMLParser
-  - `src/parser/MusicXMLParser.ts:153-166` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
-
-#### DRY
-
-- [ ] [UI] [A:High] Refactor AuthModal to use ConfirmDialog (DRY violation)
+- [ ] [UI] [A:High] [Quality-DRY] Refactor AuthModal to use ConfirmDialog (DRY violation)
   - `src/components/AuthComponents.ts` and `src/components/ConfirmDialog.ts` have significant duplication
   - Both implement overlay, modal container, escape key handling, click-to-close
   - **Recommended approach**: Extend ConfirmDialog to accept custom body content
@@ -363,80 +185,222 @@ Tasks identified by auditing `src/` against the engineering principles in CLAUDE
   - Shares all overlay/container/button logic
   - Alternative: Create shared BaseDialog component that both extend
 
-- [ ] [UI] [A:High] Deduplicate empty-state grid template in ScoreLibrary
+- [ ] [UI] [A:High] [Quality-DRY] Deduplicate empty-state grid template in ScoreLibrary
   - `src/components/ScoreLibrary.ts:114-127` and `157-170` — The "No scores found" HTML with the conditional "Clear Filters" button is duplicated verbatim in `render()` and `renderGrid()`. Extract to a private method `renderEmptyState(): string` called from both places.
 
-- [ ] [UI] [A:High] Deduplicate score card click listener attachment in ScoreLibrary
+- [ ] [UI] [A:High] [Quality-DRY] Deduplicate score card click listener attachment in ScoreLibrary
   - `src/components/ScoreLibrary.ts:179-187` and `attachEventListeners()` — Score card click listeners are attached in two separate methods (after full render and after grid-only partial update). Extract to a single `attachCardListeners(container: Element)` method called from both paths.
 
-- [ ] [Backend] [A:High] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
+- [ ] [Backend] [A:High] [Quality-SingleResp] Extract score data validation out of ScoreEditor into a reusable module
+  - `src/components/ScoreEditor.ts:120-150` — `validateScoreData()` handles JSON parsing, XML parsing via DOMParser, and error message formatting. This validation logic is useful beyond the editor (e.g., API-side validation, import flows). Extract to `src/utils/score-validation.ts` with a function like `validateScoreInput(data: string, format: ScoreDataFormat): { valid: boolean; error?: string }`.
+
+- [ ] [Backend] [A:High] [Quality-SingleResp] Extract auto-save logic out of ScoreEditor
+  - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
+
+- [ ] [Backend] [A:High] [Quality-Separation] Extract auth subscription boilerplate into a shared page initializer
+  - `src/pages/index.astro:26-35`, `src/pages/editor.astro:21-30`, `src/pages/score/[slug].astro:90-99` — All three pages have an identical block: create `AuthWidget`, call `authState.subscribe()`, toggle `setUser()`/`clearUser()`. Extract to a function like `initPageAuth(widgetId: string)` in `src/utils/page-init.ts` and call it from each page.
+
+- [ ] [Both] [A:High] [Quality-Separation] Separate auth check from DOM mutation in ScoreDetailClient.handleEditButtonVisibility
+  - `src/components/ScoreDetailClient.ts:49-57` — One method queries auth state, finds a DOM element, and sets inline styles. Split into: (a) a pure check `isOwner(): boolean` and (b) a DOM updater that uses CSS classes (`editBtn.classList.add('visible')`) instead of inline styles. This makes the authorization logic testable without a DOM.
+
+- [ ] [Backend] [A:High] [Quality-Separation] Move MusicXML parsing out of ScoreDetailClient
+  - `src/components/ScoreDetailClient.ts:79-84` — The UI component directly imports `MusicXMLParser` and calls `MusicXMLParser.parse()` to convert stored data before rendering. This parsing concern should live in a shared utility (e.g., `parseScoreByFormat(data, format)`) so that every component that renders a score doesn't need to know about format-specific parsing.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Replace hardcoded fallback viewport 800×600 with explicit error or documented default
+  - `src/renderer/ScoreRenderer.ts:207-208` — `width: rect.width || 800, height: rect.height || 600` silently substitutes default dimensions when the container has zero size (common when container is hidden or not yet in the DOM). Either throw an error ("Container has zero dimensions — ensure it is visible before rendering") or define a named constant `DEFAULT_VIEWPORT = { width: 800, height: 600 }` so the fallback is discoverable.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Document or name the MusicXMLParser duration mapping thresholds
+  - `src/parser/MusicXMLParser.ts:80-89` — Duration mapping uses `>= 4` → whole, `>= 2` → half, else quarter. The thresholds are undocumented and lossy (a MusicXML duration of 3 maps to half note, but 3 divisions typically means dotted quarter). Add a comment block explaining the mapping decisions and known limitations, or extract to a named function `mapMusicXMLDuration(rawDuration: number): number`.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Name magic numbers in VerticalSystem separator drawing
+  - `src/renderer/VerticalSystem.ts:160-164` — `this.y - 20`, `this.y + this.columnHeight + 20`, `'#ccc'`, `1` are unexplained. Define named constants like `SEPARATOR_EXTENSION = 20`, `SEPARATOR_COLOR = '#ccc'`, `SEPARATOR_WIDTH = 1`, or better yet, derive from `RenderOptions`.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Name the auto-save interval constant in ScoreEditor
+  - `src/components/ScoreEditor.ts:105-107` — `window.setInterval(() => ..., 30000)` uses a bare number. Define `const AUTO_SAVE_INTERVAL_MS = 30_000;` at the top of the file or in a constants module.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Name magic number for rest vertical centering in ShakuNote
+  - `src/notes/ShakuNote.ts:144` — `this.y - this.fontSize * 0.4` uses an unexplained `0.4` multiplier to position the rest circle relative to the note baseline. Extract to a named constant like `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` with a comment explaining that Japanese characters are typically centered around 40% above the baseline.
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Name magic number for duration line baseline ratio
+  - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
+
+- [ ] [Backend] [A:High] [Quality-Explicit] Extract hardcoded editor URL into a route constant
+  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\``in a shared`src/constants/routes.ts` module.
+
+- [ ] [Backend] [A:High] [Quality-TypeSafety] Fix handleMetadataChange double `as any` cast in ScoreEditor
+  - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
+
+- [ ] [Backend] [A:High] [Quality-TypeSafety] Remove `undefined as any` hack from DEFAULT_RENDER_OPTIONS
+  - `src/renderer/RenderOptions.ts:256-257` — `width: undefined as any, height: undefined as any` is used to make these fields exist in the defaults object while keeping them "optional". Instead, separate the type: define `ViewportOptions = { width?: number; height?: number }` and merge it separately, avoiding the `any` cast that breaks `Required<RenderOptions>` semantics.
+
+- [ ] [Backend] [A:High] [Quality-Coupling] Move MusicXMLParser out of ScoreRenderer
+  - `src/renderer/ScoreRenderer.ts` imports `MusicXMLParser` for the `renderFromURL()` method. The renderer's job is to render `ScoreData`, not to fetch and parse XML files. Move `renderFromURL()` to the convenience functions module (`src/renderer/convenience.ts`) where it already lives as `renderScoreFromURL()`. This makes `ScoreRenderer` depend only on `ScoreData`, not on parsing.
+
+- [ ] [Backend] [A:High] [Quality-Abstraction] Remove TestModifier from public API exports [Claude validated]
+  - `src/index.ts:50` — `TestModifier` is a testing utility, not a library feature. Exporting it as part of the public API makes it contractual — consumers may depend on it, preventing removal. Remove the export from `index.ts`. Test files can import directly from the source path.
+
+- [ ] [Backend] [A:High] [Quality-Abstraction] Move toJSON/convertToJSON off MusicXMLParser
+  - `src/parser/MusicXMLParser.ts:153-166` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
+
+- [ ] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
   - `src/components/ScoreDetailClient.ts:7-10` — Defines `interface ScoreData { score: Score; parentScore: Score | null }` which shadows the `ScoreData` type from `src/types/ScoreData.ts`. Rename to `ScorePageData` or `EmbeddedScoreData` to avoid confusion when reading imports.
 
-- [ ] [Backend] [A:High] Extract repeated error wrapping pattern in scores.ts
+- [ ] [Backend] [A:High] [Quality-DRY] Extract repeated error wrapping pattern in scores.ts
   - `src/api/scores.ts` — Six functions (`createScore`, `getUserScores`, `getScoreBySlug`, `updateScore`, `deleteScore`, `forkScore`) all share the same try/catch + `{ score: null, error: ... }` wrapping pattern. Each catch block has identical `error instanceof Error ? error : new Error('Unknown error ...')` logic. Extract a helper like `wrapScoreResult<T>(fn: () => Promise<T>): Promise<ScoreResult<T>>` to eliminate the repetition and ensure consistent error handling across all CRUD operations.
 
-- [ ] [Backend] [A:High] Move curated score slugs to a configuration file [Claude validated]
+- [ ] [Backend] [A:High] [Quality-DRY] Move curated score slugs to a configuration file [Claude validated]
   - `src/api/scores.ts:444-454` — `getCuratedScoreSlugs()` returns a hardcoded array `['akatombo', 'love-story', 'sakura-sakura', 'kojo-no-tsuki', 'kuroda-bushi', 'shika-no-tone', 'tsuru-no-sugomori']`. Adding a new curated score requires editing TypeScript source code and redeploying. Move to a JSON config file (e.g., `src/data/curated-scores.json`) or read from the database, so the score catalog can be updated without code changes.
 
-#### Test Coverage
+- [ ] [Backend] [A:High] [Quality-FailFast] ScoreRenderer.renderDebugLabel(): replace silent null check with assertion
+  - `src/renderer/ScoreRenderer.ts:154` — `if (!this.renderer) return;` silently skips rendering. After construction, `this.renderer` should always exist when `renderDebugLabel` is called (it's only called inside `renderNotes` which creates the renderer). Replace with a dev assertion or remove the guard since the invariant is guaranteed by the calling code.
 
-- [ ] [Backend] [A:High] Add unit tests for MusicXMLParser
-  - `src/parser/MusicXMLParser.ts` has 0 tests. The XML-to-ScoreData pipeline is the primary data entry point for the application. Test: valid MusicXML produces correct ScoreData, missing `<pitch>` elements are handled, unknown pitch mappings are skipped with warning, dotted notes get `dotted: true`, rests produce `rest: true`, `parseFromURL` handles HTTP errors.
+- [ ] [Backend] [A:High] [Quality-FailFast] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
+  - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
 
-- [ ] [Both] [A:High] Add unit tests for ScoreEditor validation and save logic
-  - `src/components/ScoreEditor.ts` has 0 tests. The `validateScoreData()` method (lines 120-150) handles JSON and XML parsing with error messages — test valid/invalid inputs for both formats. The `handleSave()` method (lines 238-307) has branching for create vs update, error handling, and localStorage cleanup — test each path.
-
-- [ ] [Backend] [A:High] Add unit tests for SVGRenderer group management
+- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for SVGRenderer group management
   - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws, multiple groups at same level work.
 
-- [ ] [Backend] [A:High] Add unit tests for modifier rendering logic
+- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for modifier rendering logic
   - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
 
-- [ ] [UI] [A:High] Replace waitForTimeout with waitForSelector in visual regression tests
-  - `tests/visual/visual-regression.spec.ts:34,47,60,73` — All four tests use `page.waitForTimeout(2000)` which is fragile (slow on CI, may pass prematurely on fast machines). Replace with `page.waitForSelector('svg')` or `page.waitForSelector('[data-testid="score-rendered"]')` to wait for actual score rendering completion.
-
-- [ ] [Backend] [A:High] Verify mock was called in convenience.test.ts
+- [ ] [Backend] [A:High] [Quality-Testing] Verify mock was called in convenience.test.ts
   - `src/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
 
-- [ ] [Backend] [A:High] Add unit tests for auth module
+- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for auth module
   - `src/api/auth.ts` and `src/api/authState.ts` have 0 tests. Test: `signUp`/`signIn`/`signOut` call correct Supabase methods and return expected results, `AuthStateManager.subscribe()` fires callback immediately, `isAuthenticated()` reflects current state, `onAuthStateChange` relays Supabase auth events.
 
-- [ ] [Backend] [A:High] Add unit tests for scores.ts CRUD operations
-  - `src/api/scores.ts` has 0 tests. Test: `createScore` generates unique slug and inserts record, `getScoreBySlug` returns score or null, `updateScore` updates only specified fields, `deleteScore` removes record, `forkScore` creates copy and increments parent fork count, error wrapping returns consistent `{ score: null, error }` shape.
-
-- [ ] [Both] [A:High] Add unit tests for ScoreLibrary component logic
+- [ ] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreLibrary component logic
   - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
 
-### Architectural Refactoring
+- [ ] [Backend] [A:Medium] [Quality-TypeSafety] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
+  - `src/types/ScoreData.ts:45-52` — Three optional booleans (`meri`, `chu_meri`, `dai_meri`) allow invalid states: all three can be true simultaneously, which has no musical meaning. Replace with a single field `meriType?: 'meri' | 'chu_meri' | 'dai_meri'` that makes illegal states unrepresentable. This requires updating `ScoreParser`, `MusicXMLParser`, `KINKO_PITCH_MAP`, and all tests that reference these fields. Also fixes the naming inconsistency: `chu_meri` uses snake_case while the rest of the interface uses camelCase.
 
-Structural issues identified by module-level analysis (dependency graph, information flow, change impact simulation). These are about module boundaries and abstractions, not individual lines. **Before starting any of these tasks: validate the finding by reading all affected files, confirm the problem still exists, and create a step-by-step implementation plan before writing any code.**
+- [ ] [Backend] [A:Medium] [Quality-TypeSafety] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
+  - `src/api/scores.ts:15,27,36` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
 
-- [ ] [Backend] [A:Medium] Extract a RenderingBackend interface from SVGRenderer
+- [ ] [Backend] [A:Medium] [Quality-Coupling] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
+  - `src/web-component/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` at lines 190, 307 when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
+
+- [ ] [Backend] [A:Medium] [Quality-Abstraction] Evaluate whether Formatter and VerticalSystem should be public API [Claude validated]
+  - `src/index.ts:31-34` — `Formatter` and `VerticalSystem` are exported but appear to be alternative/experimental layout components not used by the main `ScoreRenderer` pipeline (which uses `ColumnLayoutCalculator`). If they are internal or experimental, remove from `index.ts` to reduce the public API surface. If they are intentionally public, add JSDoc explaining their purpose and relationship to `ColumnLayoutCalculator`.
+
+### Tier 5: Architecture & API Improvements (Library Users)
+
+- [ ] [Backend] [A:High] [API-Improvements] Add options validation with warnings
+  - [ ] Validate `notesPerColumn >= 1`
+  - [ ] Validate `columnSpacing >= 0`
+  - [ ] Validate font sizes in reasonable range (1-200)
+  - [ ] Log warnings for invalid values, use defaults
+  - **Rationale**: Prevent silent failures and broken rendering states
+
+- [ ] [Backend] [A:High] [API-Improvements] Add typed error classes
+  - [ ] Create `RendererError` base class
+  - [ ] Add `ParseError` for MusicXML parsing failures
+  - [ ] Add `NetworkError` for fetch failures
+  - [ ] Add `ValidationError` for invalid options
+  - **Rationale**: Better error handling and debugging in user applications
+
+- [ ] [Backend] [A:Medium] [API-Improvements] Clean up public API surface
+  - [ ] Audit all exports in `src/index.ts` (currently 55+ exports)
+  - [ ] Keep only high-level API: `ScoreRenderer`, `renderScoreFromURL`, `renderScore`, `RenderOptions`
+  - [ ] Move advanced APIs to separate import path: `shakuhachi-ro/advanced`
+  - [ ] Remove internal exports: `TestModifier`, `ScoreParser`, kinko-symbols utilities
+  - [ ] Remove experimental exports: `Formatter`, `VerticalSystem` (not used by main API)
+  - **Rationale**: Clearer API boundaries, better tree-shaking, signals stability
+
+- [ ] [Backend] [A:High] [API-Improvements] Fix async API consistency
+  - [ ] Make `renderFromScoreData()` synchronous (no async work happening)
+  - [ ] Keep `renderFromURL()` async (actually fetches data)
+  - [ ] Add deprecation warning for old async signature
+  - [ ] Update all call sites
+  - **Rationale**: Better performance, more predictable API
+
+- [ ] [Backend] [A:High] [API-Improvements] Add fluent API pattern
+  - [ ] Return `this` from `setOptions()`
+  - [ ] Return `this` from `resize()`
+  - [ ] Return `this` from `clear()`
+  - [ ] Enable method chaining: `renderer.setOptions(...).resize(...).refresh()`
+  - **Rationale**: Better ergonomics, matches VexFlow pattern
+
+- [ ] [Backend] [A:High] [API-Improvements] Replace getter methods with property getters
+  - [ ] Replace `getOptions()` with `get options()`
+  - [ ] Replace `getNotes()` with `get notes()`
+  - [ ] Replace `getScoreData()` with `get scoreData()`
+  - [ ] Update documentation with new syntax
+  - **Rationale**: More idiomatic JavaScript, better DX
+
+- [ ] [Backend] [A:High] [API-Improvements] Improve naming consistency
+  - [ ] Rename `ColumnLayoutCalculator` → `LayoutCalculator` (simpler)
+  - [ ] Rename `ModifierConfigurator` → `ModifierManager` (more conventional)
+  - [ ] Rename `mergeWithDefaults()` → `mergeOptions()` (more descriptive)
+  - **Rationale**: Consistent naming patterns across codebase
+
+- [ ] [Backend] [A:High] [API-Improvements] Subpath exports for better tree-shaking
+  - [ ] Add `package.json` exports map
+  - [ ] Create `shakuhachi-ro/renderer`, `shakuhachi-ro/modifiers`, `shakuhachi-ro/utils`
+  - [ ] Update build configuration
+  - **Rationale**: Better tree-shaking, clearer API boundaries
+
+- [ ] [Backend] [A:Medium] [API-Improvements] Add event system for lifecycle hooks
+  - [ ] Design event types: `render:start`, `render:complete`, `render:error`, `options:change`, `resize`
+  - [ ] Implement `on(listener)` method
+  - [ ] Emit events during rendering lifecycle
+  - [ ] Add documentation and examples
+  - **Rationale**: Enables performance monitoring, loading states, error handling in frameworks
+
+- [ ] [Backend] [A:Medium] [API-Improvements] Flexible constructor overloads
+  - [ ] Allow `new ScoreRenderer(options)` without container
+  - [ ] Add `attachTo(container)` method for deferred attachment
+  - [ ] Support rendering before container is available
+  - **Rationale**: Better framework integration (React refs, Vue $refs)
+
+- [ ] [Backend] [A:Medium] [API-Improvements] Multi-container support
+  - [ ] Allow `attachTo()` multiple containers
+  - [ ] Add `detachFrom(container)` method
+  - [ ] Render same score to multiple places
+  - **Rationale**: Reuse renderer across components
+
+- [ ] [Backend] [A:Medium] [API-Improvements] Prepare v2.0 release
+  - [ ] Create migration guide document
+  - [ ] Add deprecation warnings to v1.x for breaking changes
+  - [ ] Maintain v1.x branch for 6-12 months after v2.0 release
+  - [ ] Document all breaking changes with before/after examples
+  - [ ] Provide automated migration tooling (codemod) if possible
+
+- [ ] [Backend] [A:Medium] [Architecture] Extract a RenderingBackend interface from SVGRenderer
   - `SVGRenderer` is imported as a concrete type in 13 files (all 6 modifiers, ShakuNote, ScoreRenderer, VerticalSystem, ModifierConfigurator, and more). The draw primitives (`drawText`, `drawCircle`, `drawLine`, `drawPath`, `drawRect`, `openGroup`, `closeGroup`, `resize`, `clear`) are already abstract in practice — only the type references are concrete. Define a `RenderingBackend` interface with these methods, have `SVGRenderer` implement it, and change all consumers to depend on the interface. This is a mechanical type-level change with zero runtime cost. It unlocks Canvas/WebGL backends and enables mock renderers for unit testing modifiers and notes without a DOM.
   - **Validate first**: Read every file that imports `SVGRenderer`, confirm none use SVG-specific APIs beyond the draw primitives (exception: `VerticalSystem` uses `setAttribute('transform', ...)` on SVG group elements — plan how to abstract this). Map every method signature that needs to change.
 
-- [ ] [Backend] [A:Medium] Introduce a Parser interface and registry
+- [ ] [Backend] [A:Medium] [Architecture] Introduce a Parser interface and registry
   - There is no formal `Parser` interface. `MusicXMLParser` is a concrete static class imported by name in `ScoreDetailClient` (line 83), `ScoreRenderer` (line 64), and `convenience.ts`. Format dispatch (`if format === 'musicxml' ... else if format === 'json'`) is scattered across 3 components. Define a `Parser` interface (`parse(content: string): ScoreData`), create a `ParserRegistry` keyed by `ScoreDataFormat`, and replace scattered conditionals with `ParserRegistry.get(format).parse(content)`. Adding a new format (e.g., ABC notation) then becomes one new file + one registry entry instead of touching 6 files.
   - **Validate first**: Read all files that reference `MusicXMLParser` or check `data_format`. Map every call site. Confirm that `ScoreParser` (which converts `ScoreData` → `ShakuNote[]`) is a separate concern and should NOT be part of this interface. Verify `ScoreDataFormat` type location (`api/scores.ts:5`) and whether it belongs in `types/`.
 
-- [ ] [Both] [A:Low] Decompose ScoreEditor into model + view
+- [ ] [Both] [A:Low] [Architecture] Decompose ScoreEditor into model + view
   - `ScoreEditor.ts` is 771 lines mixing 8+ concerns: state management (instance variables), DOM generation (`innerHTML` templates), event handling, API calls, validation, auto-save, theme detection, and CSS injection. This monolith is the primary bottleneck for adding versioning, collaboration, and i18n — all three require invasive surgery on this single file. Separate into: (a) an `EditorState` model class that holds data and emits change events, (b) an `EditorView` that subscribes to state changes and renders DOM, (c) extracted concerns (CSS → stylesheet, validation → utility, auto-save → utility, already tracked as separate tasks above). The same pattern applies to `ScoreLibrary.ts` (543 lines) and `ScoreDetailClient.ts` (175 lines) at smaller scale.
   - **Validate first**: Read the full `ScoreEditor.ts`. Map every instance variable and method. Identify which methods are pure state mutations vs DOM manipulation vs API calls. Sketch the `EditorState` interface before writing any code. Consider whether a lightweight event emitter is sufficient or if a more structured pattern is needed.
 
-- [ ] [Both] [A:High] Fix potential theme detection bug: MutationObserver watches wrong attribute
-  - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
-  - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
+### Tier 6: Polish & Nice-to-Have Features
 
-## Content Acquisition
+- [ ] [UI] [A:High] [Polish] Test geometricPrecision on shakuhachi SVG notes
+- [ ] [UI] [A:High] [Polish] Create site header component (logo, navigation)
+- [ ] [UI] [A:High] [Polish] Add navigation links: Home | Create Score | My Scores | Profile
+- [ ] [UI] [A:High] [Polish] Add auth UI: Login/Signup or Username/Logout
+- [ ] [UI] [A:High] [Polish] Create footer with attribution
+- [ ] [UI] [A:High] [Polish] Add consistent styling (CSS framework or custom)
+- [ ] [UI] [A:High] [Polish] Implement responsive design (mobile, tablet, desktop)
+- [ ] [UI] [A:High] [Polish] Add loading spinners and error states
+- [ ] [UI] [A:High] [Polish] Polish form validation and error messages
+- [ ] [UI] [A:High] [Polish] Test across browsers (Chrome, Firefox, Safari)
 
-- [ ] [Research] [A:Medium] Research and identify shakuhachi score sources
-  - Survey publicly available shakuhachi score repositories (websites, archives, blogs, academic sources)
-  - Identify sources with digital scores in machine-readable formats (MusicXML, ABC, MIDI, PDF)
-  - Note each source's language, format, scope (honkyoku, minyo, Western adaptations, etc.)
-  - Assess volume and quality of available scores per source
-  - Document findings to guide prioritization of scraping/import tasks
+- [ ] [Research] [A:Low] [Alpha] Investigate web component frameworks
 
-- [ ] [Both] [A:High] Handle score license requirements
+- [ ] [Backend] [A:High] [Renderer-Future] Add JSDoc comments to public APIs
+- [ ] [Backend] [A:Medium] [Renderer-Future] Write usage guide in reference/README.md
+- [ ] [Backend] [A:Medium] [Renderer-Future] Document score data format
+
+### Tier 7: Content & Feature Expansion
+
+- [ ] [Both] [A:High] [Content] Handle score license requirements
   - Audit license types likely encountered: public domain, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, all-rights-reserved
   - Implement license metadata field on scores (store SPDX identifier or license name + URL)
   - Display license badge/notice on score detail page (required by CC licenses)
@@ -446,21 +410,7 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - Ensure user-created scores can also declare a license
   - Block or warn on import of all-rights-reserved content without explicit permission
 
-- [ ] [Content] [A:Medium] Scrape scores from https://imslp.org/wiki/
-  - Investigate IMSLP's API or data availability for shakuhachi-relevant scores
-  - Determine licensing compatibility (IMSLP uses various Creative Commons and public domain licenses — verify per score)
-  - Build or adapt a scraper to extract score data and metadata
-  - Convert extracted data to the platform's JSON/MusicXML format
-  - Import scores with correct attribution and license metadata
-
-- [ ] [Content] [A:Medium] Scrape scores from https://shin-itchiro.seesaa.net/
-  - Investigate available score data format and structure on the site
-  - Determine licensing/permission before importing any content
-  - Build or adapt a scraper to extract shakuhachi score data
-  - Convert extracted data to the platform's JSON/MusicXML format
-  - Import scores into the platform with correct metadata (title, attribution)
-
-- [ ] [UI] [A:Medium] Add license selector field to score editor
+- [ ] [UI] [A:Medium] [Content] Add license selector field to score editor
   - Add a license dropdown to the score metadata section of the editor
   - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
   - Show a brief description of each license to help users choose appropriately
@@ -468,55 +418,83 @@ Structural issues identified by module-level analysis (dependency graph, informa
   - Default to All Rights Reserved for new scores
   - Display selected license on score detail page
 
-- [ ] [Both] [A:Medium] Revisit attribution modules design and placement
+- [ ] [Both] [A:Medium] [Content] Revisit attribution modules design and placement
   - Review how attribution (composer, source, license) is currently stored and displayed
   - Evaluate whether attribution belongs in score metadata, a separate DB field, or a dedicated module
   - Consider display placement: score detail page, score card in library, score header, footer
   - Ensure design scales to support imported scores (IMSLP, shin-itchiro) with varied attribution requirements
   - Align with any licensing obligations (e.g., CC license notices must be visible)
 
-## Renderer Enhancements (Future)
+- [ ] [Research] [A:Medium] [Content] Research and identify shakuhachi score sources
+  - Survey publicly available shakuhachi score repositories (websites, archives, blogs, academic sources)
+  - Identify sources with digital scores in machine-readable formats (MusicXML, ABC, MIDI, PDF)
+  - Note each source's language, format, scope (honkyoku, minyo, Western adaptations, etc.)
+  - Assess volume and quality of available scores per source
+  - Document findings to guide prioritization of scraping/import tasks
 
-- [ ] [UI] [A:Medium] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
-- [ ] [UI] [A:Medium] Add score selector dropdown
-- [ ] [Backend] [A:Medium] Load different score files dynamically
-- [ ] [Backend] [A:High] Add JSDoc comments to public APIs
-- [ ] [Backend] [A:Medium] Write usage guide in reference/README.md
-- [ ] [Backend] [A:Medium] Document score data format
+- [ ] [Content] [A:Medium] [Content] Scrape scores from https://imslp.org/wiki/
+  - Investigate IMSLP's API or data availability for shakuhachi-relevant scores
+  - Determine licensing compatibility (IMSLP uses various Creative Commons and public domain licenses — verify per score)
+  - Build or adapt a scraper to extract score data and metadata
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores with correct attribution and license metadata
 
-### Additional Modifiers
+- [ ] [Content] [A:Medium] [Content] Scrape scores from https://shin-itchiro.seesaa.net/
+  - Investigate available score data format and structure on the site
+  - Determine licensing/permission before importing any content
+  - Build or adapt a scraper to extract shakuhachi score data
+  - Convert extracted data to the platform's JSON/MusicXML format
+  - Import scores into the platform with correct metadata (title, attribution)
 
-- [ ] [Backend] [A:Medium] YuriModifier (vibrato)
-- [ ] [Backend] [A:Medium] MuraikiModifier (breathy tone)
-- [ ] [Backend] [A:Medium] SuriModifier (sliding)
-- [ ] [Backend] [A:Medium] OriModifier (pitch bend)
-- [ ] [Backend] [A:Medium] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
+- [ ] [UI] [A:Medium] [Renderer-Future] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
+- [ ] [UI] [A:Medium] [Renderer-Future] Add score selector dropdown
+- [ ] [Backend] [A:Medium] [Renderer-Future] Load different score files dynamically
 
-### Performance & Optimization
+- [ ] [Backend] [A:Medium] [Renderer-Modifiers] YuriModifier (vibrato)
+- [ ] [Backend] [A:Medium] [Renderer-Modifiers] MuraikiModifier (breathy tone)
+- [ ] [Backend] [A:Medium] [Renderer-Modifiers] SuriModifier (sliding)
+- [ ] [Backend] [A:Medium] [Renderer-Modifiers] OriModifier (pitch bend)
+- [ ] [Backend] [A:Medium] [Renderer-Modifiers] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
 
-- [ ] [Backend] [A:Medium] Profile rendering performance
-- [ ] [Backend] [A:Medium] Optimize frequent operations
-- [ ] [Backend] [A:Medium] Add caching where appropriate
-- [ ] [Backend] [A:Low] Revisit column breaking with TeX-inspired badness algorithm
+### Tier 8: Performance & Optimization
+
+- [ ] [Backend] [A:Medium] [Performance] Profile rendering performance
+- [ ] [Backend] [A:Medium] [Performance] Optimize frequent operations
+- [ ] [Backend] [A:Medium] [Performance] Add caching where appropriate
+- [ ] [Backend] [A:Low] [Performance] Revisit column breaking with TeX-inspired badness algorithm
   - [ ] Implement badness metric for column height variance
   - [ ] Add demerits for orphans (single notes in columns)
   - [ ] Add penalties for breaking at certain notation points
   - [ ] Implement global optimization across score (Knuth-Plass approach)
 
-### Advanced Features (Post-MVP)
+### Tier 9: Advanced Features (Post-MVP)
 
-- [ ] [UI] [A:Low] Visual score editor (point-and-click note entry)
-- [ ] [Both] [A:Low] OCR tool (scan physical scores to MusicXML/JSON)
-- [ ] [Both] [A:Medium] Collections (curated score groups)
-- [ ] [Both] [A:Medium] Version history (track edits over time)
-- [ ] [Both] [A:Medium] Comments/discussions on scores
-- [ ] [Both] [A:Low] Pull request workflow (suggest changes to others' scores)
-- [ ] [Backend] [A:Medium] Private scores (unlisted or private visibility)
-- [ ] [Both] [A:Medium] Export/download scores as files
-- [ ] [UI] [A:Medium] Print optimization (CSS for clean printouts)
-- [ ] [Both] [A:Medium] Advanced search (filter by tags, difficulty, date ranges)
-- [ ] [Backend] [A:Medium] Multiple score input formats (import from ABC, etc.)
-- [ ] [Backend] [A:Low] MIDI playback mapping
-- [ ] [Backend] [A:Medium] Western staff intermixing
-- [ ] [Backend] [A:Medium] Custom font support for traditional glyphs
-- [ ] [Backend] [A:Medium] Score transposition tool
+- [ ] [Both] [A:Medium] [Advanced] Collections (curated score groups)
+- [ ] [Both] [A:Medium] [Advanced] Version history (track edits over time)
+- [ ] [Both] [A:Medium] [Advanced] Comments/discussions on scores
+- [ ] [Both] [A:Medium] [Advanced] Export/download scores as files
+- [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
+- [ ] [Both] [A:Medium] [Advanced] Advanced search (filter by tags, difficulty, date ranges)
+- [ ] [Backend] [A:Medium] [Advanced] Private scores (unlisted or private visibility)
+- [ ] [Backend] [A:Medium] [Advanced] Multiple score input formats (import from ABC, etc.)
+- [ ] [Backend] [A:Medium] [Advanced] Western staff intermixing
+- [ ] [Backend] [A:Medium] [Advanced] Custom font support for traditional glyphs
+- [ ] [Backend] [A:Medium] [Advanced] Score transposition tool
+- [ ] [UI] [A:Low] [Advanced] Visual score editor (point-and-click note entry)
+- [ ] [Both] [A:Low] [Advanced] OCR tool (scan physical scores to MusicXML/JSON)
+- [ ] [Both] [A:Low] [Advanced] Pull request workflow (suggest changes to others' scores)
+- [ ] [Backend] [A:Low] [Advanced] MIDI playback mapping
+
+---
+
+## Completed Tasks
+
+- [x] [UI] [A:High] [Visual-Testing] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
+  - [x] Determine authentication approach for visual tests (use test credentials from .env)
+  - [x] Test external preview mode (side-by-side desktop layout)
+  - [x] Test with all three data formats (JSON, MusicXML, ABC)
+  - [x] Test light and dark themes
+  - [x] Test desktop viewport (1280x720)
+  - [x] Test empty notation (minimal score data)
+  - [x] Test mobile viewport (375x667)
+  - [x] Test mobile toggle between editor and preview panels
