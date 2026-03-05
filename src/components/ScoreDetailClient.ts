@@ -201,12 +201,12 @@ export class ScoreDetailClient {
   private handleDelete() {
     if (!this.score) return;
 
-    const dialog = new ConfirmDialog();
-    dialog.show({
-      title: 'Delete score',
-      message: `Delete '${this.score.title}'? This cannot be undone.`,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
+    const dialog = STRINGS.DIALOGS.ScoreDetailClient.deleteScore;
+    new ConfirmDialog().show({
+      title: dialog.title,
+      message: dialog.message(this.score.title),
+      confirmText: dialog.confirmText,
+      cancelText: dialog.cancelText,
       onConfirm: () => this.performDelete(),
     });
   }
@@ -258,12 +258,12 @@ export class ScoreDetailClient {
     }
 
     // Show confirmation dialog
-    const dialog = new ConfirmDialog();
-    dialog.show({
-      title: 'Fork score',
-      message: `Fork '${this.score.title}'? This creates your own editable copy.`,
-      confirmText: 'Fork',
-      cancelText: 'Cancel',
+    const dialog = STRINGS.DIALOGS.ScoreDetailClient.forkScore;
+    new ConfirmDialog().show({
+      title: dialog.title,
+      message: dialog.message(this.score.title),
+      confirmText: dialog.confirmText,
+      cancelText: dialog.cancelText,
       onConfirm: () => this.performFork(),
     });
   }
