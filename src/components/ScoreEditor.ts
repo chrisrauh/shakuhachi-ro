@@ -261,7 +261,7 @@ export class ScoreEditor {
         const parseError = doc.querySelector('parsererror');
 
         if (parseError) {
-          this.validationError = 'Invalid MusicXML format';
+          this.validationError = STRINGS.VALIDATION.ScoreEditor.invalidMusicXML;
           return false;
         }
 
@@ -270,7 +270,9 @@ export class ScoreEditor {
       }
     } catch (error) {
       this.validationError =
-        error instanceof Error ? error.message : 'Invalid format';
+        error instanceof Error
+          ? error.message
+          : STRINGS.VALIDATION.ScoreEditor.invalidFormat;
       return false;
     }
   }
@@ -297,11 +299,12 @@ export class ScoreEditor {
         this.dataFormat = format;
       } catch {
         // Conversion failed - ask user what to do
+        const dialog = STRINGS.DIALOGS.ScoreEditor.formatConversionFailed;
         new ConfirmDialog().show({
-          title: 'Format Conversion Failed',
-          message: `Could not convert ${this.dataFormat} to ${format}. Clear content and switch format?`,
-          confirmText: 'Clear and Switch',
-          cancelText: 'Keep Current Format',
+          title: dialog.title,
+          message: dialog.message(this.dataFormat, format),
+          confirmText: dialog.confirmText,
+          cancelText: dialog.cancelText,
           onConfirm: () => {
             this.scoreData = ''; // Clear content
             this.dataFormat = format;
@@ -683,10 +686,9 @@ export class ScoreEditor {
       this.showAutosaveRestoreFailedToast = false;
       // Use setTimeout to ensure toast appears after all rendering is complete
       setTimeout(() => {
-        toast.warning(
-          'Could not restore auto-saved draft. Starting with a blank score.',
-          { duration: 5000 },
-        );
+        toast.warning(STRINGS.WARNINGS.ScoreEditor.autosaveRestoreFailed, {
+          duration: 5000,
+        });
       }, 0);
     }
   }
