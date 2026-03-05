@@ -34,6 +34,7 @@ export class ScoreEditor {
   private debouncedAutoSave: (() => void) | null = null;
   private isSaving = false;
   private lastSuccessfulSaveTime: Date | null = null;
+  private showAutosaveRestoreFailedToast: boolean = false;
 
   constructor(containerId: string, scoreId?: string) {
     const container = document.getElementById(containerId);
@@ -115,6 +116,12 @@ export class ScoreEditor {
         this.metadata = data.metadata || this.metadata;
       } catch (error) {
         console.error('Failed to load autosave:', error);
+
+        // Clear corrupted autosave data to prevent repeated failures
+        localStorage.removeItem('shakuhachi-editor-autosave');
+
+        // Flag to show toast after render completes
+        this.showAutosaveRestoreFailedToast = true;
       }
     }
   }
@@ -662,6 +669,18 @@ export class ScoreEditor {
     this.attachEventListeners();
     this.renderValidation();
     this.updatePreview();
+
+    // Show autosave restore failed toast if needed (after render completes)
+    if (this.showAutosaveRestoreFailedToast) {
+      this.showAutosaveRestoreFailedToast = false;
+      // Use setTimeout to ensure toast appears after all rendering is complete
+      setTimeout(() => {
+        toast.warning(
+          'Could not restore auto-saved draft. Starting with a blank score.',
+          { duration: 5000 },
+        );
+      }, 0);
+    }
   }
 
   private renderMetadataHTML(): string {
