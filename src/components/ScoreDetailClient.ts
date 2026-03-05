@@ -26,16 +26,15 @@ export class ScoreDetailClient {
         // parentScore is rendered server-side, no need to store client-side
       } catch (error) {
         console.error('Failed to parse score data:', error);
+        // this.score remains null, renderScore() will display error UI
       }
+    } else {
+      console.error('Score data element not found in page');
+      // this.score remains null, renderScore() will display error UI
     }
   }
 
   async init() {
-    if (!this.score) {
-      console.error('No score data found');
-      return;
-    }
-
     // Subscribe to auth state changes using onAuthReady
     // Handles Supabase's quirky event ordering automatically
     onAuthReady((user) => {
@@ -46,14 +45,17 @@ export class ScoreDetailClient {
       }
     });
 
-    // Render score visualization
+    // Render score visualization (handles error state if score is null)
     await this.renderScore();
 
-    // Attach event listeners
-    this.attachEventListeners();
+    // Only attach listeners if we have a valid score
+    if (this.score) {
+      // Attach event listeners
+      this.attachEventListeners();
 
-    // Listen for theme changes and re-render score
-    this.setupThemeListener();
+      // Listen for theme changes and re-render score
+      this.setupThemeListener();
+    }
   }
 
   private handleEditButtonVisibility(user: User | null) {
@@ -74,7 +76,21 @@ export class ScoreDetailClient {
 
   private async renderScore() {
     const container = document.getElementById('score-renderer') as HTMLElement;
-    if (!container || !this.score) return;
+    if (!container) return;
+
+    // Handle missing score data
+    if (!this.score) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: var(--color-text-danger);">
+          <h2 style="margin-bottom: 16px;">Score data not found</h2>
+          <p>The score data is empty.</p>
+          <p style="margin-top: 24px;">
+            <a href="/" style="color: var(--color-primary); text-decoration: underline;">Return to library</a>
+          </p>
+        </div>
+      `;
+      return;
+    }
 
     try {
       // Convert score data to ScoreData format based on data_format
