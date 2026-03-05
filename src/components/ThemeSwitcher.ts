@@ -5,6 +5,7 @@
  */
 
 import { createElement, SunMoon } from 'lucide';
+import { STRING_FACTORIES } from '../constants/strings';
 
 export class ThemeSwitcher {
   private container: HTMLElement;
@@ -13,9 +14,7 @@ export class ThemeSwitcher {
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(
-        `ThemeSwitcher: container with id "${containerId}" not found`,
-      );
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
 
