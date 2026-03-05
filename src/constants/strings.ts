@@ -26,10 +26,12 @@ export const STRINGS = {
     ScoreEditor: {
       loadError: (message: string) => `Error loading score: ${message}`,
       loadNotFound: 'Score not found',
-      saveLoginRequired: 'Please log in to save scores',
+      saveLoginRequired: 'Please sign in to save scores',
       saveValidationFailed: 'Please fix validation errors before saving',
       saveError: (message: string) => `Error saving score: ${message}`,
       autoSaveFailed: (message: string) => `Auto-save failed: ${message}`,
+      createScoreFailed: 'Failed to create score. Please try again.',
+      editPermissionDenied: 'You do not have permission to edit this score.',
     },
 
     ScoreDetailClient: {
@@ -47,6 +49,13 @@ export const STRINGS = {
     },
   },
 
+  VALIDATION: {
+    ScoreEditor: {
+      invalidMusicXML: 'Invalid MusicXML format',
+      invalidFormat: 'Invalid format',
+    },
+  },
+
   SUCCESS: {
     ScoreEditor: {
       scoreSaved: (isEditing: boolean) =>
@@ -58,6 +67,34 @@ export const STRINGS = {
     ScoreEditor: {
       autosaveRestoreFailed:
         'Could not restore auto-saved draft. Starting with a blank score.',
+    },
+  },
+
+  DIALOGS: {
+    ScoreEditor: {
+      formatConversionFailed: {
+        title: 'Format Conversion Failed',
+        message: (fromFormat: string, toFormat: string) =>
+          `Could not convert ${fromFormat} to ${toFormat}. Clear content and switch format?`,
+        confirmText: 'Clear and Switch',
+        cancelText: 'Keep Current Format',
+      },
+    },
+
+    ScoreDetailClient: {
+      deleteScore: {
+        title: 'Delete score',
+        message: (title: string) => `Delete '${title}'? This cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+      },
+      forkScore: {
+        title: 'Fork score',
+        message: (title: string) =>
+          `Fork '${title}'? This creates your own editable copy.`,
+        confirmText: 'Fork',
+        cancelText: 'Cancel',
+      },
     },
   },
 } as const;

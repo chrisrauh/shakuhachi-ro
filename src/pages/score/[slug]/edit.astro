@@ -190,6 +190,7 @@ const { score } = scoreResult;
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { onAuthReady } from '../../../api/auth';
     import { toast } from '../../../components/Toast';
+    import { STRINGS } from '../../../constants/strings';
 
     // Client-side auth and permission check
     const checkAuthAndPermissions = (user: any) => {
@@ -206,7 +207,7 @@ const { score } = scoreResult;
 
         if (user.id !== scoreData.score.user_id) {
           // Not owner - redirect to view page
-          toast.error('You do not have permission to edit this score.', { duration: 2000 });
+          toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, { duration: 2000 });
           setTimeout(() => {
             window.location.href = `/score/${scoreData.score.slug}`;
           }, 2000);

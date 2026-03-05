@@ -35,6 +35,9 @@
   - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
   - Test page for visual verification: http://localhost:3003/test/buttons
 
+- [ ] There seems to be extra spacing at the bottom of the shakuhachi score component, between the last note and the end of the component.
+  - Investigate what is happening and whether it is an issue.
+  - If yes, fix.
 - [ ] [UI] [A:Medium] [Alpha] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
   - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
     - Layout.astro:284-289 (create button)
