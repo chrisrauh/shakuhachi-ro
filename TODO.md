@@ -29,11 +29,15 @@
 - [x] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails ✅ PR #TBD
   - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
 
-- [ ] [UI] [A:Medium] [Alpha] Investigate button text vertical alignment
+- [x] [UI] [A:Medium] [Alpha] Investigate button text vertical alignment ✅ Fixed - PR #TBD
   - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS [Claude validated - components.css:22-24]
-  - [ ] Properties not taking effect (button labels appear ~1px lower than ideal)
-  - [ ] Root cause (surrounding CSS conditions blocking the trim) not yet identified
-  - Test page for visual verification: http://localhost:3003/test/buttons
+  - [x] Root cause identified: `text-box-trim` doesn't work on flex formatting contexts (applies to line boxes in inline formatting contexts only)
+  - [x] Solution: Wrap button text in `<span class="btn-text">` to create inline box where text-box-trim can operate
+  - [x] Moved text-box-trim properties from `.btn` to `.btn-text` class in src/styles/components.css
+  - [x] Updated all button templates across codebase to wrap text content with `<span class="btn-text">`
+  - [x] Adjusted padding from `var(--spacing-x-small)` to `calc(var(--spacing-x-small) + 3px)` to preserve 32px button height
+  - [x] Visual verification: text perfectly centered, consistent heights across all button variants (standard, small, icon)
+  - Test page for visual verification: http://localhost:3001/test/buttons
 
 - [ ] There seems to be extra spacing at the bottom of the shakuhachi score component, between the last note and the end of the component.
   - Investigate what is happening and whether it is an issue.
@@ -165,9 +169,7 @@
   - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
 
-- [ ] [Content] [A:Low] [Future-Enhancements] Create a contact email address for the site
-  - Add it to the Contributing section of the About page
-  - Currently pointing to GitHub discussions and Mastodon DMs as interim contact
+- [ ] [Content] [A:Low] [Future-Enhancements] Add a contact email address <chris@shakuhachi.ro> to the Contributing section of the About page as the first mean of contact.
 
 ### Tier 4: Code Quality & Maintainability
 

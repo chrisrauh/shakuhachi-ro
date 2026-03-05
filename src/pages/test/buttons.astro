@@ -46,27 +46,27 @@ const title = 'Button Components';
         <h2>Small Buttons</h2>
         <div class="compact-row">
           <div class="btn-sample">
-            <button class="btn btn-small btn-primary">Primary</button>
+            <button class="btn btn-small btn-primary"><span class="btn-text">Primary</span></button>
             <span>Primary</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-small btn-secondary">Secondary</button>
+            <button class="btn btn-small btn-secondary"><span class="btn-text">Secondary</span></button>
             <span>Secondary</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-small btn-success">Success</button>
+            <button class="btn btn-small btn-success"><span class="btn-text">Success</span></button>
             <span>Success</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-small btn-neutral">Neutral</button>
+            <button class="btn btn-small btn-neutral"><span class="btn-text">Neutral</span></button>
             <span>Neutral</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-small btn-ghost">Ghost</button>
+            <button class="btn btn-small btn-ghost"><span class="btn-text">Ghost</span></button>
             <span>Ghost</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-small btn-primary" disabled>Disabled</button>
+            <button class="btn btn-small btn-primary" disabled><span class="btn-text">Disabled</span></button>
             <span>Disabled</span>
           </div>
         </div>
@@ -77,27 +77,27 @@ const title = 'Button Components';
         <h2>Standard Buttons</h2>
         <div class="compact-row">
           <div class="btn-sample">
-            <button class="btn btn-primary">Primary</button>
+            <button class="btn btn-primary"><span class="btn-text">Primary</span></button>
             <span>Primary</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-secondary">Secondary</button>
+            <button class="btn btn-secondary"><span class="btn-text">Secondary</span></button>
             <span>Secondary</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-success">Success</button>
+            <button class="btn btn-success"><span class="btn-text">Success</span></button>
             <span>Success</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-neutral">Neutral</button>
+            <button class="btn btn-neutral"><span class="btn-text">Neutral</span></button>
             <span>Neutral</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-ghost">Ghost</button>
+            <button class="btn btn-ghost"><span class="btn-text">Ghost</span></button>
             <span>Ghost</span>
           </div>
           <div class="btn-sample">
-            <button class="btn btn-primary" disabled>Disabled</button>
+            <button class="btn btn-primary" disabled><span class="btn-text">Disabled</span></button>
             <span>Disabled</span>
           </div>
         </div>
@@ -135,23 +135,23 @@ const title = 'Button Components';
         <div class="state-comparison">
           <div class="state-row">
             <span class="state-label">Primary:</span>
-            <button class="btn btn-primary">Default</button>
-            <button class="btn btn-primary" disabled>Disabled</button>
+            <button class="btn btn-primary"><span class="btn-text">Default</span></button>
+            <button class="btn btn-primary" disabled><span class="btn-text">Disabled</span></button>
           </div>
           <div class="state-row">
             <span class="state-label">Secondary:</span>
-            <button class="btn btn-secondary">Default</button>
-            <button class="btn btn-secondary" disabled>Disabled</button>
+            <button class="btn btn-secondary"><span class="btn-text">Default</span></button>
+            <button class="btn btn-secondary" disabled><span class="btn-text">Disabled</span></button>
           </div>
           <div class="state-row">
             <span class="state-label">Success:</span>
-            <button class="btn btn-success">Default</button>
-            <button class="btn btn-success" disabled>Disabled</button>
+            <button class="btn btn-success"><span class="btn-text">Default</span></button>
+            <button class="btn btn-success" disabled><span class="btn-text">Disabled</span></button>
           </div>
           <div class="state-row">
             <span class="state-label">Ghost:</span>
-            <button class="btn btn-ghost">Default</button>
-            <button class="btn btn-ghost" disabled>Disabled</button>
+            <button class="btn btn-ghost"><span class="btn-text">Default</span></button>
+            <button class="btn btn-ghost" disabled><span class="btn-text">Disabled</span></button>
           </div>
         </div>
       </section>
@@ -163,8 +163,8 @@ const title = 'Button Components';
           <button class="btn btn-icon" aria-label="Icon">
             <Book size={16} />
           </button>
-          <button class="btn btn-small btn-primary">Small</button>
-          <button class="btn btn-primary">Standard</button>
+          <button class="btn btn-small btn-primary"><span class="btn-text">Small</span></button>
+          <button class="btn btn-primary"><span class="btn-text">Standard</span></button>
           <button class="btn-icon-with-count">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 3h6v6M14 10l6.1-6.1M9 21H3v-6m6 0l-6.1 6.1"/>
@@ -223,7 +223,7 @@ const title = 'Button Components';
     gap: var(--spacing-x-small);
   }
 
-  .btn-sample span {
+  .btn-sample > span {
     font-size: var(--font-size-x-small);
     color: var(--color-text-secondary);
   }
@@ -264,3 +264,20 @@ const title = 'Button Components';
     }
   }
 </style>
+
+<script>
+  import { ThemeSwitcher } from '../../components/ThemeSwitcher';
+  import { AuthWidget } from '../../components/AuthComponents';
+  import { onAuthReady } from '../../api/auth';
+
+  // Initialize theme switcher
+  new ThemeSwitcher('theme-switcher');
+
+  // Initialize auth widget
+  const authWidget = new AuthWidget('auth-widget');
+
+  // Subscribe to auth changes
+  onAuthReady((user) => {
+    authWidget.setUser(user);
+  });
+</script>
