@@ -23,22 +23,6 @@
 
 ### Tier 1: Critical User-Facing Issues (Fix Now)
 
-- [x] [Both] [A:High] [Quality-FailFast] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated] ✅ PR #161
-  - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
-
-- [x] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails ✅ PR #TBD
-  - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
-
-- [x] [UI] [A:Medium] [Alpha] Investigate button text vertical alignment ✅ Fixed - PR #TBD
-  - [x] `text-box-trim: trim-both` and `text-box-edge: cap alphabetic` applied in CSS [Claude validated - components.css:22-24]
-  - [x] Root cause identified: `text-box-trim` doesn't work on flex formatting contexts (applies to line boxes in inline formatting contexts only)
-  - [x] Solution: Wrap button text in `<span class="btn-text">` to create inline box where text-box-trim can operate
-  - [x] Moved text-box-trim properties from `.btn` to `.btn-text` class in src/styles/components.css
-  - [x] Updated all button templates across codebase to wrap text content with `<span class="btn-text">`
-  - [x] Adjusted padding from `var(--spacing-x-small)` to `calc(var(--spacing-x-small) + 3px)` to preserve 32px button height
-  - [x] Visual verification: text perfectly centered, consistent heights across all button variants (standard, small, icon)
-  - Test page for visual verification: http://localhost:3001/test/buttons
-
 - [ ] [UI] [A:Medium] [Alpha] Embedded score component on about page shows incorrect color in light mode
   - The embedded shakuhachi-score component on /about renders with light gray text in light mode instead of dark text
   - Color tokens (`--color-text-primary`) are working correctly elsewhere on the page
@@ -101,7 +85,6 @@
   - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
 
 - [ ] [Backend] [A:High] [Quality-FailFast] ScoreDetailClient.handleFork: preserve error context in catch block
-  - [x] Replaced `alert('Failed to fork score')` with `showNotification()`
   - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
 
 - [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for MusicXMLParser
@@ -120,12 +103,6 @@
 ### Tier 3: User Experience Enhancements
 
 - [ ] [UI] [A:Medium] [Alpha] Investigate letter spacing for font aesthetics and legibility.
-  - **Phase 1: Experimentation Tool** ✅ COMPLETE [Claude validated]
-    - [x] Implemented dev-only control panel for experimentation
-    - [x] Range: -0.1em to 0.15em with 0.001em granularity
-    - [x] Persists to localStorage across sessions
-    - [x] See CLAUDE.md for usage instructions
-    - [x] Control loaded in dev mode on about page (about.astro:38-43)
   - **Phase 2: Determine Optimal Values** (User-driven)
     - [ ] Use control panel to test different letter spacing values
     - [ ] Identify optimal value for body copy
@@ -169,7 +146,6 @@
   - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
 - [ ] [UI] [A:Medium] [Quality-Separation] Standardize error UX across components
-  - [x] `ScoreEditor` no longer uses `alert()` for errors — uses `showNotification()`
   - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
 
