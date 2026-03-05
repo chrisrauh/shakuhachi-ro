@@ -15,6 +15,7 @@ import { ABCParser } from '../web-component/parser/ABCParser';
 import { ABCSerializer } from '../web-component/parser/ABCSerializer';
 import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 import { MusicXMLSerializer } from '../web-component/parser/MusicXMLSerializer';
+import { STRINGS } from '../constants/strings';
 
 /**
  * Convert score data from one format to another
@@ -65,7 +66,7 @@ export function parseFormat(input: string, format: ScoreDataFormat): ScoreData {
       return ABCParser.parse(input);
 
     default:
-      throw new Error(`Unsupported input format: ${format}`);
+      throw new Error(STRINGS.ERRORS.FormatConverter.unsupportedInput(format));
   }
 }
 
@@ -91,6 +92,6 @@ export function serializeFormat(
       return ABCSerializer.serialize(scoreData);
 
     default:
-      throw new Error(`Unsupported output format: ${format}`);
+      throw new Error(STRINGS.ERRORS.FormatConverter.unsupportedOutput(format));
   }
 }

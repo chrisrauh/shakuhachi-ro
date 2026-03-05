@@ -6,6 +6,7 @@ import { toast } from './Toast';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
 import type { ScoreData as RendererScoreData } from '../web-component/types/ScoreData';
+import { STRINGS } from '../constants/strings';
 
 interface ScoreData {
   score: Score;
@@ -233,7 +234,9 @@ export class ScoreDetailClient {
 
     const result = await deleteScore(this.score.id);
     if (result.error) {
-      toast.error(`Error deleting score: ${result.error.message}`);
+      toast.error(
+        STRINGS.ERRORS.ScoreDetailClient.deleteError(result.error.message),
+      );
       if (deleteBtn && originalContent) {
         deleteBtn.disabled = false;
         deleteBtn.innerHTML = originalContent;
@@ -250,7 +253,7 @@ export class ScoreDetailClient {
 
     const { user } = await getCurrentUser();
     if (!user) {
-      toast.error('Please sign in to fork this score');
+      toast.error(STRINGS.ERRORS.ScoreDetailClient.forkLoginRequired);
       return;
     }
 
@@ -288,7 +291,9 @@ export class ScoreDetailClient {
     try {
       const result = await forkScore(this.score.id);
       if (result.error) {
-        toast.error(`Error forking score: ${result.error.message}`);
+        toast.error(
+          STRINGS.ERRORS.ScoreDetailClient.forkError(result.error.message),
+        );
         if (forkBtn && originalContent) {
           forkBtn.disabled = false;
           forkBtn.innerHTML = originalContent;
@@ -301,7 +306,7 @@ export class ScoreDetailClient {
         window.location.href = `/editor.html?id=${result.score.id}`;
       }
     } catch {
-      toast.error('Failed to fork score');
+      toast.error(STRINGS.ERRORS.ScoreDetailClient.forkFailed);
       if (forkBtn && originalContent) {
         forkBtn.disabled = false;
         forkBtn.innerHTML = originalContent;

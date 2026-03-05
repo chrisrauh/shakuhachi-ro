@@ -7,6 +7,7 @@
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
+import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class MusicXMLParser {
   /**
@@ -137,7 +138,9 @@ export class MusicXMLParser {
   static async parseFromURL(url: string): Promise<ScoreData> {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to load MusicXML file: ${response.statusText}`);
+      throw new Error(
+        PARSER_STRINGS.ERRORS.MusicXMLParser.loadFailed(response.statusText),
+      );
     }
     const xmlContent = await response.text();
     return this.parse(xmlContent);
