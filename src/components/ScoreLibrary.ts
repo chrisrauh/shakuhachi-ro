@@ -126,7 +126,7 @@ export class ScoreLibrary {
         <div class="score-library-error">
           <h2>Error Loading Scores</h2>
           <p>${this.error.message}</p>
-          <button id="retry-btn" class="btn btn-small btn-primary">Retry</button>
+          <button id="retry-btn" class="btn btn-small btn-primary"><span class="btn-text">Retry</span></button>
         </div>
       `;
       this.addStyles();
@@ -284,7 +284,7 @@ export class ScoreLibrary {
             ${
               this.searchQuery
                 ? `
-              <button id="clear-filters-btn" class="btn btn-small btn-primary">Clear Filters</button>
+              <button id="clear-filters-btn" class="btn btn-small btn-primary"><span class="btn-text">Clear Filters</span></button>
             `
                 : ''
             }
