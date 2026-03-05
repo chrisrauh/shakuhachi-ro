@@ -16,6 +16,7 @@
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import { ABC_TO_KINKO_MAP } from '../constants/abc-pitch-map';
+import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class ABCParser {
   /**
@@ -26,7 +27,7 @@ export class ABCParser {
    */
   static parse(abcContent: string): ScoreData {
     if (!abcContent || !abcContent.trim()) {
-      throw new Error('ABC notation content is required');
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.contentRequired);
     }
 
     const lines = abcContent.split('\n');
@@ -75,7 +76,7 @@ export class ABCParser {
 
     // Validate required headers
     if (!inBody) {
-      throw new Error('ABC notation must include K: (key) field');
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.keyFieldRequired);
     }
 
     // Parse notes from body
@@ -145,9 +146,7 @@ export class ABCParser {
 
       // Validate letter first
       if (!validLetters.has(pitch)) {
-        throw new Error(
-          `Unknown ABC pitch: "${pitch}". Valid pitches: D, F, G, A, C (uppercase/lowercase) with optional ^, _, =, ', or ,`,
-        );
+        throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(pitch));
       }
 
       // Handle rest
@@ -166,9 +165,7 @@ export class ABCParser {
       // Map to shakuhachi
       const shakuPitch = ABC_TO_KINKO_MAP[abcPitch];
       if (!shakuPitch) {
-        throw new Error(
-          `Unknown ABC pitch: "${abcPitch}". Valid pitches: D, F, G, A, C (uppercase/lowercase) with optional ^, _, =, ', or ,`,
-        );
+        throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(abcPitch));
       }
 
       // Calculate duration
@@ -206,9 +203,7 @@ export class ABCParser {
     }
 
     if (notes.length === 0) {
-      throw new Error(
-        'No notes found in ABC notation. Ensure K: field is followed by note data.',
-      );
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.noNotesFound);
     }
 
     return notes;
@@ -234,7 +229,9 @@ export class ABCParser {
         // "/2" format = divide unit by denominator
         const divisor = parseInt(parts[1], 10);
         if (isNaN(divisor)) {
-          throw new Error(`Invalid duration: ${durationSuffix}`);
+          throw new Error(
+            PARSER_STRINGS.ERRORS.ABCParser.invalidDuration(durationSuffix),
+          );
         }
         return 1 / divisor;
       } else {
@@ -242,7 +239,9 @@ export class ABCParser {
         const numerator = parseInt(parts[0], 10);
         const denominator = parseInt(parts[1], 10);
         if (isNaN(numerator) || isNaN(denominator)) {
-          throw new Error(`Invalid duration: ${durationSuffix}`);
+          throw new Error(
+            PARSER_STRINGS.ERRORS.ABCParser.invalidDuration(durationSuffix),
+          );
         }
         return numerator / denominator;
       }
@@ -251,7 +250,9 @@ export class ABCParser {
     // Handle integer: "2", "3", "4"
     const multiplier = parseInt(durationSuffix, 10);
     if (isNaN(multiplier)) {
-      throw new Error(`Invalid duration: ${durationSuffix}`);
+      throw new Error(
+        PARSER_STRINGS.ERRORS.ABCParser.invalidDuration(durationSuffix),
+      );
     }
 
     return multiplier;
@@ -266,7 +267,9 @@ export class ABCParser {
   static async parseFromURL(url: string): Promise<ScoreData> {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to load ABC file: ${response.statusText}`);
+      throw new Error(
+        PARSER_STRINGS.ERRORS.ABCParser.loadFailed(response.statusText),
+      );
     }
     const abcContent = await response.text();
     return this.parse(abcContent);

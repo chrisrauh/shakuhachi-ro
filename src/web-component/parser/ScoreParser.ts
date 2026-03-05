@@ -14,6 +14,7 @@ import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import type { ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../constants/kinko-symbols';
+import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /**
  * Maps numeric duration to NoteDuration
@@ -112,7 +113,7 @@ export class ScoreParser {
       // Ensure pitch exists for non-rest notes
       if (!note.pitch) {
         throw new Error(
-          `Note at index ${i} must have pitch when rest is not set`,
+          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexPitchWhenNotRest(i),
         );
       }
 
@@ -249,16 +250,18 @@ export class ScoreParser {
    * @throws Error if validation fails
    */
   private static validate(scoreData: ScoreData): void {
+    const S = PARSER_STRINGS.ERRORS.ScoreParser;
+
     if (!scoreData) {
-      throw new Error('Score data is required');
+      throw new Error(S.scoreDataRequired);
     }
 
     if (!Array.isArray(scoreData.notes)) {
-      throw new Error('Score notes must be an array');
+      throw new Error(S.notesArrayRequired);
     }
 
     if (scoreData.notes.length === 0) {
-      throw new Error('Score must contain at least one note');
+      throw new Error(S.notesEmptyArray);
     }
 
     // Validate each note
@@ -266,40 +269,36 @@ export class ScoreParser {
       // Rest notes don't need pitch
       if (note.rest) {
         if (!note.duration) {
-          throw new Error(`Rest at index ${index} is missing duration`);
+          throw new Error(S.restIndexDuration(index));
         }
         return;
       }
 
       // Regular notes need pitch
       if (!note.pitch) {
-        throw new Error(`Note at index ${index} is missing pitch`);
+        throw new Error(S.noteIndexPitchRequired(index));
       }
 
       if (!note.pitch.step) {
-        throw new Error(`Note at index ${index} is missing pitch.step`);
+        throw new Error(S.noteIndexPitchStep(index));
       }
 
       if (note.pitch.octave === undefined || note.pitch.octave === null) {
-        throw new Error(`Note at index ${index} is missing pitch.octave`);
+        throw new Error(S.noteIndexPitchOctave(index));
       }
 
       if (note.duration === undefined || note.duration === null) {
-        throw new Error(`Note at index ${index} is missing duration`);
+        throw new Error(S.noteIndexDuration(index));
       }
 
       // Validate octave range
       if (note.pitch.octave < 0 || note.pitch.octave > 2) {
-        throw new Error(
-          `Note at index ${index} has invalid octave: ${note.pitch.octave}. Must be 0-2.`,
-        );
+        throw new Error(S.noteIndexOctaveInvalid(index, note.pitch.octave));
       }
 
       // Validate duration is positive
       if (note.duration <= 0) {
-        throw new Error(
-          `Note at index ${index} has invalid duration: ${note.duration}. Must be > 0.`,
-        );
+        throw new Error(S.noteIndexDurationInvalid(index, note.duration));
       }
     });
   }
@@ -317,7 +316,9 @@ export class ScoreParser {
       return this.parse(scoreData);
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new Error(`Invalid JSON: ${error.message}`);
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ScoreParser.invalidJSON(error.message),
+        );
       }
       throw error;
     }
@@ -334,14 +335,18 @@ export class ScoreParser {
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Failed to load score: ${response.statusText}`);
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ScoreParser.loadFailed(response.statusText),
+        );
       }
 
       const scoreData = (await response.json()) as ScoreData;
       return this.parse(scoreData);
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to load score from URL: ${error.message}`);
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ScoreParser.loadFailedFromURL(error.message),
+        );
       }
       throw error;
     }

@@ -4,6 +4,7 @@ import { renderIcon, initIcons } from '../utils/icons';
 import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
+import { STRING_FACTORIES } from '../constants/strings';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -20,7 +21,7 @@ export class ScoreLibrary {
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(`Container with id "${containerId}" not found`);
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
 

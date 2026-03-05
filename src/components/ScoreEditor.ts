@@ -6,6 +6,7 @@ import { toast } from './Toast';
 import { ConfirmDialog } from './ConfirmDialog';
 import { debounce } from '../utils/debounce';
 import type { ScoreDataFormat } from '../api/scores';
+import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 
 const AUTO_SAVE_LOCALSTORAGE_INTERVAL_MS = 30_000; // 30s
 const AUTO_SAVE_DATABASE_DEBOUNCE_MS = 5_000; // 5s inactivity
@@ -39,7 +40,7 @@ export class ScoreEditor {
   constructor(containerId: string, scoreId?: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(`Container with id "${containerId}" not found`);
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
 
@@ -80,7 +81,9 @@ export class ScoreEditor {
 
     if (result.error || !result.score) {
       toast.error(
-        `Error loading score: ${result.error?.message || 'Score not found'}`,
+        result.error?.message
+          ? STRINGS.ERRORS.ScoreEditor.loadError(result.error.message)
+          : STRINGS.ERRORS.ScoreEditor.loadNotFound,
       );
       return;
     }
@@ -183,9 +186,12 @@ export class ScoreEditor {
       });
 
       if (result.error) {
-        toast.error(`Auto-save failed: ${result.error.message}`, {
-          duration: Infinity,
-        });
+        toast.error(
+          STRINGS.ERRORS.ScoreEditor.autoSaveFailed(result.error.message),
+          {
+            duration: Infinity,
+          },
+        );
         this.updateSaveStatusUI('error');
       } else {
         this.lastSuccessfulSaveTime = new Date();
@@ -193,7 +199,9 @@ export class ScoreEditor {
       }
     } catch (err) {
       toast.error(
-        `Auto-save failed: ${err instanceof Error ? err.message : 'Network error'}`,
+        STRINGS.ERRORS.ScoreEditor.autoSaveFailed(
+          err instanceof Error ? err.message : 'Network error',
+        ),
         { duration: Infinity },
       );
       this.updateSaveStatusUI('error');
@@ -505,7 +513,7 @@ export class ScoreEditor {
   private async handleSave(): Promise<void> {
     const { user } = await getCurrentUser();
     if (!user) {
-      toast.error('Please log in to save scores');
+      toast.error(STRINGS.ERRORS.ScoreEditor.saveLoginRequired);
       return;
     }
 
@@ -515,7 +523,7 @@ export class ScoreEditor {
     }
 
     if (!this.validateScoreData()) {
-      toast.error('Please fix validation errors before saving');
+      toast.error(STRINGS.ERRORS.ScoreEditor.saveValidationFailed);
       return;
     }
 
@@ -558,22 +566,22 @@ export class ScoreEditor {
       }
 
       if (result.error) {
-        toast.error(`Error saving score: ${result.error.message}`);
+        toast.error(STRINGS.ERRORS.ScoreEditor.saveError(result.error.message));
       } else {
         // Clear autosave
         localStorage.removeItem('shakuhachi-editor-autosave');
         this.hasUnsavedChanges = false;
 
-        toast.success(
-          `Score ${this.isEditing ? 'updated' : 'created'} successfully!`,
-        );
+        toast.success(STRINGS.SUCCESS.ScoreEditor.scoreSaved(this.isEditing));
 
         // Redirect to library
         window.location.href = '/';
       }
     } catch (error) {
       toast.error(
-        `Error saving score: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        STRINGS.ERRORS.ScoreEditor.saveError(
+          error instanceof Error ? error.message : 'Unknown error',
+        ),
       );
     } finally {
       if (saveBtn) {

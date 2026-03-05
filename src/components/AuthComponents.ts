@@ -1,5 +1,6 @@
 import { signIn, signUp, signOut } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
+import { STRING_FACTORIES } from '../constants/strings';
 
 export class AuthModal {
   private modal: HTMLElement;
@@ -208,7 +209,7 @@ export class AuthWidget {
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(`Container with id "${containerId}" not found`);
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
     this.authModal = new AuthModal();

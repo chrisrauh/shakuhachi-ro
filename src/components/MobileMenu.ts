@@ -1,3 +1,5 @@
+import { STRING_FACTORIES } from '../constants/strings';
+
 export interface MenuItem {
   id: string;
   label: string;
@@ -16,7 +18,7 @@ export class MobileMenu {
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(`MobileMenu: container "${containerId}" not found`);
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
     this.addStyles();

@@ -1,4 +1,5 @@
 import { Pane } from 'tweakpane';
+import { STRING_FACTORIES } from '../constants/strings';
 
 interface LetterSpacingSettings {
   letterSpacing: number; // in em units
@@ -12,7 +13,7 @@ export class LetterSpacingControl {
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) {
-      throw new Error(`Container element with id "${containerId}" not found`);
+      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
 
     this.settings = this.loadSettings();
