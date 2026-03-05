@@ -23,7 +23,7 @@
 
 ### Tier 1: Critical User-Facing Issues (Fix Now)
 
-- [ ] [Both] [A:High] [Quality-FailFast] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated]
+- [x] [Both] [A:High] [Quality-FailFast] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated] ✅ PR #161
   - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
 
 - [ ] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails
