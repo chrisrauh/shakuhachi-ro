@@ -42,6 +42,13 @@
 - [ ] There seems to be extra spacing at the bottom of the shakuhachi score component, between the last note and the end of the component.
   - Investigate what is happening and whether it is an issue.
   - If yes, fix.
+- [ ] [UI] [A:Medium] [Alpha] Embedded score component on about page shows incorrect color in light mode
+  - The embedded shakuhachi-score component on /about renders with light gray text in light mode instead of dark text
+  - Color tokens (`--color-text-primary`) are working correctly elsewhere on the page
+  - Score page (/score/[slug]) shows correct dark color in light mode for comparison
+  - Investigation indicates issue is specific to the about page embedded component styling
+  - Check how the component on about page is styled vs score page
+  - Verify `--shakuhachi-note-color` custom property is correctly inheriting theme colors
 - [ ] [UI] [A:Medium] [Alpha] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
   - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
     - Layout.astro:284-289 (create button)
