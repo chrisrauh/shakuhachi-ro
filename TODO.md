@@ -39,9 +39,6 @@
   - [x] Visual verification: text perfectly centered, consistent heights across all button variants (standard, small, icon)
   - Test page for visual verification: http://localhost:3001/test/buttons
 
-- [ ] There seems to be extra spacing at the bottom of the shakuhachi score component, between the last note and the end of the component.
-  - Investigate what is happening and whether it is an issue.
-  - If yes, fix.
 - [ ] [UI] [A:Medium] [Alpha] Embedded score component on about page shows incorrect color in light mode
   - The embedded shakuhachi-score component on /about renders with light gray text in light mode instead of dark text
   - Color tokens (`--color-text-primary`) are working correctly elsewhere on the page
@@ -496,17 +493,3 @@
 - [ ] [Both] [A:Low] [Advanced] OCR tool (scan physical scores to MusicXML/JSON)
 - [ ] [Both] [A:Low] [Advanced] Pull request workflow (suggest changes to others' scores)
 - [ ] [Backend] [A:Low] [Advanced] MIDI playback mapping
-
----
-
-## Completed Tasks
-
-- [x] [UI] [A:High] [Visual-Testing] Add visual regression tests for ScoreEditor page (/score/[slug]/edit)
-  - [x] Determine authentication approach for visual tests (use test credentials from .env)
-  - [x] Test external preview mode (side-by-side desktop layout)
-  - [x] Test with all three data formats (JSON, MusicXML, ABC)
-  - [x] Test light and dark themes
-  - [x] Test desktop viewport (1280x720)
-  - [x] Test empty notation (minimal score data)
-  - [x] Test mobile viewport (375x667)
-  - [x] Test mobile toggle between editor and preview panels
