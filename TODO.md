@@ -26,7 +26,7 @@
 - [x] [Both] [A:High] [Quality-FailFast] ScoreDetailClient: show error UI instead of console.error on failed data parse [Claude validated] ✅ PR #161
   - `src/components/ScoreDetailClient.ts:24-29` — When `JSON.parse(dataEl.textContent)` fails, it logs `console.error` and sets `this.score = null`. Then `init()` at line 34-36 returns silently. The user sees a blank page with no explanation. Render an error message in the container instead.
 
-- [ ] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails
+- [x] [UI] [A:High] [Quality-FailFast] ScoreEditor: notify user when autosave restore fails ✅ PR #TBD
   - `src/components/ScoreEditor.ts:97-99` — When `loadFromLocalStorage()` catches a parse error, it logs `console.error` silently. The user's auto-saved work is lost with no notification. Show a brief inline warning like "Could not restore auto-saved draft" so the user knows their previous session data was corrupted.
 
 - [ ] [UI] [A:Medium] [Alpha] Investigate button text vertical alignment
