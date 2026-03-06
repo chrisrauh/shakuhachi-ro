@@ -72,6 +72,9 @@ test.describe('Visual Regression', () => {
           // Wait for rendering to complete
           if (pageConfig.hasWebComponent) {
             await waitForScoreRendered(page);
+          } else {
+            // Static pages need networkidle — auth check + theme scripts run after 'load'
+            await page.waitForLoadState('networkidle');
           }
 
           // Take screenshot and compare to baseline
