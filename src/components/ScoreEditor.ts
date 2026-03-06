@@ -594,7 +594,12 @@ export class ScoreEditor {
         <div class="editor-main">
           <div class="editor-pane">
             <div class="editor-pane-header">
-              <h2>Score Data</h2>
+              <h2>
+                Score Data
+                <a href="/help/notation-formats" target="_blank" class="help-link" title="Format help">
+                  ${renderIcon('circle-help')}
+                </a>
+              </h2>
               <div class="format-toggle">
                 <label>
                   <input
@@ -653,6 +658,7 @@ export class ScoreEditor {
     `;
 
     this.addStyles();
+    initIcons(); // Initialize Lucide icons
     this.attachEventListeners();
     this.renderValidation();
     this.updatePreview();
@@ -907,6 +913,27 @@ export class ScoreEditor {
         font-size: var(--font-size-large);
         font-weight: var(--font-weight-semibold);
         color: var(--color-text-primary);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-x-small);
+      }
+
+      .help-link {
+        display: inline-flex;
+        align-items: center;
+        color: var(--color-text-secondary);
+        opacity: 0.7;
+        transition: opacity var(--transition-fast);
+      }
+
+      .help-link:hover {
+        opacity: 1;
+      }
+
+      .help-link svg {
+        display: block;
+        width: 16px;
+        height: 16px;
       }
 
       .format-toggle {

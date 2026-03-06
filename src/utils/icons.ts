@@ -5,6 +5,7 @@ import {
   AlertCircle,
   Calendar,
   SquarePen,
+  CircleHelp,
 } from 'lucide';
 
 /**
@@ -20,6 +21,7 @@ export function initIcons(): void {
       AlertCircle,
       Calendar,
       SquarePen,
+      CircleHelp,
     },
   });
 }
