@@ -49,3 +49,5 @@ CLAUDE.local.md
 
 # Local Netlify folder
 .netlify
+.mcp.json.bak
+.claude/settings.local.json.bak
