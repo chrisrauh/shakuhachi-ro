@@ -6,7 +6,6 @@
 
 - **Work in strict top-to-bottom order** - Start with the first unchecked task, then move to the next
 - **One task at a time** - Never work on multiple tasks simultaneously
-- **Verify before starting** - Check if the task is already implemented before beginning work
 - **Follow the dev workflow** - See [CLAUDE.md](./CLAUDE.md)
 
 ## Task Tags
