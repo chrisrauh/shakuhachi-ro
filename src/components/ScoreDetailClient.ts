@@ -3,6 +3,7 @@ import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
 import { toast } from './Toast';
+import { ButtonLoadingState } from './LoadingSpinner';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
 import type { ScoreData as RendererScoreData } from '../web-component/types/ScoreData';
@@ -183,30 +184,15 @@ export class ScoreDetailClient {
     const deleteBtn = document.getElementById(
       'delete-btn',
     ) as HTMLButtonElement;
-    const originalContent = deleteBtn?.innerHTML;
-
-    if (deleteBtn) {
-      deleteBtn.disabled = true;
-      // Show loading spinner
-      deleteBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3" stroke-dasharray="15.7" stroke-dashoffset="0">
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-          </circle>
-        </svg>
-        <span>Deleting…</span>
-      `;
-    }
+    const loadingState = deleteBtn ? new ButtonLoadingState(deleteBtn) : null;
+    loadingState?.show('<span>Deleting…</span>');
 
     const result = await deleteScore(this.score.id);
     if (result.error) {
       toast.error(
         STRINGS.ERRORS.ScoreDetailClient.deleteError(result.error.message),
       );
-      if (deleteBtn && originalContent) {
-        deleteBtn.disabled = false;
-        deleteBtn.innerHTML = originalContent;
-      }
+      loadingState?.hide();
       return;
     }
 
@@ -237,22 +223,9 @@ export class ScoreDetailClient {
   private async performFork() {
     if (!this.score) return;
 
-    // Disable the fork button to prevent double-clicks
     const forkBtn = document.getElementById('fork-btn') as HTMLButtonElement;
-    const originalContent = forkBtn?.innerHTML;
-
-    if (forkBtn) {
-      forkBtn.disabled = true;
-      // Update to show loading state while preserving structure (icon + loading indicator)
-      forkBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3" stroke-dasharray="15.7" stroke-dashoffset="0">
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-          </circle>
-        </svg>
-        <span class="count">⋯</span>
-      `;
-    }
+    const loadingState = forkBtn ? new ButtonLoadingState(forkBtn) : null;
+    loadingState?.show('<span class="count">⋯</span>');
 
     try {
       const result = await forkScore(this.score.id);
@@ -260,10 +233,7 @@ export class ScoreDetailClient {
         toast.error(
           STRINGS.ERRORS.ScoreDetailClient.forkError(result.error.message),
         );
-        if (forkBtn && originalContent) {
-          forkBtn.disabled = false;
-          forkBtn.innerHTML = originalContent;
-        }
+        loadingState?.hide();
         return;
       }
 
@@ -273,10 +243,7 @@ export class ScoreDetailClient {
       }
     } catch {
       toast.error(STRINGS.ERRORS.ScoreDetailClient.forkFailed);
-      if (forkBtn && originalContent) {
-        forkBtn.disabled = false;
-        forkBtn.innerHTML = originalContent;
-      }
+      loadingState?.hide();
     }
   }
 }
