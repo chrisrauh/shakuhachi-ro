@@ -23,11 +23,6 @@
 
 ### Tier 1: Critical User-Facing Issues (Fix Now)
 
-- [ ] [UI] [A:Medium] [Alpha] Notation format help in editor
-  - Examples of valid notation
-  - Links to documentation
-  - Format validation and helpful error messages
-
 - [ ] [Backend] [A:Medium] [Quality-Explicit] Slug utility: handle Unicode characters (Japanese score titles)
   - `src/utils/slug.ts:16` — `replace(/[^\w\s-]/g, '')` strips all non-ASCII characters. A score titled "赤とんぼ" produces an empty slug; "Ranjo 大師" loses "大師" and becomes just "ranjo". For a shakuhachi app where Japanese titles are common, this silently produces ambiguous or empty slugs. Either transliterate (e.g., use a library like `slugify` with Unicode support) or preserve Unicode word characters in the regex.
 
