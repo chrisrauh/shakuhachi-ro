@@ -1,0 +1,256 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { getEntry } from 'astro:content';
+
+// Prerender this page at build time (static HTML)
+export const prerender = true;
+
+// Load MDX content
+const helpPage = await getEntry('pages', 'notation-formats');
+const { Content } = await helpPage.render();
+---
+
+<Layout title="Notation Format Help - Shakuhachi.ro" currentPage="browse">
+  <PageHeader slot="header-metadata" title="Notation Format Help" />
+
+  <div class="help-page">
+    <div class="help-section">
+      <Content />
+    </div>
+  </div>
+
+  <script>
+    import { createElement, Book, Plus, Info, SunMoon, LogIn, LogOut, User, UserPlus } from 'lucide';
+    import { ThemeSwitcher } from '../../components/ThemeSwitcher';
+    import { AuthWidget } from '../../components/AuthComponents';
+    import { onAuthReady, signOut } from '../../api/auth';
+    import { MobileMenu } from '../../components/MobileMenu';
+    import { createEmptyScore } from '../../utils/create-score-handler';
+    import { toast } from '../../components/Toast';
+    import type { User as SupabaseUser } from '@supabase/supabase-js';
+
+    // Initialize theme switcher
+    new ThemeSwitcher('theme-switcher');
+
+    // Initialize letter spacing control (dev only)
+    if (import.meta.env.DEV) {
+      import('../../components/LetterSpacingControl').then(({ LetterSpacingControl }) => {
+        new LetterSpacingControl('letter-spacing-control');
+      });
+    }
+
+    // Initialize auth widget
+    const authWidget = new AuthWidget('auth-widget');
+
+    // Get reference to auth modal for mobile menu
+    const authModal = authWidget.getAuthModal();
+
+    // Helper to generate Lucide icon HTML
+    const getIconHTML = (iconComponent: typeof Book) => {
+      const icon = createElement(iconComponent);
+      icon.setAttribute('width', '16');
+      icon.setAttribute('height', '16');
+      icon.setAttribute('stroke-width', '2');
+      return icon.outerHTML;
+    };
+
+    // Initialize mobile menu
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+    };
+
+    const mobileMenu = new MobileMenu('mobile-menu');
+
+    // Function to update menu items based on auth state
+    const updateMobileMenu = (user: SupabaseUser | null) => {
+      const baseItems = [
+        {
+          id: 'browse',
+          label: 'Library',
+          href: '/',
+          icon: getIconHTML(Book),
+          dividerAfter: false,
+        },
+        {
+          id: 'create',
+          label: 'Create score',
+          action: async () => {
+            const result = await createEmptyScore();
+            if (result.error) {
+              toast.error(result.error.message, { duration: Infinity });
+            } else {
+              window.location.href = `/score/${result.slug}/edit`;
+            }
+          },
+          icon: getIconHTML(Plus),
+          dividerAfter: false,
+        },
+        {
+          id: 'about',
+          label: 'About',
+          href: '/about',
+          icon: getIconHTML(Info),
+          dividerAfter: true,
+        },
+      ];
+
+      const authItems = user
+        ? [
+            {
+              id: 'account',
+              label: user.email || 'Account',
+              action: () => {},
+              icon: getIconHTML(User),
+              dividerAfter: false,
+            },
+            {
+              id: 'logout',
+              label: 'Log Out',
+              action: async () => {
+                await signOut();
+              },
+              icon: getIconHTML(LogOut),
+              dividerAfter: true,
+            },
+          ]
+        : [
+            {
+              id: 'login',
+              label: 'Log In',
+              action: () => authModal.show('login'),
+              icon: getIconHTML(LogIn),
+              dividerAfter: false,
+            },
+            {
+              id: 'signup',
+              label: 'Sign Up',
+              action: () => authModal.show('signup'),
+              icon: getIconHTML(UserPlus),
+              dividerAfter: true,
+            },
+          ];
+
+      const themeItem = {
+        id: 'theme',
+        label: 'Toggle theme',
+        action: toggleTheme,
+        icon: getIconHTML(SunMoon),
+        dividerAfter: false,
+      };
+
+      mobileMenu.setItems([...baseItems, ...authItems, themeItem]);
+    };
+
+    // Subscribe to auth changes - onAuthReady handles deduplication
+    onAuthReady((user) => {
+      authWidget.setUser(user);
+      updateMobileMenu(user);
+    });
+  </script>
+
+  <style>
+    .help-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-medium);
+    }
+
+    .help-section {
+      margin-bottom: var(--spacing-2x-large);
+    }
+
+    .help-section :global(h2) {
+      font-size: var(--font-size-x-large);
+      font-weight: 500;
+      margin-bottom: var(--spacing-medium);
+      color: var(--color-text-heading);
+    }
+
+    .help-section :global(h3) {
+      font-size: var(--font-size-large);
+      font-weight: 500;
+      margin-bottom: var(--spacing-small);
+      color: var(--color-text-heading);
+    }
+
+    .help-section :global(p) {
+      font-size: var(--font-size-medium);
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-medium);
+    }
+
+    .help-section :global(p:last-child) {
+      margin-bottom: 0;
+    }
+
+    .help-section :global(a) {
+      color: var(--color-link);
+      text-decoration: none;
+      border-bottom: 1px solid var(--color-link-border);
+      transition: border-color var(--transition-fast);
+    }
+
+    .help-section :global(a:hover) {
+      border-bottom-color: var(--color-link-border-hover);
+    }
+
+    .help-section :global(strong) {
+      font-weight: 600;
+      color: var(--color-text-heading);
+    }
+
+    .help-section :global(pre) {
+      border-radius: var(--border-radius-medium);
+      padding: var(--spacing-medium);
+      margin: var(--spacing-medium) 0;
+      overflow-x: auto;
+      font-size: var(--font-size-small);
+      line-height: 1.5;
+    }
+
+    /* Switch to dark theme colors when in dark mode */
+    :global([data-theme='dark']) .help-section :global(pre) {
+      background-color: var(--shiki-dark-bg) !important;
+      color: var(--shiki-dark) !important;
+    }
+
+    :global([data-theme='dark']) .help-section :global(pre span) {
+      color: var(--shiki-dark) !important;
+    }
+
+    .help-section :global(code) {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    }
+
+    .help-section :global(p code) {
+      background-color: var(--color-background-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-small);
+      padding: 2px 6px;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      .help-page {
+        padding: 0 var(--spacing-small);
+      }
+
+      .help-section :global(h2) {
+        font-size: var(--font-size-large);
+      }
+
+      .help-section :global(h3) {
+        font-size: var(--font-size-medium);
+      }
+
+      .help-section :global(p) {
+        font-size: var(--font-size-small);
+      }
+    }
+  </style>
+</Layout>

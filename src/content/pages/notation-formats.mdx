@@ -1,0 +1,46 @@
+---
+title: Notation Format Help
+---
+
+## Score Notation Formats
+
+### JSON Format
+
+Shakuhachi score notation in JSON format. Each note has a pitch (step and octave) and duration.
+
+**Example:**
+```json
+{
+  "notes": [
+    {"pitch": {"step": "ro", "octave": 0}, "duration": 1},
+    {"pitch": {"step": "tsu", "octave": 0}, "duration": 1},
+    {"pitch": {"step": "re", "octave": 0}, "duration": 1}
+  ]
+}
+```
+
+**Valid note steps:** ro, tsu, re, chi, ri, u, hi
+
+**Octaves:** 0 (otsu), 1 (kan), 2 (daikan)
+
+**Duration:** 1 (quarter note), 2 (half note), 4 (whole note)
+
+### ABC Notation
+
+Text-based music notation. Must include K: (key) field.
+
+**Example:**
+```
+K:D
+D F G A d
+```
+
+[ABC Notation Standard](https://abcnotation.com/wiki/abc:standard:v2.1)
+
+**Note:** Plans to add shakuhachi-specific ABC notation using Ro-Tsu-Re notation in the future.
+
+### MusicXML Format
+
+Standard music notation XML format.
+
+[MusicXML Documentation](https://www.w3.org/2021/06/musicxml40/)
