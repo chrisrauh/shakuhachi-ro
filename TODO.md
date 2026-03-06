@@ -21,49 +21,21 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Tier 1: Critical User-Facing Issues (Fix Now)
-
-- [ ] [Backend] [A:Medium] [Quality-Explicit] Slug utility: handle Unicode characters (Japanese score titles)
-  - `src/utils/slug.ts:16` — `replace(/[^\w\s-]/g, '')` strips all non-ASCII characters. A score titled "赤とんぼ" produces an empty slug; "Ranjo 大師" loses "大師" and becomes just "ranjo". For a shakuhachi app where Japanese titles are common, this silently produces ambiguous or empty slugs. Either transliterate (e.g., use a library like `slugify` with Unicode support) or preserve Unicode word characters in the regex.
-
 ### Tier 2: Stability & Quality (Prevent Future Issues)
 
-- [ ] [UI] [A:High] [Visual-Testing] Update existing visual tests to capture both light and dark mode
-  - [ ] Browse page - light & dark mode screenshots
-  - [ ] Editor page - light & dark mode screenshots
-  - [ ] Score detail page - light & dark mode screenshots
-  - [ ] Add appropriate wait times for theme transitions
-  - [ ] Ensure score rendering completes before capturing
 
-- [ ] [UI] [A:High] [Visual-Testing] Add visual regression tests for Score page (/score)
-  - [ ] Test score rendering (full page and viewport)
-  - [ ] Test debug mode
-  - [ ] Test different viewport sizes (desktop, tablet, mobile)
-
-- [ ] [UI] [A:High] [Visual-Testing] Update Browse page visual tests to properly test library view
-  - [ ] Test empty state (no scores)
-  - [ ] Test with scores displayed
-  - [ ] Test search/filter interactions
-
-- [ ] [UI] [A:High] [Visual-Testing] Add cross-viewport testing (desktop 1280x720, tablet 768x1024, mobile 375x667)
-
-- [ ] [UI] [A:High] [Visual-Testing] Add visual tests for different auth states (logged in vs logged out)
-
-- [ ] [UI] [A:High] [Quality-Testing] Replace waitForTimeout with waitForSelector in visual regression tests
-  - `tests/visual/visual-regression.spec.ts:34,47,60,73` — All four tests use `page.waitForTimeout(2000)` which is fragile (slow on CI, may pass prematurely on fast machines). Replace with `page.waitForSelector('svg')` or `page.waitForSelector('[data-testid="score-rendered"]')` to wait for actual score rendering completion.
-
-- [ ] [Backend] [A:High] [Quality-FailFast] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
+- [x] [Backend] [A:High] [Quality-FailFast] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
   - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
   - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
 
-- [ ] [Backend] [A:High] [Quality-FailFast] forkScore: check error on fork count increment
+- [x] [Backend] [A:High] [Quality-FailFast] forkScore: check error on fork count increment
   - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
 
-- [ ] [Backend] [A:High] [Quality-FailFast] forkScore: handle slug query error in createScore
+- [x] [Backend] [A:High] [Quality-FailFast] forkScore: handle slug query error in createScore
   - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
 
-- [ ] [Backend] [A:High] [Quality-FailFast] ScoreDetailClient.handleFork: preserve error context in catch block
-  - [ ] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
+- [x] [Backend] [A:High] [Quality-FailFast] ScoreDetailClient.handleFork: preserve error context in catch block
+  - [x] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
 
 - [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for MusicXMLParser
   - `src/parser/MusicXMLParser.ts` has 0 tests. The XML-to-ScoreData pipeline is the primary data entry point for the application. Test: valid MusicXML produces correct ScoreData, missing `<pitch>` elements are handled, unknown pitch mappings are skipped with warning, dotted notes get `dotted: true`, rests produce `rest: true`, `parseFromURL` handles HTTP errors.
@@ -74,9 +46,6 @@
 - [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for scores.ts CRUD operations
   - `src/api/scores.ts` has 0 tests. Test: `createScore` generates unique slug and inserts record, `getScoreBySlug` returns score or null, `updateScore` updates only specified fields, `deleteScore` removes record, `forkScore` creates copy and increments parent fork count, error wrapping returns consistent `{ score: null, error }` shape.
 
-- [ ] [Both] [A:High] [Architecture] Fix potential theme detection bug: MutationObserver watches wrong attribute
-  - `ScoreDetailClient.setupThemeListener()` (line 103) and `ScoreEditor.setupThemeListener()` (line 45) both use `MutationObserver` with `attributeFilter: ['class']`. But `ThemeSwitcher.applyTheme()` sets the `data-theme` attribute on `<html>`, not `class`. The theme re-render may not be firing reliably. This is related to the existing task "Replace MutationObserver theme detection with a custom event" — fixing it by switching to a custom event would solve both the bug and the coupling.
-  - **Validate first**: Read `ThemeSwitcher.ts` to confirm which attribute it sets. Test in browser whether theme changes actually trigger re-renders in the editor and score detail pages. If the observer already works (e.g., a CSS framework also toggles `class`), document why.
 
 ### Tier 3: User Experience Enhancements
 
@@ -140,8 +109,6 @@
 - [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
   - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
 
-- [ ] [Both] [A:High] [Quality-Coupling] Replace MutationObserver theme detection with a custom event [Claude validated]
-  - `src/components/ScoreDetailClient.ts:148` and `src/components/ScoreEditor.ts:66` — Both components use `MutationObserver` watching attribute changes on `document.documentElement` to detect theme switches, then re-render. This is overcomplicated, duplicated, and couples components to the DOM structure of the theme switcher. Instead, have `ThemeSwitcher` dispatch a custom event (e.g., `document.dispatchEvent(new CustomEvent('theme-changed'))`) and have components listen for it. Simpler, more explicit, and decouples theme detection from DOM implementation.
 
 - [ ] [UI] [A:High] [Quality-DRY] Refactor AuthModal to use ConfirmDialog (DRY violation)
   - `src/components/AuthComponents.ts` and `src/components/ConfirmDialog.ts` have significant duplication

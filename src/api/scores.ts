@@ -89,10 +89,19 @@ export async function createScore(
     }
 
     // Get existing slugs to ensure uniqueness
-    const { data: existingScores } = await supabase
+    const { data: existingScores, error: slugQueryError } = await supabase
       .from('scores')
       .select('slug')
       .ilike('slug', `${baseSlug}%`);
+
+    if (slugQueryError) {
+      return {
+        score: null,
+        error: new Error(
+          `Failed to check slug uniqueness: ${slugQueryError.message}`,
+        ),
+      };
+    }
 
     const existingSlugs = existingScores?.map((s) => s.slug) || [];
     const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
@@ -434,10 +443,17 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     }
 
     // Increment fork count on parent score
-    await supabase
+    const { error: forkCountError } = await supabase
       .from('scores')
       .update({ fork_count: originalScore.fork_count + 1 })
       .eq('id', scoreId);
+
+    if (forkCountError) {
+      console.warn(
+        `Failed to increment fork_count for score ${scoreId}:`,
+        forkCountError.message,
+      );
+    }
 
     return forkResult;
   } catch (error) {
