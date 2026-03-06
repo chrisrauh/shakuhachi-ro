@@ -249,42 +249,6 @@ class ShakuhachiScore extends HTMLElement {
   }
 
   /**
-   * Read CSS custom properties for theming
-   * Falls back to defaults if not specified
-   */
-  private getThemeOptions(): {
-    noteColor: string;
-    noteFontSize: number;
-    noteFontWeight: number;
-    noteFontFamily: string;
-    noteVerticalSpacing: number;
-  } {
-    const computedStyle = getComputedStyle(this);
-
-    return {
-      noteColor:
-        computedStyle.getPropertyValue('--shakuhachi-note-color').trim() ||
-        '#000',
-      noteFontSize:
-        parseInt(
-          computedStyle.getPropertyValue('--shakuhachi-note-font-size'),
-        ) || 28,
-      noteFontWeight:
-        parseInt(
-          computedStyle.getPropertyValue('--shakuhachi-note-font-weight'),
-        ) || 400,
-      noteFontFamily:
-        computedStyle
-          .getPropertyValue('--shakuhachi-note-font-family')
-          .trim() || 'Noto Sans JP, sans-serif',
-      noteVerticalSpacing:
-        parseInt(
-          computedStyle.getPropertyValue('--shakuhachi-note-vertical-spacing'),
-        ) || 44,
-    };
-  }
-
-  /**
    * Render the shakuhachi score
    * Creates shadow DOM with styles and ScoreRenderer instance
    */
@@ -317,9 +281,6 @@ class ShakuhachiScore extends HTMLElement {
         isExplicitColumnCount = true;
         columnCount = columns;
       }
-
-      // Get theme options
-      const themeOptions = this.getThemeOptions();
 
       // Create container
       const container = document.createElement('div');
@@ -401,7 +362,11 @@ class ShakuhachiScore extends HTMLElement {
         autoResize: this.getAttribute('auto-resize') !== 'false',
         width,
         height,
-        ...themeOptions,
+        noteColor: 'var(--shakuhachi-note-color)',
+        noteFontSize: DEFAULT_RENDER_OPTIONS.noteFontSize,
+        noteFontWeight: DEFAULT_RENDER_OPTIONS.noteFontWeight,
+        noteFontFamily: DEFAULT_RENDER_OPTIONS.noteFontFamily,
+        noteVerticalSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       };
 
       // Render using ScoreRenderer
