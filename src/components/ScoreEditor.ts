@@ -54,25 +54,11 @@ export class ScoreEditor {
 
     this.render();
     this.setupAutoSave();
-    this.setupThemeListener();
 
     window.addEventListener('beforeunload', (e) => {
       if (this.hasUnsavedChanges) {
         e.preventDefault();
       }
-    });
-  }
-
-  private setupThemeListener(): void {
-    // Use MutationObserver to watch for theme attribute changes on <html>
-    const observer = new MutationObserver(() => {
-      // Re-render preview when theme changes
-      this.updatePreview();
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
     });
   }
 
@@ -391,15 +377,10 @@ export class ScoreEditor {
 
         if (!container) return;
 
-        // Read theme-aware colors from CSS variables
-        const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-primary')
-          .trim();
-
         // Set CSS variables for theme colors BEFORE setting attributes
         container.style.setProperty(
           '--shakuhachi-note-color',
-          noteColor || '#000',
+          'var(--color-text-primary)',
         );
         container.style.setProperty(
           '--shakuhachi-note-vertical-spacing',
@@ -475,15 +456,10 @@ export class ScoreEditor {
 
       if (!container) return;
 
-      // Read theme-aware colors from CSS variables
-      const noteColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-text-primary')
-        .trim();
-
       // Set CSS variables for theme colors BEFORE setting attributes
       container.style.setProperty(
         '--shakuhachi-note-color',
-        noteColor || '#000',
+        'var(--color-text-primary)',
       );
       container.style.setProperty(
         '--shakuhachi-note-vertical-spacing',

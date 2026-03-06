@@ -53,9 +53,6 @@ export class ScoreDetailClient {
     if (this.score) {
       // Attach event listeners
       this.attachEventListeners();
-
-      // Listen for theme changes and re-render score
-      this.setupThemeListener();
     }
   }
 
@@ -118,16 +115,11 @@ export class ScoreDetailClient {
       // Detect mobile viewport
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-      // Read theme-aware colors from CSS variables
-      const noteColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-text-primary')
-        .trim();
-
       // Set CSS variables for theme colors BEFORE setting attributes
       // (setting data-score attribute triggers render, so CSS vars must be ready)
       container.style.setProperty(
         '--shakuhachi-note-color',
-        noteColor || '#000',
+        'var(--color-text-primary)',
       );
       container.style.setProperty(
         '--shakuhachi-note-vertical-spacing',
@@ -158,32 +150,6 @@ export class ScoreDetailClient {
         </div>
       `;
     }
-  }
-
-  private setupThemeListener(): void {
-    // Use MutationObserver to watch for theme attribute changes on <html>
-    const observer = new MutationObserver(() => {
-      // Re-render score when theme changes
-      const container = document.getElementById('score-renderer') as any;
-      if (container && container.forceRender) {
-        // Update CSS variable first
-        const noteColor = getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-text-primary')
-          .trim();
-        container.style.setProperty(
-          '--shakuhachi-note-color',
-          noteColor || '#000',
-        );
-
-        // Force web component to re-render with new theme
-        container.forceRender();
-      }
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
   }
 
   private attachEventListeners() {
