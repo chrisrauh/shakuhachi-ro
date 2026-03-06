@@ -32,7 +32,7 @@ export class MusicXMLParser {
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
 
-    noteElements.forEach((noteElement) => {
+    noteElements.forEach((noteElement, i) => {
       // Check for rests
       const restElement = noteElement.querySelector('rest');
       if (restElement) {
@@ -52,6 +52,7 @@ export class MusicXMLParser {
       // Extract pitch
       const pitchElement = noteElement.querySelector('pitch');
       if (!pitchElement) {
+        console.warn(`Skipping note at index ${i}: no <pitch> element`);
         return;
       }
 
