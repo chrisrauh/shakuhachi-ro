@@ -106,7 +106,7 @@ export class ScoreLibrary {
 
   private handleScoreClick(scoreSlug: string): void {
     // Navigate to score detail page
-    window.location.href = `/score/${scoreSlug}`;
+    window.location.href = `/score/${encodeURIComponent(scoreSlug)}`;
   }
 
   private render(): void {

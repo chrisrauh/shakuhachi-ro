@@ -290,7 +290,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
             }
 
             // Redirect to edit page
-            window.location.href = `/score/${result.slug}/edit`;
+            window.location.href = `/score/${encodeURIComponent(result.slug)}/edit`;
           } catch (error) {
             toast.error(STRINGS.ERRORS.ScoreEditor.createScoreFailed, { duration: Infinity });
             loadingState.hide();

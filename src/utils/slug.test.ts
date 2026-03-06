@@ -14,16 +14,31 @@ describe('generateSlug', () => {
 
   it('removes apostrophes and special characters', () => {
     expect(generateSlug("San'ya Sugagaki")).toBe('sanya-sugagaki');
-    expect(generateSlug('Akatombo (赤とんぼ)')).toBe('akatombo');
+    expect(generateSlug('Akatombo (赤とんぼ)')).toBe('akatombo-赤とんぼ');
   });
 
   it('collapses multiple hyphens and trims', () => {
     expect(generateSlug('--hello---world--')).toBe('hello-world');
   });
 
-  it('produces empty slug for non-ASCII-only input', () => {
-    expect(generateSlug('赤とんぼ')).toBe('');
+  it('preserves Unicode characters', () => {
+    expect(generateSlug('赤とんぼ')).toBe('赤とんぼ');
+    expect(generateSlug('Café du Monde')).toBe('café-du-monde');
+    expect(generateSlug('Привет Мир')).toBe('привет-мир');
+    expect(generateSlug('Love Story (愛の物語)')).toBe('love-story-愛の物語');
+  });
+
+  it('produces empty slug for punctuation-only input', () => {
     expect(generateSlug('!@#$%')).toBe('');
+    expect(generateSlug('---')).toBe('');
+    expect(generateSlug('   ')).toBe('');
+  });
+
+  it('normalizes Unicode to NFC form', () => {
+    // Composed vs decomposed é (different byte sequences, same visual)
+    const composed = 'café'; // é as single character (U+00E9)
+    const decomposed = 'cafe\u0301'; // e + combining acute accent (U+0065 U+0301)
+    expect(generateSlug(composed)).toBe(generateSlug(decomposed));
   });
 });
 
