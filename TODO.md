@@ -21,31 +21,6 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Tier 2: Stability & Quality (Prevent Future Issues)
-
-
-- [x] [Backend] [A:High] [Quality-FailFast] MusicXMLParser: warn on skipped notes instead of silent return [Claude validated]
-  - `src/web-component/parser/MusicXMLParser.ts:53-54` — When a `<note>` element has no `<pitch>` child (and is not a rest), the parser silently `return`s, dropping the note from the score. The user sees a rendered score with missing notes and no explanation. Add `console.warn(`Skipping note at index ${i}: no <pitch> element`)` before the return.
-  - Same issue at line 67 for unknown pitch mappings — already warns, which is good, but consider collecting warnings and surfacing them to the caller.
-
-- [x] [Backend] [A:High] [Quality-FailFast] forkScore: check error on fork count increment
-  - `src/api/scores.ts:411-414` — After creating a forked score, the parent's `fork_count` is incremented via `supabase.from('scores').update(...)` but the result is never checked. If the update fails, the fork count silently drifts out of sync. Check the error and at minimum log a warning.
-
-- [x] [Backend] [A:High] [Quality-FailFast] forkScore: handle slug query error in createScore
-  - `src/api/scores.ts:69-74` — When generating a unique slug, the Supabase query `supabase.from('scores').select('slug').ilike(...)` has no error checking. If the query fails, `existingScores` is undefined, `existingSlugs` becomes `[]`, and a potentially duplicate slug is used. Check the error before proceeding.
-
-- [x] [Backend] [A:High] [Quality-FailFast] ScoreDetailClient.handleFork: preserve error context in catch block
-  - [x] `catch {}` still doesn't bind the error variable — add `console.error('Fork failed:', error)` so debugging context isn't lost
-
-- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for MusicXMLParser
-  - `src/parser/MusicXMLParser.ts` has 0 tests. The XML-to-ScoreData pipeline is the primary data entry point for the application. Test: valid MusicXML produces correct ScoreData, missing `<pitch>` elements are handled, unknown pitch mappings are skipped with warning, dotted notes get `dotted: true`, rests produce `rest: true`, `parseFromURL` handles HTTP errors.
-
-- [ ] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreEditor validation and save logic
-  - `src/components/ScoreEditor.ts` has 0 tests. The `validateScoreData()` method (lines 120-150) handles JSON and XML parsing with error messages — test valid/invalid inputs for both formats. The `handleSave()` method (lines 238-307) has branching for create vs update, error handling, and localStorage cleanup — test each path.
-
-- [ ] [Backend] [A:High] [Quality-Testing] Add unit tests for scores.ts CRUD operations
-  - `src/api/scores.ts` has 0 tests. Test: `createScore` generates unique slug and inserts record, `getScoreBySlug` returns score or null, `updateScore` updates only specified fields, `deleteScore` removes record, `forkScore` creates copy and increments parent fork count, error wrapping returns consistent `{ score: null, error }` shape.
-
 
 ### Tier 3: User Experience Enhancements
 
