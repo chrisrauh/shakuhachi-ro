@@ -70,15 +70,20 @@ This project is used in two environments: a local terminal and **Claude Code on 
 
 1. **Check current branch** - If on main, create feature branch before any work
 2. Create feature branch (if not already on one)
-3. Make changes and test
+3. **Verify the task before starting** — the checkbox is a claim, not a fact; the code is ground truth:
+   - For test tasks: `Glob` for the test file, read it to check coverage
+   - For implementation tasks: `Grep` for the function/class/feature
+   - For bug fixes: confirm the bug still exists in the code
+   - If already done: mark `[x]` and move on without re-implementing
+4. Make changes and test
 4. **Ask user to review changes before committing**
 5. Commit locally (no push yet)
-6. Mark completed tasks in TODO.md with [x]
+6. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked**
 7. Ask user if you should create PR
 8. Push and create PR
 9. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
 10. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
-11. Remove completed tasks from TODO.md
+11. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked**
 12. Look for next task in TODO.md and ask user if you should work on it
 
 For multi-phase work, create separate PR for each phase.
