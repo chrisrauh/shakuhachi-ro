@@ -1,6 +1,10 @@
 import { supabase } from './supabase';
 import { getCurrentUser } from './auth';
-import { generateSlug, ensureUniqueSlug } from '../utils/slug';
+import {
+  generateSlug,
+  ensureUniqueSlug,
+  generateUniqueRandomSlug,
+} from '../utils/slug';
 
 export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
@@ -72,7 +76,17 @@ export async function createScore(
     }
 
     // Generate slug from title
-    const baseSlug = generateSlug(scoreData.title);
+    let baseSlug = generateSlug(scoreData.title);
+
+    // Fallback to random slug if title is all punctuation/symbols
+    if (!baseSlug) {
+      const { slug: randomSlug, error: randomError } =
+        await generateUniqueRandomSlug();
+      if (randomError) {
+        return { score: null, error: randomError };
+      }
+      baseSlug = randomSlug;
+    }
 
     // Get existing slugs to ensure uniqueness
     const { data: existingScores } = await supabase

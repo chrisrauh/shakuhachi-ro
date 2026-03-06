@@ -8,12 +8,13 @@
 export function generateSlug(text: string): string {
   return (
     text
+      .normalize('NFC')
       .toLowerCase()
       .trim()
       // Remove apostrophes
       .replace(/'/g, '')
-      // Replace spaces and special characters with hyphens
-      .replace(/[^\w\s-]/g, '')
+      // Replace spaces and special characters with hyphens (preserves Unicode letters/numbers)
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
       .replace(/[\s_]+/g, '-')
       // Remove leading/trailing hyphens
       .replace(/^-+|-+$/g, '')
