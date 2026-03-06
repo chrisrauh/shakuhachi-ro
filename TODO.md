@@ -23,16 +23,6 @@
 
 ### Tier 1: Critical User-Facing Issues (Fix Now)
 
-- [x] [UI] [A:Medium] [Alpha] Consolidate loading spinner implementations [Claude validated - 3 duplicates confirmed]
-  - Currently: Inline SVG spinners duplicated in 3 places (fork, delete, create)
-    - Layout.astro:284-289 (create button)
-    - ScoreDetailClient.ts:262-268 (fork button)
-    - ScoreDetailClient.ts:208-212 (delete button)
-  - Create reusable spinner utility or component
-  - Standardize spinner size, animation, and appearance
-  - Consider creating `src/utils/loading-spinner.ts` with `showLoadingSpinner(button, text?)` helper
-  - Apply DRY principle to reduce code duplication
-
 - [ ] [UI] [A:Medium] [Alpha] Notation format help in editor
   - Examples of valid notation
   - Links to documentation
