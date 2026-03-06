@@ -269,6 +269,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       import { createEmptyScore } from '../utils/create-score-handler';
       import { toast } from '../components/Toast';
       import { STRINGS } from '../constants/strings';
+      import { ButtonLoadingState } from '../components/LoadingSpinner';
 
       document.addEventListener('DOMContentLoaded', () => {
         const createBtn = document.querySelector('a[aria-label="Create new score"]');
@@ -276,29 +277,15 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         createBtn?.addEventListener('click', async (e) => {
           e.preventDefault();
 
-          // Save original content
-          const originalContent = createBtn.innerHTML;
-
-          // Show loading spinner
-          createBtn.classList.add('loading');
-          createBtn.setAttribute('aria-busy', 'true');
-          createBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3" stroke-dasharray="15.7" stroke-dashoffset="0">
-                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-              </circle>
-            </svg>
-          `;
+          const loadingState = new ButtonLoadingState(createBtn as HTMLElement);
+          loadingState.show(); // Icon-only, no text
 
           try {
             const result = await createEmptyScore();
 
             if (result.error) {
               toast.error(result.error.message, { duration: Infinity });
-              // Restore original content on error
-              createBtn.innerHTML = originalContent;
-              createBtn.classList.remove('loading');
-              createBtn.setAttribute('aria-busy', 'false');
+              loadingState.hide();
               return;
             }
 
@@ -306,10 +293,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
             window.location.href = `/score/${result.slug}/edit`;
           } catch (error) {
             toast.error(STRINGS.ERRORS.ScoreEditor.createScoreFailed, { duration: Infinity });
-            // Restore original content on error
-            createBtn.innerHTML = originalContent;
-            createBtn.classList.remove('loading');
-            createBtn.setAttribute('aria-busy', 'false');
+            loadingState.hide();
           }
         });
       });
