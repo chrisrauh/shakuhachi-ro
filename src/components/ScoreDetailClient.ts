@@ -241,7 +241,8 @@ export class ScoreDetailClient {
         // Redirect to editor with the forked score
         window.location.href = `/editor.html?id=${result.score.id}`;
       }
-    } catch {
+    } catch (error) {
+      console.error('Fork failed:', error);
       toast.error(STRINGS.ERRORS.ScoreDetailClient.forkFailed);
       loadingState?.hide();
     }
