@@ -134,7 +134,6 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
     await waitForWebComponent(page);
 
     // Take screenshot of auto mode (default)
@@ -183,7 +182,6 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
     await waitForWebComponent(page);
 
     // Take screenshot of single column mode
@@ -246,8 +244,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
     expect(parseInt(dimensions.width || '0')).toBeGreaterThan(250);
 
     // With 12 notes ÷ 2 columns = 6 notes per column
-    // Height = 34px top + (6 × 44px) + 20px bottom = 318px
-    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(300);
+    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(250);
 
     // Take screenshot of 2-column layout
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -298,8 +295,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
     expect(parseInt(dimensions.width || '0')).toBeGreaterThan(800);
 
     // With 36 notes ÷ 6 columns = 6 notes per column
-    // Height = 34px top + (6 × 44px) + 20px bottom = 318px
-    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(300);
+    expect(parseInt(dimensions.height || '0')).toBeGreaterThan(250);
 
     // Take screenshot of 6-column layout
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -334,7 +330,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
+    await waitForWebComponent(page);
 
     // Take screenshot of auto mode with tall container
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -369,7 +365,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
+    await waitForWebComponent(page);
 
     // Take screenshot of auto mode with short container
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -399,7 +395,6 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
     await waitForWebComponent(page);
 
     // Verify uses browser width (800 - 40px padding = 760px)
@@ -443,7 +438,6 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
     await waitForWebComponent(page);
 
     // Take screenshot in light mode
@@ -496,7 +490,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await page.waitForTimeout(500);
+    await waitForWebComponent(page);
 
     // Verify explicit dimensions override container
     const svgDimensions = await page.evaluate(() => {

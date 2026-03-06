@@ -15,11 +15,15 @@
  * - Mobile menu now includes "Log In" and "Sign Up" buttons
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { test, expect } from '@playwright/test';
 
 const TEST_EMAIL = process.env.TEST_EMAIL || '';
 const TEST_PASSWORD = process.env.TEST_PASSWORD || '';
 const TEST_SCORE_SLUG = 'test'; // Test score fixture (see CLAUDE.md)
+const AUTH_FILE = 'tests/visual/.auth/user.json';
 
 /**
  * Helper to set theme via data attribute
@@ -79,20 +83,31 @@ async function waitForEditor(page: any) {
   // Wait for preview panel to exist (may be hidden on mobile)
   await page.waitForSelector('#score-preview', { state: 'attached' });
 
-  // Additional wait for web component to render
-  await page.waitForTimeout(500);
+  // Wait for web component to render in shadow root
+  await page.waitForFunction(() => {
+    const c = document.querySelector('shakuhachi-score');
+    return c?.shadowRoot?.querySelector('svg') !== null;
+  });
 }
 
 test.describe('Score Editor Mobile Viewport (375x667)', () => {
-  test.use({ viewport: { width: 375, height: 667 } });
+  test.use({ viewport: { width: 375, height: 667 }, storageState: AUTH_FILE });
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeAll(async ({ browser }) => {
     if (!TEST_EMAIL || !TEST_PASSWORD) {
       throw new Error('TEST_EMAIL and TEST_PASSWORD must be set in .env file');
     }
-
-    // Authenticate using mobile menu (real mobile flow)
+    fs.mkdirSync(path.dirname(AUTH_FILE), { recursive: true });
+    // Use empty storage state to bypass test.use({ storageState: AUTH_FILE })
+    // (the file doesn't exist yet — we're about to create it)
+    const context = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const page = await context.newPage();
     await authenticate(page);
+    await context.storageState({ path: AUTH_FILE });
+    await page.close();
+    await context.close();
   });
 
   test('Light mode - Editor panel default', async ({ page }) => {

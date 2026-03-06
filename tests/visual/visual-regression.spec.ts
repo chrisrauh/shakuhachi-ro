@@ -17,13 +17,13 @@
  *   npm run test:visual:report       # View HTML report with diffs
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 // Test configurations
 const pages = [
-  { name: 'landing', path: '/' },
-  { name: 'akatombo', path: '/score/akatombo' },
-  { name: 'buttons', path: '/test/buttons' },
+  { name: 'landing', path: '/', hasWebComponent: false },
+  { name: 'akatombo', path: '/score/akatombo', hasWebComponent: true },
+  { name: 'buttons', path: '/test/buttons', hasWebComponent: false },
 ];
 
 const colorSchemes = ['light', 'dark'] as const;
@@ -32,6 +32,13 @@ const viewports = [
   { name: 'desktop', width: 1280, height: 780 },
   { name: 'mobile', width: 375, height: 1450 },
 ];
+
+async function waitForScoreRendered(page: Page) {
+  await page.waitForFunction(() => {
+    const c = document.querySelector('shakuhachi-score');
+    return c?.shadowRoot?.querySelector('svg') !== null;
+  });
+}
 
 test.describe('Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
@@ -63,7 +70,9 @@ test.describe('Visual Regression', () => {
           await page.goto(pageConfig.path);
 
           // Wait for rendering to complete
-          await page.waitForTimeout(1000);
+          if (pageConfig.hasWebComponent) {
+            await waitForScoreRendered(page);
+          }
 
           // Take screenshot and compare to baseline
           await expect(page).toHaveScreenshot(screenshotName, {
@@ -87,7 +96,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/test/shakuhachi-score.html');
 
     // Wait for rendering to complete
-    await page.waitForTimeout(1000);
+    await waitForScoreRendered(page);
 
     // Take full-page screenshot
     await expect(page).toHaveScreenshot('shakuhachi-score-full-page.png', {
