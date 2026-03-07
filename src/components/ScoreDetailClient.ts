@@ -239,7 +239,7 @@ export class ScoreDetailClient {
 
       if (result.score) {
         // Redirect to editor with the forked score
-        window.location.href = `/editor.html?id=${result.score.id}`;
+        window.location.href = `/score/${result.score.slug}/edit`;
       }
     } catch (error) {
       console.error('Fork failed:', error);
