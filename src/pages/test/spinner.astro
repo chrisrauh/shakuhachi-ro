@@ -1,9 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { buildSpinnerSVG } from '../../components/LoadingSpinner';
+import { buildSpinnerSVG, buildButtonSpinnerSVG } from '../../components/LoadingSpinner';
 
 const title = 'Loading Spinner';
 const spinner = buildSpinnerSVG();
+const btnSpinner = buildButtonSpinnerSVG();
 ---
 
 <Layout title={title} currentPage="browse">
@@ -38,6 +39,25 @@ const spinner = buildSpinnerSVG();
         <button class="btn btn-primary btn-sm" data-btn-demo data-loading-text="Saving…">
           Small
         </button>
+        <button class="btn btn-icon btn-primary" aria-label="Trigger loading" data-btn-demo data-icon-btn>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <button class="btn btn-icon" aria-label="Trigger loading" data-btn-demo data-icon-btn>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Loading States</h2>
+      <p>Static examples — already in loading state.</p>
+      <div class="button-demo-row">
+        <button class="btn btn-primary loading" disabled aria-busy="true" set:html={`${btnSpinner}\nSaving…`} />
+        <button class="btn btn-secondary loading" disabled aria-busy="true" set:html={`${btnSpinner}\nLoading…`} />
+        <button class="btn btn-danger loading" disabled aria-busy="true" set:html={`${btnSpinner}\nDeleting…`} />
+        <button class="btn btn-primary btn-sm loading" disabled aria-busy="true" set:html={`${btnSpinner}\nSaving…`} />
+        <button class="btn btn-icon btn-primary loading" aria-label="Loading" disabled aria-busy="true" set:html={btnSpinner} />
+        <button class="btn btn-icon loading" aria-label="Loading" disabled aria-busy="true" set:html={btnSpinner} />
       </div>
     </section>
 
@@ -49,23 +69,25 @@ const spinner = buildSpinnerSVG();
     padding: 2rem;
     max-width: 860px;
     margin: 0 auto;
+    padding: 0;
   }
 
   .spinner-test-page h1 {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
+    margin-top: 0;
   }
 
   .spinner-test-page > p {
     color: var(--color-text-muted);
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   .demo-section {
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem 1.25rem;
   }
 
   .demo-row {
@@ -90,13 +112,14 @@ const spinner = buildSpinnerSVG();
   }
 
   .demo-section + .demo-section {
-    margin-top: 1.5rem;
+    margin-top: 0.75rem;
   }
 
   .demo-section h2 {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
+    margin-top:0;;
   }
 
   .demo-section > p {
@@ -122,9 +145,9 @@ const spinner = buildSpinnerSVG();
     radius: 8,
     gap: 8,
     strokeWidth: 0,
-    stepDuration: 0.4,
-    fadeIn: 0.4,
-    fadeOut: 0.4,
+    stepDuration: 0.5,
+    fadeIn: 0.5,
+    fadeOut: 0.5,
   };
 
   function updateAll() {
@@ -168,9 +191,9 @@ const spinner = buildSpinnerSVG();
 
   // Button spinner params
   const btnParams = {
-    radius: 8,
+    radius: 6,
     strokeWidth: 0,
-    stepDuration: 0.4,
+    stepDuration: 0.65,
   };
 
   function updateButtonSpinners() {
@@ -180,7 +203,7 @@ const spinner = buildSpinnerSVG();
       stepDuration: btnParams.stepDuration,
     });
     // Update spinners inside any button currently in loading state
-    document.querySelectorAll('[data-btn-demo].loading svg').forEach((el) => {
+    document.querySelectorAll('.btn.loading svg').forEach((el) => {
       el.outerHTML = svg;
     });
   }
@@ -210,7 +233,8 @@ const spinner = buildSpinnerSVG();
       if (loading) {
         state.hide();
       } else {
-        state.show(btn.dataset.loadingText);
+        const isIcon = btn.hasAttribute('data-icon-btn');
+        state.show(isIcon ? undefined : btn.dataset.loadingText);
       }
       loading = !loading;
     });

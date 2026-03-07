@@ -32,9 +32,9 @@ export function buildSpinnerSVG({
   r = 8,
   gap = 8,
   strokeWidth = 0,
-  stepDuration = 0.4,
-  fadeIn = 0.4,
-  fadeOut = 0.4,
+  stepDuration = 0.5,
+  fadeIn = 0.5,
+  fadeOut = 0.5,
 }: SpinnerParams = {}): string {
   const d = r * 2;
   const step = d + gap;
@@ -73,12 +73,12 @@ export function buildSpinnerSVG({
 }
 
 export function buildButtonSpinnerSVG({
-  r = 8,
+  r = 6,
   strokeWidth = 0,
-  stepDuration = 0.4,
+  stepDuration = 0.65,
 }: SpinnerParams = {}): string {
   const d = r * 2;
-  const dur = `${stepDuration * 8}s`;
+  const dur = `${stepDuration * 2}s`;
   const style =
     `@keyframes sh-pulse{0%,100%{opacity:0.15}50%{opacity:1}}` +
     `.sh-pulse{fill:currentColor;stroke:var(--color-border);stroke-width:${strokeWidth};animation:sh-pulse ${dur} ease-in-out infinite}`;
