@@ -60,43 +60,40 @@ This project is used in two environments: a local terminal and **Claude Code on 
 
 ⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
 
-**CRITICAL: Always check branch state when starting work:**
-
-- At the beginning of any work session
-- After context compaction or session resumption
-- Before making any code changes
-- Run `git branch --show-current` to verify you're on a feature branch
+**Always verify branch before starting any work** (see step 1 below).
 
 **Standard workflow:**
 
-1. **Check current branch** - If on main, create feature branch before any work
-2. Create feature branch (if not already on one)
-3. **Verify the task before starting** — the checkbox is a claim, not a fact; the code is ground truth:
+1. **Check and set branch**: Run `git branch --show-current`. If on main, create a feature branch: `git checkout -b feature/descriptive-name`
+2. **Verify the task before starting** — the checkbox is a claim, not a fact; the code is ground truth:
    - For test tasks: `Glob` for the test file, read it to check coverage
    - For implementation tasks: `Grep` for the function/class/feature
    - For bug fixes: confirm the bug still exists in the code
    - If already done: mark `[x]` and move on without re-implementing
-4. Make changes and test
-5. **Ask user to review changes before committing**
-6. Commit locally (no push yet)
-7. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked**
-8. Ask user if you should create PR
-9. Push and create PR
-10. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
-11. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
-12. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked**
-13. Look for next task in TODO.md and ask user if you should work on it
-
-For multi-phase work, create separate PR for each phase.
+3. Make changes and test
+4. **Ask user to review changes before committing**
+5. Commit locally (no push yet)
+6. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked** (temporary marker — task will be removed after merge)
+7. Ask user if you should create PR
+8. Push and create PR
+9. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
+10. After user confirms merge, switch to main, pull and delete branches by running these 4 commands separately:
+    - `git checkout main`
+    - `git pull`
+    - `git branch -d <branch>`
+    - `git push origin --delete <branch>`
+11. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked** (final cleanup — do this immediately after merge confirmation)
+12. Look for next task in TODO.md and ask user if you should work on it
 
 **Recovery from accidental work on main:**
-If you discover you've been working on main (via `git branch --show-current`):
+Create a feature branch, commit, and PR normally.
 
-1. Don't panic - changes can be recovered
-2. Create feature branch from current state: `git checkout -b feature/descriptive-name`
-3. Stage and commit all changes to the feature branch
-4. Push and create PR normally
-5. The work is preserved and properly isolated
+If changes are already committed to main (but not pushed):
+
+1. `git checkout -b feature/descriptive-name`
+2. `git checkout main`
+3. `git reset --hard origin/main`
+4. `git checkout feature/descriptive-name`, push and PR
 
 **CRITICAL: Git Commit and PR Messages**
 
@@ -181,19 +178,13 @@ git push
 
 **CRITICAL: Reading Test Output**
 
-When running `npm test`, you MUST carefully read the ENTIRE output before reporting results:
-
 1. **Check type-check results**: Look for "0 errors, 0 warnings, 0 hints"
 2. **Check lint results**: Verify eslint completed without errors
 3. **Check unit test results**: Verify all tests passed (green checkmarks)
 4. **Never assume success**: If you see any errors, STOP and fix them before proceeding
 5. **Report accurately**: Only say "all tests passing" if ALL three steps (type-check, lint, tests) succeeded
 
-**Common mistake pattern:**
-
-- ❌ Seeing unit tests pass and reporting "all tests passing" without reading lint output
-- ❌ Missing lint failures because you only looked at the bottom of the output
-- ✅ Read the full output line by line, verify each step passed
+**Common mistake:** Seeing unit tests pass and reporting success without reading lint output. Read the full output — verify all three steps.
 
 **After creating new files:**
 
@@ -243,7 +234,7 @@ Run `npm run test:visual` before creating PR. When tests fail:
 - Only update baselines after user approval with `npm run test:visual:update`
 - Unit tests can be updated directly as they don't require visual approval
 
-**CRITICAL: NEVER proceed with failing tests**
+**⚠️ CRITICAL: NEVER proceed with failing tests**
 
 - If ANY test fails, STOP and investigate
 - NEVER update baselines without user approval
@@ -255,7 +246,7 @@ Run `npm run test:visual` before creating PR. When tests fail:
 
 Test pages for visual verification during development (available when dev server is running):
 
-- **Buttons**: http://localhost:3003/test/buttons
+- **Buttons**: http://localhost:3001/test/buttons
   - Shows all button variants (icon, small, standard) with all color options
   - Displays default and disabled states side-by-side
   - Use for verifying button styling, sizing, alignment, and hover states

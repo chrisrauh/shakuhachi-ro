@@ -6,12 +6,11 @@ export interface MenuItem {
   href?: string;
   action?: () => void; // For action items like theme toggle, auth
   icon?: string; // SVG icon path
-  dividerAfter?: boolean; // Add divider after this item
 }
 
 export class MobileMenu {
   private container: HTMLElement;
-  private items: MenuItem[] = [];
+  private groups: MenuItem[][] = [];
   private isOpen: boolean = false;
   private dropdown: HTMLElement | null = null;
 
@@ -26,8 +25,8 @@ export class MobileMenu {
     this.setupEventListeners();
   }
 
-  public setItems(items: MenuItem[]): void {
-    this.items = items;
+  public setItems(groups: MenuItem[][]): void {
+    this.groups = groups;
   }
 
   private addStyles(): void {
@@ -156,52 +155,53 @@ export class MobileMenu {
     this.dropdown = document.createElement('div');
     this.dropdown.className = 'mobile-menu-dropdown';
 
-    this.items.forEach((item) => {
-      if (item.action) {
-        // Action button (theme toggle, auth)
-        const button = document.createElement('button');
-        button.className = 'mobile-menu-item';
+    this.groups.forEach((group, groupIndex) => {
+      group.forEach((item) => {
+        if (item.action) {
+          // Action button (theme toggle, auth)
+          const button = document.createElement('button');
+          button.className = 'mobile-menu-item';
 
-        // Add icon if provided
-        if (item.icon) {
-          const iconSpan = document.createElement('span');
-          iconSpan.className = 'mobile-menu-item-icon';
-          iconSpan.innerHTML = item.icon;
-          button.appendChild(iconSpan);
+          // Add icon if provided
+          if (item.icon) {
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'mobile-menu-item-icon';
+            iconSpan.innerHTML = item.icon;
+            button.appendChild(iconSpan);
+          }
+
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = item.label;
+          button.appendChild(labelSpan);
+
+          button.addEventListener('click', () => {
+            item.action!();
+            this.toggleMenu(); // Close menu after action
+          });
+          this.dropdown!.appendChild(button);
+        } else if (item.href) {
+          // Navigation link
+          const link = document.createElement('a');
+          link.href = item.href;
+          link.className = 'mobile-menu-item';
+
+          // Add icon if provided
+          if (item.icon) {
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'mobile-menu-item-icon';
+            iconSpan.innerHTML = item.icon;
+            link.appendChild(iconSpan);
+          }
+
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = item.label;
+          link.appendChild(labelSpan);
+
+          this.dropdown!.appendChild(link);
         }
+      });
 
-        const labelSpan = document.createElement('span');
-        labelSpan.textContent = item.label;
-        button.appendChild(labelSpan);
-
-        button.addEventListener('click', () => {
-          item.action!();
-          this.toggleMenu(); // Close menu after action
-        });
-        this.dropdown!.appendChild(button);
-      } else if (item.href) {
-        // Navigation link
-        const link = document.createElement('a');
-        link.href = item.href;
-        link.className = 'mobile-menu-item';
-
-        // Add icon if provided
-        if (item.icon) {
-          const iconSpan = document.createElement('span');
-          iconSpan.className = 'mobile-menu-item-icon';
-          iconSpan.innerHTML = item.icon;
-          link.appendChild(iconSpan);
-        }
-
-        const labelSpan = document.createElement('span');
-        labelSpan.textContent = item.label;
-        link.appendChild(labelSpan);
-
-        this.dropdown!.appendChild(link);
-      }
-
-      // Add divider if specified
-      if (item.dividerAfter) {
+      if (groupIndex < this.groups.length - 1) {
         const divider = document.createElement('div');
         divider.className = 'mobile-menu-divider';
         this.dropdown!.appendChild(divider);
