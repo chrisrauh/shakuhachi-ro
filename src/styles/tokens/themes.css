@@ -629,7 +629,6 @@
   /* SPECIAL */
   --color-separator: var(--color-gray-400); /* Visual separators */
   --color-logo: var(--color-gray-700); /* Logo */
-  --color-spinner-track: var(--color-gray-200); /* Loading spinner track */
 
   /* STATUS COLORS - Success */
   --color-text-success: var(--color-green-700); /* Success text */
@@ -688,9 +687,6 @@
   --color-link-border-hover: var(
     --color-blue-600
   ); /* Link hover underline/border */
-
-  /* LOADING INDICATORS */
-  --color-spinner-accent: var(--color-blue-600); /* Loading spinner accent */
 
   /* INPUT FOCUS */
   --color-input-border-focus: var(--color-blue-500); /* Input focus border */

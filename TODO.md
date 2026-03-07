@@ -22,16 +22,14 @@
 
 ### Global / Navigation
 
-- [ ] [UI] [A:Low] [Alpha] Revisit mobile menu action order
-  - Current order: Library, Create score, About, [divider], Auth items, [divider], Toggle theme
-  - Consider grouping by action type (navigation vs account vs settings)
-  - Evaluate whether auth actions should be higher priority (top of menu)
-  - Consider if theme toggle belongs at bottom or integrated with other settings
-  - Test with users to determine most intuitive ordering
-  - Current implementation works but may not be optimal for common workflows
-
-- [ ] Revisig loading spinner visual design
+- [x] Revisig loading spinner visual design
   - explore shakuhachi themed loading "spinner". For example, 5 dots that "play" a song, with the fingering of going up and down and octave.
+
+- [x] [UI] [A:High] [Polish] Create a button version of the loading spinner
+  - Add a visual spinner state to buttons (e.g. used by `ButtonLoadingState` in `LoadingSpinner.ts`)
+  - The spinner should appear inline within the button, replacing or accompanying the button label during loading
+  - Integrate with the shakuhachi-themed spinner design once that is finalized
+  - Used in: delete button (`ScoreDetailClient.ts:187`), fork button (`ScoreDetailClient.ts:227`), create button (`Layout.astro:280`)
 
 - [ ] [UI] [A:High] [Polish] Create site header component (logo, navigation)
 - [ ] [UI] [A:High] [Polish] Add navigation links: Home | Create Score | My Scores | Profile
