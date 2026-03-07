@@ -22,6 +22,25 @@ const spinner = buildSpinnerSVG();
       </div>
     </section>
 
+    <section class="demo-section">
+      <h2>In Buttons</h2>
+      <p>Click each button to toggle loading state.</p>
+      <div class="button-demo-row">
+        <button class="btn btn-primary" data-btn-demo data-loading-text="Loading…">
+          Load
+        </button>
+        <button class="btn btn-secondary" data-btn-demo>
+          Save
+        </button>
+        <button class="btn btn-danger" data-btn-demo data-loading-text="Deleting…">
+          Delete
+        </button>
+        <button class="btn btn-primary btn-sm" data-btn-demo data-loading-text="Saving…">
+          Small
+        </button>
+      </div>
+    </section>
+
   </div>
 </Layout>
 
@@ -70,11 +89,33 @@ const spinner = buildSpinnerSVG();
     border-radius: 0 6px 6px 0;
   }
 
+  .demo-section + .demo-section {
+    margin-top: 1.5rem;
+  }
+
+  .demo-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .demo-section > p {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .button-demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
 </style>
 
 <script>
   import { Pane } from 'tweakpane';
-  import { buildSpinnerSVG } from '../../components/LoadingSpinner';
+  import { buildSpinnerSVG, buildButtonSpinnerSVG, ButtonLoadingState } from '../../components/LoadingSpinner';
 
   // Default params (match buildSpinnerSVG defaults)
   const params = {
@@ -124,4 +165,54 @@ const spinner = buildSpinnerSVG();
   pane
     .addBinding(params, 'fadeOut', { label: 'fade-out (s)', min: 0, max: 1, step: 0.01 })
     .on('change', updateAll);
+
+  // Button spinner params
+  const btnParams = {
+    radius: 8,
+    strokeWidth: 0,
+    stepDuration: 0.4,
+  };
+
+  function updateButtonSpinners() {
+    const svg = buildButtonSpinnerSVG({
+      r: btnParams.radius,
+      strokeWidth: btnParams.strokeWidth,
+      stepDuration: btnParams.stepDuration,
+    });
+    // Update spinners inside any button currently in loading state
+    document.querySelectorAll('[data-btn-demo].loading svg').forEach((el) => {
+      el.outerHTML = svg;
+    });
+  }
+
+  const btnPane = new Pane({ title: 'Button spinner params' });
+  const btnPaneEl = btnPane.element.closest('.tp-dfwv') as HTMLElement;
+  if (btnPaneEl) {
+    btnPaneEl.style.top = 'auto';
+    btnPaneEl.style.bottom = '1rem';
+    btnPaneEl.style.right = '260px';
+  }
+  btnPane
+    .addBinding(btnParams, 'radius', { label: 'radius (px)', min: 2, max: 16, step: 0.5 })
+    .on('change', updateButtonSpinners);
+  btnPane
+    .addBinding(btnParams, 'strokeWidth', { label: 'stroke (px)', min: 0, max: 3, step: 0.1 })
+    .on('change', updateButtonSpinners);
+  btnPane
+    .addBinding(btnParams, 'stepDuration', { label: 'step (s)', min: 0, max: 1.5, step: 0.05 })
+    .on('change', updateButtonSpinners);
+
+  // Toggle button loading state on click
+  document.querySelectorAll<HTMLElement>('[data-btn-demo]').forEach((btn) => {
+    const state = new ButtonLoadingState(btn);
+    let loading = false;
+    btn.addEventListener('click', () => {
+      if (loading) {
+        state.hide();
+      } else {
+        state.show(btn.dataset.loadingText);
+      }
+      loading = !loading;
+    });
+  });
 </script>

@@ -22,8 +22,14 @@
 
 ### Global / Navigation
 
-- [ ] Revisig loading spinner visual design
+- [x] Revisig loading spinner visual design
   - explore shakuhachi themed loading "spinner". For example, 5 dots that "play" a song, with the fingering of going up and down and octave.
+
+- [x] [UI] [A:High] [Polish] Create a button version of the loading spinner
+  - Add a visual spinner state to buttons (e.g. used by `ButtonLoadingState` in `LoadingSpinner.ts`)
+  - The spinner should appear inline within the button, replacing or accompanying the button label during loading
+  - Integrate with the shakuhachi-themed spinner design once that is finalized
+  - Used in: delete button (`ScoreDetailClient.ts:187`), fork button (`ScoreDetailClient.ts:227`), create button (`Layout.astro:280`)
 
 - [ ] [UI] [A:High] [Polish] Create site header component (logo, navigation)
 - [ ] [UI] [A:High] [Polish] Add navigation links: Home | Create Score | My Scores | Profile

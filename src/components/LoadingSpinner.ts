@@ -72,8 +72,26 @@ export function buildSpinnerSVG({
   );
 }
 
+export function buildButtonSpinnerSVG({
+  r = 8,
+  strokeWidth = 0,
+  stepDuration = 0.4,
+}: SpinnerParams = {}): string {
+  const d = r * 2;
+  const dur = `${stepDuration * 8}s`;
+  const style =
+    `@keyframes sh-pulse{0%,100%{opacity:0.15}50%{opacity:1}}` +
+    `.sh-pulse{fill:currentColor;stroke:var(--color-border);stroke-width:${strokeWidth};animation:sh-pulse ${dur} ease-in-out infinite}`;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${d}" height="${d}" viewBox="0 0 ${d} ${d}">` +
+    `<style>${style}</style>` +
+    `<circle class="sh-pulse" cx="${r}" cy="${r}" r="${r}"/>` +
+    `</svg>`
+  );
+}
+
 export function createSpinnerSVG(): string {
-  return buildSpinnerSVG();
+  return buildButtonSpinnerSVG();
 }
 
 export class ButtonLoadingState {
