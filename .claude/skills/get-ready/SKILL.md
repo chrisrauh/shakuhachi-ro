@@ -13,31 +13,15 @@ Follow this sequence to get context:
 
 ### 1. Review Guidelines (CLAUDE.md)
 
-Read `./CLAUDE.md` to understand:
-
-- Software engineering principles
-- Dev workflow and git practices
-- Testing requirements and patterns
-- Chrome DevTools MCP usage
-- Build process for web components
-- Test fixtures and visual regression testing
+Read `./CLAUDE.md` to understand each section.
+Pay special attention to the dev workflow and the engineering principles.
 
 ### 2. Review Architecture
 
 Read the architecture documents to understand the system:
 
 **Renderer Library**: `./docs/ARCHITECTURE-RENDERER.MD`
-
-- How the shakuhachi notation renderer works
-- ScoreData format and rendering pipeline
-- Web component implementation
-
 **Platform**: `./docs/ARCHITECTURE-PLATFORM.MD`
-
-- How shakuhachi.ro platform works
-- Key pages (browse, detail, edit)
-- Data flow and authentication
-- Notation format support (ABC, JSON, MusicXML)
 
 ### 3. Review Current Tasks (TODO.md)
 
