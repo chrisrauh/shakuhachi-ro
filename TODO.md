@@ -20,7 +20,7 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Tier 3: User Experience Enhancements
+### Sprint 1: User Experience Enhancements
 
 - [ ] [UI] [A:Medium] [Alpha] Investigate letter spacing for font aesthetics and legibility.
   - **Phase 2: Determine Optimal Values** (User-driven)
@@ -72,9 +72,7 @@
   - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
 
-- [ ] [Content] [A:Low] [Future-Enhancements] Add a contact email address <chris@shakuhachi.ro> to the Contributing section of the About page as the first mean of contact.
-
-### Tier 4: Code Quality & Maintainability
+### Sprint 2: Code Quality & Maintainability
 
 - [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreEditor inline CSS into a stylesheet [Claude validated]
   - `src/components/ScoreEditor.ts:789+` — The `addStyles()` method at line 789 injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
@@ -188,7 +186,7 @@
 - [ ] [Backend] [A:Medium] [Quality-Abstraction] Evaluate whether Formatter and VerticalSystem should be public API [Claude validated]
   - `src/index.ts:31-34` — `Formatter` and `VerticalSystem` are exported but appear to be alternative/experimental layout components not used by the main `ScoreRenderer` pipeline (which uses `ColumnLayoutCalculator`). If they are internal or experimental, remove from `index.ts` to reduce the public API surface. If they are intentionally public, add JSDoc explaining their purpose and relationship to `ColumnLayoutCalculator`.
 
-### Tier 5: Architecture & API Improvements (Library Users)
+### Sprint 3: Architecture & API Improvements (Library Users)
 
 - [ ] [Backend] [A:High] [API-Improvements] Add options validation with warnings
   - [ ] Validate `notesPerColumn >= 1`
@@ -283,7 +281,7 @@
   - `ScoreEditor.ts` is 771 lines mixing 8+ concerns: state management (instance variables), DOM generation (`innerHTML` templates), event handling, API calls, validation, auto-save, theme detection, and CSS injection. This monolith is the primary bottleneck for adding versioning, collaboration, and i18n — all three require invasive surgery on this single file. Separate into: (a) an `EditorState` model class that holds data and emits change events, (b) an `EditorView` that subscribes to state changes and renders DOM, (c) extracted concerns (CSS → stylesheet, validation → utility, auto-save → utility, already tracked as separate tasks above). The same pattern applies to `ScoreLibrary.ts` (543 lines) and `ScoreDetailClient.ts` (175 lines) at smaller scale.
   - **Validate first**: Read the full `ScoreEditor.ts`. Map every instance variable and method. Identify which methods are pure state mutations vs DOM manipulation vs API calls. Sketch the `EditorState` interface before writing any code. Consider whether a lightweight event emitter is sufficient or if a more structured pattern is needed.
 
-### Tier 6: Polish & Nice-to-Have Features
+### Sprint 4: Polish & Nice-to-Have Features
 
 - [ ] [UI] [A:High] [Polish] Test geometricPrecision on shakuhachi SVG notes
 - [ ] [UI] [A:High] [Polish] Create site header component (logo, navigation)
@@ -302,7 +300,7 @@
 - [ ] [Backend] [A:Medium] [Renderer-Future] Write usage guide in reference/README.md
 - [ ] [Backend] [A:Medium] [Renderer-Future] Document score data format
 
-### Tier 7: Content & Feature Expansion
+### Sprint 5: Content & Feature Expansion
 
 - [ ] [Both] [A:High] [Content] Handle score license requirements
   - Audit license types likely encountered: public domain, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, all-rights-reserved
@@ -360,7 +358,7 @@
 - [ ] [Backend] [A:Medium] [Renderer-Modifiers] OriModifier (pitch bend)
 - [ ] [Backend] [A:Medium] [Renderer-Modifiers] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
 
-### Tier 8: Performance & Optimization
+### Sprint 6: Performance & Optimization
 
 - [ ] [Backend] [A:Medium] [Performance] Profile rendering performance
 - [ ] [Backend] [A:Medium] [Performance] Optimize frequent operations
@@ -371,7 +369,7 @@
   - [ ] Add penalties for breaking at certain notation points
   - [ ] Implement global optimization across score (Knuth-Plass approach)
 
-### Tier 9: Advanced Features (Post-MVP)
+### Sprint 7: Advanced Features (Post-MVP)
 
 - [ ] [Both] [A:Medium] [Advanced] Collections (curated score groups)
 - [ ] [Both] [A:Medium] [Advanced] Version history (track edits over time)
