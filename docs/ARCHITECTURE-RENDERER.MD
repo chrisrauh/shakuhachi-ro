@@ -2,8 +2,6 @@
 
 **Scope:** This document covers the renderer library architecture. For web platform architecture, see [ARCHITECTURE-PLATFORM.MD](./ARCHITECTURE-PLATFORM.MD).
 
-This document explains the design and architecture of the standalone shakuhachi notation renderer, following VexFlow-inspired patterns for music notation rendering.
-
 ## Directory Structure
 
 All renderer library code lives in `src/web-component/`:
@@ -15,472 +13,118 @@ src/web-component/
 │   ├── ScoreRenderer.ts    # Main orchestrator
 │   ├── RenderOptions.ts    # Configuration
 │   ├── ColumnLayoutCalculator.ts
+│   ├── Formatter.ts        # Text/symbol formatting
 │   ├── ModifierConfigurator.ts
 │   ├── SVGRenderer.ts      # Low-level SVG drawing
+│   ├── VerticalSystem.ts   # Vertical layout system
 │   └── convenience.ts      # Factory functions
 ├── parser/                 # Data parsing
 │   ├── ScoreParser.ts      # ScoreData → ShakuNote[]
 │   ├── MusicXMLParser.ts   # MusicXML → ScoreData
+│   ├── MusicXMLSerializer.ts
 │   ├── ABCParser.ts        # ABC notation → ScoreData
-│   └── *Serializer.ts      # Reverse conversions
+│   └── ABCSerializer.ts
 ├── notes/
 │   └── ShakuNote.ts        # Note primitive
 ├── modifiers/              # Visual decorations
 │   ├── Modifier.ts         # Base class
-│   ├── OctaveMarksModifier.ts
+│   ├── AtariModifier.ts
+│   ├── DurationDotModifier.ts
+│   ├── DurationLineModifier.ts
 │   ├── MeriKariModifier.ts
-│   └── DurationDotModifier.ts
+│   ├── OctaveMarksModifier.ts
+│   └── TestModifier.ts     # Testing helper
 ├── types/
 │   └── ScoreData.ts        # Core data types
-└── constants/              # Kinko symbols, mappings
+└── constants/              # Kinko symbols, mappings, layout
 ```
 
-**Why this structure:**
 - All renderer code in one place for future npm package extraction
-- Clear separation from platform code (`src/api/`, `src/components/`, `src/pages/`)
-- No dependencies on platform code (one-way dependency: platform → renderer)
+- No dependencies on platform code (one-way: platform → renderer)
 
-## Web Component
-
-The renderer is wrapped as a custom element `<shakuhachi-score>` for easy embedding:
-
-```html
-<!-- Minimal data - just notes (recommended for simple use cases) -->
-<shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
-
-<!-- With optional metadata -->
-<shakuhachi-score data-score='{
-  "title": "Test",
-  "style": "kinko",
-  "composer": "Traditional",
-  "notes": [...]
-}'></shakuhachi-score>
-
-<!-- Single column with intrinsic height -->
-<shakuhachi-score columns="1" data-score='{"notes":[...]}'></shakuhachi-score>
-
-<!-- Explicit column count -->
-<shakuhachi-score columns="6" data-score='{"notes":[...]}'></shakuhachi-score>
-
-<!-- Disable auto-resize for performance -->
-<shakuhachi-score auto-resize="false" data-score='...'></shakuhachi-score>
-```
-
-**Minimal data requirement:**
-Only the `notes` array is required. All other fields (`title`, `style`, `composer`, etc.) are optional metadata.
-
-**Implementation:** `src/web-component/ShakuhachiScore.ts`
-
-**Attributes:**
-- `data-score` - JSON score data (required, must contain `notes` array)
-- `columns` - Layout mode: `"auto"` (default), `"1"` (single column), or number (explicit column count)
-- `auto-resize` - Enable ResizeObserver (default: `true`, set to `"false"` to disable)
-- `width`/`height` - Explicit dimensions (optional, overrides CSS)
-- `debug` - Show debug labels (optional)
-
-**Features:**
-- Custom element that renders shakuhachi notation
-- Reactive attributes (changes trigger re-render)
-- Auto-resize with ResizeObserver (enabled by default)
-- Supports both JSON data and ScoreData objects
-- Works with CSS sizing (flex, grid, percentages)
-- Default 300×150 fallback dimensions
-
-**Build Output:** `public/embed/shakuhachi-score.js` (IIFE bundle, ~25KB)
-
-**Build Command:** `npm run build:wc`
-
-## Two Usage Patterns
-
-### 1. NPM Package (for developers)
-
-```typescript
-import { ScoreRenderer, renderScoreFromURL } from 'shakuhachi-ro';
-
-const renderer = new ScoreRenderer(container, options);
-await renderer.renderFromScoreData(scoreData);
-```
-
-**Entry point:** `src/index.ts` (re-exports from `src/web-component/`)
-
-### 2. Standalone Script (for embedding)
-
-```html
-<script src="/embed/shakuhachi-score.js"></script>
-<shakuhachi-score score-data="..."></shakuhachi-score>
-```
-
-**Entry point:** `src/web-component/ShakuhachiScore.ts`
-
-Both patterns use the same underlying renderer code.
-
-## Overview
-
-The renderer is organized into distinct layers, each with a single responsibility:
+## Layer Diagram
 
 ```
 ┌─────────────────────────────────────────┐
-│     High-Level API (ScoreRenderer)      │  ← User-facing
+│     Web Component (ShakuhachiScore)     │  ← Embedding API
 ├─────────────────────────────────────────┤
-│   Configuration (RenderOptions)         │
+│     High-Level API (ScoreRenderer)      │  ← Developer API
 ├─────────────────────────────────────────┤
 │   Layout (ColumnLayoutCalculator)       │
-├─────────────────────────────────────────┤
 │   Modifiers (ModifierConfigurator)      │
+│   Formatting (Formatter, VerticalSystem)│
 ├─────────────────────────────────────────┤
 │   Parsing (MusicXMLParser, ScoreParser) │
 ├─────────────────────────────────────────┤
 │   Primitives (ShakuNote, Modifiers)     │
 ├─────────────────────────────────────────┤
-│   Rendering (SVGRenderer)                │  ← Low-level
+│   Rendering (SVGRenderer)              │  ← Low-level SVG
 └─────────────────────────────────────────┘
+```
+
+## Web Component
+
+The renderer is wrapped as a custom element `<shakuhachi-score>`:
+
+```html
+<shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
+<shakuhachi-score columns="6" data-score='...'></shakuhachi-score>
+<shakuhachi-score auto-resize="false" data-score='...'></shakuhachi-score>
+```
+
+**Attributes:**
+- `data-score` - JSON score data (required, must contain `notes` array)
+- `columns` - `"auto"` (default), `"1"` (single column), or explicit number
+- `auto-resize` - Enable ResizeObserver (default: `true`)
+- `debug` - Show debug labels (optional)
+
+**Build:** `npm run build:wc` → `public/embed/shakuhachi-score.js` (IIFE, ~25KB)
+
+## Rendering Pipeline
+
+```
+1. Load     renderFromURL() → MusicXMLParser → ScoreData
+2. Parse    ScoreParser.parse() → ShakuNote[]
+3. Configure ModifierConfigurator.configureModifiers()
+4. Layout   ColumnLayoutCalculator.calculateLayout()
+5. Render   For each note: note.setPosition() → note.render(svgRenderer)
 ```
 
 ## Core Principles
 
-### 1. Separation of Concerns
+**Data vs Presentation:** ScoreData describes WHAT (pitches, durations, markers). The renderer determines HOW (column layout, positioning, styling). Never put presentation logic in data.
 
-Each component has a single, well-defined responsibility:
-- **ScoreRenderer**: Orchestrates the rendering pipeline
-- **RenderOptions**: Type-safe configuration
-- **ColumnLayoutCalculator**: Calculates multi-column layout
-- **ModifierConfigurator**: Configures note modifiers
-- **ScoreParser**: Converts data to renderable objects
-- **SVGRenderer**: Low-level SVG drawing
+**Composition over inheritance:** Modifiers are added to notes. Layout uses a calculator. Renderer uses a configurator.
 
-### 2. VexFlow-Inspired Design
-
-Following VexFlow's proven patterns:
-- Constructor takes container + options
-- Fluent API for configuration
-- Explicit render() calls
-- Separation of data and presentation
-
-### 3. Data vs Presentation
-
-**Data describes WHAT:**
-- ScoreData format is minimal and semantic
-- Notes are just pitches, durations, and markers
-- No layout or styling in data
-
-**Renderer determines HOW:**
-- Column breaks calculated dynamically
-- Positioning determined by viewport
-- Styling controlled by RenderOptions
-
-### 4. Composition Over Inheritance
-
-Components are composed, not inherited:
-- Modifiers added to notes
-- Layout uses calculator
-- Renderer uses configurator
-
-## Component Details
-
-### ScoreRenderer
-
-**Purpose**: Main public API for rendering scores
-
-**Responsibilities**:
-- Parse score data from various sources
-- Configure modifiers based on options
-- Calculate layout
-- Manage SVG renderer lifecycle
-- Handle viewport changes
-
-**Usage**:
-```typescript
-const renderer = new ScoreRenderer(container, options);
-await renderer.renderFromURL('/score.musicxml');
-renderer.setOptions({ showOctaveMarks: false });
-```
-
-### RenderOptions
-
-**Purpose**: Type-safe configuration with defaults
-
-**Design**:
-- All options are optional (Partial<RenderOptions>)
-- Defaults merged via `mergeWithDefaults()`
-- Required<RenderOptions> used internally
-
-**Categories**:
-- Display: showOctaveMarks, showDebugLabels
-- Layout: notesPerColumn, columnWidth, columnSpacing
-- Typography: Font sizes, weights, colors
-- Modifiers: Octave marks, meri/kari marks
-- Viewport: width, height
-
-### ColumnLayoutCalculator
-
-**Purpose**: Calculate multi-column layout
-
-**Algorithm**:
-1. Calculate total columns needed
-2. Center columns horizontally
-3. Position columns right-to-left (Japanese reading order)
-4. Calculate vertical positions for each note
-5. Add extra spacing for duration dots
-
-**Output**: `ColumnLayout` with complete position information
-
-### ModifierConfigurator
-
-**Purpose**: Configure note modifiers
-
-**Operations**:
-1. Remove octave marks if disabled
-2. Configure octave mark appearance
-3. Configure meri/kari mark appearance
-
-**Type Safety**: Uses `instanceof` instead of string comparison
-
-### Rendering Pipeline
-
-```
-1. Load Data
-   renderFromURL() → MusicXMLParser → ScoreData
-
-2. Parse
-   ScoreParser.parse() → ShakuNote[]
-
-3. Configure
-   ModifierConfigurator.configureModifiers()
-
-4. Layout
-   ColumnLayoutCalculator.calculateLayout()
-
-5. Render
-   For each column:
-     For each note:
-       note.setPosition()
-       note.render(svgRenderer)
-```
-
-## Design Patterns
-
-### Factory Pattern
-
-Convenience functions wrap the main API:
-```typescript
-await renderScoreFromURL(container, url, options);
-// Creates ScoreRenderer internally
-```
-
-### Builder Pattern
-
-Fluent API for configuration:
-```typescript
-renderer
-  .setOptions({ notesPerColumn: 8 })
-  .refresh();
-```
-
-### Strategy Pattern
-
-Different parsers for different formats:
-- MusicXMLParser for .musicxml files
-- ScoreParser for ScoreData objects
-
-### Decorator Pattern
-
-Modifiers decorate notes with additional rendering:
-```typescript
-note.addModifier(new OctaveMarksModifier('kan'));
-note.addModifier(new MeriKariModifier('meri'));
-```
-
-## UI Guidelines
-
-### Icons
-
-**Use Lucide Icons for all UI elements.**
-
-**Implementation**:
-```typescript
-// src/utils/icons.ts
-import { createIcons, GitFork, Eye, AlertCircle, Calendar } from 'lucide';
-
-// Initialize icons (call once when component mounts)
-export function initIcons(): void {
-  createIcons({
-    icons: {
-      GitFork,
-      Eye,
-      AlertCircle,
-      Calendar
-    }
-  });
-}
-
-// Render icon placeholder in HTML
-export function renderIcon(name: string, className: string = ''): string {
-  return `<i data-lucide="${name}" class="${className}"></i>`;
-}
-```
-
-**Usage in Components**:
-```typescript
-import { renderIcon, initIcons } from '../utils/icons';
-
-// In render method
-this.container.innerHTML = `
-  <span class="icon-label">
-    ${renderIcon('git-fork')} Fork count: ${count}
-  </span>
-`;
-
-// After rendering HTML
-initIcons();
-```
-
-**Available Icons**:
-- `git-fork` - Fork/remix actions
-- `eye` - View count
-- `calendar` - Dates
-- `alert-circle` - Errors/warnings
-
-**Adding New Icons**:
-1. Import from `lucide` package
-2. Add to `createIcons()` object
-3. Use via `renderIcon()`
-
-**Branding Exception**: Keep the 🎐 (flute) emoji for branding/logo purposes.
+**VexFlow-inspired:** Constructor takes container + options. Explicit render() calls. Separation of data and presentation.
 
 ## Extension Points
 
-### Adding New Options
+**New modifiers:** Extend `Modifier` base class, implement `render()`, add to `ModifierConfigurator` if needed.
 
-1. Add to `RenderOptions` interface
-2. Add default value to `DEFAULT_RENDER_OPTIONS`
-3. Use in relevant component
-4. Update documentation
+**New options:** Add to `RenderOptions` interface and `DEFAULT_RENDER_OPTIONS`.
 
-### Adding New Modifiers
+**New formats:** Add parser/serializer pair in `parser/`, wire into `src/utils/format-converter.ts`.
 
-1. Extend `Modifier` base class
-2. Implement `render()` method
-3. Add configuration to `ModifierConfigurator` if needed
-4. Export from `src/index.ts` (which re-exports from `src/web-component/`)
+## Usage
 
-### Adding New Layout Algorithms
+### NPM Package
 
-1. Create new calculator class
-2. Implement `calculateLayout()` method
-3. Return `ColumnLayout` interface
-4. Use in `ScoreRenderer.renderNotes()`
-
-## Testing Strategy
-
-### Unit Tests
-
-- **RenderOptions**: Option merging, defaults
-- **ModifierConfigurator**: Modifier configuration, removal
-- **ColumnLayoutCalculator**: Layout calculation, positioning
-
-### Integration Tests
-
-- **ScoreRenderer**: Full rendering pipeline
-- **Convenience functions**: Factory functions
-
-### Visual Tests
-
-- **Playwright**: Visual regression testing
-- Manual testing for visual changes
-
-## Performance Considerations
-
-### Layout Caching
-
-Currently, layout is recalculated on each render. Future optimization:
-- Cache layout results
-- Invalidate on resize or option changes
-
-### Modifier Configuration
-
-Modifiers are configured in-place. This mutates the notes but avoids copying.
-
-### SVG Rendering
-
-SVG elements created directly, no virtual DOM. Fast and simple.
-
-## Migration from Old Code
-
-### Before (index.html, ~220 lines)
-
-```javascript
-// Manual parsing
-const scoreData = await MusicXMLParser.parseFromURL(url);
-const notes = ScoreParser.parse(scoreData);
-
-// Manual modifier configuration
-notes.forEach(note => {
-  if (!showOctaveMarks) {
-    note.modifiers = note.modifiers.filter(...);
-  } else {
-    note.modifiers.forEach(mod => {
-      if (mod.constructor.name === 'OctaveMarksModifier') {
-        mod.setFontSize(...).setFontWeight(...);
-      }
-    });
-  }
-});
-
-// Manual layout calculation
-const totalColumns = Math.ceil(notes.length / notesPerColumn);
-const startX = (width - totalWidth) / 2;
-for (let col = 0; col < totalColumns; col++) {
-  const columnX = startX + (totalColumns - 1 - col) * spacing;
-  // ... more calculation
-
-  // Manual rendering
-  columnNotes.forEach(note => {
-    note.setPosition(x, y);
-    note.render(renderer);
-    // ... spacing calculation
-  });
-}
+```typescript
+import { ScoreRenderer } from 'shakuhachi-ro';
+const renderer = new ScoreRenderer(container, options);
+await renderer.renderFromScoreData(scoreData);
 ```
 
-### After (index.html, ~10 lines)
+### Standalone Script
 
-```javascript
-const renderer = await renderScoreFromURL(
-  container,
-  url,
-  { showOctaveMarks, showDebugLabels }
-);
+```html
+<script src="/embed/shakuhachi-score.js"></script>
+<shakuhachi-score data-score='{"notes":[]}'></shakuhachi-score>
 ```
 
-**Benefits**:
-- 95% code reduction
-- Clear, declarative API
-- Type-safe configuration
-- Reusable across pages
-- Easier to test
-- Easier to maintain
+## Testing
 
-## Future Enhancements
-
-### Responsive Layout
-
-Auto-adjust `notesPerColumn` based on viewport height.
-
-### Layout Algorithms
-
-Support different layout strategies:
-- Traditional vertical columns
-- Horizontal scrolling
-- Paginated layout
-
-### Caching
-
-Cache parsed scores, calculated layouts.
-
-### Animation
-
-Smooth transitions when changing options.
-
-### Accessibility
-
-ARIA labels, keyboard navigation.
+- **Unit tests:** Vitest, co-located (`*.test.ts`) — options, modifiers, layout, parsing
+- **Visual tests:** Playwright visual regression (`npm run test:visual`)
+- **Manual:** Chrome DevTools MCP for interactive verification

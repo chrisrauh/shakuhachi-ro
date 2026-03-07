@@ -61,6 +61,7 @@ This project is used in two environments: a local terminal and **Claude Code on 
 ⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
 
 **CRITICAL: Always check branch state when starting work:**
+
 - At the beginning of any work session
 - After context compaction or session resumption
 - Before making any code changes
@@ -76,20 +77,21 @@ This project is used in two environments: a local terminal and **Claude Code on 
    - For bug fixes: confirm the bug still exists in the code
    - If already done: mark `[x]` and move on without re-implementing
 4. Make changes and test
-4. **Ask user to review changes before committing**
-5. Commit locally (no push yet)
-6. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked**
-7. Ask user if you should create PR
-8. Push and create PR
-9. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
-10. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
-11. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked**
-12. Look for next task in TODO.md and ask user if you should work on it
+5. **Ask user to review changes before committing**
+6. Commit locally (no push yet)
+7. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked**
+8. Ask user if you should create PR
+9. Push and create PR
+10. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
+11. After user confirms: `git branch -d <branch> && git push origin --delete <branch>`
+12. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked**
+13. Look for next task in TODO.md and ask user if you should work on it
 
 For multi-phase work, create separate PR for each phase.
 
 **Recovery from accidental work on main:**
 If you discover you've been working on main (via `git branch --show-current`):
+
 1. Don't panic - changes can be recovered
 2. Create feature branch from current state: `git checkout -b feature/descriptive-name`
 3. Stage and commit all changes to the feature branch
@@ -99,6 +101,7 @@ If you discover you've been working on main (via `git branch --show-current`):
 **CRITICAL: Git Commit and PR Messages**
 
 ⚠️ **NEVER add attribution/co-authoring text to commits or PRs:**
+
 - ❌ NO "Co-Authored-By: Claude" in commit messages
 - ❌ NO "Generated with Claude Code" in PR descriptions
 - ❌ NO any other Claude attribution text in repo messages
@@ -113,10 +116,12 @@ The web component renderer lives in a separate package and must be built:
 - **When to rebuild:** After any changes to renderer package code
 
 **Integration points:**
+
 - Edit page: `<script is:inline src="/embed/shakuhachi-score.js">`
 - Detail page: `<script is:inline src="/embed/shakuhachi-score.js">`
 
 **Testing workflow:**
+
 1. Make renderer changes
 2. Run `npm run build:wc`
 3. Refresh browser (dev server serves from `public/`)
@@ -129,6 +134,7 @@ The web component renderer lives in a separate package and must be built:
 Why: Avoiding authorization prompts enables more autonomous, efficient work without interruptions. Claude can work faster when using dedicated tools that don't require per-command approval.
 
 Claude Code has specialized tools that work better than shell commands:
+
 - Read files → Use **Read** tool (not `cat`)
 - Write files → Use **Write** tool (not `echo >` or `cat <<EOF`)
 - Edit files → Use **Edit** tool (not `sed`)
@@ -138,6 +144,7 @@ Claude Code has specialized tools that work better than shell commands:
 **For Bash commands, use simple syntax only:**
 
 Avoid shell features that trigger authorization prompts:
+
 - ❌ Command chaining: `cmd1 && cmd2` (use sequential Bash calls instead)
 - ❌ Pipes: `cmd | grep` (use Grep tool instead)
 - ❌ Command substitution: `$(...)` (use Read tool then process)
@@ -147,6 +154,7 @@ Avoid shell features that trigger authorization prompts:
 
 **Multi-step operations:**
 Make separate Bash calls instead of chaining:
+
 ```bash
 # ❌ Triggers prompt
 git add . && git commit -m "msg" && git push
@@ -158,6 +166,7 @@ git push
 ```
 
 **Acceptable exceptions:**
+
 - `source .env && echo $VAR` - Required because .env is locked and shells don't persist
 - `cd dir && npm test` - When absolute paths aren't practical (though prefer absolute paths)
 
@@ -181,16 +190,19 @@ When running `npm test`, you MUST carefully read the ENTIRE output before report
 5. **Report accurately**: Only say "all tests passing" if ALL three steps (type-check, lint, tests) succeeded
 
 **Common mistake pattern:**
+
 - ❌ Seeing unit tests pass and reporting "all tests passing" without reading lint output
 - ❌ Missing lint failures because you only looked at the bottom of the output
 - ✅ Read the full output line by line, verify each step passed
 
 **After creating new files:**
+
 - Always run `npm test` to catch formatting/linting errors in new code
 - New files often have formatting issues even if existing code is clean
 - Run `npx eslint <file> --fix` to auto-fix formatting before committing
 
 **Example of what to check:**
+
 ```bash
 > npm test
 # ... type-check output (must show "0 errors, 0 warnings")
@@ -259,6 +271,7 @@ When implementing or testing features that require test data:
 - Give fixtures descriptive, memorable names/slugs
 
 Example:
+
 - Test score for editor testing: `/score/test` (slug: `test`)
 - Owned by test account, contains simple 3-note JSON data
 - Use for testing editor features without creating temporary test data each time
@@ -275,6 +288,7 @@ After migrations, refactors, or new UI features:
 Example: After migrating ScoreEditor to web component, verify that visual regression tests exist for the editor page. If not, add a task before closing the PR.
 
 **What to test:**
+
 - Critical user paths (viewing, editing, creating scores)
 - Component states (loading, empty, error, populated)
 - Responsive behavior (mobile, tablet, desktop)
@@ -380,6 +394,7 @@ evaluate_script({ function: "() => ({ scoreData: window.__SCORE_DATA__, renderSt
 When testing authenticated features (score editor, creating scores, forking):
 
 **For visual testing with chrome-devtools-mcp:**
+
 - Authenticate directly in the browser using credentials from `.env` file
 - Use `fill()` tool to enter email and password in login form
 - Access credentials using `source .env && echo $VAR` command (requires one-time authorization per session):
@@ -389,6 +404,7 @@ When testing authenticated features (score editor, creating scores, forking):
 - **Note:** This is an acceptable exception to the "avoid &&" guideline since `.env` cannot be read directly and each Bash call is a separate shell session
 
 **For automated tests:**
+
 ```typescript
 // Read credentials from environment
 const TEST_EMAIL = process.env.TEST_EMAIL;
@@ -396,12 +412,14 @@ const TEST_PASSWORD = process.env.TEST_PASSWORD;
 ```
 
 **Important:**
+
 - Never hardcode credentials in code or memory files
 - Store in `.env` file (gitignored)
 - Use `.env.example` as template with placeholder values
 - Test credentials are documented in `.env.example` with `TEST_EMAIL` and `TEST_PASSWORD` variables
 
 **Test Score for Editor Testing:**
+
 - A test score titled "Test" is available at `/score/test` (slug: `test`)
 - Owned by the test account for editor testing
 - Contains simple JSON data with 3 notes (ro, tsu, re)
