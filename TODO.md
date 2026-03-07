@@ -138,8 +138,6 @@
 - [ ] [Backend] [A:High] [Quality-Explicit] Name magic number for duration line baseline ratio
   - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
 
-- [ ] [Backend] [A:High] [Quality-Explicit] Extract hardcoded editor URL into a route constant
-  - `src/components/ScoreDetailClient.ts:164` and `src/pages/score/[slug].astro:60` — The URL pattern `/editor.html?id=` is hardcoded in two places. If the editor route ever changes (e.g., dropping `.html`), both need manual updating. Define `const EDITOR_URL = (id: string) => \`/editor.html?id=\${id}\``in a shared`src/constants/routes.ts` module.
 
 - [ ] [Backend] [A:High] [Quality-TypeSafety] Fix handleMetadataChange double `as any` cast in ScoreEditor
   - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.

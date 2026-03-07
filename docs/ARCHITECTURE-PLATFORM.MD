@@ -28,7 +28,7 @@ SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client in
 
 **Fork flow:** User clicks "Fork" → `forkScore()` API call → new score created → redirect to `/score/[slug]/edit`
 
-### Score Edit Page (`/score/[slug]/edit` and `/editor.html`)
+### Score Edit Page (`/score/[slug]/edit`)
 
 Client-side with live preview. Notation input supports ABC, JSON, MusicXML. Automatic format conversion when switching. Title changes update the slug. Saves to Supabase on submit.
 
@@ -38,7 +38,7 @@ Client-side with live preview. Notation input supports ABC, JSON, MusicXML. Auto
 
 **Score creation:**
 ```
-Create new score → temporary slug → empty score in Supabase → /editor.html?id=<uuid>
+Create new score → temporary slug → empty score in Supabase → /score/[slug]/edit
 User enters title + notation → live preview → title updates slug → save
 ```
 
