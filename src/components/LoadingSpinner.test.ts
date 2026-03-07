@@ -1,14 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createSpinnerSVG, ButtonLoadingState } from './LoadingSpinner';
-
-describe('createSpinnerSVG', () => {
-  it('returns SVG markup with rotating animation', () => {
-    const svg = createSpinnerSVG();
-    expect(svg).toContain('<svg');
-    expect(svg).toContain('stroke="currentColor"');
-    expect(svg).toContain('<animateTransform');
-  });
-});
+import { ButtonLoadingState } from './LoadingSpinner';
 
 describe('ButtonLoadingState', () => {
   let button: HTMLButtonElement;

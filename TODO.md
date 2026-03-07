@@ -22,14 +22,6 @@
 
 ### Global / Navigation
 
-- [ ] [UI] [A:Low] [Alpha] Revisit mobile menu action order
-  - Current order: Library, Create score, About, [divider], Auth items, [divider], Toggle theme
-  - Consider grouping by action type (navigation vs account vs settings)
-  - Evaluate whether auth actions should be higher priority (top of menu)
-  - Consider if theme toggle belongs at bottom or integrated with other settings
-  - Test with users to determine most intuitive ordering
-  - Current implementation works but may not be optimal for common workflows
-
 - [ ] Revisig loading spinner visual design
   - explore shakuhachi themed loading "spinner". For example, 5 dots that "play" a song, with the fingering of going up and down and octave.
 
