@@ -10,15 +10,21 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 
 1. Page loads all scores from the database
 2. If logged in: "My Scores" section appears above "Library" section
-3. Scores display as cards in a responsive grid (title, composer, description, fork count, relative timestamp)
-4. User types in search bar → real-time filter on title and composer
+3. Scores display as cards in a responsive grid:
+   - Title (with fork icon badge if forked)
+   - Composer
+   - Description (truncated)
+   - License/rights badge (when present)
+   - Fork count
+   - Relative timestamp (e.g., "2 days ago")
+4. User types in search bar → real-time filter on title and composer (case-insensitive)
 5. If no results: "No scores found" message with "Clear Filters" button
 6. User clicks a score card → navigates to `/score/{slug}`
 
 **Variants:**
 - Anonymous user sees only "Library" section
 - Authenticated user sees "My Scores" + "Library" (other users' scores)
-- Forked scores show a fork icon badge on the card
+- Empty states: "You haven't created any scores yet" (My Scores) / "No scores found" (Library)
 
 ---
 
@@ -28,18 +34,22 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 
 1. Server fetches score by slug and renders the detail page
 2. Score renders as SVG notation using the shakuhachi renderer web component
-3. Metadata displayed: title, composer, description, attribution (source URL, rights, source description)
+3. Metadata displayed: title, composer, description
 4. If forked: "forked from {parent title}" link shown, clicking navigates to parent score
 5. Fork count badge displayed if > 0
 6. Relative timestamp shown (e.g., "2 days ago")
+7. Attribution section shown when present:
+   - Source description text
+   - Rights/license badge
+   - Source URL as clickable link
 
 **Available actions (contextual):**
-- **Fork** button (all users, requires auth to execute)
+- **Fork** button (visible to all users, requires auth to execute)
 - **Edit** button (owner only, appears in header and mobile menu)
 - **Delete** button (owner only, appears in mobile menu)
 
 **Error states:**
-- Score not found → 404 page
+- Score not found → 404 page with "Back to Library" link
 - Network error → error toast
 
 ---
@@ -98,11 +108,13 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 5. User fills in metadata and notation data
 6. Format selector: JSON (default), MusicXML, or ABC
 7. Live preview renders the score as the user types
-8. Auto-save: local storage every 30s, database save after 5s of inactivity (max 2 min wait)
-9. Unsaved changes trigger browser `beforeunload` warning if navigating away
+8. Save status indicator shows "Saved X ago" feedback
+9. Auto-save runs in background (see Flow 14: Auto-save & Draft Recovery)
+10. Unsaved changes trigger browser `beforeunload` warning if navigating away
 
 **Mobile behavior:**
 - Toggle between "Preview" and "Edit" tabs (not side-by-side)
+- Default state: Editor tab active on load
 
 ---
 
@@ -116,13 +128,18 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
    - Not the owner → error toast "You do not have permission to edit this score" + redirect to view page
 3. Editor loads with existing score data
 4. User modifies metadata or notation data
-5. Live preview updates
-6. Auto-save behavior same as creation flow
+5. Live preview updates in real time
+6. Auto-save behavior same as creation flow (see Flow 14)
 7. Format switch: if converting between formats fails, confirmation dialog offers to clear content and switch
 
-**Error states:**
-- Auto-save failure → error toast "Auto-save failed: {message}"
-- Save failure → error toast "Error saving score: {message}"
+**Validation errors:**
+- Invalid JSON → parse error message displayed in editor
+- Invalid MusicXML → XML parsing error shown
+- Invalid ABC → format error shown
+
+**Save errors:**
+- Auto-save failure → persistent error toast "Auto-save failed: {message}"
+- Manual save failure → error toast "Error saving score: {message}"
 
 ---
 
@@ -153,7 +170,7 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 3. Score deleted from database
 4. Success toast shown
 5. Redirect to home page (`/`)
-6. Banner message displayed: "'{title}' was deleted."
+6. Success banner displayed at top of page: "'{title}' was deleted." (carried via sessionStorage across navigation, dismissible)
 
 ---
 
@@ -177,9 +194,10 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
    - **Always:** Library, Create score, About, Theme toggle
    - **On own score:** Edit score, Delete score
    - **Anonymous:** Log In, Sign Up
-   - **Authenticated:** Log Out
+   - **Authenticated:** Account email display (non-interactive), Log Out
 3. Tapping an item executes the action and closes the menu
 4. Tapping outside the menu closes it
+5. Menu items update dynamically on auth state change (login/logout)
 
 ---
 
@@ -206,6 +224,64 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 
 ---
 
+## 14. Auto-save & Draft Recovery
+
+**Context:** Active during score creation (Flow 6) and editing (Flow 7)
+
+**Auto-save layers:**
+1. **Local storage** — saves every 30 seconds as a draft
+2. **Database** — debounced save after 5 seconds of inactivity (max 2-minute wait)
+
+**Save feedback:**
+- Save status indicator shows "Saved X ago" in the editor
+- Auto-save failure → persistent error toast (does not auto-dismiss)
+
+**Draft recovery:**
+- On editor page load, checks localStorage for an existing draft
+- If draft found and newer than DB version, restores from local draft
+- If draft is corrupted or unparseable, clears localStorage and shows error toast
+
+**Navigation protection:**
+- Unsaved changes trigger browser `beforeunload` confirmation dialog
+
+---
+
+## 15. Legacy URL Redirects
+
+**Handled automatically — no user action required:**
+
+| Legacy URL | Redirects To |
+|---|---|
+| `/editor` | `/score/new/edit` |
+| `/score?slug=X` | `/score/X` |
+| Any unmatched path | 404 page with "Back to Library" link |
+
+---
+
+## 16. Error Recovery
+
+**Score not found:**
+- Visiting `/score/{invalid-slug}` → 404 error page
+- Page shows message and "Back to Library" link
+
+**Score load failure:**
+- Network or database error while loading → error toast with details
+- User can retry by refreshing
+
+**Editor validation errors:**
+- Invalid data format (JSON/MusicXML/ABC) → inline error message in editor
+- Live preview does not render; error message describes the issue
+
+**Auto-save failure:**
+- Persistent toast notification (does not auto-dismiss): "Auto-save failed: {message}"
+- Local storage draft still available as fallback
+
+**Score creation failure:**
+- "Failed to create score" error toast
+- User remains on current page
+
+---
+
 ## Summary: Flow Access by Auth State
 
 | Flow | Anonymous | Authenticated (non-owner) | Owner |
@@ -221,3 +297,20 @@ UX analysis of shakuhachi.ro — all flows derived from the codebase.
 | Fork score | No (error toast) | Yes | Yes |
 | Switch theme | Yes | Yes | Yes |
 | Share (copy URL) | Yes | Yes | Yes |
+
+---
+
+## Features Not Present
+
+Notable UX capabilities the app does **not** currently have:
+
+- **Account management** — No profile page, settings, or password reset/change
+- **Share button** — No "Copy Link" or social share UI; sharing is via browser URL bar only
+- **Social previews** — No OG tags or Twitter/Discord embed cards for shared links
+- **Embed codes** — No "Embed this score" widget for external websites
+- **Export / Download** — No PDF, MusicXML, or image export from scores
+- **Keyboard shortcuts** — No hotkeys in the score viewer or editor
+- **Offline mode** — No service worker or offline caching
+- **Pagination** — Library loads all scores at once (no infinite scroll or pages)
+- **Email notifications** — No notification system for forks, comments, or activity
+- **Comments / Annotations** — No commenting or discussion on scores
