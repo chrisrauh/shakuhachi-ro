@@ -20,6 +20,13 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
+### Bug Fixes
+
+- [ ] [Backend] [A:High] Fix fork redirect in ScoreDetailClient
+  - `src/components/ScoreDetailClient.ts:242` — `performFork()` redirects to `/editor.html?id=${result.score.id}` but should redirect to `/score/${result.score.slug}/edit`
+  - The `/editor.html` page ignores `?id=` params entirely; it just redirects to `/score/new/edit`, so forked scores open as new blank scores instead of the fork
+  - All other editor navigations use `/score/${slug}/edit` (new score creation, edit button)
+  - Fix: change redirect to `/score/${result.score.slug}/edit`
 
 ### Tier 3: User Experience Enhancements
 
