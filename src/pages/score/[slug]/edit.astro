@@ -54,7 +54,7 @@ const { score } = scoreResult;
 
   <!-- Initialize theme switcher, auth widget, and mobile menu -->
   <script>
-    import { createElement, Book, Plus, Info, SunMoon, LogIn, LogOut, User, UserPlus } from 'lucide';
+    import { createElement, Book, Plus, Info, HelpCircle, SunMoon, LogIn, LogOut, User, UserPlus } from 'lucide';
     import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
     import { AuthWidget } from '../../../components/AuthComponents';
     import { onAuthReady, signOut } from '../../../api/auth';
@@ -100,13 +100,12 @@ const { score } = scoreResult;
 
     // Function to update menu items based on auth state
     const updateMobileMenu = (user: SupabaseUser | null) => {
-      const baseItems = [
+      const actionItems = [
         {
           id: 'browse',
           label: 'Library',
           href: '/',
           icon: getIconHTML(Book),
-          dividerAfter: false,
         },
         {
           id: 'create',
@@ -120,14 +119,6 @@ const { score } = scoreResult;
             }
           },
           icon: getIconHTML(Plus),
-          dividerAfter: false,
-        },
-        {
-          id: 'about',
-          label: 'About',
-          href: '/about',
-          icon: getIconHTML(Info),
-          dividerAfter: true,
         },
       ];
 
@@ -138,7 +129,6 @@ const { score } = scoreResult;
               label: user.email || 'Account',
               action: () => {},
               icon: getIconHTML(User),
-              dividerAfter: false,
             },
             {
               id: 'logout',
@@ -147,7 +137,6 @@ const { score } = scoreResult;
                 await signOut();
               },
               icon: getIconHTML(LogOut),
-              dividerAfter: true,
             },
           ]
         : [
@@ -156,26 +145,24 @@ const { score } = scoreResult;
               label: 'Log In',
               action: () => authModal.show('login'),
               icon: getIconHTML(LogIn),
-              dividerAfter: false,
             },
             {
               id: 'signup',
               label: 'Sign Up',
               action: () => authModal.show('signup'),
               icon: getIconHTML(UserPlus),
-              dividerAfter: true,
             },
           ];
 
-      const themeItem = {
-        id: 'theme',
-        label: 'Toggle theme',
-        action: toggleTheme,
-        icon: getIconHTML(SunMoon),
-        dividerAfter: false,
-      };
-
-      mobileMenu.setItems([...baseItems, ...authItems, themeItem]);
+      mobileMenu.setItems([
+        actionItems,
+        authItems,
+        [{ id: 'theme', label: 'Toggle theme', action: toggleTheme, icon: getIconHTML(SunMoon) }],
+        [
+          { id: 'help', label: 'Help', href: '/help/notation-formats', icon: getIconHTML(HelpCircle) },
+          { id: 'about', label: 'About', href: '/about', icon: getIconHTML(Info) },
+        ],
+      ]);
     };
 
     // Subscribe to auth changes - onAuthReady handles deduplication
