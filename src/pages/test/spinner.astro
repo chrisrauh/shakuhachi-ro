@@ -11,101 +11,17 @@ const spinner = buildSpinnerSVG();
     <h1>Loading Spinner</h1>
     <p>Shakuhachi fingering holes — Ri → Chi → Re → Tsu → Ro → reverse</p>
 
-    <div class="demo-grid">
-      <section class="demo-section">
-        <h2>Standalone</h2>
-        <div class="demo-row">
-          <div class="demo-item">
-            <div data-spinner-host set:html={spinner} />
-            <span>Default</span>
-          </div>
-          <div class="demo-item demo-dark">
-            <div data-spinner-host set:html={spinner} />
-            <span>Dark bg</span>
-          </div>
+    <section class="demo-section">
+      <div class="demo-row">
+        <div class="demo-item">
+          <div data-spinner-host set:html={spinner} />
         </div>
-      </section>
+        <div class="demo-item demo-inverted">
+          <div data-spinner-host set:html={spinner} />
+        </div>
+      </div>
+    </section>
 
-      <section class="demo-section">
-        <h2>In Buttons</h2>
-        <div class="demo-row">
-          <div class="demo-item">
-            <button class="btn btn-icon loading" disabled aria-busy="true" aria-label="Loading">
-              <span data-spinner-host set:html={spinner}></span>
-            </button>
-            <span>Icon</span>
-          </div>
-          <div class="demo-item">
-            <button class="btn btn-sm btn-primary loading" disabled aria-busy="true">
-              <span data-spinner-host set:html={spinner}></span>
-              Saving…
-            </button>
-            <span>Small</span>
-          </div>
-          <div class="demo-item">
-            <button class="btn btn-primary loading" disabled aria-busy="true">
-              <span data-spinner-host set:html={spinner}></span>
-              Saving…
-            </button>
-            <span>Standard</span>
-          </div>
-          <div class="demo-item">
-            <button class="btn btn-neutral loading" disabled aria-busy="true">
-              <span data-spinner-host set:html={spinner}></span>
-              Deleting…
-            </button>
-            <span>Neutral</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="demo-section">
-        <h2>Interactive</h2>
-        <div class="demo-row">
-          <div class="demo-item">
-            <button id="toggle-btn" class="btn btn-primary">Trigger Loading</button>
-            <span>Click to toggle</span>
-          </div>
-          <div class="demo-item">
-            <button id="toggle-icon" class="btn btn-icon" aria-label="Save">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-                ></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline
-                  points="7 3 7 8 15 8"></polyline></svg
-              >
-            </button>
-            <span>Icon toggle</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="demo-section">
-        <h2>Scale</h2>
-        <div class="demo-row align-end">
-          <div class="demo-item">
-            <div data-spinner-host class="scale-1x" set:html={spinner} />
-            <span>1×</span>
-          </div>
-          <div class="demo-item">
-            <div data-spinner-host class="scale-2x" set:html={spinner} />
-            <span>2×</span>
-          </div>
-          <div class="demo-item">
-            <div data-spinner-host class="scale-4x" set:html={spinner} />
-            <span>4×</span>
-          </div>
-        </div>
-      </section>
-    </div>
   </div>
 </Layout>
 
@@ -127,80 +43,47 @@ const spinner = buildSpinnerSVG();
     margin-bottom: 2rem;
   }
 
-  .demo-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
   .demo-section {
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1.25rem 1.5rem;
   }
 
-  .demo-section h2 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    margin-bottom: 1.25rem;
-  }
-
   .demo-row {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 2rem;
-  }
-
-  .demo-row.align-end {
-    align-items: flex-end;
+    gap: 0;
   }
 
   .demo-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
+    width: 50%;
+    padding: 2rem;
   }
 
-  .demo-item span {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
+  .demo-inverted {
+    background: var(--color-text-primary);
+    color: var(--page-background-color);
+    border-radius: 0 6px 6px 0;
   }
 
-  .demo-dark {
-    background: #1a1a1a;
-    color: #fff;
-    padding: 0.75rem;
-    border-radius: 6px;
-  }
-
-  .scale-2x svg {
-    width: calc(var(--sh-w, 16px) * 2);
-    height: calc(var(--sh-h, 96px) * 2);
-  }
-
-  .scale-4x svg {
-    width: calc(var(--sh-w, 16px) * 4);
-    height: calc(var(--sh-h, 96px) * 4);
-  }
 </style>
 
 <script>
   import { Pane } from 'tweakpane';
   import { buildSpinnerSVG } from '../../components/LoadingSpinner';
-  import { ButtonLoadingState } from '../../components/LoadingSpinner';
 
   // Default params (match buildSpinnerSVG defaults)
   const params = {
     radius: 8,
-    gap: 4,
+    gap: 8,
     strokeWidth: 1.5,
-    duration: 6,
-    fade: 0.1,
+    stepDuration: 0.5,
+    fadeIn: 0.4,
+    fadeOut: 0.4,
   };
 
   function updateAll() {
@@ -208,59 +91,37 @@ const spinner = buildSpinnerSVG();
       r: params.radius,
       gap: params.gap,
       strokeWidth: params.strokeWidth,
-      duration: params.duration,
-      fade: params.fade,
+      stepDuration: params.stepDuration,
+      fadeIn: params.fadeIn,
+      fadeOut: params.fadeOut,
     });
-    // Update CSS custom props for scale variants
-    const d = params.radius * 2;
-    const h = d + (d + params.gap) * 4;
-    document.documentElement.style.setProperty('--sh-w', `${d}px`);
-    document.documentElement.style.setProperty('--sh-h', `${h}px`);
     document.querySelectorAll('[data-spinner-host]').forEach((el) => {
       el.innerHTML = svg;
     });
   }
 
   const pane = new Pane({ title: 'Spinner params' });
+  const paneEl = pane.element.closest('.tp-dfwv') as HTMLElement;
+  if (paneEl) {
+    paneEl.style.top = 'auto';
+    paneEl.style.bottom = '1rem';
+  }
   pane
     .addBinding(params, 'radius', { label: 'radius (px)', min: 0, max: 16, step: 0.5 })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'gap', { label: 'gap (px)', min: 0, max: 8, step: 0.5 })
+    .addBinding(params, 'gap', { label: 'gap (px)', min: 0, max: 16, step: 0.5 })
     .on('change', updateAll);
   pane
     .addBinding(params, 'strokeWidth', { label: 'stroke (px)', min: 0, max: 3, step: 0.1 })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'duration', { label: 'duration (s)', min: 1, max: 12, step: 0.5 })
+    .addBinding(params, 'stepDuration', { label: 'step (s)', min: 0, max: 1.5, step: 0.05 })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'fade', { label: 'fade (s)', min: 0, max: 0.2, step: 0.01 })
+    .addBinding(params, 'fadeIn', { label: 'fade-in (s)', min: 0, max: 1, step: 0.01 })
     .on('change', updateAll);
-
-  // Interactive toggles
-  let toggleState: ButtonLoadingState | null = null;
-  let iconState: ButtonLoadingState | null = null;
-
-  document.getElementById('toggle-btn')?.addEventListener('click', (e) => {
-    const btn = e.currentTarget as HTMLButtonElement;
-    if (toggleState) {
-      toggleState.hide();
-      toggleState = null;
-    } else {
-      toggleState = new ButtonLoadingState(btn);
-      toggleState.show('Saving…');
-    }
-  });
-
-  document.getElementById('toggle-icon')?.addEventListener('click', (e) => {
-    const btn = e.currentTarget as HTMLButtonElement;
-    if (iconState) {
-      iconState.hide();
-      iconState = null;
-    } else {
-      iconState = new ButtonLoadingState(btn);
-      iconState.show();
-    }
-  });
+  pane
+    .addBinding(params, 'fadeOut', { label: 'fade-out (s)', min: 0, max: 1, step: 0.01 })
+    .on('change', updateAll);
 </script>

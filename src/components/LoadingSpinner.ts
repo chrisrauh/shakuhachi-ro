@@ -15,8 +15,9 @@ export interface SpinnerParams {
   r?: number;
   gap?: number;
   strokeWidth?: number;
-  duration?: number;
-  fade?: number;
+  stepDuration?: number; // duration of each of the 8 fingering positions (seconds)
+  fadeIn?: number; // hole-closing transition duration (seconds)
+  fadeOut?: number; // hole-opening transition duration (seconds)
 }
 
 // Animation: Ri→Chi→Re→Tsu→Ro→Tsu→Re→Chi→Ri (8 equal steps, no pauses)
@@ -29,28 +30,31 @@ export interface SpinnerParams {
 //   Ro:  ●●●●●
 export function buildSpinnerSVG({
   r = 8,
-  gap = 4,
+  gap = 8,
   strokeWidth = 1.5,
-  duration = 6,
-  fade = 0.1,
+  stepDuration = 0.5,
+  fadeIn = 0.4,
+  fadeOut = 0.4,
 }: SpinnerParams = {}): string {
   const d = r * 2;
   const step = d + gap;
   const h = d + step * 4;
-  const f = fade / duration;
+  const total = stepDuration * 8;
+  const fi = fadeIn / total;
+  const fo = fadeOut / total;
   const p = (v: number) => `${+(v * 100).toFixed(3)}%`;
   const [t1, t2, t3, t4, t5, t6, t7] = [1, 2, 3, 4, 5, 6, 7].map((n) => n / 8);
-  const dur = `${duration}s`;
+  const dur = `${total}s`;
   const cy = (i: number) => r + step * i;
 
-  // Each keyframe: hold at current state, then fade over `f` to next state.
-  // H4, H2, H1 start/end closed and use cross-loop fades (pct(1-f)→100%).
+  // fi = fade-in fraction (hole closing: fill-opacity 0→1)
+  // fo = fade-out fraction (hole opening: fill-opacity 1→0)
   const style =
-    `@keyframes sh-h4{0%,${p(t1)}{fill-opacity:0}${p(t1 + f)}{fill-opacity:1}${p(1 - f)}{fill-opacity:1}100%{fill-opacity:0}}` +
-    `@keyframes sh-h3{0%,${p(t2)}{fill-opacity:0}${p(t2 + f)}{fill-opacity:1}${p(t7)}{fill-opacity:1}${p(t7 + f)},100%{fill-opacity:0}}` +
-    `@keyframes sh-h2{0%,${p(t1)}{fill-opacity:1}${p(t1 + f)},${p(t3)}{fill-opacity:0}${p(t3 + f)},${p(t6)}{fill-opacity:1}${p(t6 + f)},${p(1 - f)}{fill-opacity:0}100%{fill-opacity:1}}` +
-    `@keyframes sh-h1{0%,${p(t1)}{fill-opacity:1}${p(t1 + f)},${p(t4)}{fill-opacity:0}${p(t4 + f)},${p(t5)}{fill-opacity:1}${p(t5 + f)},${p(1 - f)}{fill-opacity:0}100%{fill-opacity:1}}` +
-    `.sh-hole{fill:currentColor;stroke:currentColor;stroke-width:${strokeWidth}}` +
+    `@keyframes sh-h4{0%,${p(t1)}{fill-opacity:0}${p(t1 + fi)}{fill-opacity:1}${p(1 - fo)}{fill-opacity:1}100%{fill-opacity:0}}` +
+    `@keyframes sh-h3{0%,${p(t2)}{fill-opacity:0}${p(t2 + fi)}{fill-opacity:1}${p(t7)}{fill-opacity:1}${p(t7 + fo)},100%{fill-opacity:0}}` +
+    `@keyframes sh-h2{0%,${p(t1)}{fill-opacity:1}${p(t1 + fo)},${p(t3)}{fill-opacity:0}${p(t3 + fi)},${p(t6)}{fill-opacity:1}${p(t6 + fo)},${p(1 - fi)}{fill-opacity:0}100%{fill-opacity:1}}` +
+    `@keyframes sh-h1{0%,${p(t1)}{fill-opacity:1}${p(t1 + fo)},${p(t4)}{fill-opacity:0}${p(t4 + fi)},${p(t5)}{fill-opacity:1}${p(t5 + fo)},${p(1 - fi)}{fill-opacity:0}100%{fill-opacity:1}}` +
+    `.sh-hole{fill:currentColor;stroke:var(--color-border);stroke-width:${strokeWidth}}` +
     `.sh-h4{fill-opacity:0;animation:sh-h4 ${dur} linear infinite}` +
     `.sh-h3{fill-opacity:0;animation:sh-h3 ${dur} linear infinite}` +
     `.sh-h2{animation:sh-h2 ${dur} linear infinite}` +
