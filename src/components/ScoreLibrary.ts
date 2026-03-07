@@ -5,6 +5,7 @@ import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
+import { buildSpinnerSVG } from './LoadingSpinner';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -113,7 +114,7 @@ export class ScoreLibrary {
     if (this.isLoading) {
       this.container.innerHTML = `
         <div class="score-library-loading">
-          <div class="spinner"></div>
+          ${buildSpinnerSVG()}
           <p>Loading scores...</p>
         </div>
       `;
@@ -658,21 +659,6 @@ export class ScoreLibrary {
       .score-library-loading {
         text-align: center;
         padding: var(--spacing-3x-large) var(--spacing-large);
-      }
-
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid var(--color-spinner-track);
-        border-top: 4px solid var(--color-spinner-accent);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto var(--spacing-large);
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
       }
 
       .score-library-error {

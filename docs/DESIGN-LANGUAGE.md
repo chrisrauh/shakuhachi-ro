@@ -109,7 +109,6 @@ These describe *what* the color is for, not *what shade* it is. Components shoul
 |-------|-------|-------|
 | `--color-separator` | neutral-400 | Visual separators between items |
 | `--color-logo` | neutral-700 (light), neutral-600 (dark) | Logo color |
-| `--color-spinner-track` | neutral-200 | Loading spinner track |
 
 ### 4. Component Tokens
 
