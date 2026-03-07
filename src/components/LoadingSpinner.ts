@@ -31,8 +31,8 @@ export interface SpinnerParams {
 export function buildSpinnerSVG({
   r = 8,
   gap = 8,
-  strokeWidth = 1.5,
-  stepDuration = 0.5,
+  strokeWidth = 0,
+  stepDuration = 0.4,
   fadeIn = 0.4,
   fadeOut = 0.4,
 }: SpinnerParams = {}): string {
