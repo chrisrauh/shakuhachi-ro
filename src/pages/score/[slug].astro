@@ -111,32 +111,13 @@ if (score?.forked_from) {
   <!-- Initialize theme switcher and auth widget -->
   <script>
     import { createElement, Book, Plus, Info, HelpCircle, SunMoon, SquarePen, Trash2, LogIn, LogOut, User, UserPlus } from 'lucide';
-    import { ThemeSwitcher } from '../../components/ThemeSwitcher';
-    import { AuthWidget } from '../../components/AuthComponents';
+    import { initHeader } from '../../utils/init-header';
     import { onAuthReady, signOut } from '../../api/auth';
     import { MobileMenu, type MenuItem } from '../../components/MobileMenu';
     import type { User as SupabaseUser } from '@supabase/supabase-js';
 
     // Initialize theme switcher
-    new ThemeSwitcher('theme-switcher');
-
-    // Initialize letter spacing control (dev only)
-    if (import.meta.env.DEV) {
-      import('../../components/LetterSpacingControl').then(({ LetterSpacingControl }) => {
-        new LetterSpacingControl('letter-spacing-control');
-      });
-    }
-
-    // Initialize auth widget
-    const authWidget = new AuthWidget('auth-widget');
-
-    // Get reference to auth modal for mobile menu
-    const authModal = authWidget.getAuthModal();
-
-    // Subscribe to auth changes - onAuthReady handles deduplication
-    onAuthReady((user) => {
-      authWidget.setUser(user);
-    });
+    const { authWidget, authModal } = initHeader();
 
     // Helper to generate Lucide icon HTML
     const getIconHTML = (iconComponent: typeof Book) => {
