@@ -7,7 +7,9 @@ import { Book, Plus, Info } from '@lucide/astro';
     <a href="/" class="logo">
       <div class="logo-icon">ロ</div>
     </a>
-    <slot name="header-metadata" />
+    <div class="header-metadata">
+      <slot name="header-metadata" />
+    </div>
   </div>
   <div class="header-right">
     <slot name="header-actions" />
@@ -52,8 +54,12 @@ import { Book, Plus, Info } from '@lucide/astro';
 
   .header-left {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-medium);
+  }
+
+  .header-metadata {
+    align-self: center;
   }
 
   .header-right {
