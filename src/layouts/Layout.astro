@@ -1,5 +1,5 @@
 ---
-import { Book, Plus, Info } from '@lucide/astro';
+import SiteHeader from '../components/SiteHeader.astro';
 
 interface Props {
   title: string;
@@ -34,45 +34,10 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     </script>
   </head>
   <body class={fullHeight ? 'full-height' : ''}>
-    <header>
-      <div class="header-left">
-        <a href="/" class="logo">
-          <div class="logo-icon">ロ</div>
-        </a>
-        <slot name="header-metadata" />
-      </div>
-      <div class="header-right">
-        <slot name="header-actions" />
-        <!-- Desktop navigation (hidden on mobile) -->
-        <div class="header-desktop-nav">
-          <a
-            href="/"
-            class="btn btn-icon"
-            aria-label="View scores"
-          >
-            <Book size={16} stroke-width={2} />
-          </a>
-          <a
-            href="/score/new/edit"
-            class="btn btn-icon"
-            aria-label="Create new score"
-          >
-            <Plus size={16} stroke-width={2} />
-          </a>
-          <a
-            href="/about"
-            class="btn btn-icon"
-            aria-label="About"
-          >
-            <Info size={16} stroke-width={2} />
-          </a>
-          <div id="theme-switcher"></div>
-          <div id="auth-widget"></div>
-        </div>
-        <!-- Mobile menu (shown on mobile) -->
-        <div id="mobile-menu" class="mobile-menu-container"></div>
-      </div>
-    </header>
+    <SiteHeader>
+      <slot name="header-metadata" slot="header-metadata" />
+      <slot name="header-actions" slot="header-actions" />
+    </SiteHeader>
 
     <main class={noPadding ? 'no-padding' : ''}>
       <slot />
@@ -138,96 +103,12 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
         }
       }
 
-      header {
-        padding: var(--spacing-medium) var(--spacing-medium);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-medium);
-      }
-
-      .header-right {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-medium);
-      }
-
-      /* Desktop navigation - hide on mobile */
-      .header-desktop-nav {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-medium);
-      }
-
-      /* Mobile menu - hide on desktop */
-      .mobile-menu-container {
-        display: none;
-      }
-
-      /* Logo */
-      .logo {
-        text-decoration: none;
-      }
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        color: var(--color-logo);
-        border-radius: var(--border-radius-2x-small);
-        font-size: 24px;
-        text-align: center;
-        line-height: 24px;
-        font-weight: 450;
-        border: 2px solid var(--color-logo);
-        box-sizing: border-box;
-      }
-
-      #theme-switcher {
-        flex-shrink: 0;
-      }
-
-      #auth-widget {
-        flex-shrink: 0;
-      }
-
       main {
         padding: var(--spacing-large) 0;
       }
 
       main.no-padding {
         padding: 0;
-      }
-
-      @media (max-width: 768px) {
-        header {
-          gap: var(--spacing-small);
-        }
-
-        .header-left {
-          align-items: flex-start;
-          gap: var(--spacing-small);
-          flex: 1;
-        }
-
-        .header-right {
-          justify-content: flex-end;
-          flex-shrink: 0;
-          gap: var(--spacing-small);
-        }
-
-        /* Hide desktop navigation on mobile */
-        .header-desktop-nav {
-          display: none;
-        }
-
-        /* Show mobile menu on mobile */
-        .mobile-menu-container {
-          display: block;
-        }
       }
 
       /* Loading state for Plus button */

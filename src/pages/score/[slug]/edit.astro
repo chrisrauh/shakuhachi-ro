@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
 import { getScoreBySlug } from '../../../api/scores';
 
 const { slug } = Astro.params;
@@ -15,11 +16,7 @@ const { score } = scoreResult;
 
 <Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
   <!-- Page header with title -->
-  <div slot="header-metadata" style="display: flex; align-items: center; gap: var(--spacing-small);">
-    <h1 style="margin: 0; font-size: var(--font-size-large); font-weight: var(--font-weight-semibold); color: var(--color-text-heading);">
-      {score ? `Edit ${score.title}` : 'Create New Score'}
-    </h1>
-  </div>
+  <PageHeader slot="header-metadata" title={score ? `Edit ${score.title}` : 'Create New Score'} />
 
   <div class="edit-layout">
     <!-- Mobile toggle -->
@@ -55,29 +52,14 @@ const { score } = scoreResult;
   <!-- Initialize theme switcher, auth widget, and mobile menu -->
   <script>
     import { createElement, Book, Plus, Info, HelpCircle, SunMoon, LogIn, LogOut, User, UserPlus } from 'lucide';
-    import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
-    import { AuthWidget } from '../../../components/AuthComponents';
+    import { initHeader } from '../../../utils/init-header';
     import { onAuthReady, signOut } from '../../../api/auth';
     import { MobileMenu } from '../../../components/MobileMenu';
     import { createEmptyScore } from '../../../utils/create-score-handler';
     import { toast } from '../../../components/Toast';
     import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-    // Initialize theme switcher
-    new ThemeSwitcher('theme-switcher');
-
-    // Initialize letter spacing control (dev only)
-    if (import.meta.env.DEV) {
-      import('../../../components/LetterSpacingControl').then(({ LetterSpacingControl }) => {
-        new LetterSpacingControl('letter-spacing-control');
-      });
-    }
-
-    // Initialize auth widget
-    const authWidget = new AuthWidget('auth-widget');
-
-    // Get reference to auth modal for mobile menu
-    const authModal = authWidget.getAuthModal();
+    const { authWidget, authModal } = initHeader();
 
     // Helper to generate Lucide icon HTML
     const getIconHTML = (iconComponent: typeof Book) => {
