@@ -1,7 +1,7 @@
 # Design: Header Initialization Refactor + Mobile Menu Extraction
 
 **Date:** 2026-03-14
-**Status:** Ready for implementation plan
+**Status:** In progress — under discussion
 
 ---
 
@@ -18,166 +18,220 @@
 
 The slug page (`score/[slug].astro`) has the same structure but with owner-conditional edit/delete items.
 
+Additionally: header initialization lives in page `<script>` blocks rather than in `SiteHeader.astro` itself, and the auth widget suffers a visible layout jump when auth state resolves client-side.
+
 ---
 
 ## Goals
 
 1. Eliminate ~90 lines of duplication across the three standard pages
-2. Make the slug page follow the same `initHeader()` pattern as standard pages
-3. Fix modal ownership: `AuthModal` should be a top-level peer, not secretly owned by `AuthWidget`
-4. `initHeader` is the single entry point for all pages — it owns all header initialization
+2. Make the slug page follow the same pattern as standard pages
+3. Fix modal ownership: `HeaderModal` should be a top-level peer, not secretly owned by `AuthWidget`
+4. `SiteHeader.astro` owns all header initialization — pages do not call `initHeader()`
+5. Smooth the auth widget appearance to eliminate layout jump on auth resolution
 
 ---
 
-## Key Design Decision: Who Owns Auth Reactivity?
+## Key Design Decisions
 
-**Previous draft had pages wiring `onAuthReady` themselves (Option B).**
-This is wrong. Keeping auth subscription on the page means pages still have boilerplate, and the subscription is not conceptually "page logic" — it's "header logic." The header needs to react to auth state. That belongs in `initHeader`.
+### Who owns auth reactivity?
 
-**Correct approach: `initHeader` owns the full reactive lifecycle.**
-"Initialize the header" means making it fully functional and reactive, including subscribing to auth state. This is a single, coherent responsibility.
+The auth subscription (`onAuthReady`) belongs in `initHeader`, not on the page. "Initialize the header" means making it fully functional and reactive — that includes subscribing to auth state. Keeping it on pages is boilerplate that doesn't belong there.
+
+### Who calls `initHeader()`?
+
+Pages currently call `initHeader()` because mobile menu items vary per page. The right owner is `SiteHeader.astro` — it should have its own `<script>` block that calls `initHeader()`. Pages stop calling it entirely.
+
+For pages with custom menus (the slug page), `SiteHeader.astro` accepts a `mobileMenuType` prop rendered as a `data-menu-type` attribute on the mobile menu container. The header script reads this attribute and selects the appropriate builder. All custom builders are defined in `init-header.ts`.
 
 ---
 
 ## Architecture
 
+### `SiteHeader.astro` changes
+
+Accepts a new optional prop:
+
+```ts
+interface Props {
+  // ... existing props
+  mobileMenuType?: 'standard' | 'score-detail'  // default: 'standard'
+}
+```
+
+Renders it as a data attribute:
+
+```html
+<div id="mobile-menu" class="mobile-menu-container"
+     data-menu-type={mobileMenuType ?? 'standard'}></div>
+```
+
+Has its own `<script>` block:
+
+```ts
+import { initHeader } from '../utils/init-header';
+initHeader();
+```
+
+`initHeader` reads `data-menu-type` from the DOM to select the builder. Pages no longer import or call `initHeader`.
+
 ### `initHeader` interface
 
 ```ts
-type MobileMenuBuilder = (
-  user: SupabaseUser | null,
-  authModal: AuthModal
-) => MenuItem[][]
-
-interface HeaderOptions {
-  mobileMenu?: MobileMenuBuilder  // omit = use standard 3-group items
-}
-
-export function initHeader(options?: HeaderOptions): void
+export function initHeader(): void
 ```
 
-Internally, `initHeader`:
+Internally:
 
 1. Creates `ThemeSwitcher('theme-switcher')`
 2. Creates `LetterSpacingControl` in dev mode (lazy import, guard lives here)
-3. Creates `AuthModal` — **top-level, not inside AuthWidget**
-4. Creates `AuthWidget('auth-widget', authModal)` — receives modal as dependency
+3. Creates `HeaderModal` — top-level, not inside `AuthWidget`
+4. Creates `AuthWidget('auth-widget', headerModal)` — receives modal as dependency
 5. Creates `MobileMenu('mobile-menu')`
-6. Subscribes to `onAuthReady`:
+6. Reads `data-menu-type` from `#mobile-menu` to select the menu builder
+7. Subscribes to `onAuthReady`:
    - Calls `authWidget.setUser(user)`
-   - Calls `mobileMenu.setItems(buildItems(user, authModal))`
-   - `buildItems` = `options.mobileMenu ?? standardMobileMenuItems`
+   - Calls `mobileMenu.setItems(builder(user, headerModal))`
 
-Returns `void`. Pages don't need to touch auth, the widget, or the menu after calling `initHeader`.
+Returns `void`.
 
-### Standard pages (index, about, notation-formats)
-
-```ts
-initHeader();  // one line — header fully initialized and reactive
-```
-
-Any page-specific init (e.g., `new ScoreLibrary(...)`) follows separately.
-
-### Slug page (custom mobile menu)
-
-The slug page is SSR — score data is embedded in the HTML by the server. The `mobileMenu` callback reads it from the DOM client-side. **Parsing must happen inside the callback**, not before `initHeader`, so that a malformed or missing `score-data` element doesn't prevent the rest of the header (theme switcher, auth widget) from initializing.
+### Menu builders in `init-header.ts`
 
 ```ts
-initHeader({
-  mobileMenu: (user, authModal) => {
-    // Parse score data inside the callback — if this fails, header still initializes
-    let isOwner = false;
-    try {
-      const dataEl = document.getElementById('score-data');
-      if (dataEl) {
-        const score = JSON.parse(dataEl.textContent || '{}').score;
-        isOwner = !!(user && score && user.id === score.user_id);
-      }
-    } catch {
-      // fall through: isOwner stays false
-    }
+// Standard builder — used by index, about, notation-formats
+function standardMenuBuilder(user, headerModal): MenuItem[][]
 
-    const extraItems = isOwner ? [editItem, deleteItem] : [];
-    return [
-      ...(extraItems.length > 0 ? [extraItems] : []),
-      buildNavItems(),
-      buildAuthItems(user, authModal),  // shared helper
-      buildUtilityItems(),              // shared helper
-    ];
-  }
-});
+// Score-detail builder — used by score/[slug]
+function scoreDetailMenuBuilder(user, headerModal): MenuItem[][]
+// Reads score-data from DOM, determines isOwner, builds conditional items
 ```
 
-### Exported helpers for custom menus
+### Exported helpers
 
-To avoid duplication in the slug page's custom builder, `init-header.ts` exports the item-group builders used by the standard menu:
+To avoid duplication within `scoreDetailMenuBuilder`, these are exported for internal reuse:
 
 ```ts
 export function buildNavItems(): MenuItem[]
-export function buildAuthItems(user: SupabaseUser | null, authModal: AuthModal): MenuItem[]
+export function buildAuthItems(user: SupabaseUser | null, headerModal: HeaderModal): MenuItem[]
 export function buildUtilityItems(): MenuItem[]
 export function getIconHTML(icon: LucideIcon): string
 ```
 
-The slug page reuses `buildAuthItems` and `buildUtilityItems` and only defines its own nav/extra items.
+### Standard pages (index, about, notation-formats)
 
-## Static Rendering Considerations
+```astro
+<SiteHeader />
+```
 
-The project uses `output: 'server'` (SSR by default). Three standard pages opt into static prerendering with `export const prerender = true`. The slug page is SSR.
+No `<script>` block for header initialization. `SiteHeader`'s own script handles everything.
 
-**`initHeader` always runs client-side.** Astro never executes `<script>` blocks at build/render time — they are bundled by Vite and sent to the browser. No server-side implications for `initHeader` itself.
+### Slug page
 
-**Auth state and prerendered pages.** Static pages serve the same HTML to all users. The auth widget and mobile menu always start in an unauthenticated visual state and update reactively when `onAuthReady` fires client-side. This is existing behavior — our refactor doesn't change it.
+```astro
+<SiteHeader mobileMenuType="score-detail" />
+```
 
-**Bundle sharing.** All three prerendered pages will import the same `initHeader` module. Astro/Vite creates a shared chunk cached by the browser across page navigations — a net improvement over today, where each page bundles its own copy of the menu-building code.
+`scoreDetailMenuBuilder` in `init-header.ts` reads `#score-data` from the DOM inside the builder callback (so a parse failure doesn't prevent the rest of the header from initializing):
 
-**Slug page score data must be parsed inside the `mobileMenu` callback** (see Slug page section above), not before `initHeader()`. Parsing outside means a DOM error prevents the entire header from initializing. Parsing inside means the header always initializes; the menu gracefully falls back if score data is unavailable.
+```ts
+function scoreDetailMenuBuilder(user, headerModal): MenuItem[][] {
+  let isOwner = false;
+  try {
+    const dataEl = document.getElementById('score-data');
+    if (dataEl) {
+      const score = JSON.parse(dataEl.textContent || '{}').score;
+      isOwner = !!(user && score && user.id === score.user_id);
+    }
+  } catch {
+    // fall through: isOwner stays false, standard nav shown
+  }
+
+  const extraItems: MenuItem[] = isOwner ? [editItem, deleteItem] : [];
+  return [
+    ...(extraItems.length > 0 ? [extraItems] : []),
+    buildNavItems(),
+    buildAuthItems(user, headerModal),
+    buildUtilityItems(),
+  ];
+}
+```
 
 ---
 
+## AuthWidget Refactor (Modal Ownership)
 
-
-`AuthWidget` currently creates `AuthModal` internally and exposes it via `getAuthModal()`. This hides a shared dependency.
+`AuthWidget` currently creates `HeaderModal` internally and exposes it via `getAuthModal()`. This hides a shared dependency.
 
 **Before:**
 ```ts
 // AuthWidget constructor
 this.authModal = new AuthModal();  // owns modal internally
 
-// Pages
-const { authWidget, authModal } = initHeader();  // modal leaked via getter
+// initHeader
+const authModal = authWidget.getAuthModal();  // leaked via getter
 ```
 
 **After:**
 ```ts
 // AuthWidget constructor accepts modal as dependency
-constructor(containerId: string, authModal: AuthModal)
+constructor(containerId: string, headerModal: HeaderModal)
 
-// initHeader creates modal first, passes to widget
-const authModal = new AuthModal();
-const authWidget = new AuthWidget('auth-widget', authModal);
+// initHeader
+const headerModal = new HeaderModal();
+const authWidget = new AuthWidget('auth-widget', headerModal);
 ```
 
-`getAuthModal()` can be removed. The modal is not accessed outside `initHeader`.
+`getAuthModal()` is removed. `AuthModal` is renamed to `HeaderModal` throughout.
 
 ---
 
-## Standard Mobile Menu Item Groups
+## Auth Widget Appearance (Flash Mitigation)
 
-Three groups, consistent across all standard pages:
+`#auth-widget` starts as an empty div — zero width. When JS loads and `AuthWidget` renders, the button appears and the layout jumps. This affects both logged-out (button appears) and the subsequent auth resolution (button may change size).
 
-**Group 1 — Nav actions:**
-- Library → `href: '/'`
-- Create score → calls `createEmptyScore()`, redirects on success
+**Approach: CSS width transition driven by JS measurement**
 
-**Group 2 — Auth (user-conditional):**
-- Logged in: email (non-interactive), Log Out
-- Logged out: Log In (opens auth modal), Sign Up (opens auth modal)
+`#auth-widget` in `SiteHeader.astro`:
 
-**Group 3 — Utility:**
-- Toggle theme
-- Help → `href: '/help/notation-formats'`
-- About → `href: '/about'`
+```css
+#auth-widget {
+  overflow: hidden;
+  width: 0;
+  transition: width 200ms ease;
+}
+```
+
+`AuthWidget`, after each render (initial and on auth change), measures its content and sets an explicit pixel width on the container:
+
+```ts
+private updateContainerWidth(): void {
+  const content = this.container.firstElementChild as HTMLElement;
+  if (content) {
+    this.container.style.width = `${content.scrollWidth}px`;
+  }
+}
+```
+
+Called at the end of `render()`. This means:
+- Initial appearance: smooth expansion from 0 → logged-out button width
+- Auth state change (logged-out → logged-in or vice versa): smooth width transition between the two sizes
+- No layout jump at any point
+
+This is CSS-only (no `min-width` assumption needed), handles both states, and is self-correcting if button sizes change.
+
+---
+
+## Static Rendering Considerations
+
+The project uses `output: 'server'` (SSR by default). Three standard pages opt into static prerendering with `export const prerender = true`. The slug page is SSR.
+
+**`initHeader` always runs client-side.** Astro never executes component `<script>` blocks at build/render time — they are bundled by Vite and sent to the browser.
+
+**Auth state and prerendered pages.** Static pages serve the same HTML to all users. The auth widget starts at width 0 and expands smoothly once `onAuthReady` fires. The `data-menu-type` attribute is baked into the static HTML at build time (it's a fixed value per page, not user-specific).
+
+**Bundle sharing.** All pages share `SiteHeader.astro`, so they share its `<script>` chunk — `initHeader` and all its dependencies are bundled once, cached by the browser across navigations.
+
+**Slug page score data** is parsed inside `scoreDetailMenuBuilder` (not at script top level), so parse failures degrade gracefully without preventing header initialization.
 
 ---
 
@@ -185,12 +239,13 @@ Three groups, consistent across all standard pages:
 
 | File | Change |
 |------|--------|
-| `src/utils/init-header.ts` | Rewrite: flat internal setup, `onAuthReady` inside, configurable menu, export helpers |
-| `src/components/AuthComponents.ts` | `AuthWidget` accepts `AuthModal` as constructor param; remove `getAuthModal()` |
-| `src/pages/index.astro` | Replace ~90-line script block with `initHeader()` |
+| `src/components/SiteHeader.astro` | Add `mobileMenuType` prop, `data-menu-type` attribute, `<script>` calling `initHeader()`, width-transition CSS on `#auth-widget` |
+| `src/utils/init-header.ts` | Rewrite: reads `data-menu-type`, selects builder, owns `onAuthReady`, exports helpers |
+| `src/components/AuthComponents.ts` | Rename `AuthModal` → `HeaderModal`; `AuthWidget` accepts `HeaderModal` as constructor param; remove `getAuthModal()`; call `updateContainerWidth()` after each render |
+| `src/pages/index.astro` | Remove ~90-line script block (header script handles it) |
 | `src/pages/about.astro` | Same |
 | `src/pages/help/notation-formats.astro` | Same |
-| `src/pages/score/[slug].astro` | Replace script with `initHeader({ mobileMenu: ... })` using exported helpers |
+| `src/pages/score/[slug].astro` | Replace mobile menu script block with `mobileMenuType="score-detail"` prop on `<SiteHeader>` |
 
 ---
 
@@ -198,9 +253,9 @@ Three groups, consistent across all standard pages:
 
 | Principle | How |
 |-----------|-----|
-| **Single Responsibility** | `initHeader` = initialize the header. One reason to change. |
-| **Explicit over Implicit** | Custom menu items declared at the call site. Auth subscription is internal to header init (not a page concern). |
-| **Make Change Cheap** | New page with unique menu = pass a different function. No structural changes. |
-| **Loose Coupling** | Pages know nothing about `ThemeSwitcher`, `AuthModal`, or `MobileMenu` internals. |
-| **DRY** | Standard items defined once. Helpers exported for reuse in custom menus. |
-| **YAGNI** | No config options beyond what existing pages need. |
+| **Single Responsibility** | `initHeader` = initialize the header. `SiteHeader.astro` = render and initialize the header. One reason to change each. |
+| **Explicit over Implicit** | Custom menu type declared at the call site (`mobileMenuType` prop). Auth subscription is header-internal (not page logic). |
+| **Make Change Cheap** | New page with unique menu = add a builder to `init-header.ts`, pass a new `mobileMenuType` string. |
+| **Loose Coupling** | Pages know nothing about `ThemeSwitcher`, `HeaderModal`, or `MobileMenu` internals. |
+| **DRY** | Standard items defined once. Helpers exported for reuse in custom builders. |
+| **YAGNI** | Only two `mobileMenuType` values exist. No over-engineered registry. |
