@@ -79,7 +79,7 @@ const { Content } = await helpPage.render();
             {
               id: 'account',
               label: user.email || 'Account',
-              action: () => {},
+              nonInteractive: true,
               icon: getIconHTML(User),
             },
             {
