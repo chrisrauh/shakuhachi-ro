@@ -4,6 +4,7 @@ export interface MenuItem {
   href?: string;
   action?: () => void;
   icon?: string;
+  nonInteractive?: boolean;
 }
 
 interface ShowOptions {
@@ -92,6 +93,19 @@ export class MenuDropdown {
         background: var(--panel-background-color);
       }
 
+      .menu-dropdown-item--static {
+        cursor: default;
+        color: var(--color-text-secondary);
+      }
+
+      .menu-dropdown-item--static:hover {
+        background: none;
+      }
+
+      .menu-dropdown-item--static .menu-dropdown-item-icon {
+        color: var(--color-text-secondary);
+      }
+
       .menu-dropdown-item-icon {
         width: 16px;
         height: 16px;
@@ -158,12 +172,16 @@ export class MenuDropdown {
     // Groups of items
     groups.forEach((group, groupIndex) => {
       group.forEach((item) => {
-        let el: HTMLButtonElement | HTMLAnchorElement;
+        let el: HTMLElement;
 
-        if (item.href) {
+        if (item.nonInteractive) {
+          el = document.createElement('div');
+          el.className = 'menu-dropdown-item menu-dropdown-item--static';
+        } else if (item.href) {
           const a = document.createElement('a');
           a.href = item.href;
           el = a;
+          el.className = 'menu-dropdown-item';
         } else {
           const btn = document.createElement('button');
           btn.addEventListener('click', () => {
@@ -171,9 +189,8 @@ export class MenuDropdown {
             this.hide();
           });
           el = btn;
+          el.className = 'menu-dropdown-item';
         }
-
-        el.className = 'menu-dropdown-item';
 
         if (item.icon) {
           const iconSpan = document.createElement('span');
