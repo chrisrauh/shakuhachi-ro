@@ -603,7 +603,7 @@
      ============================================ */
 
   /* ============================================
-     SEMANTIC TOKENS
+     SEMANTIC COLOR TOKENS
      ============================================ */
 
   /* TEXT */
@@ -628,7 +628,9 @@
 
   /* SPECIAL */
   --color-separator: var(--color-gray-400); /* Visual separators */
-  --color-logo: var(--color-gray-650); /* Logo — one shade lighter than text-primary (gray-700) */
+  --color-logo: var(
+    --color-gray-650
+  ); /* Logo — one shade lighter than text-primary (gray-700) */
 
   /* STATUS COLORS - Success */
   --color-text-success: var(--color-green-700); /* Success text */
