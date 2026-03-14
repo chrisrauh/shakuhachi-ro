@@ -1,5 +1,10 @@
 ---
 import { Book, Plus, Info } from '@lucide/astro';
+
+interface Props {
+  mobileMenuType?: 'standard' | 'score-edit';
+}
+const { mobileMenuType = 'standard' } = Astro.props;
 ---
 
 <header>
@@ -41,9 +46,14 @@ import { Book, Plus, Info } from '@lucide/astro';
       <div id="auth-widget"></div>
     </div>
     <!-- Mobile menu (shown on mobile) -->
-    <div id="mobile-menu" class="mobile-menu-container"></div>
+    <div id="mobile-menu" class="mobile-menu-container" data-menu-type={mobileMenuType}></div>
   </div>
 </header>
+
+<script>
+  import { initHeader } from '../utils/init-header';
+  initHeader();
+</script>
 
 <style>
   header {
@@ -105,8 +115,22 @@ import { Book, Plus, Info } from '@lucide/astro';
     flex-shrink: 0;
   }
 
+  /* Auth widget expands smoothly from zero width when content is inserted */
   #auth-widget {
     flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 0fr;
+    transition: grid-template-columns 200ms ease;
+    overflow: hidden;
+  }
+
+  #auth-widget:has(*) {
+    grid-template-columns: 1fr;
+  }
+
+  #auth-widget > * {
+    overflow: hidden;
+    min-width: 0;
   }
 
   .header-nav-separator {
