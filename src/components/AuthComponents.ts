@@ -1,11 +1,13 @@
 import { signIn, signUp, signOut } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import { STRING_FACTORIES } from '../constants/strings';
+import { MenuDropdown } from './MenuDropdown';
 
-/** Derives a one-character avatar initial from an email address. */
+/** Derives a one- or two-character avatar initial from an email address. */
 export function getInitials(email: string): string {
   const local = email.split('@')[0];
-  return local.length > 0 ? local[0].toUpperCase() : '?';
+  if (local.length === 0) return '?';
+  return local.slice(0, 2).toUpperCase();
 }
 
 export class AuthModal {
@@ -211,8 +213,7 @@ export class AuthWidget {
   private container: HTMLElement;
   private authModal: AuthModal;
   private currentUser: User | null = null;
-  private outsideClickListener: ((e: MouseEvent) => void) | null = null;
-  private escapeListener: ((e: KeyboardEvent) => void) | null = null;
+  private menuDropdown: MenuDropdown;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -221,6 +222,7 @@ export class AuthWidget {
     }
     this.container = container;
     this.authModal = new AuthModal();
+    this.menuDropdown = new MenuDropdown();
     this.render();
 
     window.addEventListener('auth-change', ((e: CustomEvent) => {
@@ -235,114 +237,64 @@ export class AuthWidget {
   }
 
   private render(): void {
-    if (this.currentUser) {
-      // Clean up any open dropdown listeners before re-rendering
-      if (this.outsideClickListener) {
-        document.removeEventListener('click', this.outsideClickListener);
-        this.outsideClickListener = null;
-      }
-      if (this.escapeListener) {
-        document.removeEventListener('keydown', this.escapeListener);
-        this.escapeListener = null;
-      }
+    // Close any open dropdown before rebuilding DOM
+    this.menuDropdown.hide();
 
+    if (this.currentUser) {
       const initials = getInitials(this.currentUser.email ?? '');
       const email = this.currentUser.email ?? '';
 
       this.container.innerHTML = `
-        <div class="auth-avatar-wrapper" style="position: relative;">
-          <button
-            class="btn btn-icon auth-avatar-btn"
-            aria-label="Account menu"
-            aria-expanded="false"
-            aria-haspopup="menu"
-            style="
-              border-radius: var(--border-radius-circle);
-              width: 32px;
-              height: 32px;
-              background: var(--color-bg-active);
-              border-color: var(--color-border);
-              color: var(--color-text-primary);
-              font-size: var(--font-size-medium);
-              font-weight: var(--font-weight-normal);
-              line-height: 1;
-              user-select: none;
-              flex-shrink: 0;
-            "
-          >${initials}</button>
-          <div
-            class="auth-avatar-dropdown"
-            role="menu"
-            style="
-              display: none;
-              position: absolute;
-              top: calc(100% + var(--spacing-x-small));
-              right: 0;
-              min-width: 180px;
-              background: var(--panel-background-color);
-              border: var(--panel-border-width) solid var(--panel-border-color);
-              border-radius: var(--border-radius-large);
-              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-              z-index: var(--z-index-dropdown);
-              overflow: hidden;
-            "
-          >
-            <div
-              class="auth-email-display"
-              style="
-                padding: var(--spacing-small) var(--spacing-medium);
-                font-size: var(--font-size-x-small);
-                color: var(--color-text-secondary);
-                border-bottom: 1px solid var(--panel-border-color);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 180px;
-                box-sizing: border-box;
-              "
-            ></div>
-            <div style="padding: var(--spacing-x-small);">
-              <button
-                id="auth-logout"
-                class="btn btn-small btn-neutral"
-                role="menuitem"
-                style="width: 100%; justify-content: flex-start;"
-              >
-                <span class="btn-text">Log Out</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <button
+          class="btn btn-icon auth-avatar-btn"
+          aria-label="Account menu"
+          aria-expanded="false"
+          aria-haspopup="menu"
+          style="
+            border-radius: var(--border-radius-circle);
+            width: 32px;
+            height: 32px;
+            background: var(--color-bg-active);
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-medium);
+            font-weight: var(--font-weight-normal);
+            line-height: 1;
+            user-select: none;
+            flex-shrink: 0;
+          "
+        ><span class="btn-text">${initials}</span></button>
       `;
 
       const avatarBtn = this.container.querySelector(
         '.auth-avatar-btn',
       ) as HTMLButtonElement;
-      const dropdown = this.container.querySelector(
-        '.auth-avatar-dropdown',
-      ) as HTMLElement;
-      const emailDisplay = this.container.querySelector(
-        '.auth-email-display',
-      ) as HTMLElement;
-      const logoutBtn = this.container.querySelector(
-        '#auth-logout',
-      ) as HTMLButtonElement;
 
-      // Set email via textContent to avoid XSS from user-controlled input
-      emailDisplay.textContent = email;
-
-      // Toggle dropdown on avatar click
       avatarBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isOpen = dropdown.style.display !== 'none';
-        if (isOpen) {
-          this.closeDropdown(avatarBtn, dropdown);
+        if (this.menuDropdown.isOpen) {
+          this.menuDropdown.hide();
+          avatarBtn.setAttribute('aria-expanded', 'false');
         } else {
-          this.openDropdown(avatarBtn, dropdown);
+          this.menuDropdown.show(
+            [
+              [
+                {
+                  id: 'logout',
+                  label: 'Log Out',
+                  action: () => this.handleLogout(),
+                },
+              ],
+            ],
+            {
+              anchor: avatarBtn,
+              header: email,
+              onClose: () => avatarBtn.setAttribute('aria-expanded', 'false'),
+            },
+          );
+          avatarBtn.setAttribute('aria-expanded', 'true');
         }
       });
-
-      logoutBtn.addEventListener('click', () => this.handleLogout());
     } else {
       this.container.innerHTML = `
         <div style="display: flex; gap: var(--spacing-small);">
@@ -368,39 +320,6 @@ export class AuthWidget {
     this.currentUser = null;
     this.render();
     window.dispatchEvent(new CustomEvent('auth-change', { detail: null }));
-  }
-
-  private openDropdown(btn: HTMLButtonElement, dropdown: HTMLElement): void {
-    dropdown.style.display = 'block';
-    btn.setAttribute('aria-expanded', 'true');
-
-    this.outsideClickListener = (e: MouseEvent) => {
-      if (!this.container.contains(e.target as Node)) {
-        this.closeDropdown(btn, dropdown);
-      }
-    };
-    document.addEventListener('click', this.outsideClickListener);
-
-    // Close on Escape — stored as field so it can be removed if render() fires while open
-    this.escapeListener = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        this.closeDropdown(btn, dropdown);
-      }
-    };
-    document.addEventListener('keydown', this.escapeListener);
-  }
-
-  private closeDropdown(btn: HTMLButtonElement, dropdown: HTMLElement): void {
-    dropdown.style.display = 'none';
-    btn.setAttribute('aria-expanded', 'false');
-    if (this.outsideClickListener) {
-      document.removeEventListener('click', this.outsideClickListener);
-      this.outsideClickListener = null;
-    }
-    if (this.escapeListener) {
-      document.removeEventListener('keydown', this.escapeListener);
-      this.escapeListener = null;
-    }
   }
 
   public setUser(user: User | null): void {

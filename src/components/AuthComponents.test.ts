@@ -2,16 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getInitials } from './AuthComponents';
 
 describe('getInitials', () => {
-  it('returns first character of local part, uppercased', () => {
-    expect(getInitials('chris@example.com')).toBe('C');
+  it('returns first two characters of local part, uppercased', () => {
+    expect(getInitials('chris@example.com')).toBe('CH');
   });
 
   it('works with dots in local part', () => {
-    expect(getInitials('john.doe@example.com')).toBe('J');
+    expect(getInitials('john.doe@example.com')).toBe('JO');
   });
 
   it('works with plus-sign aliases', () => {
-    expect(getInitials('chris+test@rauh.net')).toBe('C');
+    expect(getInitials('chris+test@rauh.net')).toBe('CH');
+  });
+
+  it('returns single character when local part has only one character', () => {
+    expect(getInitials('j@example.com')).toBe('J');
   });
 
   it('returns ? when local part is empty', () => {
@@ -43,7 +47,7 @@ describe('AuthWidget avatar render', () => {
     const container = document.getElementById('test-auth-widget')!;
     const avatarBtn = container.querySelector('.auth-avatar-btn');
     expect(avatarBtn).not.toBeNull();
-    expect(avatarBtn!.textContent?.trim()).toBe('C');
+    expect(avatarBtn!.textContent?.trim()).toBe('CH');
   });
 
   it('does not render avatar button when no user is set', async () => {
