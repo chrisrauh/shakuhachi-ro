@@ -108,7 +108,7 @@ import { Book, Plus, Info } from '@lucide/astro';
 
   .header-nav-separator {
     width: 1px;
-    height: 16px;
+    height: 1em; /* matches icon size (1em = 16px at base font) */
     background: var(--color-border);
     flex-shrink: 0;
   }
@@ -129,9 +129,17 @@ import { Book, Plus, Info } from '@lucide/astro';
       flex: 1;
     }
 
+    /* Default: centering container for title-only case */
     .header-metadata {
+      display: flex;
+      align-items: center;
       min-height: 32px;
-      margin-top: 3px;
+    }
+
+    /* Override when metadata has 2+ children (title + metadata present) */
+    .header-left:has(.score-header-metadata > :nth-child(2)) .header-metadata {
+      align-items: flex-start;
+      margin-top: 3px; /* visual nudge — aligns title cap-height with logo center; between --spacing-3x-small (2px) and --spacing-2x-small (4px) */
     }
 
     .header-right {

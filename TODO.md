@@ -22,6 +22,13 @@
 
 ### Global / Navigation
 
+- [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
+  - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
+  - Set `font-size` on `.logo-icon` to a token (e.g. 1.5rem for the character, making the box `calc(4/3 * 1em)` = 32px equivalent)
+  - Consider whether `border` should also scale (`0.125em`) or stay at `2px`
+  - The `min-height: 32px` in `.header-metadata` mobile media query derives from the logo height — update it to match the new token-based size
+  - Verify alignment still holds across all four header states (title-only / title+metadata × mobile / desktop)
+
 - [ ] [Both] [A:High] [Quality-DRY] Extract standard mobile menu initialization into a shared utility
   - `src/pages/index.astro`, `src/pages/about.astro`, and `src/pages/help/notation-formats.astro` each contain ~90 lines of identical mobile menu boilerplate: same imports, `getIconHTML()`, `toggleTheme()`, `actionItems`, `authItems`, `setItems()` call, and `onAuthReady()` subscription
   - Extract to `src/utils/init-mobile-menu.ts` exporting `initStandardMobileMenu(authWidget, authModal)`
