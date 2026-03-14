@@ -1,6 +1,14 @@
 import { signIn, signUp, signOut } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import { STRING_FACTORIES } from '../constants/strings';
+import { MenuDropdown } from './MenuDropdown';
+
+/** Derives a one- or two-character avatar initial from an email address. */
+export function getInitials(email: string): string {
+  const local = email.split('@')[0];
+  if (local.length === 0) return '?';
+  return local.slice(0, 2).toUpperCase();
+}
 
 export class AuthModal {
   private modal: HTMLElement;
@@ -205,6 +213,7 @@ export class AuthWidget {
   private container: HTMLElement;
   private authModal: AuthModal;
   private currentUser: User | null = null;
+  private menuDropdown: MenuDropdown;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -213,6 +222,7 @@ export class AuthWidget {
     }
     this.container = container;
     this.authModal = new AuthModal();
+    this.menuDropdown = new MenuDropdown();
     this.render();
 
     window.addEventListener('auth-change', ((e: CustomEvent) => {
@@ -227,18 +237,64 @@ export class AuthWidget {
   }
 
   private render(): void {
+    // Close any open dropdown before rebuilding DOM
+    this.menuDropdown.hide();
+
     if (this.currentUser) {
+      const initials = getInitials(this.currentUser.email ?? '');
+      const email = this.currentUser.email ?? '';
+
       this.container.innerHTML = `
-        <div style="display: flex; align-items: center; gap: var(--spacing-small);">
-          <span style="color: var(--color-text-primary); font-size: var(--font-size-small);">${this.currentUser.email}</span>
-          <button id="auth-logout" class="btn btn-small btn-neutral">
-            <span class="btn-text">Log Out</span>
-          </button>
-        </div>
+        <button
+          class="btn btn-icon auth-avatar-btn"
+          aria-label="Account menu"
+          aria-expanded="false"
+          aria-haspopup="menu"
+          style="
+            border-radius: var(--border-radius-circle);
+            width: 32px;
+            height: 32px;
+            background: var(--color-bg-active);
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-medium);
+            font-weight: var(--font-weight-normal);
+            line-height: 1;
+            user-select: none;
+            flex-shrink: 0;
+          "
+        ><span class="btn-text">${initials}</span></button>
       `;
 
-      const logoutBtn = this.container.querySelector('#auth-logout');
-      logoutBtn?.addEventListener('click', () => this.handleLogout());
+      const avatarBtn = this.container.querySelector(
+        '.auth-avatar-btn',
+      ) as HTMLButtonElement;
+
+      avatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (this.menuDropdown.isOpen) {
+          this.menuDropdown.hide();
+          avatarBtn.setAttribute('aria-expanded', 'false');
+        } else {
+          this.menuDropdown.show(
+            [
+              [
+                {
+                  id: 'logout',
+                  label: 'Log Out',
+                  action: () => this.handleLogout(),
+                },
+              ],
+            ],
+            {
+              anchor: avatarBtn,
+              header: email,
+              onClose: () => avatarBtn.setAttribute('aria-expanded', 'false'),
+            },
+          );
+          avatarBtn.setAttribute('aria-expanded', 'true');
+        }
+      });
     } else {
       this.container.innerHTML = `
         <div style="display: flex; gap: var(--spacing-small);">
