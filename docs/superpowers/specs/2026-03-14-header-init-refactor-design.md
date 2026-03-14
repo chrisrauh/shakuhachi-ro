@@ -80,14 +80,23 @@ Any page-specific init (e.g., `new ScoreLibrary(...)`) follows separately.
 
 ### Slug page (custom mobile menu)
 
-```ts
-// score is available from the server-rendered DOM
-const scoreData = JSON.parse(document.getElementById('score-data')!.textContent!);
-const score = scoreData.score;
+The slug page is SSR — score data is embedded in the HTML by the server. The `mobileMenu` callback reads it from the DOM client-side. **Parsing must happen inside the callback**, not before `initHeader`, so that a malformed or missing `score-data` element doesn't prevent the rest of the header (theme switcher, auth widget) from initializing.
 
+```ts
 initHeader({
   mobileMenu: (user, authModal) => {
-    const isOwner = !!(user && score && user.id === score.user_id);
+    // Parse score data inside the callback — if this fails, header still initializes
+    let isOwner = false;
+    try {
+      const dataEl = document.getElementById('score-data');
+      if (dataEl) {
+        const score = JSON.parse(dataEl.textContent || '{}').score;
+        isOwner = !!(user && score && user.id === score.user_id);
+      }
+    } catch {
+      // fall through: isOwner stays false
+    }
+
     const extraItems = isOwner ? [editItem, deleteItem] : [];
     return [
       ...(extraItems.length > 0 ? [extraItems] : []),
@@ -112,9 +121,21 @@ export function getIconHTML(icon: LucideIcon): string
 
 The slug page reuses `buildAuthItems` and `buildUtilityItems` and only defines its own nav/extra items.
 
+## Static Rendering Considerations
+
+The project uses `output: 'server'` (SSR by default). Three standard pages opt into static prerendering with `export const prerender = true`. The slug page is SSR.
+
+**`initHeader` always runs client-side.** Astro never executes `<script>` blocks at build/render time — they are bundled by Vite and sent to the browser. No server-side implications for `initHeader` itself.
+
+**Auth state and prerendered pages.** Static pages serve the same HTML to all users. The auth widget and mobile menu always start in an unauthenticated visual state and update reactively when `onAuthReady` fires client-side. This is existing behavior — our refactor doesn't change it.
+
+**Bundle sharing.** All three prerendered pages will import the same `initHeader` module. Astro/Vite creates a shared chunk cached by the browser across page navigations — a net improvement over today, where each page bundles its own copy of the menu-building code.
+
+**Slug page score data must be parsed inside the `mobileMenu` callback** (see Slug page section above), not before `initHeader()`. Parsing outside means a DOM error prevents the entire header from initializing. Parsing inside means the header always initializes; the menu gracefully falls back if score data is unavailable.
+
 ---
 
-## AuthWidget Refactor
+
 
 `AuthWidget` currently creates `AuthModal` internally and exposes it via `getAuthModal()`. This hides a shared dependency.
 
