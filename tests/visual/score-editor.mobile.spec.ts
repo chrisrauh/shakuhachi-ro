@@ -51,8 +51,8 @@ async function authenticate(page: any) {
   if (await mobileMenuButton.isVisible()) {
     // Mobile flow
     await mobileMenuButton.click();
-    await page.waitForSelector('.mobile-menu-dropdown', { state: 'visible' });
-    await page.click('button.mobile-menu-item:has-text("Log In")');
+    await page.waitForSelector('.menu-dropdown', { state: 'visible' });
+    await page.click('button.menu-dropdown-item:has-text("Log In")');
   } else {
     // Desktop flow
     const loginButton = page.locator('button:has-text("Log In")').first();
