@@ -13,6 +13,7 @@ import { Book, Plus, Info } from '@lucide/astro';
   </div>
   <div class="header-right">
     <slot name="header-actions" />
+    <div class="header-nav-separator" aria-hidden="true"></div>
     <!-- Desktop navigation (hidden on mobile) -->
     <div class="header-desktop-nav">
       <a
@@ -105,6 +106,18 @@ import { Book, Plus, Info } from '@lucide/astro';
     flex-shrink: 0;
   }
 
+  .header-nav-separator {
+    width: 1px;
+    height: 16px;
+    background: var(--color-border);
+    flex-shrink: 0;
+  }
+
+  /* Hide separator when no header-actions precede it */
+  .header-right > .header-nav-separator:first-child {
+    display: none;
+  }
+
   @media (max-width: 768px) {
     header {
       gap: var(--spacing-small);
@@ -116,6 +129,11 @@ import { Book, Plus, Info } from '@lucide/astro';
       flex: 1;
     }
 
+    .header-metadata {
+      min-height: 32px;
+      margin-top: 3px;
+    }
+
     .header-right {
       justify-content: flex-end;
       flex-shrink: 0;
@@ -124,6 +142,10 @@ import { Book, Plus, Info } from '@lucide/astro';
 
     /* Hide desktop navigation on mobile */
     .header-desktop-nav {
+      display: none;
+    }
+
+    .header-nav-separator {
       display: none;
     }
 

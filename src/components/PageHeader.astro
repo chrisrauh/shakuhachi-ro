@@ -38,8 +38,17 @@ const { title } = Astro.props;
       font-size: var(--font-size-x-small);
     }
 
+    .score-header-metadata :global(span) {
+      display: block;
+      line-height: 1;
+      text-box-trim: trim-end;
+      text-box-edge: cap alphabetic;
+    }
+
     .score-title {
       font-size: var(--font-size-medium);
+      line-height: 1;
+      margin-bottom: 3px;
     }
   }
 </style>
