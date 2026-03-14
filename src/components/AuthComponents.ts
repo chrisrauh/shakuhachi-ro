@@ -21,7 +21,7 @@ function getIconHTML(
   return icon.outerHTML;
 }
 
-export class AuthModal {
+export class HeaderModal {
   private modal: HTMLElement;
   private isLoginMode: boolean = true;
 
@@ -222,17 +222,17 @@ export class AuthModal {
 
 export class AuthWidget {
   private container: HTMLElement;
-  private authModal: AuthModal;
+  private headerModal: HeaderModal;
   private currentUser: User | null = null;
   private menuDropdown: MenuDropdown;
 
-  constructor(containerId: string) {
+  constructor(containerId: string, headerModal: HeaderModal) {
     const container = document.getElementById(containerId);
     if (!container) {
       throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
-    this.authModal = new AuthModal();
+    this.headerModal = headerModal;
     this.menuDropdown = new MenuDropdown();
     this.render();
 
@@ -240,11 +240,6 @@ export class AuthWidget {
       this.currentUser = e.detail;
       this.render();
     }) as EventListener);
-  }
-
-  // Expose authModal for mobile menu
-  public getAuthModal(): AuthModal {
-    return this.authModal;
   }
 
   private render(): void {
@@ -327,8 +322,10 @@ export class AuthWidget {
       const loginBtn = this.container.querySelector('#auth-login');
       const signupBtn = this.container.querySelector('#auth-signup');
 
-      loginBtn?.addEventListener('click', () => this.authModal.show('login'));
-      signupBtn?.addEventListener('click', () => this.authModal.show('signup'));
+      loginBtn?.addEventListener('click', () => this.headerModal.show('login'));
+      signupBtn?.addEventListener('click', () =>
+        this.headerModal.show('signup'),
+      );
     }
   }
 

@@ -27,21 +27,22 @@ describe('getInitials', () => {
   });
 });
 
+// vi.mock must be at top level — not inside beforeEach — for Vitest hoisting to work
+vi.mock('../api/auth', () => ({
+  signIn: vi.fn(),
+  signUp: vi.fn(),
+  signOut: vi.fn(),
+}));
+
 describe('AuthWidget avatar render', () => {
   beforeEach(() => {
-    // AuthWidget reads from document, so set up a minimal DOM
     document.body.innerHTML = '<div id="test-auth-widget"></div>';
-    // Stub AuthModal to avoid full modal setup in unit tests
-    vi.mock('../api/auth', () => ({
-      signIn: vi.fn(),
-      signUp: vi.fn(),
-      signOut: vi.fn(),
-    }));
   });
 
   it('renders avatar button with initials when user is set', async () => {
-    const { AuthWidget } = await import('./AuthComponents');
-    const widget = new AuthWidget('test-auth-widget');
+    const { AuthWidget, HeaderModal } = await import('./AuthComponents');
+    const headerModal = new HeaderModal();
+    const widget = new AuthWidget('test-auth-widget', headerModal);
     widget.setUser({ email: 'chris@example.com' } as never);
 
     const container = document.getElementById('test-auth-widget')!;
@@ -51,8 +52,9 @@ describe('AuthWidget avatar render', () => {
   });
 
   it('does not render avatar button when no user is set', async () => {
-    const { AuthWidget } = await import('./AuthComponents');
-    const widget = new AuthWidget('test-auth-widget');
+    const { AuthWidget, HeaderModal } = await import('./AuthComponents');
+    const headerModal = new HeaderModal();
+    const widget = new AuthWidget('test-auth-widget', headerModal);
     widget.setUser(null);
 
     const container = document.getElementById('test-auth-widget')!;

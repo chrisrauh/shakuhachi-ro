@@ -1,5 +1,5 @@
 import { ThemeSwitcher } from '../components/ThemeSwitcher';
-import { AuthWidget } from '../components/AuthComponents';
+import { AuthWidget, HeaderModal } from '../components/AuthComponents';
 
 export function initHeader() {
   new ThemeSwitcher('theme-switcher');
@@ -12,8 +12,8 @@ export function initHeader() {
     );
   }
 
-  const authWidget = new AuthWidget('auth-widget');
-  const authModal = authWidget.getAuthModal();
+  const headerModal = new HeaderModal();
+  const authWidget = new AuthWidget('auth-widget', headerModal);
 
-  return { authWidget, authModal };
+  return { authWidget, headerModal };
 }
