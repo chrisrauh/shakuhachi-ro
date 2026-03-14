@@ -140,7 +140,7 @@ if (score?.forked_from) {
 
     // Function to update mobile menu items based on auth state and ownership
     const updateMobileMenuItems = (user: SupabaseUser | null, isOwner: boolean) => {
-      const actionItems: MenuItem[] = [
+      const navItems: MenuItem[] = [
         {
           id: 'browse',
           label: 'Library',
@@ -153,23 +153,24 @@ if (score?.forked_from) {
           href: '/score/new/edit',
           icon: getIconHTML(Plus),
         },
-        ...(isOwner
-          ? [
-              {
-                id: 'edit',
-                label: 'Edit score',
-                href: (document.getElementById('edit-btn') as HTMLAnchorElement)?.href,
-                icon: getIconHTML(SquarePen),
-              },
-              {
-                id: 'delete',
-                label: 'Delete score',
-                action: () => (document.getElementById('delete-btn') as HTMLButtonElement)?.click(),
-                icon: getIconHTML(Trash2),
-              },
-            ]
-          : []),
       ];
+
+      const extraItems: MenuItem[] = isOwner
+        ? [
+            {
+              id: 'edit',
+              label: 'Edit score',
+              href: (document.getElementById('edit-btn') as HTMLAnchorElement)?.href,
+              icon: getIconHTML(SquarePen),
+            },
+            {
+              id: 'delete',
+              label: 'Delete score',
+              action: () => (document.getElementById('delete-btn') as HTMLButtonElement)?.click(),
+              icon: getIconHTML(Trash2),
+            },
+          ]
+        : [];
 
       // Add auth items
       const authItems = user
@@ -205,10 +206,11 @@ if (score?.forked_from) {
           ];
 
       mobileMenu.setItems([
-        actionItems,
+        ...(extraItems.length > 0 ? [extraItems] : []),
+        navItems,
         authItems,
-        [{ id: 'theme', label: 'Toggle theme', action: toggleTheme, icon: getIconHTML(SunMoon) }],
         [
+          { id: 'theme', label: 'Toggle theme', action: toggleTheme, icon: getIconHTML(SunMoon) },
           { id: 'help', label: 'Help', href: '/help/notation-formats', icon: getIconHTML(HelpCircle) },
           { id: 'about', label: 'About', href: '/about', icon: getIconHTML(Info) },
         ],

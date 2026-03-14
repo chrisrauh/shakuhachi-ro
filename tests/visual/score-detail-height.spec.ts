@@ -22,7 +22,7 @@ test.describe('Score Detail Page - Height', () => {
     // Get viewport and score renderer dimensions
     const viewportHeight = page.viewportSize()!.height;
     const headerHeight = await page
-      .locator('header[data-astro-cid-sckkx6r4]')
+      .locator('header[data-astro-cid-ctg3m53h]')
       .first()
       .boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
@@ -114,7 +114,7 @@ test.describe('Score Detail Page - Height', () => {
 
     const viewportHeight = 720;
     const headerHeight = await page
-      .locator('header[data-astro-cid-sckkx6r4]')
+      .locator('header[data-astro-cid-ctg3m53h]')
       .first()
       .boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
@@ -134,7 +134,7 @@ test.describe('Score Detail Page - Height', () => {
 
     const viewportHeight = 1024;
     const headerHeight = await page
-      .locator('header[data-astro-cid-sckkx6r4]')
+      .locator('header[data-astro-cid-ctg3m53h]')
       .first()
       .boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
@@ -154,7 +154,7 @@ test.describe('Score Detail Page - Height', () => {
 
     const viewportHeight = 667;
     const headerHeight = await page
-      .locator('header[data-astro-cid-sckkx6r4]')
+      .locator('header[data-astro-cid-ctg3m53h]')
       .first()
       .boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();

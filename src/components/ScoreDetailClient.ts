@@ -61,15 +61,16 @@ export class ScoreDetailClient {
     if (!this.score) return;
 
     const isOwner = !!(user && user.id === this.score.user_id);
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
     const editBtn = document.getElementById('edit-btn') as HTMLElement;
     if (editBtn) {
-      editBtn.style.display = isOwner ? 'inline-flex' : 'none';
+      editBtn.style.display = isOwner && !isMobile ? 'inline-flex' : 'none';
     }
 
     const deleteBtn = document.getElementById('delete-btn') as HTMLElement;
     if (deleteBtn) {
-      deleteBtn.style.display = isOwner ? 'inline-flex' : 'none';
+      deleteBtn.style.display = isOwner && !isMobile ? 'inline-flex' : 'none';
     }
   }
 

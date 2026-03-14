@@ -109,8 +109,8 @@ const { Content } = await helpPage.render();
       mobileMenu.setItems([
         actionItems,
         authItems,
-        [{ id: 'theme', label: 'Toggle theme', action: toggleTheme, icon: getIconHTML(SunMoon) }],
         [
+          { id: 'theme', label: 'Toggle theme', action: toggleTheme, icon: getIconHTML(SunMoon) },
           { id: 'help', label: 'Help', href: '/help/notation-formats', icon: getIconHTML(HelpCircle) },
           { id: 'about', label: 'About', href: '/about', icon: getIconHTML(Info) },
         ],
