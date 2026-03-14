@@ -30,7 +30,7 @@ if (score?.forked_from) {
 ---
 
 {score ? (
-<Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true}>
+<Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true} mobileMenuType="score-edit">
   <!-- Score metadata in header -->
   <PageHeader slot="header-metadata" title={score.title}>
     {parentScore ? (
