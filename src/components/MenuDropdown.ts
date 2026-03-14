@@ -57,11 +57,9 @@ export class MenuDropdown {
 
       .menu-dropdown-header {
         padding: var(--spacing-small) var(--spacing-medium);
-        font-size: var(--font-size-x-small);
+        font-size: var(--font-size-small);
         color: var(--color-text-secondary);
         border-bottom: 1px solid var(--panel-border-color);
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
         box-sizing: border-box;
         margin: calc(-1 * var(--spacing-2x-small));
@@ -142,10 +140,7 @@ export class MenuDropdown {
 
     if (options.anchor) {
       const rect = options.anchor.getBoundingClientRect();
-      const rootStyles = getComputedStyle(document.documentElement);
-      const rootFontSize = parseFloat(rootStyles.fontSize);
-      const gap = parseFloat(rootStyles.getPropertyValue('--spacing-2x-small')) * rootFontSize;
-      this.el.style.top = `${rect.bottom + gap}px`;
+      this.el.style.top = `calc(${rect.bottom}px + var(--spacing-2x-small))`;
       this.el.style.right = `${window.innerWidth - rect.right}px`;
     } else if (options.fixed) {
       this.el.style.top = options.fixed.top;
