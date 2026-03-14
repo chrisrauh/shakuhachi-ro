@@ -55,7 +55,7 @@ Accepts a new optional prop:
 ```ts
 interface Props {
   // ... existing props
-  mobileMenuType?: 'standard' | 'score-detail'  // default: 'standard'
+  mobileMenuType?: 'standard' | 'score-edit'  // default: 'standard'
 }
 ```
 
@@ -63,7 +63,8 @@ Renders it as a data attribute:
 
 ```html
 <div id="mobile-menu" class="mobile-menu-container"
-     data-menu-type={mobileMenuType ?? 'standard'}></div>
+     data-menu-type={mobileMenuType ?? 'standard'}>  // 'standard' | 'score-edit'
+</div>
 ```
 
 Has its own `<script>` block:
@@ -101,8 +102,8 @@ Returns `void`.
 // Standard builder — used by index, about, notation-formats
 function standardMenuBuilder(user, headerModal): MenuItem[][]
 
-// Score-detail builder — used by score/[slug]
-function scoreDetailMenuBuilder(user, headerModal): MenuItem[][]
+// Score-edit builder — used by score/[slug] (shows edit/delete for score owners)
+function scoreEditMenuBuilder(user, headerModal): MenuItem[][]
 // Reads score-data from DOM, determines isOwner, builds conditional items
 ```
 
@@ -128,13 +129,13 @@ No `<script>` block for header initialization. `SiteHeader`'s own script handles
 ### Slug page
 
 ```astro
-<SiteHeader mobileMenuType="score-detail" />
+<SiteHeader mobileMenuType="score-edit" />
 ```
 
-`scoreDetailMenuBuilder` in `init-header.ts` reads `#score-data` from the DOM inside the builder callback (so a parse failure doesn't prevent the rest of the header from initializing):
+`scoreEditMenuBuilder` in `init-header.ts` reads `#score-data` from the DOM inside the builder callback (so a parse failure doesn't prevent the rest of the header from initializing):
 
 ```ts
-function scoreDetailMenuBuilder(user, headerModal): MenuItem[][] {
+function scoreEditMenuBuilder(user, headerModal): MenuItem[][] {
   let isOwner = false;
   try {
     const dataEl = document.getElementById('score-data');
