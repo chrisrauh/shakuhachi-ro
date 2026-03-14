@@ -38,10 +38,6 @@ Invoke this skill when:
 
 **Meta-principle: optimize for humans, not machines.** Everything else flows from that.
 
-## Project-Specific Lessons
-
-*(Kept in CLAUDE.md — not duplicated in this skill. See `## Key Learnings` there.)*
-
 ## NEVER (Hard Rules)
 
 | Rule | Detail |
