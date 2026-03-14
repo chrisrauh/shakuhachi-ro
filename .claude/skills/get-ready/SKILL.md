@@ -14,7 +14,7 @@ Follow this sequence to get context:
 ### 1. Review Guidelines (CLAUDE.md)
 
 Read `./CLAUDE.md` to understand each section.
-Pay special attention to the dev workflow and the engineering principles.
+Pay special attention to the guidelines. Use `/dev-workflow` for the full development workflow and `/eng-principles` for engineering principle details.
 
 ### 2. Review Architecture
 

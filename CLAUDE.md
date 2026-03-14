@@ -4,6 +4,14 @@
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
 - Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 
+## Skills
+
+Use project skills for structured workflows:
+
+- **`/get-ready`** — Review guidelines, architecture, and tasks at the start of a session
+- **`/dev-workflow`** — Branch setup, commits, PRs, and post-merge cleanup. Use for all development work.
+- **`/eng-principles`** — Engineering principles, hard rules (including CSS), and project-specific lessons.
+
 ## Project Context
 
 **This project has two parts:**
@@ -26,30 +34,6 @@
 - Renderer improvements are driven by platform needs
 - Both are production-quality, just serving different audiences
 
-## Software engineering principles
-
-- **Simplicity (KISS)** - Prefer the simplest thing that works. Complexity is technical debt.
-- **YAGNI (You Aren't Gonna Need It)** - Don't build features, abstractions, or complexity for hypothetical future needs. Build what's needed now. Future requirements will change anyway.
-- **Single Responsibility** - A module/function/class should have one reason to change (one actor). Prevents coupling changes from different sources.
-- **Separation of Concerns** - Don't mix UI, business logic, data access, config, etc. Boundaries make systems evolvable.
-- **Abstraction with Intent** - Abstract _why_, not _how_. Bad abstractions are worse than duplication.
-- **DRY (with judgment)** - Eliminate _true_ duplication, not accidental similarity. Premature DRY creates tight coupling.
-- **Loose Coupling, High Cohesion** - Things that change together live together; things that change independently shouldn't know much about each other.
-- **Make Change Cheap** - Optimize for iteration, not initial elegance. Make code easy to modify.
-- **Explicit Over Implicit** - Readability beats cleverness. Code is read far more than it's written.
-- **Fail Fast, Fail Loud** - Errors should surface immediately and clearly. Silent failure is a bug factory.
-- **Test What Matters** - Tests are about confidence, not coverage. Test behavior, not implementation.
-
-Single meta-principle: **optimize for humans, not machines**. Everything else flows from that.
-
-## CSS/Styling Guidelines
-
-- **NEVER use `!important`** - This is a code smell indicating underlying architectural problems with CSS specificity or cascade order. If you need `!important`, fix the root cause instead:
-  - Refactor CSS specificity (use more specific selectors)
-  - Reorder stylesheets or style declarations
-  - Review component styling architecture
-  - Check for conflicting global styles
-
 ## Runtime Environment
 
 This project is used in two environments: a local terminal and **Claude Code on the Web** (claude.ai/code). The guidelines in this file are written for the terminal environment.
@@ -58,51 +42,7 @@ This project is used in two environments: a local terminal and **Claude Code on 
 
 ## Dev Workflow
 
-⚠️ **NEVER COMMIT DIRECTLY TO MAIN!** Verify with `git branch --show-current` before every commit.
-
-**Always verify branch before starting any work** (see step 1 below).
-
-**Standard workflow:**
-
-1. **Check and set branch**: Run `git branch --show-current`. If on main, create a feature branch: `git checkout -b feature/descriptive-name`
-2. **Verify the task before starting** — the checkbox is a claim, not a fact; the code is ground truth:
-   - For test tasks: `Glob` for the test file, read it to check coverage
-   - For implementation tasks: `Grep` for the function/class/feature
-   - For bug fixes: confirm the bug still exists in the code
-   - If already done: mark `[x]` and move on without re-implementing
-3. Make changes and test
-4. **Ask user to review changes before committing**
-5. Commit locally (no push yet)
-6. **Mark completed tasks in TODO.md with [x] — do this immediately, without waiting to be asked** (temporary marker — task will be removed after merge)
-7. Ask user if you should create PR
-8. Push and create PR
-9. **STOP - wait for user to merge** (never use `gh pr merge` or `--auto`)
-10. After user confirms merge, switch to main, pull and delete branches by running these 4 commands separately:
-    - `git checkout main`
-    - `git pull`
-    - `git branch -d <branch>`
-    - `git push origin --delete <branch>`
-11. **Remove completed tasks from TODO.md — do this immediately, without waiting to be asked** (final cleanup — do this immediately after merge confirmation)
-12. Look for next task in TODO.md and ask user if you should work on it
-
-**Recovery from accidental work on main:**
-Create a feature branch, commit, and PR normally.
-
-If changes are already committed to main (but not pushed):
-
-1. `git checkout -b feature/descriptive-name`
-2. `git checkout main`
-3. `git reset --hard origin/main`
-4. `git checkout feature/descriptive-name`, push and PR
-
-**CRITICAL: Git Commit and PR Messages**
-
-⚠️ **NEVER add attribution/co-authoring text to commits or PRs:**
-
-- ❌ NO "Co-Authored-By: Claude" in commit messages
-- ❌ NO "Generated with Claude Code" in PR descriptions
-- ❌ NO any other Claude attribution text in repo messages
-- ✅ Clean, professional commit messages only
+Use the `/dev-workflow` skill for the full workflow (branch management, commits, PRs, cleanup, bash constraints).
 
 **Build Process**
 
@@ -124,48 +64,16 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes with chrome-devtools-mcp
 
-## Bash Commands - Avoid Authorization Prompts
+**Recovery from accidental work on main:**
 
-**Use dedicated tools instead of Bash for file operations and text processing.**
+Create a feature branch, commit, and PR normally.
 
-Why: Avoiding authorization prompts enables more autonomous, efficient work without interruptions. Claude can work faster when using dedicated tools that don't require per-command approval.
+If changes are already committed to main (but not pushed):
 
-Claude Code has specialized tools that work better than shell commands:
-
-- Read files → Use **Read** tool (not `cat`)
-- Write files → Use **Write** tool (not `echo >` or `cat <<EOF`)
-- Edit files → Use **Edit** tool (not `sed`)
-- Search content → Use **Grep** tool (not `grep` or `rg`)
-- Find files → Use **Glob** tool (not `find`)
-
-**For Bash commands, use simple syntax only:**
-
-Avoid shell features that trigger authorization prompts:
-
-- ❌ Command chaining: `cmd1 && cmd2` (use sequential Bash calls instead)
-- ❌ Pipes: `cmd | grep` (use Grep tool instead)
-- ❌ Command substitution: `$(...)` (use Read tool then process)
-- ❌ Redirection: `echo > file` (use Write tool)
-- ❌ Heredocs: `cat <<EOF` (use Write tool)
-- ❌ Background: `cmd &` (use `run_in_background` parameter)
-
-**Multi-step operations:**
-Make separate Bash calls instead of chaining:
-
-```bash
-# ❌ Triggers prompt
-git add . && git commit -m "msg" && git push
-
-# ✅ Sequential calls
-git add .
-git commit -m "msg"
-git push
-```
-
-**Acceptable exceptions:**
-
-- `source .env && echo $VAR` - Required because .env is locked and shells don't persist
-- `cd dir && npm test` - When absolute paths aren't practical (though prefer absolute paths)
+1. `git checkout -b feature/descriptive-name`
+2. `git checkout main`
+3. `git reset --hard origin/main`
+4. `git checkout feature/descriptive-name`, push and PR
 
 ## Testing
 
@@ -175,33 +83,6 @@ git push
 - **When you find an error during development, implement a unit test that would have caught that error**
 - **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
-
-**CRITICAL: Reading Test Output**
-
-1. **Check type-check results**: Look for "0 errors, 0 warnings, 0 hints"
-2. **Check lint results**: Verify eslint completed without errors
-3. **Check unit test results**: Verify all tests passed (green checkmarks)
-4. **Never assume success**: If you see any errors, STOP and fix them before proceeding
-5. **Report accurately**: Only say "all tests passing" if ALL three steps (type-check, lint, tests) succeeded
-
-**Common mistake:** Seeing unit tests pass and reporting success without reading lint output. Read the full output — verify all three steps.
-
-**After creating new files:**
-
-- Always run `npm test` to catch formatting/linting errors in new code
-- New files often have formatting issues even if existing code is clean
-- Run `npx eslint <file> --fix` to auto-fix formatting before committing
-
-**Example of what to check:**
-
-```bash
-> npm test
-# ... type-check output (must show "0 errors, 0 warnings")
-# ... lint output (must complete without errors)
-# ... vitest output (must show all tests passed)
-```
-
-If ANY step fails, fix it before reporting results to the user.
 
 **Writing Tests**
 
