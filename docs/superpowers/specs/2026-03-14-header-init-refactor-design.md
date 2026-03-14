@@ -187,37 +187,39 @@ const authWidget = new AuthWidget('auth-widget', headerModal);
 
 ## Auth Widget Appearance (Flash Mitigation)
 
-`#auth-widget` starts as an empty div — zero width. When JS loads and `AuthWidget` renders, the button appears and the layout jumps. This affects both logged-out (button appears) and the subsequent auth resolution (button may change size).
+`#auth-widget` starts as an empty div — zero width. When JS loads and `AuthWidget` renders, the button appears and the layout jumps. This affects both the initial appearance and any subsequent auth state change that changes button size.
 
-**Approach: CSS width transition driven by JS measurement**
+**Approach: CSS-native grid column transition**
 
-`#auth-widget` in `SiteHeader.astro`:
+Use `grid-template-columns` to animate between `0fr` (collapsed) and `1fr` (natural content size). This is one of the few CSS properties that can transition to a content-driven size. Paired with `:has(*)`, the container is fully self-managing — no JS measurement or class toggling needed.
 
 ```css
 #auth-widget {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 200ms ease;
   overflow: hidden;
-  width: 0;
-  transition: width 200ms ease;
+}
+
+/* Expands automatically when AuthWidget inserts content */
+#auth-widget:has(*) {
+  grid-template-columns: 1fr;
+}
+
+/* Inner content must participate in grid sizing */
+#auth-widget > * {
+  overflow: hidden;
+  min-width: 0;
 }
 ```
 
-`AuthWidget`, after each render (initial and on auth change), measures its content and sets an explicit pixel width on the container:
+**Behavior:**
+- Empty container → `0fr` → zero width, no space taken
+- `AuthWidget` inserts its button → `:has(*)` triggers → smooth expansion to content width
+- Auth state changes (logged-out ↔ logged-in) → content always present → stays at `1fr`, adapts naturally
+- No JS changes to `AuthWidget` required
 
-```ts
-private updateContainerWidth(): void {
-  const content = this.container.firstElementChild as HTMLElement;
-  if (content) {
-    this.container.style.width = `${content.scrollWidth}px`;
-  }
-}
-```
-
-Called at the end of `render()`. This means:
-- Initial appearance: smooth expansion from 0 → logged-out button width
-- Auth state change (logged-out → logged-in or vice versa): smooth width transition between the two sizes
-- No layout jump at any point
-
-This is CSS-only (no `min-width` assumption needed), handles both states, and is self-correcting if button sizes change.
+`:has()` browser support is excellent as of 2026 (Chrome 105+, Safari 15.4+, Firefox 121+).
 
 ---
 
@@ -241,7 +243,7 @@ The project uses `output: 'server'` (SSR by default). Three standard pages opt i
 |------|--------|
 | `src/components/SiteHeader.astro` | Add `mobileMenuType` prop, `data-menu-type` attribute, `<script>` calling `initHeader()`, width-transition CSS on `#auth-widget` |
 | `src/utils/init-header.ts` | Rewrite: reads `data-menu-type`, selects builder, owns `onAuthReady`, exports helpers |
-| `src/components/AuthComponents.ts` | Rename `AuthModal` → `HeaderModal`; `AuthWidget` accepts `HeaderModal` as constructor param; remove `getAuthModal()`; call `updateContainerWidth()` after each render |
+| `src/components/AuthComponents.ts` | Rename `AuthModal` → `HeaderModal`; `AuthWidget` accepts `HeaderModal` as constructor param; remove `getAuthModal()` |
 | `src/pages/index.astro` | Remove ~90-line script block (header script handles it) |
 | `src/pages/about.astro` | Same |
 | `src/pages/help/notation-formats.astro` | Same |
