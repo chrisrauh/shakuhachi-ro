@@ -22,19 +22,13 @@
 
 ### Global / Navigation
 
-- [x] On desktop, when the title + metadata is too long, the page expands beyond the viewport width and the logout button pushes out to the right with some horizontal scrolling. Expected: page has no horizontal scrolling.
-
 - [ ] [Both] [A:High] [Quality-DRY] Extract standard mobile menu initialization into a shared utility
   - `src/pages/index.astro`, `src/pages/about.astro`, and `src/pages/help/notation-formats.astro` each contain ~90 lines of identical mobile menu boilerplate: same imports, `getIconHTML()`, `toggleTheme()`, `actionItems`, `authItems`, `setItems()` call, and `onAuthReady()` subscription
   - Extract to `src/utils/init-mobile-menu.ts` exporting `initStandardMobileMenu(authWidget, authModal)`
   - Each page replaces the block with two lines: call `initHeader()`, then `initStandardMobileMenu(authWidget, authModal)`
   - The score detail page (`[slug].astro`) has owner-specific items and should remain separate
 
-- [x] [UI] [A:High] [Polish] Add navigation links: Home | Create Score
-- [x] [UI] [A:High] [Polish] Add auth UI: Login/Signup or Username/Logout
 - [ ] [UI] [A:High] [Polish] Create footer with attribution
-- [x] [UI] [A:High] [Polish] Add consistent styling (CSS framework or custom)
-- [x] [UI] [A:High] [Polish] Implement responsive design (mobile, tablet, desktop)
 
 - [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
   - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
@@ -42,6 +36,12 @@
   - Consider whether `border` should also scale (`0.125em`) or stay at `2px`
   - The `min-height: 32px` in `.header-metadata` mobile media query derives from the logo height — update it to match the new token-based size
   - Verify alignment still holds across all four header states (title-only / title+metadata × mobile / desktop)
+
+- [ ] Refine the Avatar styling
+  - Consider styling like the other action buttons, styling like a secondary button, styling like a primary button (prepare a way to toggle between multiple theming options with the overlay panel)
+  - Add an option on the overlay panel to play with font weifght and size
+  - Ask user to find the best styling and the right values to implement
+  - Remove code related to the overlay panel to choose values and themes.
 
 ### Score Library
 
