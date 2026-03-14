@@ -4,6 +4,7 @@ export interface MenuItem {
   href?: string;
   action?: () => void;
   icon?: string;
+  nonInteractive?: boolean;
 }
 
 interface ShowOptions {
@@ -57,11 +58,9 @@ export class MenuDropdown {
 
       .menu-dropdown-header {
         padding: var(--spacing-small) var(--spacing-medium);
-        font-size: var(--font-size-x-small);
+        font-size: var(--font-size-small);
         color: var(--color-text-secondary);
         border-bottom: 1px solid var(--panel-border-color);
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
         box-sizing: border-box;
         margin: calc(-1 * var(--spacing-2x-small));
@@ -92,6 +91,19 @@ export class MenuDropdown {
 
       .menu-dropdown-item:hover {
         background: var(--panel-background-color);
+      }
+
+      .menu-dropdown-item--static {
+        cursor: default;
+        color: var(--color-text-secondary);
+      }
+
+      .menu-dropdown-item--static:hover {
+        background: none;
+      }
+
+      .menu-dropdown-item--static .menu-dropdown-item-icon {
+        color: var(--color-text-secondary);
       }
 
       .menu-dropdown-item-icon {
@@ -142,7 +154,7 @@ export class MenuDropdown {
 
     if (options.anchor) {
       const rect = options.anchor.getBoundingClientRect();
-      this.el.style.top = `${rect.bottom + 4}px`;
+      this.el.style.top = `calc(${rect.bottom}px + var(--spacing-2x-small))`;
       this.el.style.right = `${window.innerWidth - rect.right}px`;
     } else if (options.fixed) {
       this.el.style.top = options.fixed.top;
@@ -160,12 +172,16 @@ export class MenuDropdown {
     // Groups of items
     groups.forEach((group, groupIndex) => {
       group.forEach((item) => {
-        let el: HTMLButtonElement | HTMLAnchorElement;
+        let el: HTMLElement;
 
-        if (item.href) {
+        if (item.nonInteractive) {
+          el = document.createElement('div');
+          el.className = 'menu-dropdown-item menu-dropdown-item--static';
+        } else if (item.href) {
           const a = document.createElement('a');
           a.href = item.href;
           el = a;
+          el.className = 'menu-dropdown-item';
         } else {
           const btn = document.createElement('button');
           btn.addEventListener('click', () => {
@@ -173,9 +189,8 @@ export class MenuDropdown {
             this.hide();
           });
           el = btn;
+          el.className = 'menu-dropdown-item';
         }
-
-        el.className = 'menu-dropdown-item';
 
         if (item.icon) {
           const iconSpan = document.createElement('span');

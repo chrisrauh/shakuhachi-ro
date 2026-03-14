@@ -2,12 +2,23 @@ import { signIn, signUp, signOut } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import { STRING_FACTORIES } from '../constants/strings';
 import { MenuDropdown } from './MenuDropdown';
+import { createElement, User as UserIcon, LogOut as LogOutIcon } from 'lucide';
 
 /** Derives a one- or two-character avatar initial from an email address. */
 export function getInitials(email: string): string {
   const local = email.split('@')[0];
   if (local.length === 0) return '?';
   return local.slice(0, 2).toUpperCase();
+}
+
+function getIconHTML(
+  iconComponent: Parameters<typeof createElement>[0],
+): string {
+  const icon = createElement(iconComponent);
+  icon.setAttribute('width', '16');
+  icon.setAttribute('height', '16');
+  icon.setAttribute('stroke-width', '2');
+  return icon.outerHTML;
 }
 
 export class AuthModal {
@@ -280,15 +291,21 @@ export class AuthWidget {
             [
               [
                 {
+                  id: 'email',
+                  label: email,
+                  nonInteractive: true,
+                  icon: getIconHTML(UserIcon),
+                },
+                {
                   id: 'logout',
                   label: 'Log Out',
                   action: () => this.handleLogout(),
+                  icon: getIconHTML(LogOutIcon),
                 },
               ],
             ],
             {
               anchor: avatarBtn,
-              header: email,
               onClose: () => avatarBtn.setAttribute('aria-expanded', 'false'),
             },
           );

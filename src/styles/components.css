@@ -26,6 +26,8 @@
 .btn-text {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
+  letter-spacing: -0.05em;
+  font-weight: 450;
 }
 
 .btn:disabled {

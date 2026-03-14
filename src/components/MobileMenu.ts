@@ -50,9 +50,11 @@ export class MobileMenu {
   }
 
   private showDropdown(): void {
-    const button = this.container.querySelector('#mobile-menu-toggle');
+    const button = this.container.querySelector(
+      '#mobile-menu-toggle',
+    ) as HTMLElement;
     this.menuDropdown.show(this.groups, {
-      fixed: { top: '48px', right: 'var(--spacing-medium)' },
+      anchor: button,
       useOverlay: true,
       onClose: () => {
         this.isOpen = false;
