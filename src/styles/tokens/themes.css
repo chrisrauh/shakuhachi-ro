@@ -628,7 +628,7 @@
 
   /* SPECIAL */
   --color-separator: var(--color-gray-400); /* Visual separators */
-  --color-logo: var(--color-gray-700); /* Logo */
+  --color-logo: var(--color-gray-650); /* Logo — one shade lighter than text-primary (gray-700) */
 
   /* STATUS COLORS - Success */
   --color-text-success: var(--color-green-700); /* Success text */
@@ -1035,6 +1035,5 @@
   ); /* Hover states - slightly lighter than panel */
   --color-bg-active: var(--color-gray-200); /* Active/pressed states */
 
-  /* SPECIAL - Only logo needs override, others auto-adapt via inverted grays */
-  --color-logo: var(--color-stone-600);
+  /* SPECIAL - gray-800 auto-adapts via inverted grays, no override needed */
 }

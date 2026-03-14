@@ -22,21 +22,7 @@
 
 ### Global / Navigation
 
-- [ ] [UI] [A:High] [Polish] Replace user email display with avatar in header
-  - On desktop, the header currently shows the raw email string (e.g. `chris+shakuhachi+test@rauh.net`) in the logged-in state
-  - Replace with a compact avatar: show user initials in a circle (derived from email local part) or a generic person icon
-  - On click/tap, open a small dropdown with: email (read-only), Log Out button
-  - Avatar should be visually consistent with the existing header button style
-  - No auth changes needed — this is purely a UI/presentation change in the header
-
-- [x] Revisig loading spinner visual design
-  - explore shakuhachi themed loading "spinner". For example, 5 dots that "play" a song, with the fingering of going up and down and octave.
-
-- [x] [UI] [A:High] [Polish] Create a button version of the loading spinner
-  - Add a visual spinner state to buttons (e.g. used by `ButtonLoadingState` in `LoadingSpinner.ts`)
-  - The spinner should appear inline within the button, replacing or accompanying the button label during loading
-  - Integrate with the shakuhachi-themed spinner design once that is finalized
-  - Used in: delete button (`ScoreDetailClient.ts:187`), fork button (`ScoreDetailClient.ts:227`), create button (`Layout.astro:280`)
+- [x] On desktop, when the title + metadata is too long, the page expands beyond the viewport width and the logout button pushes out to the right with some horizontal scrolling. Expected: page has no horizontal scrolling.
 
 - [ ] [Both] [A:High] [Quality-DRY] Extract standard mobile menu initialization into a shared utility
   - `src/pages/index.astro`, `src/pages/about.astro`, and `src/pages/help/notation-formats.astro` each contain ~90 lines of identical mobile menu boilerplate: same imports, `getIconHTML()`, `toggleTheme()`, `actionItems`, `authItems`, `setItems()` call, and `onAuthReady()` subscription
@@ -44,12 +30,18 @@
   - Each page replaces the block with two lines: call `initHeader()`, then `initStandardMobileMenu(authWidget, authModal)`
   - The score detail page (`[slug].astro`) has owner-specific items and should remain separate
 
-- [ ] [UI] [A:High] [Polish] Add navigation links: Home | Create Score | My Scores | Profile
-- [ ] [UI] [A:High] [Polish] Add auth UI: Login/Signup or Username/Logout
+- [x] [UI] [A:High] [Polish] Add navigation links: Home | Create Score
+- [x] [UI] [A:High] [Polish] Add auth UI: Login/Signup or Username/Logout
 - [ ] [UI] [A:High] [Polish] Create footer with attribution
-- [ ] [UI] [A:High] [Polish] Add consistent styling (CSS framework or custom)
-- [ ] [UI] [A:High] [Polish] Implement responsive design (mobile, tablet, desktop)
-- [ ] [UI] [A:High] [Polish] Test across browsers (Chrome, Firefox, Safari)
+- [x] [UI] [A:High] [Polish] Add consistent styling (CSS framework or custom)
+- [x] [UI] [A:High] [Polish] Implement responsive design (mobile, tablet, desktop)
+
+- [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
+  - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
+  - Set `font-size` on `.logo-icon` to a token (e.g. 1.5rem for the character, making the box `calc(4/3 * 1em)` = 32px equivalent)
+  - Consider whether `border` should also scale (`0.125em`) or stay at `2px`
+  - The `min-height: 32px` in `.header-metadata` mobile media query derives from the logo height — update it to match the new token-based size
+  - Verify alignment still holds across all four header states (title-only / title+metadata × mobile / desktop)
 
 ### Score Library
 
@@ -398,3 +390,7 @@
 - [ ] [Both] [A:Low] [Advanced] OCR tool (scan physical scores to MusicXML/JSON)
 - [ ] [Both] [A:Low] [Advanced] Pull request workflow (suggest changes to others' scores)
 - [ ] [Backend] [A:Low] [Advanced] MIDI playback mapping
+
+### QA
+
+- [ ] [UI] [A:High] [Polish] Test across browsers (Chrome, Firefox, Safari)
