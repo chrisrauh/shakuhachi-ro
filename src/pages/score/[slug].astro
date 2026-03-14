@@ -117,7 +117,7 @@ if (score?.forked_from) {
     import type { User as SupabaseUser } from '@supabase/supabase-js';
 
     // Initialize theme switcher
-    const { authWidget, authModal } = initHeader();
+    const { authWidget, headerModal } = initHeader();
 
     // Helper to generate Lucide icon HTML
     const getIconHTML = (iconComponent: typeof Book) => {
@@ -194,13 +194,13 @@ if (score?.forked_from) {
             {
               id: 'login',
               label: 'Log In',
-              action: () => authModal.show('login'),
+              action: () => headerModal.show('login'),
               icon: getIconHTML(LogIn),
             },
             {
               id: 'signup',
               label: 'Sign Up',
-              action: () => authModal.show('signup'),
+              action: () => headerModal.show('signup'),
               icon: getIconHTML(UserPlus),
             },
           ];

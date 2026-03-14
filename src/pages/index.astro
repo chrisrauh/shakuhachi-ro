@@ -43,7 +43,7 @@ export const prerender = true;
     import { toast } from '../components/Toast';
     import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-    const { authWidget, authModal } = initHeader();
+    const { authWidget, headerModal } = initHeader();
 
     // Initialize score library
     new ScoreLibrary('score-library');
@@ -112,13 +112,13 @@ export const prerender = true;
             {
               id: 'login',
               label: 'Log In',
-              action: () => authModal.show('login'),
+              action: () => headerModal.show('login'),
               icon: getIconHTML(LogIn),
             },
             {
               id: 'signup',
               label: 'Sign Up',
-              action: () => authModal.show('signup'),
+              action: () => headerModal.show('signup'),
               icon: getIconHTML(UserPlus),
             },
           ];
