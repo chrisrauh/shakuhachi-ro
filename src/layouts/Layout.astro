@@ -8,9 +8,10 @@ interface Props {
   currentPage: 'browse' | 'create' | 'score';
   fullHeight?: boolean;
   noPadding?: boolean;
+  mobileMenuType?: 'standard' | 'score-edit';
 }
 
-const { title, currentPage: _currentPage, fullHeight = false, noPadding = false } = Astro.props;
+const { title, currentPage: _currentPage, fullHeight = false, noPadding = false, mobileMenuType } = Astro.props;
 ---
 
 <!doctype html>
@@ -36,7 +37,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     </script>
   </head>
   <body class={fullHeight ? 'full-height' : ''}>
-    <SiteHeader>
+    <SiteHeader mobileMenuType={mobileMenuType}>
       <slot name="header-metadata" slot="header-metadata" />
       <slot name="header-actions" slot="header-actions" />
     </SiteHeader>
