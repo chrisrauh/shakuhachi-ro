@@ -142,7 +142,10 @@ export class MenuDropdown {
 
     if (options.anchor) {
       const rect = options.anchor.getBoundingClientRect();
-      this.el.style.top = `${rect.bottom + 4}px`;
+      const rootStyles = getComputedStyle(document.documentElement);
+      const rootFontSize = parseFloat(rootStyles.fontSize);
+      const gap = parseFloat(rootStyles.getPropertyValue('--spacing-2x-small')) * rootFontSize;
+      this.el.style.top = `${rect.bottom + gap}px`;
       this.el.style.right = `${window.innerWidth - rect.right}px`;
     } else if (options.fixed) {
       this.el.style.top = options.fixed.top;

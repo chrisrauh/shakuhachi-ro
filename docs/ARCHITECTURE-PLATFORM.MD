@@ -128,3 +128,23 @@ The platform uses the `<shakuhachi-score>` web component directly. Score JSON is
 - **Unit tests:** Vitest for TypeScript logic (`npm test`)
 - **Visual tests:** Playwright for UI regression (`npm run test:visual`)
 - **Manual:** Chrome DevTools MCP for visual verification during development
+
+## CSS / Styling
+
+Global styles live in two files imported in `src/layouts/Layout.astro`:
+- `src/styles/tokens/themes.css` — CSS custom properties (colors, spacing, typography)
+- `src/styles/components.css` — shared component classes (`.btn`, `.btn-text`, etc.)
+
+**Import pattern — use frontmatter imports, not `@import` inside `<style>` blocks:**
+
+```astro
+---
+import '../styles/tokens/themes.css';
+import '../styles/components.css';
+---
+```
+
+Astro's `<style is:global>` flag only prevents scoping for CSS written *directly* in the block — it has no effect on `@import`ed files (those are always global regardless). More importantly, `@import` inside `<style>` blocks is not tracked by Vite as a module dependency, so edits to the imported files do **not** trigger HMR. Frontmatter imports are proper Vite module dependencies and hot-reload correctly.
+
+Any CSS written directly in Layout.astro (`:root`, `body`, `*` resets, etc.) should remain in the `<style is:global>` block as before.
+

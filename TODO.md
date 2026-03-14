@@ -22,22 +22,6 @@
 
 ### Global / Navigation
 
-- [ ] [UI] [A:High] [Polish] Replace user email display with avatar in header
-  - On desktop, the header currently shows the raw email string (e.g. `chris+shakuhachi+test@rauh.net`) in the logged-in state
-  - Replace with a compact avatar: show user initials in a circle (derived from email local part) or a generic person icon
-  - On click/tap, open a small dropdown with: email (read-only), Log Out button
-  - Avatar should be visually consistent with the existing header button style
-  - No auth changes needed — this is purely a UI/presentation change in the header
-
-- [x] Revisig loading spinner visual design
-  - explore shakuhachi themed loading "spinner". For example, 5 dots that "play" a song, with the fingering of going up and down and octave.
-
-- [x] [UI] [A:High] [Polish] Create a button version of the loading spinner
-  - Add a visual spinner state to buttons (e.g. used by `ButtonLoadingState` in `LoadingSpinner.ts`)
-  - The spinner should appear inline within the button, replacing or accompanying the button label during loading
-  - Integrate with the shakuhachi-themed spinner design once that is finalized
-  - Used in: delete button (`ScoreDetailClient.ts:187`), fork button (`ScoreDetailClient.ts:227`), create button (`Layout.astro:280`)
-
 - [ ] [Both] [A:High] [Quality-DRY] Extract standard mobile menu initialization into a shared utility
   - `src/pages/index.astro`, `src/pages/about.astro`, and `src/pages/help/notation-formats.astro` each contain ~90 lines of identical mobile menu boilerplate: same imports, `getIconHTML()`, `toggleTheme()`, `actionItems`, `authItems`, `setItems()` call, and `onAuthReady()` subscription
   - Extract to `src/utils/init-mobile-menu.ts` exporting `initStandardMobileMenu(authWidget, authModal)`
