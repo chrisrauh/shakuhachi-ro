@@ -57,16 +57,19 @@ import { Book, Plus, Info } from '@lucide/astro';
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-medium);
+    min-width: 0; /* allow shrinking below content size to prevent header overflow */
   }
 
   .header-metadata {
     align-self: center;
+    min-width: 0; /* needed so the inner flex content can wrap */
   }
 
   .header-right {
     display: flex;
     align-items: center;
     gap: var(--spacing-x-small);
+    flex-shrink: 0; /* nav/auth always fully visible; header-left absorbs overflow via wrapping */
   }
 
   /* Desktop navigation - hide on mobile */
