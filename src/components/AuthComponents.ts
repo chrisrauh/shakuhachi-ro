@@ -2,7 +2,8 @@ import { signOut } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import { STRING_FACTORIES } from '../constants/strings';
 import { MenuDropdown } from './MenuDropdown';
-import { createElement, User as UserIcon, LogOut as LogOutIcon } from 'lucide';
+import { User as UserIcon, LogOut as LogOutIcon } from 'lucide';
+import { getIconHTML } from '../utils/icons';
 export interface AuthModalInterface {
   show(mode: 'login' | 'signup'): void;
 }
@@ -12,16 +13,6 @@ export function getInitials(email: string): string {
   const local = email.split('@')[0];
   if (local.length === 0) return '?';
   return local.slice(0, 2).toUpperCase();
-}
-
-function getIconHTML(
-  iconComponent: Parameters<typeof createElement>[0],
-): string {
-  const icon = createElement(iconComponent);
-  icon.setAttribute('width', '16');
-  icon.setAttribute('height', '16');
-  icon.setAttribute('stroke-width', '2');
-  return icon.outerHTML;
 }
 
 export class AuthWidget {
