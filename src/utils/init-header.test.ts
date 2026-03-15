@@ -13,25 +13,36 @@ vi.mock('../api/auth', () => ({
   onAuthReady: vi.fn(),
 }));
 
+vi.mock('./create-score-handler', () => ({
+  startNewScore: vi.fn(),
+}));
+
 const mockAuthModal: import('../components/AuthComponents').AuthModalInterface =
   { show: vi.fn() };
 
 describe('buildNavItems', () => {
   it('returns browse and create items', () => {
-    const items = buildNavItems();
+    const items = buildNavItems(mockAuthModal as never);
     expect(items).toHaveLength(2);
     expect(items[0].id).toBe('browse');
     expect(items[1].id).toBe('create');
   });
 
   it('browse item links to /', () => {
-    const items = buildNavItems();
+    const items = buildNavItems(mockAuthModal as never);
     expect(items[0].href).toBe('/');
   });
 
-  it('create item links to /score/new/edit', () => {
-    const items = buildNavItems();
-    expect(items[1].href).toBe('/score/new/edit');
+  it('create item calls startNewScore with authModal', async () => {
+    const { startNewScore } = await import('./create-score-handler');
+    const items = buildNavItems(mockAuthModal as never);
+    items[1].action!();
+    expect(startNewScore).toHaveBeenCalledWith(mockAuthModal);
+  });
+
+  it('create item has no href', () => {
+    const items = buildNavItems(mockAuthModal as never);
+    expect(items[1].href).toBeUndefined();
   });
 });
 

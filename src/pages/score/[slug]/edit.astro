@@ -6,117 +6,84 @@ import { getScoreBySlug } from '../../../api/scores';
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/');
 
-// Try to fetch existing score
 const scoreResult = await getScoreBySlug(slug);
 const { score } = scoreResult;
 
-// Note: Auth check happens client-side for now (YAGNI - server-side auth can be added later)
-// If user is not authenticated or not owner, client will redirect
+// 404 if score not found (no more create mode via this route)
+if (!score) return new Response(null, { status: 404 });
 ---
 
-<Layout title={score ? `Edit ${score.title}` : 'Create New Score'} currentPage="score" fullHeight={true}>
-  <!-- Page header with title -->
-  <PageHeader slot="header-metadata" title={score ? `Edit ${score.title}` : 'Create New Score'} />
+<Layout title={`Edit ${score.title}`} currentPage="score" fullHeight={true}>
+  <PageHeader slot="header-metadata" title={`Edit ${score.title}`} />
 
   <div class="edit-layout">
-    <!-- Mobile toggle -->
     <div class="mobile-toggle">
       <button id="toggle-preview" class="btn"><span class="btn-text">Preview</span></button>
       <button id="toggle-editor" class="btn btn-primary"><span class="btn-text">Edit</span></button>
     </div>
 
-    <!-- Desktop: side-by-side | Mobile: toggle -->
     <div class="preview-panel" id="preview-panel">
       <div id="score-preview"></div>
     </div>
 
     <div class="editor-panel" id="editor-panel">
-      <!-- ScoreEditor renders here (full-page layout) -->
       <div id="score-editor"></div>
     </div>
   </div>
 
-  <!-- Embed score data if editing existing -->
-  {score && (
-    <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
-  )}
+  <!-- Always embed score data — safe because 404 above ensures score is non-null -->
+  <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
 
-  <!-- Load web component -->
   <script is:inline src="/embed/shakuhachi-score.js"></script>
 
-  <!-- Initialize relative-time web component -->
-  <script>
-    import '@github/relative-time-element';
-  </script>
-
-
-  <!-- Initialize ScoreEditor (existing component, no changes) -->
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { onAuthReady } from '../../../api/auth';
     import { toast } from '../../../components/Toast';
     import { STRINGS } from '../../../constants/strings';
 
-    // Client-side auth and permission check
+    // Simplified auth check — no "create mode" branch
     const checkAuthAndPermissions = (user: any) => {
-      const scoreDataEl = document.getElementById('score-data');
-      const scoreData = scoreDataEl ? JSON.parse(scoreDataEl.textContent!) : null;
+      const scoreData = JSON.parse(document.getElementById('score-data')!.textContent!);
 
-      // If editing existing score, check ownership
-      if (scoreData && scoreData.score) {
-        if (!user) {
-          // Not logged in - redirect to score page
+      if (!user) {
+        window.location.href = `/score/${scoreData.score.slug}`;
+        return;
+      }
+
+      if (user.id !== scoreData.score.user_id) {
+        toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, { duration: 2000 });
+        setTimeout(() => {
           window.location.href = `/score/${scoreData.score.slug}`;
-          return;
-        }
-
-        if (user.id !== scoreData.score.user_id) {
-          // Not owner - redirect to view page
-          toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, { duration: 2000 });
-          setTimeout(() => {
-            window.location.href = `/score/${scoreData.score.slug}`;
-          }, 2000);
-          return;
-        }
-      } else {
-        // Creating new score - redirect to home if not logged in
-        if (!user) {
-          window.location.href = '/';
-          return;
-        }
+        }, 2000);
+        return;
       }
     };
 
-    // Subscribe to auth changes - onAuthReady handles deduplication
     onAuthReady((user) => {
       checkAuthAndPermissions(user);
     });
 
-    // Edit mode: pass score ID | Create mode: no ID
-    const scoreDataEl = document.getElementById('score-data');
-    const scoreId = scoreDataEl ? JSON.parse(scoreDataEl.textContent).score.id : undefined;
-
-    new ScoreEditor('score-editor', scoreId);
+    // scoreId and slug always present — SSR 404 above ensures page is never served without a score
+    const scoreData = JSON.parse(document.getElementById('score-data')!.textContent!);
+    new ScoreEditor('score-editor', scoreData.score.id, scoreData.score.slug);
   </script>
 
   <style>
-    /* Desktop: side-by-side grid */
     .edit-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--spacing-large);
-      height: calc(100vh - 80px); /* Full height minus header */
+      height: calc(100vh - 80px);
       padding: var(--spacing-large);
     }
 
-    .mobile-toggle {
-      display: none;
-    }
+    .mobile-toggle { display: none; }
 
     .preview-panel,
     .editor-panel {
       overflow-y: auto;
-      min-height: 0; /* Critical for grid children */
+      min-height: 0;
       height: 100%;
     }
 
@@ -127,13 +94,11 @@ const { score } = scoreResult;
       padding: var(--spacing-large);
     }
 
-    /* Make sure preview fills the height */
     #score-preview {
       width: 100%;
       min-height: 100%;
     }
 
-    /* Mobile: stack + toggle */
     @media (max-width: 768px) {
       .edit-layout {
         grid-template-columns: 1fr;
@@ -147,19 +112,13 @@ const { score } = scoreResult;
         margin-bottom: var(--spacing-medium);
       }
 
-      .mobile-toggle button {
-        flex: 1;
-      }
+      .mobile-toggle button { flex: 1; }
 
-      /* Toggle visibility */
       .preview-panel.hidden,
-      .editor-panel.hidden {
-        display: none;
-      }
+      .editor-panel.hidden { display: none; }
     }
   </style>
 
-  <!-- Mobile toggle logic -->
   <script>
     const togglePreview = document.getElementById('toggle-preview');
     const toggleEditor = document.getElementById('toggle-editor');
@@ -180,7 +139,6 @@ const { score } = scoreResult;
       togglePreview?.classList.remove('btn-primary');
     });
 
-    // Default: editor on mobile
     if (window.innerWidth < 768) {
       previewPanel?.classList.add('hidden');
     }
