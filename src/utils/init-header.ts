@@ -1,5 +1,4 @@
 import {
-  createElement,
   Book,
   Plus,
   Info,
@@ -20,19 +19,8 @@ import {
 import { AuthModal } from '../components/AuthModal';
 import { MobileMenu, type MenuItem } from '../components/MobileMenu';
 import { onAuthReady, signOut } from '../api/auth';
-import { createEmptyScore } from './create-score-handler';
-import { toast } from '../components/Toast';
+import { getIconHTML } from './icons';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-
-export function getIconHTML(
-  iconComponent: Parameters<typeof createElement>[0],
-): string {
-  const icon = createElement(iconComponent);
-  icon.setAttribute('width', '16');
-  icon.setAttribute('height', '16');
-  icon.setAttribute('stroke-width', '2');
-  return icon.outerHTML;
-}
 
 export function buildNavItems(): MenuItem[] {
   return [
@@ -45,14 +33,7 @@ export function buildNavItems(): MenuItem[] {
     {
       id: 'create',
       label: 'Create score',
-      action: async () => {
-        const result = await createEmptyScore();
-        if (result.error) {
-          toast.error(result.error.message, { duration: Infinity });
-        } else {
-          window.location.href = `/score/${result.slug}/edit`;
-        }
-      },
+      href: '/score/new/edit',
       icon: getIconHTML(Plus),
     },
   ];
