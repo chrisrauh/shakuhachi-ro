@@ -22,12 +22,6 @@
 
 ### Global / Navigation
 
-- [ ] [Both] [A:High] [Quality-DRY] Extract standard mobile menu initialization into a shared utility
-  - `src/pages/index.astro`, `src/pages/about.astro`, and `src/pages/help/notation-formats.astro` each contain ~90 lines of identical mobile menu boilerplate: same imports, `getIconHTML()`, `toggleTheme()`, `actionItems`, `authItems`, `setItems()` call, and `onAuthReady()` subscription
-  - Extract to `src/utils/init-mobile-menu.ts` exporting `initStandardMobileMenu(authWidget, authModal)`
-  - Each page replaces the block with two lines: call `initHeader()`, then `initStandardMobileMenu(authWidget, authModal)`
-  - The score detail page (`[slug].astro`) has owner-specific items and should remain separate
-
 - [ ] Extract header model into its own file/component
 
 - [ ] Revisit auth buttons layout flash when loading auth state
