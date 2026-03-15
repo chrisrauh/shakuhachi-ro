@@ -22,9 +22,11 @@
 
 ### Global / Navigation
 
-- [x] Extract header model into its own file/component
-
 - [ ] Simplify and DRY initHeader
+
+- [ ] Fix score creation flow to use createEmptyScore() and create a new score with a slug, instead of static score/new/edit. Or update score/new/edit to centralize the score creation behavior and keep navigation static.
+
+- [ ] Move header as much as possible to static generation.
 
 - [ ] Revisit auth buttons layout flash when loading auth state
 
@@ -42,6 +44,9 @@
   - Remove code related to the overlay panel to choose values and themes.
 
 ### Score Library
+
+- [ ] [UI] Update the search input to have rounded corners and not panel around it
+  - border-radius 980px
 
 - [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
   - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
@@ -114,9 +119,6 @@
 - [ ] [Backend] [A:High] [Quality-TypeSafety] Fix handleMetadataChange double `as any` cast in ScoreEditor
   - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
 
-- [x] [Backend] [A:High] [Quality-FailFast] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
-  - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
-
 - [ ] [UI] [A:Medium] [Content] Add license selector field to score editor
   - Add a license dropdown to the score metadata section of the editor
   - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
@@ -156,6 +158,10 @@
 ### Renderer Library
 
 - [ ] [UI] [A:Medium] [Alpha] Investigate letter spacing for font aesthetics and legibility.
+  - candidate sizes:
+    - buttons -0.022em
+    - large headings: letter-spacing: -.005em;
+  - research how apple.com does letter-spacing. Seems to vary based on role, font size, font family and font weight. Is there a pattern?
   - **Phase 2: Determine Optimal Values** (User-driven)
     - [ ] Use control panel to test different letter spacing values
     - [ ] Identify optimal value for body copy

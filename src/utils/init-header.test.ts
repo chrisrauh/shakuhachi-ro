@@ -8,12 +8,6 @@ import {
 import type { User } from '@supabase/supabase-js';
 
 // Mock dependencies that have side effects
-vi.mock('../components/Toast', () => ({
-  toast: { error: vi.fn() },
-}));
-vi.mock('./create-score-handler', () => ({
-  createEmptyScore: vi.fn(),
-}));
 vi.mock('../api/auth', () => ({
   signOut: vi.fn(),
   onAuthReady: vi.fn(),
@@ -35,9 +29,9 @@ describe('buildNavItems', () => {
     expect(items[0].href).toBe('/');
   });
 
-  it('create item has an action function', () => {
+  it('create item links to /score/new/edit', () => {
     const items = buildNavItems();
-    expect(typeof items[1].action).toBe('function');
+    expect(items[1].href).toBe('/score/new/edit');
   });
 });
 
