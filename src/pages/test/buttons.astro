@@ -267,18 +267,6 @@ const title = 'Button Components';
 
 <script>
   import { ThemeSwitcher } from '../../components/ThemeSwitcher';
-  import { AuthWidget } from '../../components/AuthComponents';
-  import { AuthModal } from '../../components/AuthModal';
-  import { onAuthReady } from '../../api/auth';
 
-  // Initialize theme switcher
   new ThemeSwitcher('theme-switcher');
-
-  // Initialize auth widget
-  const authWidget = new AuthWidget('auth-widget', new AuthModal());
-
-  // Subscribe to auth changes
-  onAuthReady((user) => {
-    authWidget.setUser(user);
-  });
 </script>
