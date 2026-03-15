@@ -20,9 +20,10 @@ import { AuthModal } from '../components/AuthModal';
 import { MobileMenu, type MenuItem } from '../components/MobileMenu';
 import { onAuthReady, signOut } from '../api/auth';
 import { getIconHTML } from './icons';
+import { startNewScore } from './create-score-handler';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-export function buildNavItems(): MenuItem[] {
+export function buildNavItems(authModal: AuthModalInterface): MenuItem[] {
   return [
     {
       id: 'browse',
@@ -33,7 +34,7 @@ export function buildNavItems(): MenuItem[] {
     {
       id: 'create',
       label: 'Create score',
-      href: '/score/new/edit',
+      action: () => startNewScore(authModal),
       icon: getIconHTML(Plus),
     },
   ];
@@ -109,7 +110,7 @@ function standardMenuBuilder(
   authModal: AuthModalInterface,
 ): MenuItem[][] {
   return [
-    buildNavItems(),
+    buildNavItems(authModal),
     buildAuthItems(user, authModal),
     buildUtilityItems(),
   ];
@@ -153,7 +154,7 @@ function scoreEditMenuBuilder(
 
   return [
     ...(extraItems.length > 0 ? [extraItems] : []),
-    buildNavItems(),
+    buildNavItems(authModal),
     buildAuthItems(user, authModal),
     buildUtilityItems(),
   ];
