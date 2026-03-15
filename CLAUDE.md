@@ -11,14 +11,15 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 | Trigger | Required Action |
 |---------|----------------|
 | Session start / new task / context cleared | Invoke `/get-ready` FIRST |
-| Development work, no written plan | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
-| Development work, written plan exists | Use `superpowers:subagent-driven-development` |
+| Development work, no plan OR Claude plan (EnterPlanMode) | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
+| Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development` |
 | Before any `superpowers:*` skill | Invoke `/eng-principles` FIRST |
 
 **Red flags — if you think any of these, STOP:**
 - "I'll use `superpowers:finishing-a-development-branch` since the work is done" → Use `/dev-workflow`
 - "This is a quick task, I don't need `/get-ready`" → You still do
 - "I already know the principles" → Still invoke `/eng-principles` before any superpowers skill
+- "There's a plan, so I'll use `superpowers:subagent-driven-development`" → Only if it's a superpowers plan (from `superpowers:writing-plans`). Claude plans (EnterPlanMode) → use `/dev-workflow`
 
 ---
 

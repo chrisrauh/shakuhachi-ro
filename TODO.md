@@ -20,13 +20,11 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
+### Meta / Tooling
+
+- [x] Update hooks/skills to only use superpowers agent implementation when there is a _superpowers_ plan. Default Claude plans use the dev workflow.
+
 ### Global / Navigation
-
-- [ ] Simplify and DRY initHeader
-
-- [ ] Fix score creation flow to use createEmptyScore() and create a new score with a slug, instead of static score/new/edit. Or update score/new/edit to centralize the score creation behavior and keep navigation static.
-
-- [ ] Move header as much as possible to static generation.
 
 - [ ] Revisit auth buttons layout flash when loading auth state
 
