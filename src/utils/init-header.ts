@@ -13,7 +13,11 @@ import {
   Trash2,
 } from 'lucide';
 import { ThemeSwitcher } from '../components/ThemeSwitcher';
-import { AuthWidget, HeaderModal } from '../components/AuthComponents';
+import {
+  AuthWidget,
+  type AuthModalInterface,
+} from '../components/AuthComponents';
+import { AuthModal } from '../components/AuthModal';
 import { MobileMenu, type MenuItem } from '../components/MobileMenu';
 import { onAuthReady, signOut } from '../api/auth';
 import { createEmptyScore } from './create-score-handler';
@@ -56,7 +60,7 @@ export function buildNavItems(): MenuItem[] {
 
 export function buildAuthItems(
   user: SupabaseUser | null,
-  headerModal: HeaderModal,
+  authModal: AuthModalInterface,
 ): MenuItem[] {
   return user
     ? [
@@ -79,13 +83,13 @@ export function buildAuthItems(
         {
           id: 'login',
           label: 'Log In',
-          action: () => headerModal.show('login'),
+          action: () => authModal.show('login'),
           icon: getIconHTML(LogIn),
         },
         {
           id: 'signup',
           label: 'Sign Up',
-          action: () => headerModal.show('signup'),
+          action: () => authModal.show('signup'),
           icon: getIconHTML(UserPlus),
         },
       ];
@@ -121,18 +125,18 @@ export function buildUtilityItems(): MenuItem[] {
 
 function standardMenuBuilder(
   user: SupabaseUser | null,
-  headerModal: HeaderModal,
+  authModal: AuthModalInterface,
 ): MenuItem[][] {
   return [
     buildNavItems(),
-    buildAuthItems(user, headerModal),
+    buildAuthItems(user, authModal),
     buildUtilityItems(),
   ];
 }
 
 function scoreEditMenuBuilder(
   user: SupabaseUser | null,
-  headerModal: HeaderModal,
+  authModal: AuthModalInterface,
 ): MenuItem[][] {
   let isOwner = false;
   try {
@@ -169,14 +173,14 @@ function scoreEditMenuBuilder(
   return [
     ...(extraItems.length > 0 ? [extraItems] : []),
     buildNavItems(),
-    buildAuthItems(user, headerModal),
+    buildAuthItems(user, authModal),
     buildUtilityItems(),
   ];
 }
 
 const MENU_BUILDERS: Record<
   string,
-  (user: SupabaseUser | null, headerModal: HeaderModal) => MenuItem[][]
+  (user: SupabaseUser | null, authModal: AuthModalInterface) => MenuItem[][]
 > = {
   standard: standardMenuBuilder,
   'score-edit': scoreEditMenuBuilder,
@@ -193,8 +197,8 @@ export function initHeader(): void {
     );
   }
 
-  const headerModal = new HeaderModal();
-  const authWidget = new AuthWidget('auth-widget', headerModal);
+  const authModal = new AuthModal();
+  const authWidget = new AuthWidget('auth-widget', authModal);
   const mobileMenu = new MobileMenu('mobile-menu');
 
   const menuContainer = document.getElementById('mobile-menu');
@@ -203,6 +207,6 @@ export function initHeader(): void {
 
   onAuthReady((user) => {
     authWidget.setUser(user);
-    mobileMenu.setItems(builder(user, headerModal));
+    mobileMenu.setItems(builder(user, authModal));
   });
 }

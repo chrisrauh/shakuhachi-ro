@@ -40,9 +40,10 @@ describe('AuthWidget avatar render', () => {
   });
 
   it('renders avatar button with initials when user is set', async () => {
-    const { AuthWidget, HeaderModal } = await import('./AuthComponents');
-    const headerModal = new HeaderModal();
-    const widget = new AuthWidget('test-auth-widget', headerModal);
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser({ email: 'chris@example.com' } as never);
 
     const container = document.getElementById('test-auth-widget')!;
@@ -52,9 +53,10 @@ describe('AuthWidget avatar render', () => {
   });
 
   it('does not render avatar button when no user is set', async () => {
-    const { AuthWidget, HeaderModal } = await import('./AuthComponents');
-    const headerModal = new HeaderModal();
-    const widget = new AuthWidget('test-auth-widget', headerModal);
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser(null);
 
     const container = document.getElementById('test-auth-widget')!;

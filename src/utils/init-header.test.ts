@@ -19,7 +19,8 @@ vi.mock('../api/auth', () => ({
   onAuthReady: vi.fn(),
 }));
 
-const mockHeaderModal = { show: vi.fn() };
+const mockAuthModal: import('../components/AuthComponents').AuthModalInterface =
+  { show: vi.fn() };
 
 describe('buildNavItems', () => {
   it('returns browse and create items', () => {
@@ -42,27 +43,27 @@ describe('buildNavItems', () => {
 
 describe('buildAuthItems', () => {
   it('returns login and signup items when logged out', () => {
-    const items = buildAuthItems(null, mockHeaderModal as never);
+    const items = buildAuthItems(null, mockAuthModal as never);
     expect(items).toHaveLength(2);
     expect(items[0].id).toBe('login');
     expect(items[1].id).toBe('signup');
   });
 
   it('login item calls headerModal.show("login")', () => {
-    const items = buildAuthItems(null, mockHeaderModal as never);
+    const items = buildAuthItems(null, mockAuthModal as never);
     items[0].action!();
-    expect(mockHeaderModal.show).toHaveBeenCalledWith('login');
+    expect(mockAuthModal.show).toHaveBeenCalledWith('login');
   });
 
   it('signup item calls headerModal.show("signup")', () => {
-    const items = buildAuthItems(null, mockHeaderModal as never);
+    const items = buildAuthItems(null, mockAuthModal as never);
     items[1].action!();
-    expect(mockHeaderModal.show).toHaveBeenCalledWith('signup');
+    expect(mockAuthModal.show).toHaveBeenCalledWith('signup');
   });
 
   it('returns email and logout items when logged in', () => {
     const user = { email: 'chris@example.com', id: 'u1' } as User;
-    const items = buildAuthItems(user, mockHeaderModal as never);
+    const items = buildAuthItems(user, mockAuthModal as never);
     expect(items).toHaveLength(2);
     expect(items[0].id).toBe('account');
     expect(items[1].id).toBe('logout');
@@ -70,7 +71,7 @@ describe('buildAuthItems', () => {
 
   it('account item is non-interactive and shows email', () => {
     const user = { email: 'chris@example.com', id: 'u1' } as User;
-    const items = buildAuthItems(user, mockHeaderModal as never);
+    const items = buildAuthItems(user, mockAuthModal as never);
     expect(items[0].nonInteractive).toBe(true);
     expect(items[0].label).toBe('chris@example.com');
   });
