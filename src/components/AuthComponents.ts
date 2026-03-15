@@ -29,12 +29,19 @@ export class AuthWidget {
     this.container = container;
     this.authModal = authModal;
     this.menuDropdown = new MenuDropdown();
-    this.render();
+    this.attachLoggedOutListeners();
 
     window.addEventListener('auth-change', ((e: CustomEvent) => {
       this.currentUser = e.detail;
       this.render();
     }) as EventListener);
+  }
+
+  private attachLoggedOutListeners(): void {
+    const loginBtn = this.container.querySelector('#auth-login');
+    const signupBtn = this.container.querySelector('#auth-signup');
+    loginBtn?.addEventListener('click', () => this.authModal.show('login'));
+    signupBtn?.addEventListener('click', () => this.authModal.show('signup'));
   }
 
   private render(): void {

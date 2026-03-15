@@ -1,5 +1,5 @@
 ---
-import { Book, Plus, Info } from '@lucide/astro';
+import { Book, Plus, Info, SunMoon } from '@lucide/astro';
 
 interface Props {
   mobileMenuType?: 'standard' | 'score-edit';
@@ -42,11 +42,28 @@ const { mobileMenuType = 'standard' } = Astro.props;
       >
         <Info size={16} stroke-width={2} />
       </a>
-      <div id="theme-switcher"></div>
-      <div id="auth-widget"></div>
+      <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">
+        <SunMoon size={16} stroke-width={2} />
+      </button>
+      <div id="auth-widget">
+        <div style="display: flex; gap: var(--spacing-small);">
+          <button id="auth-login" class="btn btn-small btn-primary">
+            <span class="btn-text">Log In</span>
+          </button>
+          <button id="auth-signup" class="btn btn-small btn-neutral">
+            <span class="btn-text">Sign Up</span>
+          </button>
+        </div>
+      </div>
     </div>
     <!-- Mobile menu (shown on mobile) -->
-    <div id="mobile-menu" class="mobile-menu-container" data-menu-type={mobileMenuType}></div>
+    <div id="mobile-menu" class="mobile-menu-container" data-menu-type={mobileMenuType}>
+      <button id="mobile-menu-toggle" class="btn btn-icon" aria-label="Menu" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -66,7 +83,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
   .header-left {
     display: flex;
     align-items: flex-start;
-    gap: var(--spacing-medium);
+    gap: var(--spacing-x-small);
     min-width: 0; /* allow shrinking below content size to prevent header overflow */
   }
 
@@ -111,26 +128,14 @@ const { mobileMenuType = 'standard' } = Astro.props;
     box-sizing: border-box;
   }
 
-  #theme-switcher {
+  #theme-toggle {
     flex-shrink: 0;
   }
 
-  /* Auth widget expands smoothly from zero width when content is inserted */
+  /* Auth widget */
   #auth-widget {
     flex-shrink: 0;
-    display: grid;
-    grid-template-columns: 0fr;
-    transition: grid-template-columns 200ms ease;
-    overflow: hidden;
-  }
-
-  #auth-widget:has(*) {
-    grid-template-columns: 1fr;
-  }
-
-  #auth-widget > * {
-    overflow: hidden;
-    min-width: 0;
+    display: flex;
   }
 
   .header-nav-separator {

@@ -169,7 +169,7 @@ const MENU_BUILDERS: Record<
 };
 
 export function initHeader(): void {
-  new ThemeSwitcher('theme-switcher');
+  new ThemeSwitcher();
 
   if (import.meta.env.DEV) {
     import('../components/LetterSpacingControl').then(
