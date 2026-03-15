@@ -4,23 +4,22 @@
  * Inline script in head sets initial theme from system preference
  */
 
-import { createElement, SunMoon } from 'lucide';
-import { STRING_FACTORIES } from '../constants/strings';
-
 export class ThemeSwitcher {
-  private container: HTMLElement;
-  private currentTheme: 'light' | 'dark';
+  private currentTheme: 'light' | 'dark' = 'light';
 
-  constructor(containerId: string) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-      throw new Error(STRING_FACTORIES.containerNotFound(containerId));
+  constructor() {
+    const button = document.getElementById('theme-toggle') as HTMLButtonElement;
+    if (!button) {
+      return;
     }
-    this.container = container;
 
     // Read theme from DOM (already set by inline script in head)
     const currentAttr = document.documentElement.getAttribute('data-theme');
     this.currentTheme = currentAttr === 'dark' ? 'dark' : 'light';
+
+    button.addEventListener('click', () => {
+      this.toggleTheme();
+    });
 
     // Listen for system preference changes
     window
@@ -29,32 +28,6 @@ export class ThemeSwitcher {
         this.currentTheme = e.matches ? 'dark' : 'light';
         this.applyTheme(this.currentTheme);
       });
-
-    this.render();
-  }
-
-  private getIcon(): SVGElement {
-    const icon = createElement(SunMoon);
-    icon.setAttribute('width', '16');
-    icon.setAttribute('height', '16');
-    icon.setAttribute('stroke-width', '2');
-    icon.style.display = 'block';
-    return icon;
-  }
-
-  private render(): void {
-    const button = document.createElement('button');
-    button.id = 'theme-toggle';
-    button.className = 'btn btn-icon';
-    button.setAttribute('aria-label', 'Toggle theme');
-
-    button.appendChild(this.getIcon());
-    this.container.innerHTML = '';
-    this.container.appendChild(button);
-
-    button.addEventListener('click', () => {
-      this.toggleTheme();
-    });
   }
 
   private toggleTheme(): void {
