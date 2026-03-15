@@ -82,19 +82,9 @@ export class AuthWidget {
   private renderSpeculative(initials: string): void {
     this.container.innerHTML = `
       <button
-        class="btn btn-neutral auth-avatar-btn"
+        class="btn btn-icon auth-avatar-btn"
         aria-label="Account menu"
         disabled
-        style="
-          border-radius: var(--border-radius-circle);
-          width: 32px;
-          height: 32px;
-          font-size: var(--font-size-medium);
-          font-weight: var(--font-weight-normal);
-          line-height: 1;
-          user-select: none;
-          flex-shrink: 0;
-        "
       ><span class="btn-text">${initials}</span></button>
     `;
   }
@@ -102,20 +92,10 @@ export class AuthWidget {
   private avatarButtonHTML(initials: string): string {
     return `
       <button
-        class="btn btn-neutral auth-avatar-btn"
+        class="btn btn-icon auth-avatar-btn"
         aria-label="Account menu"
         aria-expanded="false"
         aria-haspopup="menu"
-        style="
-          border-radius: var(--border-radius-circle);
-          width: 32px;
-          height: 32px;
-          font-size: var(--font-size-medium);
-          font-weight: var(--font-weight-normal);
-          line-height: 1;
-          user-select: none;
-          flex-shrink: 0;
-        "
       ><span class="btn-text">${initials}</span></button>
     `;
   }
@@ -167,14 +147,12 @@ export class AuthWidget {
       });
     } else {
       this.container.innerHTML = `
-        <div style="display: flex; gap: var(--spacing-small);">
-          <button id="auth-login" class="btn btn-small btn-primary">
-            <span class="btn-text">Log In</span>
-          </button>
-          <button id="auth-signup" class="btn btn-small btn-neutral">
-            <span class="btn-text">Sign Up</span>
-          </button>
-        </div>
+        <button id="auth-login" class="btn btn-small btn-primary">
+          <span class="btn-text">Log In</span>
+        </button>
+        <button id="auth-signup" class="btn btn-small btn-neutral">
+          <span class="btn-text">Sign Up</span>
+        </button>
       `;
 
       const loginBtn = this.container.querySelector('#auth-login');
