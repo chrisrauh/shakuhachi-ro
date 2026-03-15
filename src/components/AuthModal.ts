@@ -150,9 +150,7 @@ export class AuthModal {
     }
   }
 
-  private toggleMode(): void {
-    this.isLoginMode = !this.isLoginMode;
-
+  private updateModeUI(): void {
     const title = this.modal.querySelector(
       '#auth-modal-title',
     ) as HTMLHeadingElement;
@@ -177,10 +175,14 @@ export class AuthModal {
     }
   }
 
+  private toggleMode(): void {
+    this.isLoginMode = !this.isLoginMode;
+    this.updateModeUI();
+  }
+
   public show(mode: 'login' | 'signup' = 'login'): void {
     this.isLoginMode = mode === 'login';
-    this.toggleMode();
-    this.toggleMode();
+    this.updateModeUI();
     this.modal.style.display = 'flex';
 
     const form = this.modal.querySelector('#auth-form') as HTMLFormElement;
