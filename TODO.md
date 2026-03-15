@@ -22,7 +22,7 @@
 
 ### Meta / Tooling
 
-- [ ] Update hooks/skills to only use superpowers agent implementation when there is a _superpowers_ plan. Default Claude plans use the dev workflow.
+- [x] Update hooks/skills to only use superpowers agent implementation when there is a _superpowers_ plan. Default Claude plans use the dev workflow.
 
 ### Global / Navigation
 
