@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getInitials } from './AuthComponents';
 
 describe('getInitials', () => {
@@ -34,9 +34,16 @@ vi.mock('../api/auth', () => ({
   signOut: vi.fn(),
 }));
 
+const INITIALS_HINT_KEY = 'shakuhachi-auth-initials';
+
 describe('AuthWidget avatar render', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="test-auth-widget"></div>';
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('renders avatar button with initials when user is set', async () => {
@@ -61,5 +68,75 @@ describe('AuthWidget avatar render', () => {
 
     const container = document.getElementById('test-auth-widget')!;
     expect(container.querySelector('.auth-avatar-btn')).toBeNull();
+  });
+
+  it('renders speculative disabled avatar on construction when hint is present', async () => {
+    localStorage.setItem(INITIALS_HINT_KEY, 'CR');
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    new AuthWidget('test-auth-widget', authModal);
+
+    const container = document.getElementById('test-auth-widget')!;
+    const avatarBtn = container.querySelector(
+      '.auth-avatar-btn',
+    ) as HTMLButtonElement;
+    expect(avatarBtn).not.toBeNull();
+    expect(avatarBtn.textContent?.trim()).toBe('CR');
+    expect(avatarBtn.disabled).toBe(true);
+  });
+
+  it('leaves SSR buttons intact on construction when no hint is present', async () => {
+    document.body.innerHTML = `
+      <div id="test-auth-widget">
+        <div>
+          <button id="auth-login">Log In</button>
+          <button id="auth-signup">Sign Up</button>
+        </div>
+      </div>
+    `;
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    new AuthWidget('test-auth-widget', authModal);
+
+    const container = document.getElementById('test-auth-widget')!;
+    expect(container.querySelector('#auth-login')).not.toBeNull();
+    expect(container.querySelector('.auth-avatar-btn')).toBeNull();
+  });
+
+  it('writes initials hint to localStorage when setUser is called with a user', async () => {
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    const widget = new AuthWidget('test-auth-widget', authModal);
+    widget.setUser({ email: 'chris@example.com' } as never);
+
+    expect(localStorage.getItem(INITIALS_HINT_KEY)).toBe('CH');
+  });
+
+  it('removes initials hint from localStorage when setUser is called with null', async () => {
+    localStorage.setItem(INITIALS_HINT_KEY, 'CR');
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    const widget = new AuthWidget('test-auth-widget', authModal);
+    widget.setUser(null);
+
+    expect(localStorage.getItem(INITIALS_HINT_KEY)).toBeNull();
+  });
+
+  it('degrades gracefully when localStorage throws', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('SecurityError');
+    });
+
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+
+    expect(() => new AuthWidget('test-auth-widget', authModal)).not.toThrow();
+
+    vi.restoreAllMocks();
   });
 });

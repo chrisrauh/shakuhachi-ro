@@ -24,6 +24,13 @@
 
 - [ ] Revisit auth buttons layout flash when loading auth state
 
+- [ ] [UI] [A:Low] [Polish] Add transition for login-action avatar swap
+  - When a user logs in via the modal, the header right side jumps from ~120px (Log In + Sign Up buttons) to 32px (avatar circle) instantly
+  - Consider a CSS transition on `#auth-widget` content during `AuthWidget.render()` swaps — fade old content out, fade new content in
+  - Only worth doing if the jump feels jarring in practice after the localStorage hint lands (implement hint first, then evaluate)
+  - `src/components/AuthComponents.ts` — `render()` is the swap point
+  - consider other transition from logge in out or logged out in
+
 - [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
   - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
   - Set `font-size` on `.logo-icon` to a token (e.g. 1.5rem for the character, making the box `calc(4/3 * 1em)` = 32px equivalent)
