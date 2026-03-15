@@ -22,7 +22,9 @@
 
 ### Global / Navigation
 
-- [ ] Extract header model into its own file/component
+- [x] Extract header model into its own file/component
+
+- [ ] Simplify and DRY initHeader
 
 - [ ] Revisit auth buttons layout flash when loading auth state
 
@@ -112,7 +114,7 @@
 - [ ] [Backend] [A:High] [Quality-TypeSafety] Fix handleMetadataChange double `as any` cast in ScoreEditor
   - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
 
-- [ ] [Backend] [A:High] [Quality-FailFast] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
+- [x] [Backend] [A:High] [Quality-FailFast] AuthComponents.show(): remove pointless double toggleMode() call [Claude validated]
   - `src/components/AuthComponents.ts:181-184` — `show()` sets `this.isLoginMode` directly, then calls `toggleMode()` twice in a row. `toggleMode()` flips `isLoginMode` and updates DOM text. Calling it twice flips the boolean away and back, resulting in a net no-op but causing two unnecessary DOM updates. Remove both `toggleMode()` calls and instead call the DOM update logic directly to match the already-set `isLoginMode` value.
 
 - [ ] [UI] [A:Medium] [Content] Add license selector field to score editor
