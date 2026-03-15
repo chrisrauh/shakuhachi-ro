@@ -94,6 +94,41 @@ If changes are already committed to main (but not pushed):
 3. `git reset --hard origin/main`
 4. `git checkout feature/descriptive-name`, push and PR
 
+## Design System
+
+Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE.md](./docs/DESIGN-LANGUAGE.md)
+
+### Hard Rules
+
+| Rule | Detail |
+|------|--------|
+| NEVER use `!important` | Fix specificity at the root — refactor selectors, reorder stylesheets |
+| NEVER use bare values in CSS | No raw px/rem/hex/rgb for spacing, color, border-radius, font-size, transitions. Always use a token. If no token fits, propose adding one. |
+| NEVER use primitive tokens in components | Use purpose tokens (`--color-text-primary`) not primitives (`--color-gray-900`) |
+| NEVER `@import` inside `<style>` blocks | Import CSS via frontmatter in Layout.astro — breaks HMR otherwise |
+
+### Token Quick Reference
+
+| Property | Token family |
+|----------|-------------|
+| Color | `--color-text-*`, `--color-border-*`, `--color-bg-*`, `--color-button-*` |
+| Spacing | `--spacing-3x-small` … `--spacing-4x-large` |
+| Border radius | `--border-radius-small` … `--border-radius-pill` (980px) |
+| Font size | `--font-size-2x-small` … `--font-size-2x-large` |
+| Transitions | `--transition-x-fast` … `--transition-x-slow` |
+| Toolbar height | `--size-toolbar-item` (2rem / 32px) — icon buttons, small buttons, logo, avatar |
+
+### Visual Verification
+
+- Always check light **and** dark mode after styling changes
+- Use chrome-devtools-mcp (`take_screenshot()`, `emulate({ colorScheme })`) — not scripts
+- Run `npm run test:visual` before PR; update baselines only with user approval
+
+### Component Patterns
+
+- Button text needs `<span class="btn-text">` wrapper — required for `text-box-trim` to work inside flex containers
+- All toolbar-height elements use `--size-toolbar-item`
+
 ## Testing
 
 - Unit tests (Vitest): Logic, validation, transformations
