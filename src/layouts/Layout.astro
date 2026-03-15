@@ -8,9 +8,10 @@ interface Props {
   currentPage: 'browse' | 'create' | 'score';
   fullHeight?: boolean;
   noPadding?: boolean;
+  mobileMenuType?: 'standard' | 'score-edit';
 }
 
-const { title, currentPage: _currentPage, fullHeight = false, noPadding = false } = Astro.props;
+const { title, currentPage: _currentPage, fullHeight = false, noPadding = false, mobileMenuType } = Astro.props;
 ---
 
 <!doctype html>
@@ -36,7 +37,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
     </script>
   </head>
   <body class={fullHeight ? 'full-height' : ''}>
-    <SiteHeader>
+    <SiteHeader mobileMenuType={mobileMenuType}>
       <slot name="header-metadata" slot="header-metadata" />
       <slot name="header-actions" slot="header-actions" />
     </SiteHeader>
@@ -143,38 +144,5 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false 
       }
     </style>
 
-    <script>
-      import { createEmptyScore } from '../utils/create-score-handler';
-      import { toast } from '../components/Toast';
-      import { STRINGS } from '../constants/strings';
-      import { ButtonLoadingState } from '../components/LoadingSpinner';
-
-      document.addEventListener('DOMContentLoaded', () => {
-        const createBtn = document.querySelector('a[aria-label="Create new score"]');
-
-        createBtn?.addEventListener('click', async (e) => {
-          e.preventDefault();
-
-          const loadingState = new ButtonLoadingState(createBtn as HTMLElement);
-          loadingState.show(); // Icon-only, no text
-
-          try {
-            const result = await createEmptyScore();
-
-            if (result.error) {
-              toast.error(result.error.message, { duration: Infinity });
-              loadingState.hide();
-              return;
-            }
-
-            // Redirect to edit page
-            window.location.href = `/score/${encodeURIComponent(result.slug)}/edit`;
-          } catch (error) {
-            toast.error(STRINGS.ERRORS.ScoreEditor.createScoreFailed, { duration: Infinity });
-            loadingState.hide();
-          }
-        });
-      });
-    </script>
   </body>
 </html>
