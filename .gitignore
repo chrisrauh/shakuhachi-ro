@@ -57,3 +57,4 @@ CLAUDE.local.md
 .netlify
 .mcp.json.bak
 .claude/settings.local.json.bak
+.superpowers/

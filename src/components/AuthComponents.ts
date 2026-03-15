@@ -4,8 +4,35 @@ import { STRING_FACTORIES } from '../constants/strings';
 import { MenuDropdown } from './MenuDropdown';
 import { User as UserIcon, LogOut as LogOutIcon } from 'lucide';
 import { getIconHTML } from '../utils/icons';
+
 export interface AuthModalInterface {
   show(mode: 'login' | 'signup'): void;
+}
+
+const INITIALS_HINT_KEY = 'shakuhachi-auth-initials';
+
+function readInitialsHint(): string | null {
+  try {
+    return localStorage.getItem(INITIALS_HINT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeInitialsHint(initials: string): void {
+  try {
+    localStorage.setItem(INITIALS_HINT_KEY, initials);
+  } catch {
+    /* degrade gracefully — e.g. Safari private browsing */
+  }
+}
+
+function clearInitialsHint(): void {
+  try {
+    localStorage.removeItem(INITIALS_HINT_KEY);
+  } catch {
+    /* degrade gracefully */
+  }
 }
 
 /** Derives a one- or two-character avatar initial from an email address. */
@@ -31,8 +58,16 @@ export class AuthWidget {
     this.menuDropdown = new MenuDropdown();
     this.attachLoggedOutListeners();
 
+    const hint = readInitialsHint();
+    if (hint) this.renderSpeculative(hint);
+
     window.addEventListener('auth-change', ((e: CustomEvent) => {
       this.currentUser = e.detail;
+      if (this.currentUser) {
+        writeInitialsHint(getInitials(this.currentUser.email ?? ''));
+      } else {
+        clearInitialsHint();
+      }
       this.render();
     }) as EventListener);
   }
@@ -44,6 +79,47 @@ export class AuthWidget {
     signupBtn?.addEventListener('click', () => this.authModal.show('signup'));
   }
 
+  private renderSpeculative(initials: string): void {
+    this.container.innerHTML = `
+      <button
+        class="btn btn-neutral auth-avatar-btn"
+        aria-label="Account menu"
+        disabled
+        style="
+          border-radius: var(--border-radius-circle);
+          width: 32px;
+          height: 32px;
+          font-size: var(--font-size-medium);
+          font-weight: var(--font-weight-normal);
+          line-height: 1;
+          user-select: none;
+          flex-shrink: 0;
+        "
+      ><span class="btn-text">${initials}</span></button>
+    `;
+  }
+
+  private avatarButtonHTML(initials: string): string {
+    return `
+      <button
+        class="btn btn-neutral auth-avatar-btn"
+        aria-label="Account menu"
+        aria-expanded="false"
+        aria-haspopup="menu"
+        style="
+          border-radius: var(--border-radius-circle);
+          width: 32px;
+          height: 32px;
+          font-size: var(--font-size-medium);
+          font-weight: var(--font-weight-normal);
+          line-height: 1;
+          user-select: none;
+          flex-shrink: 0;
+        "
+      ><span class="btn-text">${initials}</span></button>
+    `;
+  }
+
   private render(): void {
     // Close any open dropdown before rebuilding DOM
     this.menuDropdown.hide();
@@ -52,27 +128,7 @@ export class AuthWidget {
       const initials = getInitials(this.currentUser.email ?? '');
       const email = this.currentUser.email ?? '';
 
-      this.container.innerHTML = `
-        <button
-          class="btn btn-icon auth-avatar-btn"
-          aria-label="Account menu"
-          aria-expanded="false"
-          aria-haspopup="menu"
-          style="
-            border-radius: var(--border-radius-circle);
-            width: 32px;
-            height: 32px;
-            background: var(--color-bg-active);
-            border-color: var(--color-border);
-            color: var(--color-text-primary);
-            font-size: var(--font-size-medium);
-            font-weight: var(--font-weight-normal);
-            line-height: 1;
-            user-select: none;
-            flex-shrink: 0;
-          "
-        ><span class="btn-text">${initials}</span></button>
-      `;
+      this.container.innerHTML = this.avatarButtonHTML(initials);
 
       const avatarBtn = this.container.querySelector(
         '.auth-avatar-btn',
@@ -131,6 +187,7 @@ export class AuthWidget {
 
   private async handleLogout(): Promise<void> {
     await signOut();
+    clearInitialsHint();
     this.currentUser = null;
     this.render();
     window.dispatchEvent(new CustomEvent('auth-change', { detail: null }));
@@ -138,6 +195,11 @@ export class AuthWidget {
 
   public setUser(user: User | null): void {
     this.currentUser = user;
+    if (user) {
+      writeInitialsHint(getInitials(user.email ?? ''));
+    } else {
+      clearInitialsHint();
+    }
     this.render();
   }
 }
