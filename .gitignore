@@ -31,6 +31,9 @@
 # Temporary files
 /tmp
 
+# Superpowers working files (plans, specs)
+/docs/superpowers
+
 # Debug logs
 npm-debug.log*
 yarn-debug.log*
