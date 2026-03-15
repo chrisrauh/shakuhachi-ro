@@ -101,23 +101,29 @@
   - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
 
 - [ ] [UI] [A:Medium] [Quality-Separation] Standardize error UX across components
-  - [ ] `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
-  - [ ] Inconsistent patterns remain: `ScoreEditor` uses `showNotification()`; `ScoreLibrary` uses inline UI with retry button; pick one and apply consistently
+  - `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
+  - `ScoreLibrary` uses inline UI with a retry button; `ScoreEditor` uses `toast`; pick one pattern and apply consistently
 
-- [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreEditor inline CSS into a stylesheet [Claude validated]
-  - `src/components/ScoreEditor.ts:789+` — The `addStyles()` method at line 789 injects ~275 lines of CSS via JavaScript into a `<style>` tag. This mixes styling concerns into the component class and makes CSS hard to find and maintain. Move styles to `src/styles/score-editor.css` and import it in the Astro page that uses the editor. This alone removes ~35% of the file's line count.
+- [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreEditor inline CSS into a stylesheet
+  - `src/components/ScoreEditor.ts:653+` — `addStyles()` injects ~275 lines of CSS via a `<style>` tag at runtime. Move to `src/styles/score-editor.css` and import it in `edit.astro`. Removes ~30% of the file's line count and makes styles discoverable via normal CSS tooling.
 
-- [ ] [Backend] [A:High] [Quality-SingleResp] Extract score data validation out of ScoreEditor into a reusable module
-  - `src/components/ScoreEditor.ts:120-150` — `validateScoreData()` handles JSON parsing, XML parsing via DOMParser, and error message formatting. This validation logic is useful beyond the editor (e.g., API-side validation, import flows). Extract to `src/utils/score-validation.ts` with a function like `validateScoreInput(data: string, format: ScoreDataFormat): { valid: boolean; error?: string }`.
+- [ ] [Backend] [A:High] [Quality-SingleResp] Extract score data validation out of ScoreEditor
+  - `src/components/ScoreEditor.ts:151` — `validateScoreData()` handles JSON parsing, XML parsing via DOMParser, and error message formatting — all mixed into the editor class. Extract to `src/utils/score-validation.ts` as `validateScoreInput(data: string, format: ScoreDataFormat): { valid: boolean; error?: string }`. This makes validation testable in isolation and reusable for API-side or import validation.
 
-- [ ] [Backend] [A:High] [Quality-SingleResp] Extract auto-save logic out of ScoreEditor
-  - `src/components/ScoreEditor.ts:85-117` — `loadFromLocalStorage()`, `setupAutoSave()`, and `saveToLocalStorage()` form a self-contained persistence concern (setInterval management, localStorage key, serialization format). Extract to a small `AutoSaveManager` class or utility in `src/utils/auto-save.ts` that takes a storage key and serialization functions.
+- [ ] [Backend] [A:High] [Quality-SingleResp] Extract localStorage autosave logic out of ScoreEditor
+  - `src/components/ScoreEditor.ts:125-141` — `setupLocalStorageAutoSave()`, `saveToLocalStorage()`, and `checkAndOfferDraftRestore()` form a self-contained persistence concern: debounce management, per-slug key naming, serialization format, and draft/DB timestamp comparison. Extract to `src/utils/editor-autosave.ts` (or a small `EditorAutosave` class) that takes a slug and serialization callbacks. Makes the logic testable without a full editor instance.
 
-- [ ] [Backend] [A:High] [Quality-Explicit] Name the auto-save interval constant in ScoreEditor
-  - `src/components/ScoreEditor.ts:105-107` — `window.setInterval(() => ..., 30000)` uses a bare number. Define `const AUTO_SAVE_INTERVAL_MS = 30_000;` at the top of the file or in a constants module.
+- [ ] [Backend] [A:High] [Quality-DRY] Deduplicate updatePreview() in ScoreEditor
+  - `src/components/ScoreEditor.ts:248` — `updatePreview()` has two near-identical code paths: one for the external `#score-preview` panel (two-panel edit page layout) and one for the internal `#preview-pane` (standalone embed). Both paths do identical work: parse score data by format, create a `<shakuhachi-score>` element, apply the same CSS custom properties, and handle mobile vs desktop sizing. Extract shared rendering logic into a private `renderScoreInto(container: HTMLElement): Promise<void>` helper called by both paths.
 
-- [ ] [Backend] [A:High] [Quality-TypeSafety] Fix handleMetadataChange double `as any` cast in ScoreEditor
-  - `src/components/ScoreEditor.ts:172-173` — `(this.metadata as any)[field] = value` casts both the object and the value parameter to `any` to do a simple property assignment. Since all `ScoreMetadata` fields are `string` and `field` is already `keyof ScoreMetadata`, the fix is: change the parameter type from `value: any` to `value: string`, then the assignment `this.metadata[field] = value` works without any cast.
+- [ ] [Both] [A:Low] [Architecture] Decompose ScoreEditor into model + view
+  - `ScoreEditor.ts` is ~930 lines mixing 8+ concerns: state (instance variables), DOM generation (`innerHTML` templates), event wiring, API calls, validation, localStorage autosave, preview rendering, and CSS injection. This monolith makes adding versioning, collaboration, or format plugins require invasive surgery on a single file.
+  - **Approach**: (a) `EditorState` — holds data, emits change events; (b) `EditorView` — subscribes to state, renders DOM; (c) extracted concerns already tracked above (CSS → stylesheet, validation → utility, autosave → utility). The same pattern applies to `ScoreLibrary.ts` and `ScoreDetailClient.ts` at smaller scale.
+  - **Do the extractions above first** — they reduce the scope of this decomposition significantly and validate the boundaries before committing to a full split.
+
+- [ ] [UI] [A:Low] [Alpha] Revisit unsaved changes indicator design
+  - Current: "Unsaved changes" text appears inline in the metadata panel next to the Save button
+  - Consider: prominence (is it visible enough?), mobile layout (does it wrap awkwardly?), animation on state change (subtle fade-in when changes occur, fade-out after save)
 
 - [ ] [UI] [A:Medium] [Content] Add license selector field to score editor
   - Add a license dropdown to the score metadata section of the editor
@@ -126,10 +132,6 @@
   - Store selection as SPDX identifier in score metadata
   - Default to All Rights Reserved for new scores
   - Display selected license on score detail page
-
-- [ ] [Both] [A:Low] [Architecture] Decompose ScoreEditor into model + view
-  - `ScoreEditor.ts` is 771 lines mixing 8+ concerns: state management (instance variables), DOM generation (`innerHTML` templates), event handling, API calls, validation, auto-save, theme detection, and CSS injection. This monolith is the primary bottleneck for adding versioning, collaboration, and i18n — all three require invasive surgery on this single file. Separate into: (a) an `EditorState` model class that holds data and emits change events, (b) an `EditorView` that subscribes to state changes and renders DOM, (c) extracted concerns (CSS → stylesheet, validation → utility, auto-save → utility, already tracked as separate tasks above). The same pattern applies to `ScoreLibrary.ts` (543 lines) and `ScoreDetailClient.ts` (175 lines) at smaller scale.
-  - **Validate first**: Read the full `ScoreEditor.ts`. Map every instance variable and method. Identify which methods are pure state mutations vs DOM manipulation vs API calls. Sketch the `EditorState` interface before writing any code. Consider whether a lightweight event emitter is sufficient or if a more structured pattern is needed.
 
 - [ ] [UI] [A:High] [Polish] Add loading spinners and error states
 - [ ] [UI] [A:High] [Polish] Polish form validation and error messages
