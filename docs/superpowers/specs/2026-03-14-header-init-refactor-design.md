@@ -248,7 +248,7 @@ The project uses `output: 'server'` (SSR by default). Three standard pages opt i
 | `src/pages/index.astro` | Remove ~90-line script block (header script handles it) |
 | `src/pages/about.astro` | Same |
 | `src/pages/help/notation-formats.astro` | Same |
-| `src/pages/score/[slug].astro` | Replace mobile menu script block with `mobileMenuType="score-detail"` prop on `<SiteHeader>` |
+| `src/pages/score/[slug].astro` | Replace mobile menu script block with `mobileMenuType="score-edit"` prop on `<SiteHeader>` |
 
 ---
 
