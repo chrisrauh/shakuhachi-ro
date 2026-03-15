@@ -19,7 +19,8 @@ vi.mock('../api/auth', () => ({
   onAuthReady: vi.fn(),
 }));
 
-const mockAuthModal = { show: vi.fn() };
+const mockAuthModal: import('../components/AuthComponents').AuthModalInterface =
+  { show: vi.fn() };
 
 describe('buildNavItems', () => {
   it('returns browse and create items', () => {

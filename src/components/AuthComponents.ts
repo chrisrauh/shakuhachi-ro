@@ -3,7 +3,9 @@ import type { User } from '@supabase/supabase-js';
 import { STRING_FACTORIES } from '../constants/strings';
 import { MenuDropdown } from './MenuDropdown';
 import { createElement, User as UserIcon, LogOut as LogOutIcon } from 'lucide';
-import { AuthModal } from './AuthModal';
+export interface AuthModalInterface {
+  show(mode: 'login' | 'signup'): void;
+}
 
 /** Derives a one- or two-character avatar initial from an email address. */
 export function getInitials(email: string): string {
@@ -24,11 +26,11 @@ function getIconHTML(
 
 export class AuthWidget {
   private container: HTMLElement;
-  private authModal: AuthModal;
+  private authModal: AuthModalInterface;
   private currentUser: User | null = null;
   private menuDropdown: MenuDropdown;
 
-  constructor(containerId: string, authModal: AuthModal) {
+  constructor(containerId: string, authModal: AuthModalInterface) {
     const container = document.getElementById(containerId);
     if (!container) {
       throw new Error(STRING_FACTORIES.containerNotFound(containerId));

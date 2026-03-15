@@ -13,7 +13,10 @@ import {
   Trash2,
 } from 'lucide';
 import { ThemeSwitcher } from '../components/ThemeSwitcher';
-import { AuthWidget } from '../components/AuthComponents';
+import {
+  AuthWidget,
+  type AuthModalInterface,
+} from '../components/AuthComponents';
 import { AuthModal } from '../components/AuthModal';
 import { MobileMenu, type MenuItem } from '../components/MobileMenu';
 import { onAuthReady, signOut } from '../api/auth';
@@ -57,7 +60,7 @@ export function buildNavItems(): MenuItem[] {
 
 export function buildAuthItems(
   user: SupabaseUser | null,
-  authModal: AuthModal,
+  authModal: AuthModalInterface,
 ): MenuItem[] {
   return user
     ? [
@@ -122,7 +125,7 @@ export function buildUtilityItems(): MenuItem[] {
 
 function standardMenuBuilder(
   user: SupabaseUser | null,
-  authModal: AuthModal,
+  authModal: AuthModalInterface,
 ): MenuItem[][] {
   return [
     buildNavItems(),
@@ -133,7 +136,7 @@ function standardMenuBuilder(
 
 function scoreEditMenuBuilder(
   user: SupabaseUser | null,
-  authModal: AuthModal,
+  authModal: AuthModalInterface,
 ): MenuItem[][] {
   let isOwner = false;
   try {
@@ -177,7 +180,7 @@ function scoreEditMenuBuilder(
 
 const MENU_BUILDERS: Record<
   string,
-  (user: SupabaseUser | null, authModal: AuthModal) => MenuItem[][]
+  (user: SupabaseUser | null, authModal: AuthModalInterface) => MenuItem[][]
 > = {
   standard: standardMenuBuilder,
   'score-edit': scoreEditMenuBuilder,
