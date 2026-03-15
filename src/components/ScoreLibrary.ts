@@ -139,15 +139,13 @@ export class ScoreLibrary {
 
     this.container.innerHTML = `
       <div class="score-library">
-        <div class="score-library-filters">
-          <div class="search-bar">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Search by title or composer..."
-              value="${this.searchQuery}"
-            />
-          </div>
+        <div class="search-bar">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by title or composer..."
+            value="${this.searchQuery}"
+          />
         </div>
 
         <div class="score-library-grid" id="score-grid">
@@ -407,11 +405,7 @@ export class ScoreLibrary {
         padding: var(--spacing-large);
       }
 
-      .score-library-filters {
-        background: var(--panel-background-color);
-        border: var(--panel-border-width) solid var(--panel-border-color);
-        padding: var(--spacing-large);
-        border-radius: var(--border-radius-large);
+      .search-bar {
         margin-bottom: var(--spacing-x-large);
       }
 
@@ -422,15 +416,11 @@ export class ScoreLibrary {
         margin-bottom: 0;
       }
 
-      .search-bar {
-        margin: 0;
-      }
-
       .search-bar input {
         width: 100%;
-        padding: var(--input-spacing-small);
+        padding: var(--input-spacing-small) var(--spacing-large);
         border: var(--input-border-width) solid var(--input-border-color);
-        border-radius: var(--input-border-radius-medium);
+        border-radius: var(--border-radius-pill);
         font-size: var(--input-font-size-medium);
         background: var(--input-background-color);
         color: var(--input-color);

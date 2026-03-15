@@ -39,9 +39,11 @@
   gap: 8px;
 }
 
-/* Icon button - 32px × 32px with centered icon */
+/* Icon button - toolbar item size, square */
 .btn-icon {
   padding: var(--spacing-button);
+  width: var(--size-toolbar-item);
+  height: var(--size-toolbar-item);
   background: transparent;
   border: var(--input-border-width) solid var(--color-border);
   border-radius: var(--border-radius-medium);
@@ -59,10 +61,23 @@
   transform: translateY(1px);
 }
 
-/* Small button - compact variant matching icon button height (32px) */
+/* Small button - compact variant matching icon button height */
 .btn-small {
   font-size: var(--font-size-small);
   line-height: 1;
+  height: var(--size-toolbar-item);
+}
+
+/* Auth avatar button - circular icon button showing user initials */
+.auth-avatar-btn {
+  border-radius: var(--border-radius-circle);
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 /* Button variants - colors */

@@ -46,14 +46,12 @@ const { mobileMenuType = 'standard' } = Astro.props;
         <SunMoon size={16} stroke-width={2} />
       </button>
       <div id="auth-widget">
-        <div style="display: flex; gap: var(--spacing-small);">
-          <button id="auth-login" class="btn btn-small btn-primary">
-            <span class="btn-text">Log In</span>
-          </button>
-          <button id="auth-signup" class="btn btn-small btn-neutral">
-            <span class="btn-text">Sign Up</span>
-          </button>
-        </div>
+        <button id="auth-login" class="btn btn-small btn-primary">
+          <span class="btn-text">Log In</span>
+        </button>
+        <button id="auth-signup" class="btn btn-small btn-neutral">
+          <span class="btn-text">Sign Up</span>
+        </button>
       </div>
     </div>
     <!-- Mobile menu (shown on mobile) -->
@@ -116,8 +114,8 @@ const { mobileMenuType = 'standard' } = Astro.props;
     text-decoration: none;
   }
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: var(--size-toolbar-item);
+    height: var(--size-toolbar-item);
     color: var(--color-logo);
     border-radius: var(--border-radius-2x-small);
     font-size: 24px;
@@ -136,6 +134,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
   #auth-widget {
     flex-shrink: 0;
     display: flex;
+    gap: var(--spacing-x-small);
   }
 
   .header-nav-separator {
@@ -165,7 +164,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
     .header-metadata {
       display: flex;
       align-items: center;
-      min-height: 32px;
+      min-height: var(--size-toolbar-item);
     }
 
     /* Override when metadata has 2+ children (title + metadata present) */
