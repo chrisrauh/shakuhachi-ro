@@ -465,12 +465,7 @@ export class ScoreEditor {
       <div class="score-editor">
         <div class="editor-header">
           <h1>Edit Score</h1>
-          <div class="editor-actions">
-            <button id="save-btn" class="btn btn-primary">
-              <span class="btn-text">Save Score</span>
-            </button>
-            <a href="/" class="btn btn-secondary"><span class="btn-text">Cancel</span></a>
-          </div>
+          <a href="/" class="btn btn-secondary"><span class="btn-text">Cancel</span></a>
         </div>
 
         <div class="editor-metadata" id="editor-metadata">
@@ -570,7 +565,12 @@ export class ScoreEditor {
         </div>
 
         <div class="metadata-field metadata-field-full">
-          <div id="save-status-indicator"></div>
+          <div class="save-bar">
+            <div id="save-status-indicator"></div>
+            <button id="save-btn" class="btn btn-primary">
+              <span class="btn-text">Save Score</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -706,6 +706,17 @@ export class ScoreEditor {
 
       .metadata-field-full {
         grid-column: 1 / -1;
+      }
+
+      .save-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-small);
+      }
+
+      .save-bar #save-status-indicator {
+        flex: 1;
       }
 
       .metadata-field label {

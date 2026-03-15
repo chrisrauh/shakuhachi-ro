@@ -183,6 +183,9 @@ export function initHeader(): void {
   const authWidget = new AuthWidget('auth-widget', authModal);
   const mobileMenu = new MobileMenu('mobile-menu');
 
+  const desktopCreateBtn = document.getElementById('desktop-create-btn');
+  desktopCreateBtn?.addEventListener('click', () => startNewScore(authModal));
+
   const menuContainer = document.getElementById('mobile-menu');
   const menuType = menuContainer?.dataset.menuType ?? 'standard';
   const builder = MENU_BUILDERS[menuType] ?? standardMenuBuilder;
