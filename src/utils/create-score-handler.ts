@@ -1,6 +1,8 @@
 import { createScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { generateUniqueRandomSlug } from './slug';
+import type { AuthModalInterface } from '../components/AuthComponents';
+import { toast } from '../components/Toast';
 
 export interface CreateEmptyScoreResult {
   slug: string;
@@ -8,32 +10,17 @@ export interface CreateEmptyScoreResult {
 }
 
 /**
- * Create an empty score with a random slug
- * @returns The slug of the created score and any error
- * @example
- * const { slug, error } = await createEmptyScore();
- * if (error) { console.error(error); }
- * else { window.location.href = `/score/${slug}/edit`; }
+ * Create an empty score with a random slug.
+ * Pure data function — no auth check, no navigation side effects.
  */
 export async function createEmptyScore(): Promise<CreateEmptyScoreResult> {
-  // Check authentication
-  const { user } = await getCurrentUser();
-  if (!user) {
-    return {
-      slug: '',
-      error: new Error('Please log in to create scores'),
-    };
-  }
-
-  // Generate unique random slug
   const { slug, error: slugError } = await generateUniqueRandomSlug();
   if (slugError) {
     return { slug: '', error: slugError };
   }
 
-  // Create empty score with random slug as title
   const result = await createScore({
-    title: slug, // Use slug as initial title (user can change)
+    title: slug,
     data_format: 'json',
     data: { title: '', style: 'kinko', notes: [] },
   });
@@ -43,4 +30,26 @@ export async function createEmptyScore(): Promise<CreateEmptyScoreResult> {
   }
 
   return { slug: result.score!.slug, error: null };
+}
+
+/**
+ * Single entry point for all "Create score" UI actions.
+ * Checks auth, creates an empty score, and navigates to the editor.
+ */
+export async function startNewScore(
+  authModal: AuthModalInterface,
+): Promise<void> {
+  const { user } = await getCurrentUser();
+  if (!user) {
+    authModal.show('login');
+    return;
+  }
+
+  const { slug, error } = await createEmptyScore();
+  if (error) {
+    toast.error(error.message);
+    return;
+  }
+
+  window.location.href = `/score/${slug}/edit`;
 }
