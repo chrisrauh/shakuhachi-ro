@@ -16,24 +16,13 @@ export class MobileMenu {
     }
     this.container = container;
     this.menuDropdown = new MenuDropdown();
-    this.render();
+
+    const button = this.container.querySelector('#mobile-menu-toggle');
+    button?.addEventListener('click', () => this.toggleMenu());
   }
 
   public setItems(groups: MenuItem[][]): void {
     this.groups = groups;
-  }
-
-  private render(): void {
-    this.container.innerHTML = `
-      <button id="mobile-menu-toggle" class="btn btn-icon" aria-label="Menu" aria-expanded="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
-        </svg>
-      </button>
-    `;
-
-    const button = this.container.querySelector('#mobile-menu-toggle');
-    button?.addEventListener('click', () => this.toggleMenu());
   }
 
   private toggleMenu(): void {
