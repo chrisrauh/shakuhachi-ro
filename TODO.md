@@ -28,7 +28,9 @@
   - Each page replaces the block with two lines: call `initHeader()`, then `initStandardMobileMenu(authWidget, authModal)`
   - The score detail page (`[slug].astro`) has owner-specific items and should remain separate
 
-- [ ] [UI] [A:High] [Polish] Create footer with attribution
+- [ ] Extract header model into its own file/component
+
+- [ ] Revisit auth buttons layout flash when loading auth state
 
 - [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
   - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
@@ -65,6 +67,9 @@
 - [ ] [Both] [A:Medium] [Advanced] Advanced search (filter by tags, difficulty, date ranges)
 
 ### Score Detail / View
+
+- [ ] [UI] [A:High] [Polish] Move attribution data from fotter to top of page
+  - Needs ux design
 
 - [ ] [Both] [A:High] [Quality-Separation] Separate auth check from DOM mutation in ScoreDetailClient.handleEditButtonVisibility
   - `src/components/ScoreDetailClient.ts:49-57` — One method queries auth state, finds a DOM element, and sets inline styles. Split into: (a) a pure check `isOwner(): boolean` and (b) a DOM updater that uses CSS classes (`editBtn.classList.add('visible')`) instead of inline styles. This makes the authorization logic testable without a DOM.

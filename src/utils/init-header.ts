@@ -123,7 +123,11 @@ function standardMenuBuilder(
   user: SupabaseUser | null,
   headerModal: HeaderModal,
 ): MenuItem[][] {
-  return [buildNavItems(), buildAuthItems(user, headerModal), buildUtilityItems()];
+  return [
+    buildNavItems(),
+    buildAuthItems(user, headerModal),
+    buildUtilityItems(),
+  ];
 }
 
 function scoreEditMenuBuilder(
@@ -146,14 +150,17 @@ function scoreEditMenuBuilder(
         {
           id: 'edit',
           label: 'Edit score',
-          href: (document.getElementById('edit-btn') as HTMLAnchorElement)?.href,
+          href: (document.getElementById('edit-btn') as HTMLAnchorElement)
+            ?.href,
           icon: getIconHTML(SquarePen),
         },
         {
           id: 'delete',
           label: 'Delete score',
           action: () =>
-            (document.getElementById('delete-btn') as HTMLButtonElement)?.click(),
+            (
+              document.getElementById('delete-btn') as HTMLButtonElement
+            )?.click(),
           icon: getIconHTML(Trash2),
         },
       ]
@@ -179,9 +186,11 @@ export function initHeader(): void {
   new ThemeSwitcher('theme-switcher');
 
   if (import.meta.env.DEV) {
-    import('../components/LetterSpacingControl').then(({ LetterSpacingControl }) => {
-      new LetterSpacingControl('letter-spacing-control');
-    });
+    import('../components/LetterSpacingControl').then(
+      ({ LetterSpacingControl }) => {
+        new LetterSpacingControl('letter-spacing-control');
+      },
+    );
   }
 
   const headerModal = new HeaderModal();

@@ -1,6 +1,10 @@
 // src/utils/init-header.test.ts
 import { describe, it, expect, vi } from 'vitest';
-import { buildNavItems, buildAuthItems, buildUtilityItems } from './init-header';
+import {
+  buildNavItems,
+  buildAuthItems,
+  buildUtilityItems,
+} from './init-header';
 import type { User } from '@supabase/supabase-js';
 
 // Mock dependencies that have side effects
