@@ -20,10 +20,6 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Meta / Tooling
-
-- [x] Update hooks/skills to only use superpowers agent implementation when there is a _superpowers_ plan. Default Claude plans use the dev workflow.
-
 ### Global / Navigation
 
 - [ ] Revisit auth buttons layout flash when loading auth state
