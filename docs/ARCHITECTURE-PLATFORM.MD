@@ -30,16 +30,30 @@ SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client in
 
 ### Score Edit Page (`/score/[slug]/edit`)
 
-Client-side with live preview. Notation input supports ABC, JSON, MusicXML. Automatic format conversion when switching. Title changes update the slug. Saves to Supabase on submit.
+Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). Notation input supports ABC, JSON, MusicXML. Automatic format conversion when switching. Title changes update the slug. Per-slug localStorage autosave. Saves to Supabase on submit.
 
 **Components:** `ScoreEditor.ts` (form, notation input), `<shakuhachi-score>` (live preview)
+
+## Header Architecture
+
+Header concerns are split across three layers:
+
+- **`Layout.astro`** owns the document shell only (doctype, `<head>`, body wrapper). It contains no header logic and delegates to `SiteHeader.astro`.
+- **`SiteHeader.astro`** contains the header HTML and CSS. Its `<script>` tag calls `initHeader()` once on page load. Accepts a `mobileMenuType` prop (`'standard'` | `'score-edit'`) which is written to a `data-menu-type` attribute on the mobile menu element.
+- **`src/utils/init-header.ts`** — `initHeader()` wires up all header interactivity: ThemeSwitcher, AuthModal, AuthWidget, MobileMenu, and the desktop create button.
+
+**Mobile menu dispatch:** `MobileMenu` reads `data-menu-type` and dispatches to a `MENU_BUILDERS` map to determine which items to render. `mobileMenuType='score-edit'` adds owner-conditional Edit and Delete items to the mobile menu.
+
+**PageHeader.astro** is a separate page-level component for rendering a page title and metadata slot. It is not part of the site header.
 
 ## Data Flow
 
 **Score creation:**
 ```
-Create new score → temporary slug → empty score in Supabase → /score/[slug]/edit
-User enters title + notation → live preview → title updates slug → save
+"Create" UI action → startNewScore(authModal) → auth check (prompts login if needed)
+  → createEmptyScore() → Supabase creates score with random slug
+  → redirect to /score/[slug]/edit
+User edits title + notation → live preview → autosave to localStorage → save to Supabase
 ```
 
 **Fork:**
@@ -85,7 +99,9 @@ MusicXML ✓      ✓        -
 **Key files:**
 - `src/api/auth.ts` — auth API wrapper
 - `src/api/supabase.ts` — Supabase client
-- `src/components/AuthComponents.ts` — login/signup UI
+- `src/components/AuthComponents.ts` — login/signup UI (base auth components)
+
+**AuthWidget / AuthModal decoupling:** AuthWidget accepts any object implementing `AuthModalInterface`. This decouples AuthWidget from `AuthModal`'s concrete implementation, allowing the modal to be substituted or tested independently.
 
 ## Database Schema
 
@@ -97,17 +113,28 @@ MusicXML ✓      ✓        -
 
 Vanilla TypeScript classes with a simple `constructor(containerId) → render() → attachEventListeners()` pattern.
 
-**Components:**
+**Astro components:**
+- `SiteHeader.astro` — site-wide header HTML/CSS; its `<script>` calls `initHeader()`
+- `PageHeader.astro` — page-level title/metadata slot component
+
+**TypeScript components:**
 - `ThemeSwitcher.ts` — light/dark mode toggle
-- `AuthComponents.ts` — login/signup UI
-- `MobileMenu.ts` — mobile navigation
+- `AuthComponents.ts` — base auth components, including `AuthWidget` (user avatar / auth state display)
+- `AuthModal.ts` — login/signup modal (extracted from AuthComponents.ts; decoupled via `AuthModalInterface`)
+- `MenuDropdown.ts` — shared dropdown UI used by MobileMenu and AuthWidget avatar
+- `MobileMenu.ts` — mobile navigation (type-aware via `data-menu-type`)
 - `ScoreLibrary.ts` — browse page grid (fetches and renders all scores client-side)
 - `ScoreDetailClient.ts` — score page interactions (fork, delete)
-- `ScoreEditor.ts` — edit page notation input and preview
+- `ScoreEditor.ts` — edit page notation input and preview (edit-only, per-slug localStorage autosave)
 - `Toast.ts` — toast notifications
 - `ConfirmDialog.ts` — confirmation dialogs
 - `LoadingSpinner.ts` — loading state
 - `LetterSpacingControl.ts` — typography control
+
+**Utilities (`src/utils/`):**
+- `init-header.ts` — centralizes header initialization (ThemeSwitcher, AuthModal, AuthWidget, MobileMenu, desktop create button)
+- `create-score-handler.ts` — score creation coordinator: `createEmptyScore()` (pure data, creates score in Supabase) + `startNewScore()` (auth check → create → navigate)
+- `icons.ts` — `getIconHTML()` helper for lucide icons
 
 ## Renderer Integration
 
@@ -147,4 +174,3 @@ import '../styles/components.css';
 Astro's `<style is:global>` flag only prevents scoping for CSS written *directly* in the block — it has no effect on `@import`ed files (those are always global regardless). More importantly, `@import` inside `<style>` blocks is not tracked by Vite as a module dependency, so edits to the imported files do **not** trigger HMR. Frontmatter imports are proper Vite module dependencies and hot-reload correctly.
 
 Any CSS written directly in Layout.astro (`:root`, `body`, `*` resets, etc.) should remain in the `<style is:global>` block as before.
-
