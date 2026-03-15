@@ -122,7 +122,7 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 
 - Always check light **and** dark mode after styling changes
 - Use chrome-devtools-mcp (`take_screenshot()`, `emulate({ colorScheme })`) — not scripts
-- Run `npm run test:visual` before PR; update baselines only with user approval
+- Run `npm run test:visual` before PR — see `/dev-workflow` for the baseline approval workflow.
 
 ### Component Patterns
 
@@ -158,21 +158,15 @@ Example: For a slug utility, test core transformations (lowercase, spaces→hyph
 - **SVG**: `overflow: visible` to prevent clipping of modifiers beyond boundaries
 - **Modes**: Debug and non-debug render identically
 - **Edge cases**: First/last notes in columns, multiple modifiers, rests
-- **Process**: Use chrome-devtools-mcp during development; run `npm run test:visual` before PR
+- **Process**: Use chrome-devtools-mcp during development; run `npm run test:visual` before PR — see `/dev-workflow` for the baseline approval gate.
 
 **Visual Regression Tests**
 
-Run `npm run test:visual` before creating PR. When tests fail:
-
-- Run `npx playwright show-report` to open the diff viewer
-- Ask user to review and approve changes
-- Only update baselines after user approval with `npm run test:visual:update`
-- Unit tests can be updated directly as they don't require visual approval
+When tests fail, follow the baseline approval workflow in `/dev-workflow`.
 
 **⚠️ CRITICAL: NEVER proceed with failing tests**
 
 - If ANY test fails, STOP and investigate
-- NEVER update baselines without user approval
 - NEVER decide a failing test is "acceptable" - always ask the user
 - Do not proceed to next steps, create PRs, or mark tasks complete while tests are failing
 - The user decides what is acceptable, not you
