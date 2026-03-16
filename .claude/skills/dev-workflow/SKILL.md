@@ -59,6 +59,10 @@ digraph dev_workflow {
   "Fix failures" [shape=box];
   "UI change?" [shape=diamond];
   "Visual verify (chrome-devtools-mcp)" [shape=box];
+  "Run npm run test:visual" [shape=box];
+  "Baselines need update?" [shape=diamond];
+  "Show playwright report URL\nwait for explicit user approval" [shape=box];
+  "Run test:visual:update" [shape=box];
   "Ask user to review" [shape=box];
   "Commit (clean message, no attribution)" [shape=box];
   "Mark [x] in TODO.md immediately" [shape=box];
@@ -84,7 +88,12 @@ digraph dev_workflow {
   "Tests pass?" -> "UI change?" [label="yes"];
   "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
   "UI change?" -> "Ask user to review" [label="no"];
-  "Visual verify (chrome-devtools-mcp)" -> "Ask user to review";
+  "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
+  "Run npm run test:visual" -> "Baselines need update?";
+  "Baselines need update?" -> "Show playwright report URL\nwait for explicit user approval" [label="yes"];
+  "Show playwright report URL\nwait for explicit user approval" -> "Run test:visual:update";
+  "Run test:visual:update" -> "Ask user to review";
+  "Baselines need update?" -> "Ask user to review" [label="no"];
   "Ask user to review" -> "Commit (clean message, no attribution)";
   "Commit (clean message, no attribution)" -> "Mark [x] in TODO.md immediately";
   "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
@@ -147,6 +156,22 @@ take_screenshot()
 list_console_messages({ types: ["error", "warn"] })
 ```
 
+**For UI changes — run visual regression tests after chrome-devtools-mcp verification:**
+
+```bash
+npm run test:visual
+```
+
+If any baselines failed:
+
+1. Run `npx playwright show-report` to get the diff viewer URL
+2. Show the URL to the user
+3. **STOP and wait** for explicit user approval ("yes, update baselines")
+4. Only after approval: run `npm run test:visual:update`
+5. Stage the updated baseline PNG files — they must be included in the subsequent commit
+
+Do **not** re-run `npm run test:visual` after the update. Proceed directly to "ask user to review." (The update command itself outputs any errors.)
+
 ---
 
 ## Phase 3: Commit & PR
@@ -171,16 +196,26 @@ Forbidden in commit messages and PR bodies:
 
 **Step 4: Ask the user "Should I create a PR?"** — do not push or create a PR without asking.
 
-**Step 5 (if yes): Push and create PR.**
+**Step 5 (if yes): Write PR body, push, and create PR.**
 
-```bash
-git push -u origin <branch>
-gh pr create --title "concise title" --body "## Summary
+Use the Write tool to create the PR body file at `/tmp/pr-body.md`:
+
+```markdown
+## Summary
 - bullet 1
 - bullet 2
 
 ## Test plan
-- [ ] what to verify"
+- [ ] what to verify
+```
+
+Then run as two **separate** Bash tool calls (not on separate lines in one call):
+
+```bash
+git push -u origin <branch>
+```
+```bash
+gh pr create --title "concise title" --body-file /tmp/pr-body.md
 ```
 
 No heredocs (`<<EOF`), no pipes (`|`), no `&&` chaining, no `$()` substitution in Bash calls. Use sequential calls.
@@ -226,6 +261,8 @@ These have zero exceptions:
 | NEVER push before `npm test` passes | Read the FULL output — type-check + lint + vitest |
 | NEVER update TODO.md lazily | Do it immediately, without being asked |
 | NEVER use `!important` in CSS | Fix the root cause instead |
+| NEVER run `test:visual:update` without user approval | Show the playwright report URL first, wait for explicit "yes, update baselines" |
+| NEVER skip approval because the cause seems obvious | The cause is irrelevant — show diffs and ask anyway |
 
 ---
 
@@ -242,3 +279,4 @@ These thoughts mean STOP — you are rationalizing:
 | "Let me push and then ask about PR" | Ask BEFORE pushing |
 | "I'll merge it to unblock the next task" | NEVER merge — wait for the user |
 | "I can use && here, it's just two commands" | No exceptions — sequential Bash calls |
+| "The baseline failure is obviously caused by my change" | Show the playwright report URL and ask the user anyway — always |
