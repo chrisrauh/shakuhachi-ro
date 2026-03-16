@@ -27,6 +27,7 @@
 
 # Git worktrees
 .worktrees
+/.claude/worktrees
 
 # Screenshots
 /screenshots
