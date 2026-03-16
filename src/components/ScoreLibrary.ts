@@ -402,7 +402,7 @@ export class ScoreLibrary {
       .score-library {
         max-width: 1200px;
         margin: 0 auto;
-        padding: var(--spacing-large);
+        padding: 0;
       }
 
       .search-bar {
@@ -667,10 +667,6 @@ export class ScoreLibrary {
       }
 
       @media (max-width: 768px) {
-        .score-library {
-          padding: var(--spacing-medium);
-        }
-
         .score-grid-section {
           grid-template-columns: 1fr;
         }

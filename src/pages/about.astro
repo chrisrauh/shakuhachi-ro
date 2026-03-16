@@ -27,7 +27,7 @@ const { Content } = await aboutPage.render();
     .about-page {
       max-width: 720px;
       margin: 0 auto;
-      padding: 0 var(--spacing-medium);
+      padding: 0;
     }
 
     .about-section {
@@ -146,10 +146,6 @@ const { Content } = await aboutPage.render();
     }
 
     @media (max-width: 768px) {
-      .about-page {
-        padding: 0 var(--spacing-small);
-      }
-
       .about-section :global(h2) {
         font-size: var(--font-size-large);
       }
