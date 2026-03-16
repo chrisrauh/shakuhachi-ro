@@ -24,7 +24,7 @@ const { Content } = await helpPage.render();
     .help-page {
       max-width: 720px;
       margin: 0 auto;
-      padding: 0 var(--spacing-medium);
+      padding: 0;
     }
 
     .help-section {
@@ -104,10 +104,6 @@ const { Content } = await helpPage.render();
     }
 
     @media (max-width: 768px) {
-      .help-page {
-        padding: 0 var(--spacing-small);
-      }
-
       .help-section :global(h2) {
         font-size: var(--font-size-large);
       }
