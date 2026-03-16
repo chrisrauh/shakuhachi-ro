@@ -54,6 +54,10 @@
   - Ask user to find the best styling and the right values to implement
   - Remove code related to the overlay panel to choose values and themes.
 
+### Architecture
+
+- [ ] Investigate whether using Lit is beneficial for the project. We aim to use more web components in the future. YAGNI: Maybe this is something to consider when using them? https://lit.dev/ Let's assess an determine if and when Lit might be helpful.
+
 ### Score Library
 
 - [x] [UI] Update the search input to have rounded corners and not panel around it
@@ -413,3 +417,36 @@
 ### QA
 
 - [ ] [UI] [A:High] [Polish] Test across browsers (Chrome, Firefox, Safari)
+
+### Architecture
+
+- [ ] [UI] [A:Medium] [Research] Investigate standardizing page padding to always use `main` instead of per-container overrides on fullHeight pages
+  - **Goal**: Determine if all pages can get spacing from `main { padding: var(--spacing-medium) }` without each page's container needing its own padding.
+  - **Current architecture (researched 2026-03-16):**
+    - Regular pages (`fullHeight=false`): spacing comes from `main { padding: var(--spacing-medium) }` in Layout.astro — no container padding needed.
+    - fullHeight pages (`fullHeight=true`): `body.full-height main { padding: 0 }` overrides via higher specificity (`0-1-2` vs `0-0-1`), so each container sets its own padding:
+      - `/score/:slug` → `.score-detail-container { padding: var(--spacing-medium) var(--spacing-medium) 0 }`
+      - `/score/:slug/edit` → `.edit-layout { padding: var(--spacing-medium) }`
+  - **Why fullHeight pages override**: The `body.full-height main` rule exists because fullHeight pages use `flex: 1`, `height: calc(100vh - 80px)`, and `overflow: hidden`. Padding on `main` is believed to interfere with these height calculations and clip content.
+  - **Question to investigate**: Is the `padding: 0` on `body.full-height main` actually necessary, or could we give `main` its padding and let the containers handle only their specific layout concerns (flex, overflow)?
+  - **Approach**:
+    - Try adding `padding: var(--spacing-medium)` back to `body.full-height main` and removing container-level padding from score detail and edit pages
+    - Verify that score detail layout still fills viewport correctly
+    - Verify that editor side-by-side layout with `height: calc(100vh - 80px)` still works
+    - Test mobile viewports (the media query at 768px reverts fullHeight to natural scrolling — padding may behave differently there)
+    - If it works: remove per-container padding and the `body.full-height main { padding: 0 }` override
+    - If it breaks height calculations: document why the override is required and add a code comment explaining the constraint
+
+### Tooling / Guidelines
+
+- [ ] [A:Medium] [Tooling] Review and prune toast visual regression tests
+  - `tests/visual/toast.spec.ts` has 18 tests across Desktop / Mobile / Tablet but many appear to capture the same visual output (e.g. individual variant tests at desktop repeat what the "all variants" grid already covers)
+  - Review each test: does it cover a genuinely distinct visual state, or is it redundant with another test in the suite?
+  - Goal: keep tests that catch real regressions; remove duplicates that just inflate baseline count and maintenance burden
+  - Also evaluate whether Desktop + Mobile + Tablet all-variants tests are all necessary, or whether one representative viewport per theme is sufficient
+
+- [ ] [A:High] [Tooling] Add baseline-update guard to `/dev-workflow` skill
+  - The skill's visual verification step tells Claude to run `npm run test:visual` before PR but does not explicitly block running `--update-snapshots`
+  - Add a hard rule: NEVER run `--update-snapshots` without explicit user confirmation, even if the component looks correct and the root cause of a diff is understood. "The component looks correct" is NOT approval to update baselines.
+  - File: `.claude/skills/dev-workflow/SKILL.md`
+  - Place it in the NEVER table alongside the other hard rules (no `&&`, no `gh pr merge`, etc.)
