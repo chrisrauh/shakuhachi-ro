@@ -38,7 +38,20 @@ const INITIALS_HINT_KEY = 'shakuhachi-auth-initials';
 
 describe('AuthWidget avatar render', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="test-auth-widget"></div>';
+    document.body.innerHTML = `
+      <div id="test-auth-widget">
+        <button id="auth-login" class="btn btn-small btn-primary">
+          <span class="btn-text">Log In</span>
+        </button>
+        <button id="auth-signup" class="btn btn-small btn-neutral">
+          <span class="btn-text">Sign Up</span>
+        </button>
+        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn" hidden
+          aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
+          <span class="btn-text" id="auth-initials"></span>
+        </button>
+      </div>
+    `;
     localStorage.clear();
   });
 
@@ -53,10 +66,13 @@ describe('AuthWidget avatar render', () => {
     const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser({ email: 'chris@example.com' } as never);
 
-    const container = document.getElementById('test-auth-widget')!;
-    const avatarBtn = container.querySelector('.auth-avatar-btn');
-    expect(avatarBtn).not.toBeNull();
-    expect(avatarBtn!.textContent?.trim()).toBe('CH');
+    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
+    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    expect(avatarBtn.hidden).toBe(false);
+    expect(loginBtn.hidden).toBe(true);
+    expect(signupBtn.hidden).toBe(true);
+    expect(document.getElementById('auth-initials')!.textContent).toBe('CH');
   });
 
   it('does not render avatar button when no user is set', async () => {
@@ -66,8 +82,12 @@ describe('AuthWidget avatar render', () => {
     const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser(null);
 
-    const container = document.getElementById('test-auth-widget')!;
-    expect(container.querySelector('.auth-avatar-btn')).toBeNull();
+    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
+    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    expect(avatarBtn.hidden).toBe(true);
+    expect(loginBtn.hidden).toBe(false);
+    expect(signupBtn.hidden).toBe(false);
   });
 
   it('renders speculative disabled avatar on construction when hint is present', async () => {
@@ -77,32 +97,61 @@ describe('AuthWidget avatar render', () => {
     const authModal = new AuthModal();
     new AuthWidget('test-auth-widget', authModal);
 
-    const container = document.getElementById('test-auth-widget')!;
-    const avatarBtn = container.querySelector(
-      '.auth-avatar-btn',
-    ) as HTMLButtonElement;
-    expect(avatarBtn).not.toBeNull();
-    expect(avatarBtn.textContent?.trim()).toBe('CR');
+    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    expect(avatarBtn.hidden).toBe(false);
     expect(avatarBtn.disabled).toBe(true);
+    expect(document.getElementById('auth-initials')!.textContent).toBe('CR');
   });
 
   it('leaves SSR buttons intact on construction when no hint is present', async () => {
     document.body.innerHTML = `
       <div id="test-auth-widget">
-        <div>
-          <button id="auth-login">Log In</button>
-          <button id="auth-signup">Sign Up</button>
-        </div>
+        <button id="auth-login" class="btn btn-small btn-primary">
+          <span class="btn-text">Log In</span>
+        </button>
+        <button id="auth-signup" class="btn btn-small btn-neutral">
+          <span class="btn-text">Sign Up</span>
+        </button>
+        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn" hidden
+          aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
+          <span class="btn-text" id="auth-initials"></span>
+        </button>
       </div>
     `;
+    const container = document.getElementById('test-auth-widget')!;
+    const snapshotBefore = container.outerHTML;
+
     const { AuthWidget } = await import('./AuthComponents');
     const { AuthModal } = await import('./AuthModal');
     const authModal = new AuthModal();
     new AuthWidget('test-auth-widget', authModal);
 
-    const container = document.getElementById('test-auth-widget')!;
-    expect(container.querySelector('#auth-login')).not.toBeNull();
-    expect(container.querySelector('.auth-avatar-btn')).toBeNull();
+    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
+    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    expect(loginBtn.hidden).toBe(false);
+    expect(signupBtn.hidden).toBe(false);
+    expect(avatarBtn.hidden).toBe(true);
+    expect(container.outerHTML).toBe(snapshotBefore);
+  });
+
+  it('shows avatar when auth-change event fires with a user', async () => {
+    const { AuthWidget } = await import('./AuthComponents');
+    const { AuthModal } = await import('./AuthModal');
+    const authModal = new AuthModal();
+    new AuthWidget('test-auth-widget', authModal);
+
+    window.dispatchEvent(
+      new CustomEvent('auth-change', { detail: { email: 'chris@example.com' } }),
+    );
+
+    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
+    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    expect(avatarBtn.hidden).toBe(false);
+    expect(loginBtn.hidden).toBe(true);
+    expect(signupBtn.hidden).toBe(true);
+    expect(document.getElementById('auth-initials')!.textContent).toBe('CH');
   });
 
   it('writes initials hint to localStorage when setUser is called with a user', async () => {
