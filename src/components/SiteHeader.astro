@@ -52,6 +52,10 @@ const { mobileMenuType = 'standard' } = Astro.props;
         <button id="auth-signup" class="btn btn-small btn-neutral">
           <span class="btn-text">Sign Up</span>
         </button>
+        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn"
+          hidden aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
+          <span class="btn-text" id="auth-initials"></span>
+        </button>
       </div>
     </div>
     <!-- Mobile menu (shown on mobile) -->

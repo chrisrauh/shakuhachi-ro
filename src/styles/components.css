@@ -196,3 +196,9 @@
 .btn-icon-with-count .count {
   line-height: var(--line-height-denser);
 }
+
+/* Ensure the HTML `hidden` attribute hides elements even when component styles set display.
+   Author styles override the UA stylesheet's `[hidden] { display: none }`, so we re-assert it here. */
+[hidden] {
+  display: none;
+}
