@@ -118,15 +118,15 @@ const { mobileMenuType = 'standard' } = Astro.props;
     text-decoration: none;
   }
   .logo-icon {
-    width: var(--size-toolbar-item);
-    height: var(--size-toolbar-item);
+    width: var(--logo-width);
+    height: var(--logo-height);
     color: var(--color-logo);
-    border-radius: var(--border-radius-2x-small);
-    font-size: 24px;
+    border-radius: var(--logo-border-radius);
+    font-size: var(--logo-character-size);
     text-align: center;
-    line-height: 24px;
-    font-weight: 450;
-    border: 2px solid var(--color-logo);
+    line-height: var(--line-height-denser);
+    font-weight: var(--logo-font-weight);
+    border: var(--logo-border-width) solid var(--color-logo);
     box-sizing: border-box;
   }
 
