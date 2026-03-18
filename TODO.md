@@ -22,24 +22,7 @@
 
 ### Global / Navigation
 
-- [ ] [UI] [A:Low] [Polish] Add transition for login-action avatar swap
-  - When a user logs in via the modal, the header right side jumps from ~120px (Log In + Sign Up buttons) to 32px (avatar circle) instantly
-  - Consider a CSS transition on `#auth-widget` content during `AuthWidget.render()` swaps — fade old content out, fade new content in
-  - Only worth doing if the jump feels jarring in practice after the localStorage hint lands (implement hint first, then evaluate)
-  - `src/components/AuthComponents.ts` — `render()` is the swap point
-  - consider other transition from logged in to logged out or logged out to logged in
-
-- [ ] [UI] [A:Medium] [Polish] Reduce auth button markup duplication between SSR and JS
-  - **Context (validate before implementing — code may have changed):** The logged-out auth buttons (`#auth-login`, `#auth-signup`) appear in two places:
-    - `src/components/SiteHeader.astro` — SSR-rendered static default (added in PR #195 to avoid layout shift before JS loads)
-    - `src/components/AuthComponents.ts` — JS re-renders the same markup when it confirms the user is logged out at runtime
-  - **Root cause:** Astro and TypeScript can't share templates across the SSR/runtime boundary, so the markup is duplicated
-  - **Risk:** If one is updated, the other must be kept in sync manually
-  - **Options:**
-    - **Skip JS re-render when already logged out** — in `render()`, if `#auth-login` already exists in the container, just (re-)attach listeners instead of replacing `innerHTML`. SSR stays as source of truth for the initial state; JS only writes markup when transitioning from logged-in → logged-out. Markup still lives in two places but the redundant DOM write on every page load is eliminated.
-    - **Remove SSR markup, always let JS render** — eliminates duplication entirely but brings back the layout shift PR #195 fixed.
-    - **Accept with sync comment** — add a comment in both places noting they must stay in sync.
-  - Also check: `attachLoggedOutListeners()` in the constructor exists specifically to wire up the SSR-rendered buttons without a re-render — any solution should account for this pattern
+- [x] [UI] [A:Medium] [Polish] Reduce auth button markup duplication between SSR and JS
 
 - [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
   - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
