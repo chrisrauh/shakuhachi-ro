@@ -160,8 +160,9 @@ export class AuthWidget {
   public setUser(user: User | null): void {
     this.currentUser = user;
     if (user) {
-      writeInitialsHint(getInitials(user.email ?? ''));
-      this.showLoggedIn(getInitials(user.email ?? ''));
+      const initials = getInitials(user.email ?? '');
+      writeInitialsHint(initials);
+      this.showLoggedIn(initials);
     } else {
       clearInitialsHint();
       this.showLoggedOut();
