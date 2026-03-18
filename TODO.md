@@ -24,7 +24,7 @@
 
 - [x] [UI] [A:Medium] [Polish] Reduce auth button markup duplication between SSR and JS
 
-- [ ] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
+- [x] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
   - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
   - Set `font-size` on `.logo-icon` to a token (e.g. 1.5rem for the character, making the box `calc(4/3 * 1em)` = 32px equivalent)
   - Consider whether `border` should also scale (`0.125em`) or stay at `2px`
