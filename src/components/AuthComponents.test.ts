@@ -37,21 +37,23 @@ vi.mock('../api/auth', () => ({
 const INITIALS_HINT_KEY = 'shakuhachi-auth-initials';
 
 describe('AuthWidget avatar render', () => {
+  const FIXTURE_HTML = `
+    <div id="test-auth-widget">
+      <button id="auth-login" class="btn btn-small btn-primary">
+        <span class="btn-text">Log In</span>
+      </button>
+      <button id="auth-signup" class="btn btn-small btn-neutral">
+        <span class="btn-text">Sign Up</span>
+      </button>
+      <button id="auth-avatar" class="btn btn-icon auth-avatar-btn" hidden
+        aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
+        <span class="btn-text" id="auth-initials"></span>
+      </button>
+    </div>
+  `;
+
   beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="test-auth-widget">
-        <button id="auth-login" class="btn btn-small btn-primary">
-          <span class="btn-text">Log In</span>
-        </button>
-        <button id="auth-signup" class="btn btn-small btn-neutral">
-          <span class="btn-text">Sign Up</span>
-        </button>
-        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn" hidden
-          aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
-          <span class="btn-text" id="auth-initials"></span>
-        </button>
-      </div>
-    `;
+    document.body.innerHTML = FIXTURE_HTML;
     localStorage.clear();
   });
 
@@ -104,20 +106,7 @@ describe('AuthWidget avatar render', () => {
   });
 
   it('leaves SSR buttons intact on construction when no hint is present', async () => {
-    document.body.innerHTML = `
-      <div id="test-auth-widget">
-        <button id="auth-login" class="btn btn-small btn-primary">
-          <span class="btn-text">Log In</span>
-        </button>
-        <button id="auth-signup" class="btn btn-small btn-neutral">
-          <span class="btn-text">Sign Up</span>
-        </button>
-        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn" hidden
-          aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
-          <span class="btn-text" id="auth-initials"></span>
-        </button>
-      </div>
-    `;
+    document.body.innerHTML = FIXTURE_HTML;
     const container = document.getElementById('test-auth-widget')!;
     const snapshotBefore = container.outerHTML;
 
