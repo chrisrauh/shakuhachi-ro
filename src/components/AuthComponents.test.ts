@@ -68,9 +68,13 @@ describe('AuthWidget avatar render', () => {
     const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser({ email: 'chris@example.com' } as never);
 
-    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const avatarBtn = document.getElementById(
+      'auth-avatar',
+    ) as HTMLButtonElement;
     const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
-    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    const signupBtn = document.getElementById(
+      'auth-signup',
+    ) as HTMLButtonElement;
     expect(avatarBtn.hidden).toBe(false);
     expect(loginBtn.hidden).toBe(true);
     expect(signupBtn.hidden).toBe(true);
@@ -84,9 +88,13 @@ describe('AuthWidget avatar render', () => {
     const widget = new AuthWidget('test-auth-widget', authModal);
     widget.setUser(null);
 
-    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const avatarBtn = document.getElementById(
+      'auth-avatar',
+    ) as HTMLButtonElement;
     const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
-    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    const signupBtn = document.getElementById(
+      'auth-signup',
+    ) as HTMLButtonElement;
     expect(avatarBtn.hidden).toBe(true);
     expect(loginBtn.hidden).toBe(false);
     expect(signupBtn.hidden).toBe(false);
@@ -99,7 +107,9 @@ describe('AuthWidget avatar render', () => {
     const authModal = new AuthModal();
     new AuthWidget('test-auth-widget', authModal);
 
-    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const avatarBtn = document.getElementById(
+      'auth-avatar',
+    ) as HTMLButtonElement;
     expect(avatarBtn.hidden).toBe(false);
     expect(avatarBtn.disabled).toBe(true);
     expect(document.getElementById('auth-initials')!.textContent).toBe('CR');
@@ -115,9 +125,13 @@ describe('AuthWidget avatar render', () => {
     const authModal = new AuthModal();
     new AuthWidget('test-auth-widget', authModal);
 
-    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const avatarBtn = document.getElementById(
+      'auth-avatar',
+    ) as HTMLButtonElement;
     const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
-    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    const signupBtn = document.getElementById(
+      'auth-signup',
+    ) as HTMLButtonElement;
     expect(loginBtn.hidden).toBe(false);
     expect(signupBtn.hidden).toBe(false);
     expect(avatarBtn.hidden).toBe(true);
@@ -131,12 +145,18 @@ describe('AuthWidget avatar render', () => {
     new AuthWidget('test-auth-widget', authModal);
 
     window.dispatchEvent(
-      new CustomEvent('auth-change', { detail: { email: 'chris@example.com' } }),
+      new CustomEvent('auth-change', {
+        detail: { email: 'chris@example.com' },
+      }),
     );
 
-    const avatarBtn = document.getElementById('auth-avatar') as HTMLButtonElement;
+    const avatarBtn = document.getElementById(
+      'auth-avatar',
+    ) as HTMLButtonElement;
     const loginBtn = document.getElementById('auth-login') as HTMLButtonElement;
-    const signupBtn = document.getElementById('auth-signup') as HTMLButtonElement;
+    const signupBtn = document.getElementById(
+      'auth-signup',
+    ) as HTMLButtonElement;
     expect(avatarBtn.hidden).toBe(false);
     expect(loginBtn.hidden).toBe(true);
     expect(signupBtn.hidden).toBe(true);
