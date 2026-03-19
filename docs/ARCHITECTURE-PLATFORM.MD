@@ -140,6 +140,8 @@ Vanilla TypeScript classes with a simple `constructor(containerId) → render() 
 
 The platform uses the `<shakuhachi-score>` web component directly. Score JSON is embedded in HTML by the server; the component reads it via `data-score` attribute. No framework coupling — the renderer is framework-agnostic.
 
+**Web component library (Lit):** Currently all web components are vanilla `HTMLElement`. [Lit](https://lit.dev/) (~5KB) would reduce boilerplate via reactive properties and declarative templates. Evaluate adopting Lit when scoping the **next** web component — at that point migrate both components together for consistency.
+
 ## Deployment
 
 **Platform:** Netlify with SSR via Netlify Functions. Automatic deploys from main branch; preview deploys for PRs.
@@ -159,14 +161,14 @@ The platform uses the `<shakuhachi-score>` web component directly. Score JSON is
 ## CSS / Styling
 
 Global styles live in two files imported in `src/layouts/Layout.astro`:
-- `src/styles/tokens/themes.css` — CSS custom properties (colors, spacing, typography)
+- `src/styles/theme.css` — CSS custom properties (colors, spacing, typography)
 - `src/styles/components.css` — shared component classes (`.btn`, `.btn-text`, etc.)
 
 **Import pattern — use frontmatter imports, not `@import` inside `<style>` blocks:**
 
 ```astro
 ---
-import '../styles/tokens/themes.css';
+import '../styles/theme.css';
 import '../styles/components.css';
 ---
 ```
