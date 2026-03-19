@@ -20,10 +20,6 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Architecture
-
-- [ ] Investigate whether using Lit is beneficial for the project. We aim to use more web components in the future. YAGNI: Maybe this is something to consider when using them? https://lit.dev/ Let's assess an determine if and when Lit might be helpful.
-
 ### Score Library
 
 - [ ] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
