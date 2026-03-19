@@ -72,10 +72,11 @@
 .auth-avatar-btn {
   border-radius: var(--border-radius-circle);
   background: var(--color-bg-active);
+  border: var(--input-border-width) solid var(--color-border);
   color: var(--color-text-primary);
-  font-size: var(--font-size-medium);
-  font-weight: var(--font-weight-normal);
-  line-height: 1;
+  font-size: var(--font-size-small);
+  font-weight: 550;
+  letter-spacing: -0.05em;
   user-select: none;
   flex-shrink: 0;
 }
