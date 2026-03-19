@@ -45,6 +45,10 @@
 
 - [x] [UI] Update the search input to have rounded corners and not panel around it
 
+- [ ] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
+
+- [ ] Add an intro to the website on the top of the page for new users to know what the site is about.
+
 - [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
   - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
 
@@ -63,6 +67,18 @@
 - [ ] [UI] [A:Medium] [Renderer-Future] Add score selector dropdown
 - [ ] [Backend] [A:Medium] [Renderer-Future] Load different score files dynamically
 - [ ] [Both] [A:Medium] [Advanced] Advanced search (filter by tags, difficulty, date ranges)
+
+### Info pages (About, Help, etc...)
+
+- [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
+
+- [ ] the embed example seems misaligned on mobile
+
+- [ ] Add the full embed code to the example so the visitor can see how the score itself if represented (and how easy it is)
+
+- [ ] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
+
+- [ ] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
 
 ### Score Detail / View
 
