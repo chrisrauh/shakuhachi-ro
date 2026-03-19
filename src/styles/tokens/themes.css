@@ -706,7 +706,7 @@
   --logo-character-size: 1.5rem; /* 24px - ロ glyph font-size within the 32px box */
   --logo-border-width: 0.10em; /* border thickness relative to character size */
   --logo-border-radius: var(--border-radius-2x-small); /* 1px */
-  --logo-font-weight: 450;
+  --logo-font-weight: var(--font-weight-medium);
   --logo-width: var(--size-toolbar-item); /* 32px */
   --logo-height: var(--size-toolbar-item); /* 32px */
 
@@ -766,7 +766,9 @@
 
   --font-weight-light: 300;
   --font-weight-normal: 400;
+  --font-weight-medium: 450;
   --font-weight-semibold: 500;
+  --font-weight-semibold-heavy: 550;
   --font-weight-bold: 700;
 
   --line-height-denser: 1;
@@ -775,6 +777,7 @@
   --line-height-loose: 2.2;
   --line-height-looser: 2.6;
 
+  --letter-spacing-densest: -0.05em;
   --letter-spacing-denser: -0.03em;
   --letter-spacing-dense: -0.015em;
   --letter-spacing-normal: normal;

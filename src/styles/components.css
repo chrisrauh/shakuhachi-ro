@@ -26,8 +26,8 @@
 .btn-text {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
-  letter-spacing: -0.05em;
-  font-weight: 450;
+  letter-spacing: var(--letter-spacing-densest);
+  font-weight: var(--font-weight-medium);
 }
 
 .btn:disabled {
@@ -72,10 +72,11 @@
 .auth-avatar-btn {
   border-radius: var(--border-radius-circle);
   background: var(--color-bg-active);
+  border: var(--input-border-width) solid var(--color-border);
   color: var(--color-text-primary);
-  font-size: var(--font-size-medium);
-  font-weight: var(--font-weight-normal);
-  line-height: 1;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold-heavy);
+  letter-spacing: var(--letter-spacing-densest);
   user-select: none;
   flex-shrink: 0;
 }
