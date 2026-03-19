@@ -20,25 +20,11 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Global / Navigation
-
-- [x] [UI] [A:Medium] [Polish] Reduce auth button markup duplication between SSR and JS
-
-- [x] [UI] [A:Medium] [Polish] Make logo icon use relative sizing (em-based)
-  - `src/components/SiteHeader.astro` — `.logo-icon` uses hardcoded px values (`width: 32px`, `height: 32px`, `font-size: 24px`, `line-height: 24px`, `border: 2px`). Since the logo is a text character (ロ), all dimensions can be expressed relative to a single `font-size` using `em` units so the logo scales naturally with font size changes (user zoom, accessibility settings)
-  - Set `font-size` on `.logo-icon` to a token (e.g. 1.5rem for the character, making the box `calc(4/3 * 1em)` = 32px equivalent)
-  - Consider whether `border` should also scale (`0.125em`) or stay at `2px`
-  - The `min-height: 32px` in `.header-metadata` mobile media query derives from the logo height — update it to match the new token-based size
-  - Verify alignment still holds across all four header states (title-only / title+metadata × mobile / desktop)
-
-
 ### Architecture
 
 - [ ] Investigate whether using Lit is beneficial for the project. We aim to use more web components in the future. YAGNI: Maybe this is something to consider when using them? https://lit.dev/ Let's assess an determine if and when Lit might be helpful.
 
 ### Score Library
-
-- [x] [UI] Update the search input to have rounded corners and not panel around it
 
 - [ ] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
 
