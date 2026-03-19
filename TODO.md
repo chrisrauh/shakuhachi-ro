@@ -31,11 +31,6 @@
   - The `min-height: 32px` in `.header-metadata` mobile media query derives from the logo height — update it to match the new token-based size
   - Verify alignment still holds across all four header states (title-only / title+metadata × mobile / desktop)
 
-- [ ] Refine the Avatar styling
-  - Consider styling like the other action buttons, styling like a secondary button, styling like a primary button (prepare a way to toggle between multiple theming options with the overlay panel)
-  - Add an option on the overlay panel to play with font weifght and size
-  - Ask user to find the best styling and the right values to implement
-  - Remove code related to the overlay panel to choose values and themes.
 
 ### Architecture
 
