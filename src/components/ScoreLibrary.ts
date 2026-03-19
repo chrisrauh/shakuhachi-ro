@@ -414,6 +414,21 @@ export class ScoreLibrary {
         margin: 0 auto var(--spacing-x-large);
       }
 
+      .search-bar-field {
+        position: relative;
+      }
+
+      .search-bar-icon {
+        position: absolute;
+        left: var(--spacing-medium);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-secondary);
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+      }
+
       .score-count {
         color: var(--color-text-secondary);
         font-size: var(--font-size-small);
@@ -423,7 +438,7 @@ export class ScoreLibrary {
 
       .search-bar input {
         width: 100%;
-        padding: var(--input-spacing-small) var(--spacing-large);
+        padding: var(--input-spacing-small) var(--spacing-large) var(--input-spacing-small) var(--spacing-3x-large);
         border: var(--input-border-width) solid var(--input-border-color);
         border-radius: var(--border-radius-pill);
         font-size: var(--input-font-size-medium);
