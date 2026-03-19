@@ -48,7 +48,9 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false,
 
     <!-- Dev Tools (only rendered in dev mode) -->
     {import.meta.env.DEV && (
-      <div id="letter-spacing-control" class="dev-panel"></div>
+      <div class="dev-controls">
+        <div id="letter-spacing-control" class="dev-panel"></div>
+      </div>
     )}
 
     <style is:global>
@@ -115,14 +117,20 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false,
         pointer-events: none;
       }
 
-      /* Dev panel - floating bottom-right */
-      .dev-panel {
+      /* Dev controls - fixed column stack, bottom-right */
+      .dev-controls {
         position: fixed;
         bottom: var(--spacing-medium);
         right: var(--spacing-medium);
         z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-x-small);
         max-width: 280px;
       }
+
+      /* Dev panel - individual panel within the stack */
+      .dev-panel { }
 
       /* Tweakpane theme integration */
       .dev-panel :global(.tp-dfwv) {
