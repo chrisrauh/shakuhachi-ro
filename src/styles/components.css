@@ -26,7 +26,7 @@
 .btn-text {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
-  letter-spacing: var(--letter-spacing-tight);
+  letter-spacing: var(--letter-spacing-densest);
   font-weight: var(--font-weight-medium);
 }
 
@@ -75,8 +75,8 @@
   border: var(--input-border-width) solid var(--color-border);
   color: var(--color-text-primary);
   font-size: var(--font-size-small);
-  font-weight: var(--font-weight-semibold-plus);
-  letter-spacing: var(--letter-spacing-tight);
+  font-weight: var(--font-weight-semibold-heavy);
+  letter-spacing: var(--letter-spacing-densest);
   user-select: none;
   flex-shrink: 0;
 }
