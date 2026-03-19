@@ -766,7 +766,9 @@
 
   --font-weight-light: 300;
   --font-weight-normal: 400;
+  --font-weight-medium: 450;
   --font-weight-semibold: 500;
+  --font-weight-semibold-plus: 550;
   --font-weight-bold: 700;
 
   --line-height-denser: 1;
@@ -776,6 +778,7 @@
   --line-height-looser: 2.6;
 
   --letter-spacing-denser: -0.03em;
+  --letter-spacing-tight: -0.05em;
   --letter-spacing-dense: -0.015em;
   --letter-spacing-normal: normal;
   --letter-spacing-loose: 0.075em;
