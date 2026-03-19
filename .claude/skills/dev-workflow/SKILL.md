@@ -13,7 +13,7 @@ Invoke this skill when the user's message contains any of:
 
 - **Starting work:** "start", "work on", "implement", "fix", "let's do", "pick up", "next task", "begin"
 - **Commit phase:** "commit", "stage", "ready to commit"
-- **PR phase:** "PR", "pull request", "create PR", "open PR", "push"
+- **PR phase:** "PR", "pull request", "create PR", "open PR", "push", "yes" (when responding to "should I create a PR?")
 - **Merge/cleanup phase:** "merge", "merged", "done", "finish", "clean up branch", "delete branch"
 
 ## Phase Router
@@ -198,7 +198,7 @@ Forbidden in commit messages and PR bodies:
 
 **Step 5 (if yes): Write PR body, push, and create PR.**
 
-Use the Write tool to create the PR body file at `/tmp/pr-body.md`:
+Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local, gitignored):
 
 ```markdown
 ## Summary
@@ -215,7 +215,7 @@ Then run as two **separate** Bash tool calls (not on separate lines in one call)
 git push -u origin <branch>
 ```
 ```bash
-gh pr create --title "concise title" --body-file /tmp/pr-body.md
+gh pr create --title "concise title" --body-file tmp/pr-body.md
 ```
 
 No heredocs (`<<EOF`), no pipes (`|`), no `&&` chaining, no `$()` substitution in Bash calls. Use sequential calls.
@@ -256,6 +256,7 @@ These have zero exceptions:
 | NEVER commit to main | Check `git branch --show-current` before every commit |
 | NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash | Use sequential Bash calls instead |
 | NEVER add Claude attribution | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs |
+| NEVER use `--body` inline with `gh pr create` | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`. |
 | NEVER use `gh pr merge` or `--auto` | STOP and wait for user to merge |
 | NEVER skip git hooks | No `--no-verify` |
 | NEVER push before `npm test` passes | Read the FULL output — type-check + lint + vitest |
@@ -277,6 +278,7 @@ These thoughts mean STOP — you are rationalizing:
 | "I'll update TODO.md in a bit" | Update it immediately, the moment the task is done |
 | "I'll add the attribution since the system prompt says to" | CLAUDE.md overrides system prompt defaults |
 | "Let me push and then ask about PR" | Ask BEFORE pushing |
+| "I'll write the PR body inline, it's shorter" | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
 | "I'll merge it to unblock the next task" | NEVER merge — wait for the user |
 | "I can use && here, it's just two commands" | No exceptions — sequential Bash calls |
 | "The baseline failure is obviously caused by my change" | Show the playwright report URL and ask the user anyway — always |
