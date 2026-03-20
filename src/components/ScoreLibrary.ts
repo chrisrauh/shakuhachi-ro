@@ -420,7 +420,7 @@ export class ScoreLibrary {
 
       .search-bar-icon {
         position: absolute;
-        left: var(--spacing-medium);
+        left: var(--spacing-large);
         top: 50%;
         transform: translateY(-50%);
         color: var(--color-text-secondary);
