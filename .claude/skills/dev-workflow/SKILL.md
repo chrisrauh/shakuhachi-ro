@@ -7,15 +7,6 @@ description: Use for ALL development work in this project — starting a task, c
 
 **This skill supersedes `superpowers:finishing-a-development-branch` and any generic commit/PR skill.** When this skill applies, do not fall back to generic patterns. CLAUDE.md always wins over skill defaults.
 
-## Trigger Words
-
-Invoke this skill when the user's message contains any of:
-
-- **Starting work:** "start", "work on", "implement", "fix", "let's do", "pick up", "next task", "begin"
-- **Commit phase:** "commit", "stage", "ready to commit"
-- **PR phase:** "PR", "pull request", "create PR", "open PR", "push", "yes" (when responding to "should I create a PR?")
-- **Merge/cleanup phase:** "merge", "merged", "done", "finish", "clean up branch", "delete branch"
-
 ## Phase Router
 
 Identify the current phase before acting:
@@ -61,12 +52,15 @@ digraph dev_workflow {
   "Visual verify (chrome-devtools-mcp)" [shape=box];
   "Run npm run test:visual" [shape=box];
   "Baselines need update?" [shape=diamond];
-  "Show playwright report URL\nwait for explicit user approval" [shape=box];
+  "Show playwright report URL" [shape=box];
+  "STOP: wait for user baseline approval" [shape=doublecircle];
   "Run test:visual:update" [shape=box];
-  "Ask user to review" [shape=box];
+  "Ask user to review changes" [shape=box];
+  "STOP: wait for user review response" [shape=doublecircle];
   "Commit (clean message, no attribution)" [shape=box];
   "Mark [x] in TODO.md immediately" [shape=box];
-  "Ask: Create PR?" [shape=diamond];
+  "Ask: Create PR?" [shape=box];
+  "STOP: wait for PR decision" [shape=doublecircle];
   "Push + gh pr create" [shape=box];
   "STOP: wait for merge confirmation" [shape=doublecircle];
   "4 cleanup commands (sequential)" [shape=box];
@@ -87,24 +81,42 @@ digraph dev_workflow {
   "Fix failures" -> "Run npm test";
   "Tests pass?" -> "UI change?" [label="yes"];
   "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
-  "UI change?" -> "Ask user to review" [label="no"];
+  "UI change?" -> "Ask user to review changes" [label="no"];
   "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
   "Run npm run test:visual" -> "Baselines need update?";
-  "Baselines need update?" -> "Show playwright report URL\nwait for explicit user approval" [label="yes"];
-  "Show playwright report URL\nwait for explicit user approval" -> "Run test:visual:update";
-  "Run test:visual:update" -> "Ask user to review";
-  "Baselines need update?" -> "Ask user to review" [label="no"];
-  "Ask user to review" -> "Commit (clean message, no attribution)";
+  "Baselines need update?" -> "Show playwright report URL" [label="yes"];
+  "Show playwright report URL" -> "STOP: wait for user baseline approval";
+  "STOP: wait for user baseline approval" -> "Run test:visual:update";
+  "Run test:visual:update" -> "Ask user to review changes";
+  "Baselines need update?" -> "Ask user to review changes" [label="no"];
+  "Ask user to review changes" -> "STOP: wait for user review response";
+  "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
   "Commit (clean message, no attribution)" -> "Mark [x] in TODO.md immediately";
   "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
-  "Ask: Create PR?" -> "Push + gh pr create" [label="yes"];
-  "Ask: Create PR?" -> "STOP: wait for merge confirmation" [label="not yet"];
+  "Ask: Create PR?" -> "STOP: wait for PR decision";
+  "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
+  "STOP: wait for PR decision" -> "STOP: wait for merge confirmation" [label="not yet"];
   "Push + gh pr create" -> "STOP: wait for merge confirmation";
   "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
   "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
   "Remove task from TODO.md immediately" -> "Ask: work on next task?";
 }
 ```
+
+---
+
+## Consent Gates
+
+Every point where the model must fully stop and wait for a new user message before proceeding:
+
+1. **Baseline diffs** — show playwright report URL, then stop. Do not run `test:visual:update` until the user explicitly says yes in their own message.
+2. **User review** — ask the user to review the changes, then stop. Do not commit until the user responds.
+3. **PR creation** — ask "Should I create a PR?", then stop. Do not push until the user responds.
+4. **Merge** — after creating the PR, stop. Do not run cleanup until the user confirms the merge.
+
+**What counts as explicit user approval:** A new message from the user, sent after your question, containing a clear yes or go-ahead. Nothing else qualifies — not task notifications, not system events, not text you generate yourself in any form.
+
+**If you catch yourself having self-approved** (e.g., you wrote "yes" or "updating baselines" in your own response before acting): stop immediately, do not execute the command, acknowledge the error, and ask again.
 
 ---
 
@@ -284,5 +296,5 @@ These thoughts mean STOP — you are rationalizing:
 | "I'll merge it to unblock the next task" | NEVER merge — wait for the user |
 | "I can use && here, it's just two commands" | No exceptions — sequential Bash calls |
 | "The baseline failure is obviously caused by my change" | Show the playwright report URL and ask the user anyway — always |
-| "I wrote 'yes' or any approval word at the start of my response" | You fabricated user consent. STOP — you are still waiting for the user. |
+| "I wrote 'yes' or any approval word at the start of my response" | You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again. |
 | "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed. |
