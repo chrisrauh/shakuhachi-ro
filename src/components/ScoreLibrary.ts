@@ -210,6 +210,17 @@ export class ScoreLibrary {
     btn.hidden = !this.searchQuery;
   }
 
+  private clearSearch(): void {
+    this.handleSearch('');
+    const input = this.container.querySelector(
+      '#search-input',
+    ) as HTMLInputElement | null;
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+  }
+
   private renderGridContent(): string {
     // User logged in with scores - show two sections
     if (this.currentUser && this.myScores.length > 0) {
@@ -375,20 +386,13 @@ export class ScoreLibrary {
     // Clear button click
     const clearBtn = this.container.querySelector('#search-clear-btn');
     clearBtn?.addEventListener('click', () => {
-      this.searchQuery = '';
-      const searchInput = this.container.querySelector(
-        '#search-input',
-      ) as HTMLInputElement;
-      if (searchInput) searchInput.value = '';
-      this.applyFilters();
+      this.clearSearch();
     });
 
     // Escape key on search input
-    searchInput?.addEventListener('keydown', (e) => {
-      if ((e as KeyboardEvent).key === 'Escape' && this.searchQuery) {
-        this.searchQuery = '';
-        (e.target as HTMLInputElement).value = '';
-        this.applyFilters();
+    searchInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && this.searchQuery) {
+        this.clearSearch();
       }
     });
 
