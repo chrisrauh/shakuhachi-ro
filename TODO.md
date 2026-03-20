@@ -22,9 +22,6 @@
 
 ### Score Library
 
-- [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
-  - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
-
 - [ ] [UI] [A:High] [Quality-DRY] Deduplicate empty-state grid template in ScoreLibrary
   - `src/components/ScoreLibrary.ts:114-127` and `157-170` — The "No scores found" HTML with the conditional "Clear Filters" button is duplicated verbatim in `render()` and `renderGrid()`. Extract to a private method `renderEmptyState(): string` called from both places.
 
