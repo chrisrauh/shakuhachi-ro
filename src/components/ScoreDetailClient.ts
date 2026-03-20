@@ -57,21 +57,19 @@ export class ScoreDetailClient {
     }
   }
 
+  private isOwner(user: User | null): boolean {
+    return !!(user && this.score && user.id === this.score.user_id);
+  }
+
   private handleEditButtonVisibility(user: User | null) {
     if (!this.score) return;
-
-    const isOwner = !!(user && user.id === this.score.user_id);
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-    const editBtn = document.getElementById('edit-btn') as HTMLElement;
-    if (editBtn) {
-      editBtn.style.display = isOwner && !isMobile ? 'inline-flex' : 'none';
-    }
-
-    const deleteBtn = document.getElementById('delete-btn') as HTMLElement;
-    if (deleteBtn) {
-      deleteBtn.style.display = isOwner && !isMobile ? 'inline-flex' : 'none';
-    }
+    const visible = this.isOwner(user);
+    document
+      .getElementById('edit-btn')
+      ?.classList.toggle('owner-visible', visible);
+    document
+      .getElementById('delete-btn')
+      ?.classList.toggle('owner-visible', visible);
   }
 
   private async renderScore() {

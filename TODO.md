@@ -20,6 +20,36 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
+### Score Detail / View
+
+- [ ] [Both] [A:High] [Quality-Separation] Refactor button visibility in ScoreDetailClient: CSS-class approach, remove inline styles and !important
+  - `src/components/ScoreDetailClient.ts:60-75`, `src/pages/score/[slug].astro`
+  - **Problem:** `handleEditButtonVisibility` sets `element.style.display` (inline styles), which forces `!important` in the mobile CSS override for `#edit-btn`. Also: method mixes auth check + DOM query + style mutation; `delete-btn` has no mobile override (inconsistency); `isMobile` JS check doesn't respond to window resize.
+  - **Approach (decided in brainstorm):**
+    1. Add `private isOwner(user: User | null): boolean` pure method
+    2. Rewrite `handleEditButtonVisibility` to `classList.toggle('owner-visible', isOwner(user))` — remove `isMobile` check from JS entirely
+    3. In `[slug].astro`: remove `style="display: none;"` from both buttons; add `class="owner-btn"` to both
+    4. CSS: `.owner-btn { display: none; }` (safe default, replaces inline style), `.owner-btn.owner-visible { display: inline-flex; }`, `@media (max-width: 768px) { .owner-btn.owner-visible { display: none; } }` (same specificity → no !important needed, also handles resize)
+    5. Remove `:global(#edit-btn) { display: none !important; }` mobile override
+
+- [ ] [Backend] [A:Medium] [Quality-DRY] Evaluate/implement format dispatch refactor in ScoreDetailClient.renderScore()
+  - `src/components/ScoreDetailClient.ts:95-115`, `src/utils/format-converter.ts`
+  - **Problem:** 17-line if/else block dispatches to MusicXMLParser, ABCParser (dynamic import), or JSON identity — duplicating logic already in `parseFormat()` in format-converter.
+  - **Blockers identified in brainstorm — decide approach first:**
+    1. JSON type mismatch: `score.data` for JSON is a parsed object (Supabase JSONB), but `parseFormat('json')` calls `JSON.parse(string)` — can't pass object directly
+    2. Dynamic import: ABCParser is lazy-loaded currently; format-converter statically imports it — using parseFormat changes bundling
+    3. Error handling: current code renders inline error div for unknown format; parseFormat throws
+  - **Options:** (A) Handle JSON as identity pass-through, use `parseFormat` only for musicxml — keeps dynamic ABC import, reduces to ~5 lines for the string formats. (B) Skip refactor entirely (YAGNI — current code is explicit and correct, abstraction doesn't cleanly fit). Lean toward B unless there's a clear DRY win.
+
+- [ ] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
+  - `src/components/ScoreDetailClient.ts:12-15, 26` — `interface ScoreData { score: Score; parentScore: Score | null }` shadows the renderer's `ScoreData` type (already aliased as `RendererScoreData` on line 9 to paper over this). Rename local interface to `ScorePageData`, update its one usage on line 26. Optionally un-alias the import on line 9 back to `ScoreData` after rename.
+
+- [ ] [UI] [A:Medium] [Renderer-Future] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
+- [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
+
+- [ ] [UI] [A:Low] [Polish] Move attribution data from footer to top of page
+  - Needs ux design
+
 ### Info pages (About, Help, etc...)
 
 - [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
@@ -31,23 +61,6 @@
 - [ ] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
 
 - [ ] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
-
-### Score Detail / View
-
-- [ ] [UI] [A:High] [Polish] Move attribution data from fotter to top of page
-  - Needs ux design
-
-- [ ] [Both] [A:High] [Quality-Separation] Separate auth check from DOM mutation in ScoreDetailClient.handleEditButtonVisibility
-  - `src/components/ScoreDetailClient.ts:49-57` — One method queries auth state, finds a DOM element, and sets inline styles. Split into: (a) a pure check `isOwner(): boolean` and (b) a DOM updater that uses CSS classes (`editBtn.classList.add('visible')`) instead of inline styles. This makes the authorization logic testable without a DOM.
-
-- [ ] [Backend] [A:High] [Quality-Separation] Move MusicXML parsing out of ScoreDetailClient
-  - `src/components/ScoreDetailClient.ts:79-84` — The UI component directly imports `MusicXMLParser` and calls `MusicXMLParser.parse()` to convert stored data before rendering. This parsing concern should live in a shared utility (e.g., `parseScoreByFormat(data, format)`) so that every component that renders a score doesn't need to know about format-specific parsing.
-
-- [ ] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
-  - `src/components/ScoreDetailClient.ts:7-10` — Defines `interface ScoreData { score: Score; parentScore: Score | null }` which shadows the `ScoreData` type from `src/types/ScoreData.ts`. Rename to `ScorePageData` or `EmbeddedScoreData` to avoid confusion when reading imports.
-
-- [ ] [UI] [A:Medium] [Renderer-Future] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
-- [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
 
 ### Score Editor
 

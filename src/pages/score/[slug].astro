@@ -48,18 +48,16 @@ if (score?.forked_from) {
   <div slot="header-actions" style="display: flex; gap: var(--spacing-small); align-items: center;">
     <!-- Owner-only edit button -->
     <a href={`/score/${score.slug}/edit`}
-       class="btn btn-icon"
+       class="btn btn-icon owner-btn"
        id="edit-btn"
-       aria-label="Edit score"
-       style="display: none;">
+       aria-label="Edit score">
       <SquarePen size={16} />
     </a>
 
     <!-- Owner-only delete button -->
     <button id="delete-btn"
-            class="btn btn-icon"
-            aria-label="Delete score"
-            style="display: none;">
+            class="btn btn-icon owner-btn"
+            aria-label="Delete score">
       <Trash2 size={16} />
     </button>
 
@@ -219,7 +217,6 @@ if (score?.forked_from) {
       flex-shrink: 0;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
       :global(.score-header-metadata) {
         flex-direction: column;
@@ -231,10 +228,8 @@ if (score?.forked_from) {
         font-size: var(--font-size-medium);
       }
 
-      /* Hide desktop edit button on mobile - shown in menu instead */
-      :global(#edit-btn) {
-        display: none !important;
-      }
+      /* Hide owner buttons on mobile — shown in menu instead */
+      :global(.btn.owner-btn.owner-visible) { display: none; }
 
       .floating-edit-btn {
         top: 120px;
