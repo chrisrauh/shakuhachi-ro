@@ -20,23 +20,6 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Score Library
-
-- [ ] [UI] [A:Medium] [Quality-UX] Add clear (✕) icon button to search input field
-  - `src/components/ScoreLibrary.ts` — When searchQuery is non-empty, show an ✕ icon inside the
-    search field (right side) that clears the query on click. Also clear on Escape key. Replaces
-    the now-removed "Clear Filters" button that was incorrectly placed inside the results grid.
-
-- [x] [UI] [A:High] [Quality-DRY] Deduplicate score card click listener attachment in ScoreLibrary
-  - `src/components/ScoreLibrary.ts:179-187` and `attachEventListeners()` — Score card click listeners are attached in two separate methods (after full render and after grid-only partial update). Extract to a single `attachCardListeners(container: Element)` method called from both paths.
-
-- [x] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreLibrary component logic
-  - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
-
-- [ ] [UI] [A:Medium] [Renderer-Future] Add score selector dropdown
-- [ ] [Backend] [A:Medium] [Renderer-Future] Load different score files dynamically
-- [ ] [Both] [A:Medium] [Advanced] Advanced search (filter by tags, difficulty, date ranges)
-
 ### Info pages (About, Help, etc...)
 
 - [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
