@@ -276,3 +276,29 @@ describe('ScoreLibrary constructor', () => {
     );
   });
 });
+
+// --- Clear button visibility ---
+
+describe('ScoreLibrary clear button', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="score-library"></div>';
+  });
+
+  it('clear button is hidden when searchQuery is empty', () => {
+    new ScoreLibrary('score-library');
+    const btn = document.getElementById('search-clear-btn');
+    expect(btn).not.toBeNull();
+    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(false);
+  });
+
+  it('clear button is not hidden when searchQuery is non-empty', () => {
+    new ScoreLibrary('score-library');
+    ScoreLibrary.prototype['updateClearButton'].call({
+      searchQuery: 'test',
+      container: document.getElementById('score-library'),
+    });
+    const btn = document.getElementById('search-clear-btn');
+    expect(btn).not.toBeNull();
+    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(true);
+  });
+});
