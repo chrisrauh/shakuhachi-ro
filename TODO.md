@@ -22,7 +22,7 @@
 
 ### Score Library
 
-- [ ] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
+- [x] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
 
 - [ ] Add an intro to the website on the top of the page for new users to know what the site is about.
 

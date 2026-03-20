@@ -1,6 +1,7 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
-import { renderIcon, initIcons } from '../utils/icons';
+import { Search } from 'lucide';
+import { renderIcon, initIcons, getIconHTML } from '../utils/icons';
 import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
@@ -140,12 +141,15 @@ export class ScoreLibrary {
     this.container.innerHTML = `
       <div class="score-library">
         <div class="search-bar">
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Search by title or composer..."
-            value="${this.searchQuery}"
-          />
+          <div class="search-bar-field">
+            <span class="search-bar-icon" aria-hidden="true">${getIconHTML(Search)}</span>
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search by title or composer..."
+              value="${this.searchQuery}"
+            />
+          </div>
         </div>
 
         <div class="score-library-grid" id="score-grid">
@@ -406,7 +410,23 @@ export class ScoreLibrary {
       }
 
       .search-bar {
-        margin-bottom: var(--spacing-x-large);
+        max-width: 640px;
+        margin: 0 auto var(--spacing-x-large);
+      }
+
+      .search-bar-field {
+        position: relative;
+      }
+
+      .search-bar-icon {
+        position: absolute;
+        left: var(--spacing-large);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-secondary);
+        pointer-events: none;
+        display: flex;
+        align-items: center;
       }
 
       .score-count {
@@ -418,7 +438,7 @@ export class ScoreLibrary {
 
       .search-bar input {
         width: 100%;
-        padding: var(--input-spacing-small) var(--spacing-large);
+        padding: var(--input-spacing-small) var(--spacing-large) var(--input-spacing-small) var(--spacing-3x-large);
         border: var(--input-border-width) solid var(--input-border-color);
         border-radius: var(--border-radius-pill);
         font-size: var(--input-font-size-medium);
