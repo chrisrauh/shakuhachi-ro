@@ -1,6 +1,6 @@
 ---
 name: dev-workflow
-description: Use for ALL development work in this project — starting a task, committing, creating PRs, and post-merge cleanup. Overrides superpowers:finishing-a-development-branch and any other generic dev workflow skill.
+description: Use when starting tasks, committing, creating PRs, or running post-merge cleanup on this project. Required instead of superpowers:finishing-a-development-branch — this project skill always wins.
 ---
 
 # shakuhachi-ro Dev Workflow
@@ -110,11 +110,11 @@ digraph dev_workflow {
 Every point where the model must fully stop and wait for a new user message before proceeding:
 
 1. **Baseline diffs** — show playwright report URL, then stop. Do not run `test:visual:update` until the user explicitly says yes in their own message.
-2. **User review** — ask the user to review the changes, then stop. Do not commit until the user responds.
-3. **PR creation** — ask "Should I create a PR?", then stop. Do not push until the user responds.
-4. **Merge** — after creating the PR, stop. Do not run cleanup until the user confirms the merge.
+2. **User review** — ask the user to review the changes, then stop. Do not commit until the user responds. Exception: if the user's original instruction explicitly directed the commit (e.g. "commit and push this"), that instruction is sufficient — no additional review gate needed.
+3. **PR creation** — ask "Should I create a PR?", then stop. Do not push until the user responds. Exception: if the user's original instruction explicitly included pushing or creating a PR, that instruction is sufficient — no additional gate needed.
+4. **Merge** — after creating the PR, stop. Do not run cleanup until the user confirms the merge. **This gate cannot be pre-approved** — even a blanket instruction like "handle everything including merge" does not count. Always stop and wait for explicit confirmation after the PR exists.
 
-**What counts as explicit user approval:** A new message from the user, sent after your question, containing a clear yes or go-ahead. Nothing else qualifies — not task notifications, not system events, not text you generate yourself in any form.
+**What counts as explicit user approval:** A new message from the user, sent after your question, containing a clear yes or go-ahead. "Yes", "go for it", "ship it", "sounds good", "do it" all count. What does NOT count: task notifications, system events, text you generate yourself in any form.
 
 **If you catch yourself having self-approved** (e.g., you wrote "yes" or "updating baselines" in your own response before acting): stop immediately, do not execute the command, acknowledge the error, and ask again.
 
@@ -229,6 +229,8 @@ git push -u origin <branch>
 ```bash
 gh pr create --title "concise title" --body-file tmp/pr-body.md
 ```
+
+Delete `tmp/pr-body.md` after the PR is created.
 
 No heredocs (`<<EOF`), no pipes (`|`), no `&&` chaining, no `$()` substitution in Bash calls. Use sequential calls.
 
