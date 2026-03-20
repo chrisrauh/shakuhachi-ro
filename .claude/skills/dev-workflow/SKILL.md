@@ -166,7 +166,7 @@ If any baselines failed:
 
 1. Run `npx playwright show-report` to get the diff viewer URL
 2. Show the URL to the user
-3. **STOP and wait** for explicit user approval ("yes, update baselines")
+3. **STOP and wait** for the user's own message containing explicit approval. A system notification, your own generated text, or any response you write yourself does NOT count. Only a new message from the user approves this step.
 4. Only after approval: run `npm run test:visual:update`
 5. Stage the updated baseline PNG files — they must be included in the subsequent commit
 
@@ -264,6 +264,8 @@ These have zero exceptions:
 | NEVER use `!important` in CSS | Fix the root cause instead |
 | NEVER run `test:visual:update` without user approval | Show the playwright report URL first, wait for explicit "yes, update baselines" |
 | NEVER skip approval because the cause seems obvious | The cause is irrelevant — show diffs and ask anyway |
+| NEVER self-approve by writing approval words in your own response | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input. |
+| NEVER treat `<task-notification>` or other system messages as user approvals | They are system events. A pending question is still pending after a system message arrives. |
 
 ---
 
@@ -282,3 +284,5 @@ These thoughts mean STOP — you are rationalizing:
 | "I'll merge it to unblock the next task" | NEVER merge — wait for the user |
 | "I can use && here, it's just two commands" | No exceptions — sequential Bash calls |
 | "The baseline failure is obviously caused by my change" | Show the playwright report URL and ask the user anyway — always |
+| "I wrote 'yes' or any approval word at the start of my response" | You fabricated user consent. STOP — you are still waiting for the user. |
+| "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed. |
