@@ -75,6 +75,7 @@ digraph dev_workflow {
   "Verify task in code" -> "Already done?";
   "Already done?" -> "Mark done, move on" [label="yes"];
   "Already done?" -> "Make changes" [label="no"];
+  "Mark done, move on" -> "Ask: work on next task?";
   "Make changes" -> "Run npm test";
   "Run npm test" -> "Tests pass?";
   "Tests pass?" -> "Fix failures" [label="no"];
@@ -95,7 +96,6 @@ digraph dev_workflow {
   "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
   "Ask: Create PR?" -> "STOP: wait for PR decision";
   "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
-  "STOP: wait for PR decision" -> "STOP: wait for merge confirmation" [label="not yet"];
   "Push + gh pr create" -> "STOP: wait for merge confirmation";
   "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
   "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
