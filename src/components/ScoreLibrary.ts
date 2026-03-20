@@ -190,6 +190,8 @@ export class ScoreLibrary {
       e.preventDefault();
       window.location.href = '/score/new/edit';
     });
+
+    this.updateClearButton();
   }
 
   private renderNoScores(message: string): string {
@@ -198,6 +200,14 @@ export class ScoreLibrary {
         <p>${message}</p>
       </div>
     `;
+  }
+
+  private updateClearButton(): void {
+    const btn = this.container.querySelector(
+      '#search-clear-btn',
+    ) as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.hidden = !this.searchQuery;
   }
 
   private renderGridContent(): string {
@@ -360,25 +370,26 @@ export class ScoreLibrary {
     ) as HTMLInputElement;
     searchInput?.addEventListener('input', (e) => {
       this.handleSearch((e.target as HTMLInputElement).value);
-      const clearBtn = this.container.querySelector('#search-clear-btn');
-      if (clearBtn) {
-        if ((e.target as HTMLInputElement).value) {
-          clearBtn.removeAttribute('hidden');
-        } else {
-          clearBtn.setAttribute('hidden', '');
-        }
-      }
     });
 
-    // Clear button
+    // Clear button click
     const clearBtn = this.container.querySelector('#search-clear-btn');
     clearBtn?.addEventListener('click', () => {
-      this.handleSearch('');
-      if (searchInput) {
-        searchInput.value = '';
-        searchInput.focus();
+      this.searchQuery = '';
+      const searchInput = this.container.querySelector(
+        '#search-input',
+      ) as HTMLInputElement;
+      if (searchInput) searchInput.value = '';
+      this.applyFilters();
+    });
+
+    // Escape key on search input
+    searchInput?.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Escape' && this.searchQuery) {
+        this.searchQuery = '';
+        (e.target as HTMLInputElement).value = '';
+        this.applyFilters();
       }
-      clearBtn.setAttribute('hidden', '');
     });
 
     // Score cards
