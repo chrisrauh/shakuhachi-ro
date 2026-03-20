@@ -178,25 +178,20 @@ export class ScoreLibrary {
     // Reattach score card listeners
     this.attachScoreCardListeners(gridElement);
 
-    // Reattach clear filters button if present
-    const clearFiltersBtn = gridElement.querySelector('#clear-filters-btn');
-    clearFiltersBtn?.addEventListener('click', () => {
-      this.searchQuery = '';
-      this.applyFilters();
-
-      // Update UI controls
-      const searchInput = this.container.querySelector(
-        '#search-input',
-      ) as HTMLInputElement;
-      if (searchInput) searchInput.value = '';
-    });
-
     // Reattach create score link listener if present
     const createScoreLink = gridElement.querySelector('.create-score-link');
     createScoreLink?.addEventListener('click', (e) => {
       e.preventDefault();
       window.location.href = '/score/new/edit';
     });
+  }
+
+  private renderNoScores(message: string): string {
+    return `
+      <div class="no-scores">
+        <p>${message}</p>
+      </div>
+    `;
   }
 
   private renderGridContent(): string {
@@ -212,11 +207,9 @@ export class ScoreLibrary {
         <div class="score-grid-section">
           ${
             this.filteredMyScores.length === 0
-              ? `
-            <div class="no-scores">
-              <p>No scores found matching "${this.searchQuery}"</p>
-            </div>
-          `
+              ? this.renderNoScores(
+                  `No scores found matching "${this.escapeHtml(this.searchQuery)}"`,
+                )
               : this.filteredMyScores
                   .map((score) => this.renderScoreCard(score))
                   .join('')
@@ -232,11 +225,11 @@ export class ScoreLibrary {
         <div class="score-grid-section">
           ${
             this.filteredLibraryScores.length === 0
-              ? `
-            <div class="no-scores">
-              <p>${this.searchQuery ? `No scores found matching "${this.searchQuery}"` : 'No other scores yet'}</p>
-            </div>
-          `
+              ? this.renderNoScores(
+                  this.searchQuery
+                    ? `No scores found matching "${this.escapeHtml(this.searchQuery)}"`
+                    : 'No scores in the library yet',
+                )
               : this.filteredLibraryScores
                   .map((score) => this.renderScoreCard(score))
                   .join('')
@@ -278,18 +271,11 @@ export class ScoreLibrary {
       <div class="score-grid-section">
         ${
           this.filteredLibraryScores.length === 0
-            ? `
-          <div class="no-scores">
-            <p>No scores found</p>
-            ${
-              this.searchQuery
-                ? `
-              <button id="clear-filters-btn" class="btn btn-small btn-primary"><span class="btn-text">Clear Filters</span></button>
-            `
-                : ''
-            }
-          </div>
-        `
+            ? this.renderNoScores(
+                this.searchQuery
+                  ? `No scores found matching "${this.escapeHtml(this.searchQuery)}"`
+                  : 'No scores in the library yet',
+              )
             : this.filteredLibraryScores
                 .map((score) => this.renderScoreCard(score))
                 .join('')
@@ -372,13 +358,6 @@ export class ScoreLibrary {
 
     // Score cards
     this.attachScoreCardListeners(this.container);
-
-    // Clear filters button
-    const clearFiltersBtn = this.container.querySelector('#clear-filters-btn');
-    clearFiltersBtn?.addEventListener('click', () => {
-      this.searchQuery = '';
-      this.applyFilters();
-    });
 
     // Create score link
     const createScoreLink = this.container.querySelector('.create-score-link');
