@@ -14,6 +14,11 @@ export const prerender = true;
     <button id="delete-banner-close" class="delete-banner-close" aria-label="Dismiss">✕</button>
   </div>
 
+  <div class="library-intro">
+    <p class="library-intro-headline">Write and discover shakuhachi scores</p>
+    <p class="library-intro-subtitle">Browse the library, fork a score to edit, or create your own.</p>
+  </div>
+
   <div id="score-library"></div>
 
   <script is:inline>
@@ -58,6 +63,26 @@ export const prerender = true;
       font-size: var(--font-size-base);
       line-height: 1;
       flex-shrink: 0;
+    }
+
+    .library-intro {
+      margin: var(--spacing-small) auto var(--spacing-2x-large);
+      text-align: center;
+    }
+
+    .library-intro-headline {
+      font-size: var(--font-size-2x-large);
+      color: var(--color-text-primary);
+      font-weight: 900;
+      margin: 0 0 var(--spacing-x-small);
+      line-height: 1.15em;
+      letter-spacing: -0.025;
+    }
+
+    .library-intro-subtitle {
+      font-size: var(--font-size-small);
+      color: var(--color-text-secondary);
+      margin: 0;
     }
   </style>
 </Layout>
