@@ -1,6 +1,6 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
-import { Search } from 'lucide';
+import { Search, CircleX } from 'lucide';
 import { renderIcon, initIcons, getIconHTML } from '../utils/icons';
 import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
@@ -147,6 +147,12 @@ export class ScoreLibrary {
               placeholder="Search by title or composer..."
               value="${this.searchQuery}"
             />
+            <button
+              class="search-bar-clear"
+              id="search-clear-btn"
+              aria-label="Clear search"
+              ${this.searchQuery ? '' : 'hidden'}
+            >${getIconHTML(CircleX)}</button>
           </div>
         </div>
 
@@ -354,6 +360,25 @@ export class ScoreLibrary {
     ) as HTMLInputElement;
     searchInput?.addEventListener('input', (e) => {
       this.handleSearch((e.target as HTMLInputElement).value);
+      const clearBtn = this.container.querySelector('#search-clear-btn');
+      if (clearBtn) {
+        if ((e.target as HTMLInputElement).value) {
+          clearBtn.removeAttribute('hidden');
+        } else {
+          clearBtn.setAttribute('hidden', '');
+        }
+      }
+    });
+
+    // Clear button
+    const clearBtn = this.container.querySelector('#search-clear-btn');
+    clearBtn?.addEventListener('click', () => {
+      this.handleSearch('');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      clearBtn.setAttribute('hidden', '');
     });
 
     // Score cards

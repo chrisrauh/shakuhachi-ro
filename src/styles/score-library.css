@@ -24,6 +24,27 @@
   align-items: center;
 }
 
+.search-bar-clear {
+  position: absolute;
+  right: var(--spacing-large);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+  line-height: 0;
+}
+
+.search-bar-clear:hover {
+  color: var(--color-text-primary);
+}
+
 .score-count {
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
@@ -33,7 +54,7 @@
 
 .search-bar input {
   width: 100%;
-  padding: var(--input-spacing-small) var(--spacing-large) var(--input-spacing-small) var(--spacing-3x-large);
+  padding: var(--input-spacing-small) var(--spacing-3x-large) var(--input-spacing-small) var(--spacing-3x-large);
   border: var(--input-border-width) solid var(--input-border-color);
   border-radius: var(--border-radius-pill);
   font-size: var(--input-font-size-medium);
