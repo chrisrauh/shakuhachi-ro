@@ -22,10 +22,6 @@
 
 ### Score Library
 
-- [x] Add a search icon to the search field (model on the google search field layout). Make the field max-width 640px.
-
-- [x] Add an intro to the website on the top of the page for new users to know what the site is about.
-
 - [ ] [UI] [A:High] [Quality-SingleResp] Extract ScoreLibrary inline CSS into a stylesheet
   - `src/components/ScoreLibrary.ts` — Same pattern as ScoreEditor. The `addStyles()` method injects ~250 lines of CSS. Move to `src/styles/score-library.css`.
 
@@ -420,9 +416,3 @@
   - Review each test: does it cover a genuinely distinct visual state, or is it redundant with another test in the suite?
   - Goal: keep tests that catch real regressions; remove duplicates that just inflate baseline count and maintenance burden
   - Also evaluate whether Desktop + Mobile + Tablet all-variants tests are all necessary, or whether one representative viewport per theme is sufficient
-
-- [x] [A:High] [Tooling] Add baseline-update guard to `/dev-workflow` skill
-  - The skill's visual verification step tells Claude to run `npm run test:visual` before PR but does not explicitly block running `--update-snapshots`
-  - Add a hard rule: NEVER run `--update-snapshots` without explicit user confirmation, even if the component looks correct and the root cause of a diff is understood. "The component looks correct" is NOT approval to update baselines.
-  - File: `.claude/skills/dev-workflow/SKILL.md`
-  - Place it in the NEVER table alongside the other hard rules (no `&&`, no `gh pr merge`, etc.)
