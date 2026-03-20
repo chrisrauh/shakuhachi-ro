@@ -190,7 +190,7 @@ Do **not** re-run `npm run test:visual` after the update. Proceed directly to "a
 
 **Step 1: Ask the user to review before committing.**
 
-Do not commit until the user has seen the changes.
+Do not commit until the user has seen the changes. Exception: if the user's original instruction explicitly directed the commit (e.g. "commit and push this"), skip this gate — that instruction is sufficient.
 
 **Step 2: Commit with a clean message — no attribution.**
 
