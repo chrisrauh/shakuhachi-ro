@@ -33,9 +33,6 @@
 - [x] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreLibrary component logic
   - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
 
-- [ ] [Backend] [A:High] [Quality-DRY] Move curated score slugs to a configuration file [Claude validated]
-  - `src/api/scores.ts:444-454` — `getCuratedScoreSlugs()` returns a hardcoded array `['akatombo', 'love-story', 'sakura-sakura', 'kojo-no-tsuki', 'kuroda-bushi', 'shika-no-tone', 'tsuru-no-sugomori']`. Adding a new curated score requires editing TypeScript source code and redeploying. Move to a JSON config file (e.g., `src/data/curated-scores.json`) or read from the database, so the score catalog can be updated without code changes.
-
 - [ ] [UI] [A:Medium] [Renderer-Future] Add score selector dropdown
 - [ ] [Backend] [A:Medium] [Renderer-Future] Load different score files dynamically
 - [ ] [Both] [A:Medium] [Advanced] Advanced search (filter by tags, difficulty, date ranges)

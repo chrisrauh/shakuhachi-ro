@@ -24,6 +24,8 @@ Statically prerendered (`export const prerender = true`). Empty shell page; clie
 
 SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client initializes renderer, handles fork/delete actions.
 
+**Rendering strategy:** All score pages render on-demand (SSR). Static prerendering was considered but ruled out because score owners can edit at any time and edits must be immediately visible. SSR is the correct choice given this constraint. If page load latency becomes a user-facing problem in the future, revisit with Netlify CDN edge caching and a purge-on-save call from `ScoreEditor`.
+
 **Components:** `ScoreDetailClient.ts` (fork, delete), `<shakuhachi-score>` web component (notation rendering)
 
 **Fork flow:** User clicks "Fork" → `forkScore()` API call → new score created → redirect to `/score/[slug]/edit`

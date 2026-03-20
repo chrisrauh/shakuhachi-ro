@@ -466,19 +466,3 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     };
   }
 }
-
-/**
- * Get list of curated scores for static prerendering
- * These are the official library scores that exist as static files
- */
-export function getCuratedScoreSlugs(): string[] {
-  return [
-    'akatombo', // reference: reference/score-data/Akatombo.musicxml
-    'love-story', // reference: reference/score-data/love-story.json
-    'sakura-sakura', // reference: reference/score-data/sakura-sakura.json
-    'kojo-no-tsuki', // reference: reference/score-data/kojo-no-tsuki.json
-    'kuroda-bushi', // reference: reference/score-data/kuroda-bushi.json
-    'shika-no-tone', // reference: reference/score-data/shika-no-tone.json
-    'tsuru-no-sugomori', // reference: reference/score-data/tsuru-no-sugomori.json
-  ];
-}
