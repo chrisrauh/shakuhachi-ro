@@ -1,0 +1,93 @@
+digraph dev_workflow_combined {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+
+  subgraph cluster_0 {
+    label="phase_router";
+      "Message received" [shape=doublecircle];
+    "Starting new work?" [shape=diamond];
+    "Code done, need to commit?" [shape=diamond];
+    "Committed, need PR?" [shape=diamond];
+    "PR merged?" [shape=diamond];
+    "Phase 1: Start" [shape=box];
+    "Phase 2+3: Implement, Test, Commit & PR" [shape=box];
+    "Phase 4: Merge Cleanup" [shape=box];
+  
+    "Message received" -> "Starting new work?";
+    "Starting new work?" -> "Phase 1: Start" [label="yes"];
+    "Starting new work?" -> "Code done, need to commit?" [label="no"];
+    "Code done, need to commit?" -> "Phase 2+3: Implement, Test, Commit & PR" [label="yes"];
+    "Code done, need to commit?" -> "Committed, need PR?" [label="no"];
+    "Committed, need PR?" -> "Phase 2+3: Implement, Test, Commit & PR" [label="yes"];
+    "Committed, need PR?" -> "PR merged?" [label="no"];
+    "PR merged?" -> "Phase 4: Merge Cleanup" [label="yes"];
+  }
+
+  subgraph cluster_1 {
+    label="dev_workflow";
+      "Task assigned" [shape=doublecircle];
+    "Check branch" [shape=box];
+    "On main?" [shape=diamond];
+    "Create feature branch" [shape=box];
+    "Verify task in code" [shape=box];
+    "Already done?" [shape=diamond];
+    "Mark done, move on" [shape=box];
+    "Make changes" [shape=box];
+    "Run npm test" [shape=box];
+    "Tests pass?" [shape=diamond];
+    "Fix failures" [shape=box];
+    "UI change?" [shape=diamond];
+    "Visual verify (chrome-devtools-mcp)" [shape=box];
+    "Run npm run test:visual" [shape=box];
+    "Baselines need update?" [shape=diamond];
+    "Show playwright report URL" [shape=box];
+    "STOP: wait for user baseline approval" [shape=doublecircle];
+    "Run test:visual:update" [shape=box];
+    "Ask user to review changes" [shape=box];
+    "STOP: wait for user review response" [shape=doublecircle];
+    "Commit (clean message, no attribution)" [shape=box];
+    "Mark [x] in TODO.md immediately" [shape=box];
+    "Ask: Create PR?" [shape=box];
+    "STOP: wait for PR decision" [shape=doublecircle];
+    "Push + gh pr create" [shape=box];
+    "STOP: wait for merge confirmation" [shape=doublecircle];
+    "4 cleanup commands (sequential)" [shape=box];
+    "Remove task from TODO.md immediately" [shape=box];
+    "Ask: work on next task?" [shape=doublecircle];
+  
+    "Task assigned" -> "Check branch";
+    "Check branch" -> "On main?";
+    "On main?" -> "Create feature branch" [label="yes"];
+    "On main?" -> "Verify task in code" [label="no"];
+    "Create feature branch" -> "Verify task in code";
+    "Verify task in code" -> "Already done?";
+    "Already done?" -> "Mark done, move on" [label="yes"];
+    "Already done?" -> "Make changes" [label="no"];
+    "Mark done, move on" -> "Ask: work on next task?";
+    "Make changes" -> "Run npm test";
+    "Run npm test" -> "Tests pass?";
+    "Tests pass?" -> "Fix failures" [label="no"];
+    "Fix failures" -> "Run npm test";
+    "Tests pass?" -> "UI change?" [label="yes"];
+    "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
+    "UI change?" -> "Ask user to review changes" [label="no"];
+    "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
+    "Run npm run test:visual" -> "Baselines need update?";
+    "Baselines need update?" -> "Show playwright report URL" [label="yes"];
+    "Show playwright report URL" -> "STOP: wait for user baseline approval";
+    "STOP: wait for user baseline approval" -> "Run test:visual:update";
+    "Run test:visual:update" -> "Ask user to review changes";
+    "Baselines need update?" -> "Ask user to review changes" [label="no"];
+    "Ask user to review changes" -> "STOP: wait for user review response";
+    "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
+    "Commit (clean message, no attribution)" -> "Mark [x] in TODO.md immediately";
+    "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
+    "Ask: Create PR?" -> "STOP: wait for PR decision";
+    "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
+    "Push + gh pr create" -> "STOP: wait for merge confirmation";
+    "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
+    "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
+    "Remove task from TODO.md immediately" -> "Ask: work on next task?";
+  }
+}
