@@ -497,7 +497,8 @@ export class ScoreLibrary {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin: var(--spacing-x-large) 0;
+        margin-top: var(--spacing-x-large);
+        margin-bottom: 0;
       }
 
       .section-header:first-child {
