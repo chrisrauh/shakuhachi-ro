@@ -22,16 +22,6 @@
 
 ### Score Detail / View
 
-- [x] [Both] [A:High] [Quality-Separation] Refactor button visibility in ScoreDetailClient: CSS-class approach, remove inline styles and !important
-  - `src/components/ScoreDetailClient.ts:60-75`, `src/pages/score/[slug].astro`
-  - **Problem:** `handleEditButtonVisibility` sets `element.style.display` (inline styles), which forces `!important` in the mobile CSS override for `#edit-btn`. Also: method mixes auth check + DOM query + style mutation; `delete-btn` has no mobile override (inconsistency); `isMobile` JS check doesn't respond to window resize.
-  - **Approach (decided in brainstorm):**
-    1. Add `private isOwner(user: User | null): boolean` pure method
-    2. Rewrite `handleEditButtonVisibility` to `classList.toggle('owner-visible', isOwner(user))` — remove `isMobile` check from JS entirely
-    3. In `[slug].astro`: remove `style="display: none;"` from both buttons; add `class="owner-btn"` to both
-    4. CSS: `.owner-btn { display: none; }` (safe default, replaces inline style), `.owner-btn.owner-visible { display: inline-flex; }`, `@media (max-width: 768px) { .owner-btn.owner-visible { display: none; } }` (same specificity → no !important needed, also handles resize)
-    5. Remove `:global(#edit-btn) { display: none !important; }` mobile override
-
 - [ ] [Backend] [A:Medium] [Quality-DRY] Evaluate/implement format dispatch refactor in ScoreDetailClient.renderScore()
   - `src/components/ScoreDetailClient.ts:95-115`, `src/utils/format-converter.ts`
   - **Problem:** 17-line if/else block dispatches to MusicXMLParser, ABCParser (dynamic import), or JSON identity — duplicating logic already in `parseFormat()` in format-converter.
