@@ -6,7 +6,7 @@
 
 .search-bar {
   max-width: 640px;
-  margin: 0 auto var(--spacing-x-large);
+  margin: var(--spacing-2x-large) auto var(--spacing-2x-large);
 }
 
 .search-bar-field {
@@ -36,13 +36,22 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: color var(--transition-fast);
+  color: var(--color-text-tertiary);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast);
   line-height: 0;
 }
 
+.search-bar-clear.search-bar-clear--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .search-bar-clear:hover {
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }
 
 .score-count {

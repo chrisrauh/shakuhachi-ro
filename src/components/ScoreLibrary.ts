@@ -148,10 +148,10 @@ export class ScoreLibrary {
               value="${this.searchQuery}"
             />
             <button
-              class="search-bar-clear"
+              class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
               id="search-clear-btn"
               aria-label="Clear search"
-              ${this.searchQuery ? '' : 'hidden'}
+              type="button"
             >${getIconHTML(CircleX)}</button>
           </div>
         </div>
@@ -207,7 +207,7 @@ export class ScoreLibrary {
       '#search-clear-btn',
     ) as HTMLButtonElement | null;
     if (!btn) return;
-    btn.hidden = !this.searchQuery;
+    btn.classList.toggle('search-bar-clear--visible', !!this.searchQuery);
   }
 
   private clearSearch(): void {

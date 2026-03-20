@@ -288,7 +288,7 @@ describe('ScoreLibrary clear button', () => {
     new ScoreLibrary('score-library');
     const btn = document.getElementById('search-clear-btn');
     expect(btn).not.toBeNull();
-    expect(btn!.hasAttribute('hidden')).toBe(true);
+    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(false);
   });
 
   it('clear button is not hidden when searchQuery is non-empty', () => {
@@ -299,6 +299,6 @@ describe('ScoreLibrary clear button', () => {
     });
     const btn = document.getElementById('search-clear-btn');
     expect(btn).not.toBeNull();
-    expect(btn!.hasAttribute('hidden')).toBe(false);
+    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(true);
   });
 });
