@@ -22,18 +22,15 @@
 
 ### Score Library
 
-- [x] [UI] [A:High] [Quality-DRY] Deduplicate empty-state grid template in ScoreLibrary
-  - `src/components/ScoreLibrary.ts:114-127` and `157-170` — The "No scores found" HTML with the conditional "Clear Filters" button is duplicated verbatim in `render()` and `renderGrid()`. Extract to a private method `renderEmptyState(): string` called from both places.
-
 - [ ] [UI] [A:Medium] [Quality-UX] Add clear (✕) icon button to search input field
   - `src/components/ScoreLibrary.ts` — When searchQuery is non-empty, show an ✕ icon inside the
     search field (right side) that clears the query on click. Also clear on Escape key. Replaces
     the now-removed "Clear Filters" button that was incorrectly placed inside the results grid.
 
-- [ ] [UI] [A:High] [Quality-DRY] Deduplicate score card click listener attachment in ScoreLibrary
+- [x] [UI] [A:High] [Quality-DRY] Deduplicate score card click listener attachment in ScoreLibrary
   - `src/components/ScoreLibrary.ts:179-187` and `attachEventListeners()` — Score card click listeners are attached in two separate methods (after full render and after grid-only partial update). Extract to a single `attachCardListeners(container: Element)` method called from both paths.
 
-- [ ] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreLibrary component logic
+- [x] [Both] [A:High] [Quality-Testing] Add unit tests for ScoreLibrary component logic
   - `src/components/ScoreLibrary.ts` has 0 tests. Test: search filtering logic, score card rendering with correct data, empty state rendering, pagination behavior if applicable.
 
 - [ ] [Backend] [A:High] [Quality-DRY] Move curated score slugs to a configuration file [Claude validated]
