@@ -22,7 +22,7 @@
 
 ### Score Detail / View
 
-- [ ] [Both] [A:High] [Quality-Separation] Refactor button visibility in ScoreDetailClient: CSS-class approach, remove inline styles and !important
+- [x] [Both] [A:High] [Quality-Separation] Refactor button visibility in ScoreDetailClient: CSS-class approach, remove inline styles and !important
   - `src/components/ScoreDetailClient.ts:60-75`, `src/pages/score/[slug].astro`
   - **Problem:** `handleEditButtonVisibility` sets `element.style.display` (inline styles), which forces `!important` in the mobile CSS override for `#edit-btn`. Also: method mixes auth check + DOM query + style mutation; `delete-btn` has no mobile override (inconsistency); `isMobile` JS check doesn't respond to window resize.
   - **Approach (decided in brainstorm):**
