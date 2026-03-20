@@ -1,6 +1,6 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
-import { Search } from 'lucide';
+import { Search, CircleX } from 'lucide';
 import { renderIcon, initIcons, getIconHTML } from '../utils/icons';
 import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
@@ -147,6 +147,12 @@ export class ScoreLibrary {
               placeholder="Search by title or composer..."
               value="${this.searchQuery}"
             />
+            <button
+              class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
+              id="search-clear-btn"
+              aria-label="Clear search"
+              type="button"
+            >${getIconHTML(CircleX)}</button>
           </div>
         </div>
 
@@ -184,6 +190,8 @@ export class ScoreLibrary {
       e.preventDefault();
       window.location.href = '/score/new/edit';
     });
+
+    this.updateClearButton();
   }
 
   private renderNoScores(message: string): string {
@@ -192,6 +200,25 @@ export class ScoreLibrary {
         <p>${message}</p>
       </div>
     `;
+  }
+
+  private updateClearButton(): void {
+    const btn = this.container.querySelector(
+      '#search-clear-btn',
+    ) as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.classList.toggle('search-bar-clear--visible', !!this.searchQuery);
+  }
+
+  private clearSearch(): void {
+    this.handleSearch('');
+    const input = this.container.querySelector(
+      '#search-input',
+    ) as HTMLInputElement | null;
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
   }
 
   private renderGridContent(): string {
@@ -354,6 +381,19 @@ export class ScoreLibrary {
     ) as HTMLInputElement;
     searchInput?.addEventListener('input', (e) => {
       this.handleSearch((e.target as HTMLInputElement).value);
+    });
+
+    // Clear button click
+    const clearBtn = this.container.querySelector('#search-clear-btn');
+    clearBtn?.addEventListener('click', () => {
+      this.clearSearch();
+    });
+
+    // Escape key on search input
+    searchInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && this.searchQuery) {
+        this.clearSearch();
+      }
     });
 
     // Score cards
