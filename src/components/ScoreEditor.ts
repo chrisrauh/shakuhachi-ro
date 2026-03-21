@@ -268,18 +268,8 @@ export class ScoreEditor {
       try {
         const isMobile = window.innerWidth < 768;
 
-        let scoreData;
-        if (this.dataFormat === 'json') {
-          scoreData = JSON.parse(this.scoreData);
-        } else if (this.dataFormat === 'musicxml') {
-          const { MusicXMLParser } =
-            await import('../web-component/parser/MusicXMLParser');
-          scoreData = MusicXMLParser.parse(this.scoreData);
-        } else if (this.dataFormat === 'abc') {
-          const { ABCParser } =
-            await import('../web-component/parser/ABCParser');
-          scoreData = ABCParser.parse(this.scoreData);
-        }
+        const { parseScoreText } = await import('../utils/score-data');
+        const scoreData = await parseScoreText(this.scoreData, this.dataFormat);
 
         externalPreview.innerHTML =
           '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
@@ -339,16 +329,8 @@ export class ScoreEditor {
       const isMobile = window.innerWidth < 768;
 
       let scoreData;
-      if (this.dataFormat === 'json') {
-        scoreData = JSON.parse(this.scoreData);
-      } else if (this.dataFormat === 'musicxml') {
-        const { MusicXMLParser } =
-          await import('../web-component/parser/MusicXMLParser');
-        scoreData = MusicXMLParser.parse(this.scoreData);
-      } else if (this.dataFormat === 'abc') {
-        const { ABCParser } = await import('../web-component/parser/ABCParser');
-        scoreData = ABCParser.parse(this.scoreData);
-      }
+      const { parseScoreText } = await import('../utils/score-data');
+      scoreData = await parseScoreText(this.scoreData, this.dataFormat);
 
       previewContainer.innerHTML =
         '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
