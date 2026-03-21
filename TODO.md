@@ -20,26 +20,7 @@
 
 ## Prioritized Backlog (Sorted by User Impact)
 
-### Score Detail / View
-
-- [x] [Backend] [A:Medium] [Quality-DRY] Evaluate/implement format dispatch refactor in ScoreDetailClient.renderScore()
-  - **Resolved:** Created `src/utils/score-data.ts` with `toScoreData(score)` and `parseScoreText(text, format)`. ScoreDetailClient uses `toScoreData`; ScoreEditor preview uses `parseScoreText`. Both parsers dynamically imported for optimal bundling.
-
-- [x] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
-  - **Resolved:** The `RendererScoreData` alias import was removed entirely as part of the format dispatch refactor — ScoreDetailClient no longer references `ScoreData` from the renderer directly. The shadowing concern is gone.
-
-- [ ] [Backend] [A:Medium] [Architecture] Evaluate moving format parsing into the web component / renderer package
-  - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
-
-- [ ] [UI] [A:Medium] [Renderer-Future] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
-- [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
-
-- [ ] [UI] [A:Low] [Polish] Move attribution data from footer to top of page
-  - Needs ux design
-
 ### Info pages (About, Help, etc...)
-
-- [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
 
 - [ ] the embed example seems misaligned on mobile
 
@@ -48,6 +29,8 @@
 - [ ] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
 
 - [ ] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
+
+- [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
 
 ### Score Editor
 
@@ -77,9 +60,6 @@
 
 - [ ] [Backend] [A:High] [Quality-SingleResp] Extract localStorage autosave logic out of ScoreEditor
   - `src/components/ScoreEditor.ts:125-141` — `setupLocalStorageAutoSave()`, `saveToLocalStorage()`, and `checkAndOfferDraftRestore()` form a self-contained persistence concern: debounce management, per-slug key naming, serialization format, and draft/DB timestamp comparison. Extract to `src/utils/editor-autosave.ts` (or a small `EditorAutosave` class) that takes a slug and serialization callbacks. Makes the logic testable without a full editor instance.
-
-- [x] [Backend] [A:High] [Quality-DRY] Deduplicate updatePreview() in ScoreEditor
-  - **Resolved:** Both preview paths now use `parseScoreText()` from `src/utils/score-data.ts` instead of inline format dispatch.
 
 - [ ] [Both] [A:Low] [Architecture] Decompose ScoreEditor into model + view
   - `ScoreEditor.ts` is ~930 lines mixing 8+ concerns: state (instance variables), DOM generation (`innerHTML` templates), event wiring, API calls, validation, localStorage autosave, preview rendering, and CSS injection. This monolith makes adding versioning, collaboration, or format plugins require invasive surgery on a single file.
@@ -126,6 +106,9 @@
 - [ ] [Backend] [A:Medium] [Advanced] Private scores (unlisted or private visibility)
 
 ### Renderer Library
+
+- [ ] [Backend] [A:Medium] [Architecture] Evaluate moving format parsing into the web component / renderer package
+  - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
 
 - [ ] [UI] [A:Medium] [Alpha] Investigate letter spacing for font aesthetics and legibility.
   - candidate sizes:
@@ -367,6 +350,8 @@
 - [ ] [Both] [A:Low] [Advanced] OCR tool (scan physical scores to MusicXML/JSON)
 - [ ] [Both] [A:Low] [Advanced] Pull request workflow (suggest changes to others' scores)
 - [ ] [Backend] [A:Low] [Advanced] MIDI playback mapping
+- [ ] [UI] [A:Medium] [Advanced] Page-turn navigation for long scores (when score exceeds viewport height, allow keyboard/UI controls so players can advance through the score while performing)
+- [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
 
 ### QA
 
@@ -398,3 +383,8 @@
   - Review each test: does it cover a genuinely distinct visual state, or is it redundant with another test in the suite?
   - Goal: keep tests that catch real regressions; remove duplicates that just inflate baseline count and maintenance burden
   - Also evaluate whether Desktop + Mobile + Tablet all-variants tests are all necessary, or whether one representative viewport per theme is sufficient
+
+### Score Detail / View
+
+- [ ] [UI] [A:Low] [Polish] Move attribution data from footer to top of page
+  - Needs ux design
