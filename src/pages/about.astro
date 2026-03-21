@@ -111,10 +111,43 @@ const { Content } = await aboutPage.render();
       margin: var(--spacing-large) 0;
       display: flex;
       justify-content: center;
+      position: relative;
+      overflow: visible;
     }
 
     .about-section :global(.score-example shakuhachi-score) {
       --shakuhachi-note-color: var(--color-text-primary);
+    }
+
+    /* Annotation pen gradient stops — light and dark mode.
+       Applied via style="stop-color: var(...)" on SVG <stop> elements, not as
+       presentation attributes (which don't support custom properties). */
+    :root {
+      --annotation-pen-1: #8BB0EE;
+      --annotation-pen-2: #5F8ADE;
+      --annotation-pen-3: #4070CC;
+      --annotation-pen-4: #2855AE;
+    }
+
+    :global([data-theme='dark']) {
+      --annotation-pen-1: #172554;
+      --annotation-pen-2: #1E3A8A;
+      --annotation-pen-3: #1D4ED8;
+      --annotation-pen-4: #2855AE;
+    }
+
+    /* Desktop annotation: absolutely positioned right of centered score. */
+    .about-section :global(.score-annotation-desktop) {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Mobile annotation: flex sibling, sits in right half of score row. Hidden on desktop. */
+    .about-section :global(.score-annotation-mobile) {
+      display: none;
     }
 
     .about-section :global(.score-viz) {
@@ -158,10 +191,24 @@ const { Content } = await aboutPage.render();
         font-size: var(--font-size-small);
       }
 
+      /* Score + annotation sit side by side on mobile */
       .about-section :global(.score-example) {
-        flex-direction: column;
-        align-items: center;
-        padding: var(--spacing-medium);
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0;
+      }
+
+      .about-section :global(.score-example shakuhachi-score) {
+        flex: 0 0 auto;
+      }
+
+      .about-section :global(.score-annotation-desktop) {
+        display: none;
+      }
+
+      .about-section :global(.score-annotation-mobile) {
+        display: block;
+        flex: 0 0 auto;
       }
 
       .about-section :global(.score-viz) {
