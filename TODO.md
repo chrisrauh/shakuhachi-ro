@@ -22,11 +22,7 @@
 
 ### Info pages (About, Help, etc...)
 
-- [ ] the embed example seems misaligned on mobile
-
-- [ ] Add the full embed code to the example so the visitor can see how the score itself if represented (and how easy it is)
-
-- [ ] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
+- [x] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
 
 - [ ] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
 

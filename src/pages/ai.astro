@@ -1,0 +1,78 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { getEntry } from 'astro:content';
+
+// Prerender this page at build time (static HTML)
+export const prerender = true;
+
+// Load MDX content
+const aiPage = await getEntry('pages', 'ai');
+const { Content } = await aiPage.render();
+---
+
+<Layout title="AI - Shakuhachi.ro" currentPage="browse">
+  <PageHeader slot="header-metadata" title="AI" />
+
+  <div class="ai-page">
+    <div class="ai-section">
+      <Content />
+    </div>
+  </div>
+
+  <style>
+    .ai-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    .ai-section {
+      margin-bottom: var(--spacing-2x-large);
+    }
+
+    .ai-section :global(h2) {
+      font-size: var(--font-size-x-large);
+      font-weight: 500;
+      margin-bottom: var(--spacing-medium);
+      color: var(--color-text-heading);
+    }
+
+    .ai-section :global(p) {
+      font-size: var(--font-size-medium);
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-medium);
+    }
+
+    .ai-section :global(p:last-child) {
+      margin-bottom: 0;
+    }
+
+    .ai-section :global(a) {
+      color: var(--color-link);
+      text-decoration: none;
+      border-bottom: 1px solid var(--color-link-border);
+      transition: border-color var(--transition-fast);
+    }
+
+    .ai-section :global(a:hover) {
+      border-bottom-color: var(--color-link-border-hover);
+    }
+
+    .ai-section :global(strong) {
+      font-weight: 600;
+      color: var(--color-text-heading);
+    }
+
+    @media (max-width: 768px) {
+      .ai-section :global(h2) {
+        font-size: var(--font-size-large);
+      }
+
+      .ai-section :global(p) {
+        font-size: var(--font-size-small);
+      }
+    }
+  </style>
+</Layout>
