@@ -33,6 +33,58 @@ The live example below shows it in action:
     columns="1"
     data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'
   ></shakuhachi-score>
+
+  <svg class="score-annotation-desktop"
+    width="240" height="418" viewBox="0 0 240 418"
+    overflow="visible" aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="pen-desktop" x1="0" y1="288" x2="0" y2="38"
+        gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#2255aa"/>
+        <stop offset="100%" stop-color="#4a6899"/>
+      </linearGradient>
+    </defs>
+    <path d="M 70 150 L 72 150 L 72 288 L 70 288"
+      stroke="url(#pen-desktop)" stroke-width="1.2" fill="none"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 72 219 C 100 180, 125 80, 145 40"
+      stroke="url(#pen-desktop)" stroke-width="1.2" fill="none"
+      stroke-linecap="round"/>
+    <path d="M 145 40 L 135 45 M 145 40 L 141 52"
+      stroke="url(#pen-desktop)" stroke-width="1.2" fill="none"
+      stroke-linecap="round"/>
+    <text x="149" y="38" font-family="Caveat, cursive" font-size="16"
+      font-weight="400" fill="url(#pen-desktop)">open center</text>
+    <text x="149" y="57" font-family="Caveat, cursive" font-size="16"
+      font-weight="400" fill="url(#pen-desktop)">of the face</text>
+  </svg>
+
+  <svg class="score-annotation-mobile"
+    width="170" height="418" viewBox="0 0 170 418"
+    overflow="visible" preserveAspectRatio="xMinYMin meet" aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="pen-mobile" x1="0" y1="288" x2="0" y2="58"
+        gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#2255aa"/>
+        <stop offset="100%" stop-color="#4a6899"/>
+      </linearGradient>
+    </defs>
+    <path d="M 4 150 L 6 150 L 6 288 L 4 288"
+      stroke="url(#pen-mobile)" stroke-width="1.2" fill="none"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 6 219 C 40 180, 60 110, 80 62"
+      stroke="url(#pen-mobile)" stroke-width="1.2" fill="none"
+      stroke-linecap="round"/>
+    <path d="M 80 62 L 70 67 M 80 62 L 77 74"
+      stroke="url(#pen-mobile)" stroke-width="1.2" fill="none"
+      stroke-linecap="round"/>
+    <text x="84" y="60" font-family="Caveat, cursive" font-size="14"
+      font-weight="400" fill="url(#pen-mobile)">open center</text>
+    <text x="84" y="77" font-family="Caveat, cursive" font-size="14"
+      font-weight="400" fill="url(#pen-mobile)">of the face</text>
+  </svg>
 </div>
 
 Here's how you can embed it in your own site:

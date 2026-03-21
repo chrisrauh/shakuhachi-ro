@@ -111,10 +111,27 @@ const { Content } = await aboutPage.render();
       margin: var(--spacing-large) 0;
       display: flex;
       justify-content: center;
+      position: relative;
+      overflow: visible;
     }
 
     .about-section :global(.score-example shakuhachi-score) {
       --shakuhachi-note-color: var(--color-text-primary);
+    }
+
+    /* Desktop annotation: absolutely positioned right of centered score.
+       SVG uses hardcoded px/color values — CSS tokens can't be used in SVG attributes. */
+    .about-section :global(.score-annotation-desktop) {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Mobile annotation: flex sibling, sits in right half of score row. Hidden on desktop. */
+    .about-section :global(.score-annotation-mobile) {
+      display: none;
     }
 
     .about-section :global(.score-viz) {
@@ -158,10 +175,24 @@ const { Content } = await aboutPage.render();
         font-size: var(--font-size-small);
       }
 
+      /* Score + annotation sit side by side on mobile */
       .about-section :global(.score-example) {
-        flex-direction: column;
-        align-items: center;
-        padding: var(--spacing-medium);
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0;
+      }
+
+      .about-section :global(.score-example shakuhachi-score) {
+        flex: 0 0 auto;
+      }
+
+      .about-section :global(.score-annotation-desktop) {
+        display: none;
+      }
+
+      .about-section :global(.score-annotation-mobile) {
+        display: block;
+        flex: 0 0 auto;
       }
 
       .about-section :global(.score-viz) {
