@@ -24,7 +24,12 @@
 
 - [x] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
 
-- [ ] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
+- [x] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
+
+- [ ] [UI] [A:Medium] [Visual-Testing] Add visual regression tests for /about page score annotation
+  - Test desktop layout: annotation visible to right of centered score
+  - Test mobile layout (375px): score in left half, annotation in right half
+  - Test light and dark modes
 
 - [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
 
