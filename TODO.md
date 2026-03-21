@@ -22,17 +22,14 @@
 
 ### Score Detail / View
 
-- [ ] [Backend] [A:Medium] [Quality-DRY] Evaluate/implement format dispatch refactor in ScoreDetailClient.renderScore()
-  - `src/components/ScoreDetailClient.ts:95-115`, `src/utils/format-converter.ts`
-  - **Problem:** 17-line if/else block dispatches to MusicXMLParser, ABCParser (dynamic import), or JSON identity — duplicating logic already in `parseFormat()` in format-converter.
-  - **Blockers identified in brainstorm — decide approach first:**
-    1. JSON type mismatch: `score.data` for JSON is a parsed object (Supabase JSONB), but `parseFormat('json')` calls `JSON.parse(string)` — can't pass object directly
-    2. Dynamic import: ABCParser is lazy-loaded currently; format-converter statically imports it — using parseFormat changes bundling
-    3. Error handling: current code renders inline error div for unknown format; parseFormat throws
-  - **Options:** (A) Handle JSON as identity pass-through, use `parseFormat` only for musicxml — keeps dynamic ABC import, reduces to ~5 lines for the string formats. (B) Skip refactor entirely (YAGNI — current code is explicit and correct, abstraction doesn't cleanly fit). Lean toward B unless there's a clear DRY win.
+- [x] [Backend] [A:Medium] [Quality-DRY] Evaluate/implement format dispatch refactor in ScoreDetailClient.renderScore()
+  - **Resolved:** Created `src/utils/score-data.ts` with `toScoreData(score)` and `parseScoreText(text, format)`. ScoreDetailClient uses `toScoreData`; ScoreEditor preview uses `parseScoreText`. Both parsers dynamically imported for optimal bundling.
 
-- [ ] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
-  - `src/components/ScoreDetailClient.ts:12-15, 26` — `interface ScoreData { score: Score; parentScore: Score | null }` shadows the renderer's `ScoreData` type (already aliased as `RendererScoreData` on line 9 to paper over this). Rename local interface to `ScorePageData`, update its one usage on line 26. Optionally un-alias the import on line 9 back to `ScoreData` after rename.
+- [x] [Backend] [A:High] [Quality-DRY] Rename ScoreDetailClient's local ScoreData interface to avoid shadowing
+  - **Resolved:** The `RendererScoreData` alias import was removed entirely as part of the format dispatch refactor — ScoreDetailClient no longer references `ScoreData` from the renderer directly. The shadowing concern is gone.
+
+- [ ] [Backend] [A:Medium] [Architecture] Evaluate moving format parsing into the web component / renderer package
+  - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
 
 - [ ] [UI] [A:Medium] [Renderer-Future] Enable musicians to read through long scores without scrolling (when score exceeds viewport height, allow "page turn" navigation with keyboard/UI controls so players can advance through the score while performing)
 - [ ] [UI] [A:Medium] [Advanced] Print optimization (CSS for clean printouts)
@@ -81,8 +78,8 @@
 - [ ] [Backend] [A:High] [Quality-SingleResp] Extract localStorage autosave logic out of ScoreEditor
   - `src/components/ScoreEditor.ts:125-141` — `setupLocalStorageAutoSave()`, `saveToLocalStorage()`, and `checkAndOfferDraftRestore()` form a self-contained persistence concern: debounce management, per-slug key naming, serialization format, and draft/DB timestamp comparison. Extract to `src/utils/editor-autosave.ts` (or a small `EditorAutosave` class) that takes a slug and serialization callbacks. Makes the logic testable without a full editor instance.
 
-- [ ] [Backend] [A:High] [Quality-DRY] Deduplicate updatePreview() in ScoreEditor
-  - `src/components/ScoreEditor.ts:248` — `updatePreview()` has two near-identical code paths: one for the external `#score-preview` panel (two-panel edit page layout) and one for the internal `#preview-pane` (standalone embed). Both paths do identical work: parse score data by format, create a `<shakuhachi-score>` element, apply the same CSS custom properties, and handle mobile vs desktop sizing. Extract shared rendering logic into a private `renderScoreInto(container: HTMLElement): Promise<void>` helper called by both paths.
+- [x] [Backend] [A:High] [Quality-DRY] Deduplicate updatePreview() in ScoreEditor
+  - **Resolved:** Both preview paths now use `parseScoreText()` from `src/utils/score-data.ts` instead of inline format dispatch.
 
 - [ ] [Both] [A:Low] [Architecture] Decompose ScoreEditor into model + view
   - `ScoreEditor.ts` is ~930 lines mixing 8+ concerns: state (instance variables), DOM generation (`innerHTML` templates), event wiring, API calls, validation, localStorage autosave, preview rendering, and CSS injection. This monolith makes adding versioning, collaboration, or format plugins require invasive surgery on a single file.
@@ -92,6 +89,9 @@
 - [ ] [UI] [A:Low] [Alpha] Revisit unsaved changes indicator design
   - Current: "Unsaved changes" text appears inline in the metadata panel next to the Save button
   - Consider: prominence (is it visible enough?), mobile layout (does it wrap awkwardly?), animation on state change (subtle fade-in when changes occur, fade-out after save)
+
+- [ ] [Backend] [A:Medium] [Quality-Explicit] Investigate inconsistent save normalization in ScoreEditor
+  - `src/components/ScoreEditor.ts:416-424` — ABC scores are converted to JSON before saving to Supabase, but MusicXML scores are saved as raw XML strings. This means the `data_format` in the DB is always `'json'` for ABC but `'musicxml'` for MusicXML. Decide if this is intentional (MusicXML fidelity) or an oversight, and document or standardize the behavior.
 
 - [ ] [UI] [A:Medium] [Content] Add license selector field to score editor
   - Add a license dropdown to the score metadata section of the editor
