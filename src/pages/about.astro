@@ -119,8 +119,24 @@ const { Content } = await aboutPage.render();
       --shakuhachi-note-color: var(--color-text-primary);
     }
 
-    /* Desktop annotation: absolutely positioned right of centered score.
-       SVG uses hardcoded px/color values — CSS tokens can't be used in SVG attributes. */
+    /* Annotation pen gradient stops — light and dark mode.
+       Applied via style="stop-color: var(...)" on SVG <stop> elements, not as
+       presentation attributes (which don't support custom properties). */
+    :root {
+      --annotation-pen-1: #8BB0EE;
+      --annotation-pen-2: #5F8ADE;
+      --annotation-pen-3: #4070CC;
+      --annotation-pen-4: #2855AE;
+    }
+
+    :global([data-theme='dark']) {
+      --annotation-pen-1: #172554;
+      --annotation-pen-2: #1E3A8A;
+      --annotation-pen-3: #1D4ED8;
+      --annotation-pen-4: #2855AE;
+    }
+
+    /* Desktop annotation: absolutely positioned right of centered score. */
     .about-section :global(.score-annotation-desktop) {
       position: absolute;
       left: 50%;
