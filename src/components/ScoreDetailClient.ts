@@ -1,4 +1,3 @@
-import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -6,7 +5,6 @@ import { toast } from './Toast';
 import { ButtonLoadingState } from './LoadingSpinner';
 import type { Score } from '../api/scores';
 import type { User } from '@supabase/supabase-js';
-import type { ScoreData as RendererScoreData } from '../web-component/types/ScoreData';
 import { STRINGS } from '../constants/strings';
 
 interface ScoreData {
@@ -92,25 +90,8 @@ export class ScoreDetailClient {
 
     try {
       // Convert score data to ScoreData format based on data_format
-      let scoreData: RendererScoreData;
-
-      if (this.score.data_format === 'json') {
-        scoreData = this.score.data as RendererScoreData;
-      } else if (this.score.data_format === 'musicxml') {
-        // Parse MusicXML string to ScoreData
-        scoreData = MusicXMLParser.parse(this.score.data as string);
-      } else if (this.score.data_format === 'abc') {
-        // Parse ABC notation to ScoreData
-        const { ABCParser } = await import('../web-component/parser/ABCParser');
-        scoreData = ABCParser.parse(this.score.data as string);
-      } else {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 40px;">
-            <p>Unsupported format: ${this.score.data_format}</p>
-          </div>
-        `;
-        return;
-      }
+      const { toScoreData } = await import('../utils/score-data');
+      const scoreData = await toScoreData(this.score);
 
       // Detect mobile viewport
       const isMobile = window.matchMedia('(max-width: 768px)').matches;

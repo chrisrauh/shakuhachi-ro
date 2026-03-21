@@ -7,6 +7,18 @@
         "run",
         "code-mcp"
       ]
+    },
+    "chrome-devtools-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--registry=https://registry.npmjs.org",
+        "chrome-devtools-mcp@latest",
+        "--userDataDir",
+        ".cache/chrome-devtools-mcp",
+        "--chromeArg=--remote-debugging-port=9222"
+      ],
+      "type": "stdio"
     }
   }
 }
