@@ -34,6 +34,7 @@
 
 # Temporary files
 /tmp
+/.cache
 
 # Superpowers working files (plans, specs)
 /docs/superpowers
