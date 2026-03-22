@@ -18,13 +18,7 @@
 
 ### Errors and Warnings
 
-- [x] Address this console message when going into score edit page:
-      ⏺ chrome-devtools-mcp - list_console_messages (MCP)(types: ["error","warn"])
-      ⎿  Emulating color scheme: dark ## Console messages
-      Showing 1-1 of 1 (Page 1 of 1).
-      msgid=22 [warn] ShakuhachiScore: dimensions are 0 after layout (unexpected) (1 args)
-
-- [ ] Update the AUTH-TESTING-GUIDE. It has old information that is causing errors and interruptions (queries for permission) durnig develpment.
+- [x] Update the AUTH-TESTING-GUIDE. It has old information that is causing errors and interruptions (queries for permission) durnig develpment.
 
 ### Info pages (About, Help, etc...)
 

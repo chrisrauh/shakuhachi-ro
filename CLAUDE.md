@@ -83,17 +83,6 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes with chrome-devtools-mcp
 
-**Recovery from accidental work on main:**
-
-Create a feature branch, commit, and PR normally.
-
-If changes are already committed to main (but not pushed):
-
-1. `git checkout -b feature/descriptive-name`
-2. `git checkout main`
-3. `git reset --hard origin/main`
-4. `git checkout feature/descriptive-name`, push and PR
-
 ## Design System
 
 Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE.md](./docs/DESIGN-LANGUAGE.md)
@@ -190,12 +179,6 @@ When implementing or testing features that require test data:
 - Use the test account (credentials in `.env`) to create test data
 - Give fixtures descriptive, memorable names/slugs
 
-Example:
-
-- Test score for editor testing: `/score/test` (slug: `test`)
-- Owned by test account, contains simple 3-note JSON data
-- Use for testing editor features without creating temporary test data each time
-
 **Evaluating Visual Regression Test Coverage**
 
 After migrations, refactors, or new UI features:
@@ -242,11 +225,8 @@ Use chrome-devtools-mcp for visual verification (not Bash scripts, not saving to
 **Dev server:** Start once per session (port 3001), leave running throughout. Always verify both light and dark modes.
 
 ```
-# Correct — use run_in_background parameter, no shell operators needed
+# Start dev server — use run_in_background parameter, no shell operators
 Bash("npm run dev -- --port 3001", run_in_background=true)
-
-# Wrong — shell operators trigger safety prompts and are unnecessary
-npm run dev -- --port 3001 2>&1 &
 ```
 
 ### Visual Verification Patterns
@@ -331,14 +311,6 @@ When testing authenticated features (score editor, creating scores, forking):
   ```
 - **Note:** This is an acceptable exception to the "avoid &&" guideline since `.env` cannot be read directly and each Bash call is a separate shell session
 
-**For automated tests:**
-
-```typescript
-// Read credentials from environment
-const TEST_EMAIL = process.env.TEST_EMAIL;
-const TEST_PASSWORD = process.env.TEST_PASSWORD;
-```
-
 **Important:**
 
 - Never hardcode credentials in code or memory files
@@ -352,6 +324,15 @@ const TEST_PASSWORD = process.env.TEST_PASSWORD;
 - Owned by the test account for editor testing
 - Contains simple JSON data with 3 notes (ro, tsu, re)
 - Use this score to test the editor functionality: `http://localhost:3001/score/test/edit`
+
+**Auth Verification Checklist (after auth-related changes):**
+
+- Login and logout work end-to-end
+- Session persists across page reload
+- Protected pages (e.g. `/score/test/edit`) redirect when logged out
+- No auth-related console errors
+- No auth tokens in localStorage (tokens belong in httpOnly cookies only)
+- `npm test` passes
 
 ## Key Learnings
 
