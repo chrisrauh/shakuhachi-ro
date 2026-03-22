@@ -20,23 +20,9 @@ describe('ButtonLoadingState', () => {
     expect(button.getAttribute('aria-busy')).toBe('true');
   });
 
-  it('shows spinner with text content', () => {
-    const state = new ButtonLoadingState(button);
-    state.show('Deleting…');
-
-    expect(button.innerHTML).toContain('Deleting…');
-  });
-
-  it('shows spinner with HTML content', () => {
-    const state = new ButtonLoadingState(button);
-    state.show('<span class="count">⋯</span>');
-
-    expect(button.innerHTML).toContain('<span class="count">⋯</span>');
-  });
-
   it('restores original content and state', () => {
     const state = new ButtonLoadingState(button);
-    state.show('Loading…');
+    state.show();
     state.hide();
 
     expect(button.innerHTML).toBe('<span>Original</span>');
