@@ -10,10 +10,70 @@ vi.mock('./ConfirmDialog', () => ({
     show: vi.fn(),
   })),
 }));
+vi.mock('./LoadingSpinner', () => ({
+  buildSpinnerSVG: vi.fn(() => '<svg class="spinner"></svg>'),
+}));
 vi.mock('../utils/icons', () => ({
   renderIcon: vi.fn(() => ''),
   initIcons: vi.fn(),
 }));
+
+/** Flush microtask queue so loadExistingScore completes. */
+function flushLoadScore(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+// --- loading state ---
+
+describe('ScoreEditor loading state', () => {
+  const SCORE_ID = 'score-123';
+  const SLUG = 'test-slug';
+
+  let containerId: string;
+  let container: HTMLDivElement;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    containerId = 'loading-editor-container';
+    container = document.createElement('div');
+    container.id = containerId;
+    document.body.appendChild(container);
+
+    const { getScore } = await import('../api/scores');
+    vi.mocked(getScore).mockResolvedValue({
+      score: {
+        id: SCORE_ID,
+        slug: SLUG,
+        title: 'Test',
+        data_format: 'json',
+        data: { notes: [] },
+        updated_at: '2024-01-01T00:00:00Z',
+      } as any,
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    container.remove();
+    localStorage.clear();
+  });
+
+  it('shows loading placeholder before data loads', () => {
+    new ScoreEditor(containerId, SCORE_ID, SLUG);
+
+    expect(container.querySelector('.editor-loading')).not.toBeNull();
+    expect(container.querySelector('#score-data-input')).toBeNull();
+  });
+
+  it('replaces loading placeholder with editor after data loads', async () => {
+    new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    expect(container.querySelector('.editor-loading')).toBeNull();
+    expect(container.querySelector('#score-data-input')).not.toBeNull();
+  });
+});
 
 // --- validateScoreData() ---
 
@@ -137,9 +197,7 @@ describe('ScoreEditor.handleSave', () => {
 
   async function makeEditorLoaded(): Promise<ScoreEditor> {
     const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
-    // Flush microtasks so loadExistingScore completes before test manipulates state
-    await Promise.resolve();
-    await Promise.resolve();
+    await flushLoadScore();
     return editor;
   }
 
@@ -304,6 +362,7 @@ describe('ScoreEditor localStorage autosave', () => {
 
   it('saves to per-slug key after 2s of inactivity', async () => {
     const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await vi.advanceTimersByTimeAsync(0);
     editor['scoreData'] = '{"notes":[]}';
     editor['handleDataChange']('{"notes":[]}');
 
@@ -318,6 +377,7 @@ describe('ScoreEditor localStorage autosave', () => {
 
   it('does not save to old global key', async () => {
     const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await vi.advanceTimersByTimeAsync(0);
     editor['handleDataChange']('{"notes":[]}');
     vi.advanceTimersByTime(2000);
 
@@ -361,8 +421,9 @@ describe('ScoreEditor unsaved changes indicator', () => {
     localStorage.clear();
   });
 
-  it('shows unsaved indicator after a data change', () => {
+  it('shows unsaved indicator after a data change', async () => {
     const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
     editor['hasUnsavedChanges'] = false;
     editor['handleDataChange']('new data');
 
