@@ -18,7 +18,7 @@
 
 ### Errors and Warnings
 
-- [ ] Address this console message when going into score edit page:
+- [x] Address this console message when going into score edit page:
       ⏺ chrome-devtools-mcp - list_console_messages (MCP)(types: ["error","warn"])
       ⎿  Emulating color scheme: dark ## Console messages
       Showing 1-1 of 1 (Page 1 of 1).

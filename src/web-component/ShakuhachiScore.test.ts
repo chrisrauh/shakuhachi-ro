@@ -322,25 +322,6 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     (global as any).ResizeObserver = originalResizeObserver;
   });
 
-  it('should show warning when dimensions are 0 (test environment limitation)', async () => {
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    const component = document.createElement('shakuhachi-score');
-    component.setAttribute('data-score', JSON.stringify(minimalScoreData));
-    component.setAttribute('columns', 'auto');
-
-    container.appendChild(component);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // In test environments (JSDOM), dimensions are always 0, so warning is expected
-    // In production browsers, this warning should not appear
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'ShakuhachiScore: dimensions are 0 after layout (unexpected)',
-    );
-
-    consoleSpy.mockRestore();
-  });
-
   it('explicit column count (columns="3") uses intrinsic sizing', async () => {
     const component = document.createElement('shakuhachi-score');
 

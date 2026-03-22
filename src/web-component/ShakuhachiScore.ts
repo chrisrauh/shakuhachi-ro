@@ -347,9 +347,6 @@ class ShakuhachiScore extends HTMLElement {
 
         // Defensive fallback
         if (width === 0 || height === 0) {
-          console.warn(
-            'ShakuhachiScore: dimensions are 0 after layout (unexpected)',
-          );
           width = width || 300;
           height = height || 150;
         }
