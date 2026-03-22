@@ -62,11 +62,12 @@ export class DurationLineModifier extends Modifier {
       // Last note: line ends at middle of current note
       this.lineLength = verticalMiddleOfCurrentNote - startOffsetY; // ≈ 14px
     } else {
-      // Non-last note: line extends to middle of next note
-      // Next note is NOTE.verticalSpacing (44px) below
-      const verticalMiddleOfNextNote =
-        NOTE.verticalSpacing + verticalMiddleOfCurrentNote; // ≈ 36px
-      this.lineLength = verticalMiddleOfNextNote - startOffsetY; // ≈ 58px
+      // Non-last note: line extends to start of next note's segment
+      // Next note's segment starts at (noteY + verticalSpacing) + startOffsetY,
+      // so the length is exactly verticalSpacing to meet without overlap.
+      // Overlapping segments cause anti-aliasing artifacts (visible as two
+      // colors on the duration line in dark mode screenshots).
+      this.lineLength = NOTE.verticalSpacing; // 44px
     }
 
     this.setDefaultOffsets();
