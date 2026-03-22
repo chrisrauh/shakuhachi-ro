@@ -24,6 +24,8 @@
       Showing 1-1 of 1 (Page 1 of 1).
       msgid=22 [warn] ShakuhachiScore: dimensions are 0 after layout (unexpected) (1 args)
 
+- [ ] Update the AUTH-TESTING-GUIDE. It has old information that is causing errors and interruptions (queries for permission) durnig develpment.
+
 ### Info pages (About, Help, etc...)
 
 - [x] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
@@ -33,6 +35,21 @@
 - [ ] [A:Low] Review the copy to make it better and more to Christian's tone of voice, less choppy.
 
 ### Score Editor
+
+- [ ] [A:High] Fix race condition: format toggles are interactive before score data loads
+  - **Problem**: The `ScoreEditor` constructor (`src/components/ScoreEditor.ts:45-46`) calls `loadExistingScore(scoreId)` without `await`, then immediately calls `this.render()`. This renders the editor with defaults (empty `scoreData`, `'json'` format) while the async DB fetch runs in the background. The radio buttons and textarea are fully interactive before the data arrives.
+  - **What happens when the user clicks a format toggle before data loads**:
+    1. `handleFormatChange(format)` is called
+    2. `this.scoreData.trim()` is empty → takes the `else` branch → just sets `this.dataFormat = format` (no conversion)
+    3. `this.render()` runs with empty data in the new format
+    4. `loadExistingScore` completes asynchronously and calls `render()` again, overwriting the user's format selection with the DB value
+    5. The user's click is silently discarded — no error, no feedback
+  - **Evidence**: Discovered during visual regression test debugging. The `waitForEditor()` helper waited for SVG in the preview but NOT for textarea content. Tests that clicked a format toggle immediately after `waitForEditor()` hit this race: the radio changed, the async conversion ran against empty data (no-op), then `loadExistingScore` completed and reverted everything.
+  - **Fix approach**: Disable interactive elements (format radios, textarea, save button) until `loadExistingScore` completes. Options:
+    - (a) Add a `loading` state flag, set it `true` in the constructor, `false` after `loadExistingScore` resolves. Use it to add `disabled` attributes during `render()`.
+    - (b) Move the initial `this.render()` call inside `loadExistingScore` after the data is set, so the editor only renders once with real data. Show a loading placeholder until then.
+    - Option (b) is cleaner — avoids a double render and makes the loading state explicit to the user.
+  - **Related**: The visual regression test helper `waitForEditor()` was updated to also wait for textarea content (`el?.value?.trim().length > 0`) as a workaround. The app-level fix should make this unnecessary.
 
 - [ ] [A:Low] Revisit auto-save indicator placement and design
   - Current implementation: "Saved X ago" appears below description field
@@ -52,7 +69,7 @@
   - `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - `ScoreLibrary` uses inline UI with a retry button; `ScoreEditor` uses `toast`; pick one pattern and apply consistently
 
-- [ ] [A:High] Extract ScoreEditor inline CSS into a stylesheet
+- [x] [A:High] Extract ScoreEditor inline CSS into a stylesheet
   - `src/components/ScoreEditor.ts:653+` — `addStyles()` injects ~275 lines of CSS via a `<style>` tag at runtime. Move to `src/styles/score-editor.css` and import it in `edit.astro`. Removes ~30% of the file's line count and makes styles discoverable via normal CSS tooling.
 
 - [ ] [A:High] Extract score data validation out of ScoreEditor

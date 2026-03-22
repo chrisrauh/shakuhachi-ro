@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import PageHeader from '../../../components/PageHeader.astro';
 import { getScoreBySlug } from '../../../api/scores';
+import '../../../styles/score-editor.css';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/');

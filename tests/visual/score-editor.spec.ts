@@ -37,6 +37,13 @@ async function waitForEditor(page: any) {
     const c = document.querySelector('shakuhachi-score');
     return c?.shadowRoot?.querySelector('svg') !== null;
   });
+  // Wait for score data to be loaded into the textarea
+  await page.waitForFunction(() => {
+    const el = document.getElementById(
+      'score-data-input',
+    ) as HTMLTextAreaElement;
+    return el?.value?.trim().length > 0;
+  });
 }
 
 test.describe('Score Editor Visual Regression', () => {
@@ -81,6 +88,24 @@ test.describe('Score Editor Visual Regression', () => {
       await setTheme(page, 'light');
       await waitForEditor(page);
 
+      await page.click('input[type="radio"][value="json"]');
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById(
+            'score-data-input',
+          ) as HTMLTextAreaElement;
+          if (!el?.value?.trim()) return false;
+          try {
+            JSON.parse(el.value);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        null,
+        { timeout: 5000 },
+      );
+
       await expect(page).toHaveScreenshot('format-json-editor.png', {
         fullPage: false,
       });
@@ -92,7 +117,16 @@ test.describe('Score Editor Visual Regression', () => {
       await waitForEditor(page);
 
       await page.click('input[type="radio"][value="musicxml"]');
-      await page.waitForTimeout(300);
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById(
+            'score-data-input',
+          ) as HTMLTextAreaElement;
+          return el?.value?.trim().startsWith('<?xml');
+        },
+        null,
+        { timeout: 5000 },
+      );
 
       await expect(page).toHaveScreenshot('format-musicxml-editor.png', {
         fullPage: false,
@@ -105,7 +139,16 @@ test.describe('Score Editor Visual Regression', () => {
       await waitForEditor(page);
 
       await page.click('input[type="radio"][value="abc"]');
-      await page.waitForTimeout(300);
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById(
+            'score-data-input',
+          ) as HTMLTextAreaElement;
+          return el?.value?.trim().startsWith('X:');
+        },
+        null,
+        { timeout: 5000 },
+      );
 
       await expect(page).toHaveScreenshot('format-abc-editor.png', {
         fullPage: false,
@@ -237,7 +280,22 @@ test.describe('Score Editor Visual Regression', () => {
       await waitForEditor(page);
 
       await page.click('#toggle-preview');
-      await page.waitForTimeout(200);
+
+      // Wait for the score component to re-render after the panel becomes visible.
+      // On mobile the preview panel starts hidden (0 dimensions), so shakuhachi-score
+      // defers rendering until the ResizeObserver fires with real dimensions.
+      await page.waitForFunction(
+        () => {
+          const c = document.querySelector('shakuhachi-score');
+          const svg = c?.shadowRoot?.querySelector('svg');
+          if (!svg) return false;
+          return (
+            svg.querySelectorAll('text').length > 0 ||
+            svg.querySelectorAll('path').length > 0
+          );
+        },
+        { timeout: 5000 },
+      );
 
       await expect(page.locator('#preview-panel')).toBeVisible();
       await expect(page.locator('#editor-panel')).toBeHidden();
