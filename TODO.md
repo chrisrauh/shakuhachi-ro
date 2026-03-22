@@ -125,6 +125,12 @@
 
 ### Design
 
+- [ ] [A:Low] Review loading spinner design
+  - Evaluate the `ButtonLoadingState` spinner (single pulsing dot) for size, visibility, and feel across button variants
+  - Review the `buildSpinnerSVG()` full-flute spinner used on the landing page loading state
+  - Check both spinners in light and dark mode, across viewports
+  - Consider whether the landing page needs a text label, or if the spinner alone is sufficient
+
 - [ ] [A:Medium] Website Typography
   - **Content pages**
     - Fix bullet points left padding

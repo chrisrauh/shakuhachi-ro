@@ -165,7 +165,7 @@ export class ScoreDetailClient {
       'delete-btn',
     ) as HTMLButtonElement;
     const loadingState = deleteBtn ? new ButtonLoadingState(deleteBtn) : null;
-    loadingState?.show('<span>Deleting…</span>');
+    loadingState?.show();
 
     const result = await deleteScore(this.score.id);
     if (result.error) {
@@ -205,7 +205,7 @@ export class ScoreDetailClient {
 
     const forkBtn = document.getElementById('fork-btn') as HTMLButtonElement;
     const loadingState = forkBtn ? new ButtonLoadingState(forkBtn) : null;
-    loadingState?.show('<span class="count">⋯</span>');
+    loadingState?.show();
 
     try {
       const result = await forkScore(this.score.id);

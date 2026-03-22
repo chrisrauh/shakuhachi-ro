@@ -3,12 +3,8 @@
  *
  * Usage:
  *   const loadingState = new ButtonLoadingState(button);
- *   loadingState.show();                      // Just spinner
- *   loadingState.show('Deleting…');           // Spinner + text
- *   loadingState.show('<span>...</span>');    // Spinner + HTML
- *
- *   // On error: restore original state
- *   loadingState.hide();
+ *   loadingState.show();   // Replace content with spinner
+ *   loadingState.hide();   // Restore original content
  */
 
 export interface SpinnerParams {
@@ -105,7 +101,7 @@ export class ButtonLoadingState {
     this.originalDisabled = (button as HTMLButtonElement).disabled || false;
   }
 
-  show(content?: string): void {
+  show(): void {
     // Disable interaction
     if ('disabled' in this.button) {
       (this.button as HTMLButtonElement).disabled = true;
@@ -114,8 +110,7 @@ export class ButtonLoadingState {
     this.button.setAttribute('aria-busy', 'true');
 
     // Update content
-    const spinner = createSpinnerSVG();
-    this.button.innerHTML = content ? `${spinner}\n${content}` : spinner;
+    this.button.innerHTML = createSpinnerSVG();
   }
 
   hide(): void {
