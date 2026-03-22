@@ -8,6 +8,15 @@ dotenv.config();
  * Playwright configuration for visual regression testing
  *
  * See https://playwright.dev/docs/test-configuration
+ *
+ * Projects:
+ *   setup      — runs auth-setup.ts once, saves session to .auth/user.json
+ *   no-auth    — unauthenticated tests (visual-regression, toast, content-pages, etc.)
+ *   auth       — authenticated tests (score-editor), depends on setup
+ *
+ * All three projects run in parallel (workers: 3), and within each project
+ * tests run in parallel too (fullyParallel: true). This eliminates the main
+ * bottleneck where slow auth-dependent editor tests blocked everything else.
  */
 export default defineConfig({
   // Test directory
@@ -20,10 +29,10 @@ export default defineConfig({
   timeout: 30000,
 
   // Test settings
-  fullyParallel: false, // Run tests sequentially for visual stability
+  fullyParallel: true,
   forbidOnly: !!process.env.CI, // Fail if test.only in CI
   retries: process.env.CI ? 2 : 0, // Retry failed tests in CI
-  workers: 1, // Single worker for visual consistency
+  workers: 3, // Parallel: setup + no-auth + auth run concurrently
 
   // Reporter configuration
   reporter: [['html', { outputFolder: 'tests/visual/reports' }], ['list']],
@@ -43,13 +52,46 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
 
-  // Configure projects for different browsers (desktop only)
+  // Configure projects
   projects: [
+    // Auth setup — runs once, saves session to .auth/user.json
     {
-      name: 'chromium',
+      name: 'setup',
+      testMatch: /auth-setup\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
+      },
+    },
+
+    // Unauthenticated tests — no dependency on setup
+    {
+      name: 'no-auth',
+      testMatch: [
+        /landing\.spec\.ts/,
+        /score-detail\.spec\.ts/,
+        /buttons\.spec\.ts/,
+        /shakuhachi-score\.spec\.ts/,
+        /toast\.spec\.ts/,
+        /web-component-columns\.spec\.ts/,
+        /score-detail-layout\.spec\.ts/,
+        /content-pages\.spec\.ts/,
+      ],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+
+    // Authenticated tests — depend on setup completing first
+    {
+      name: 'auth',
+      testMatch: [/score-editor\.spec\.ts/],
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        storageState: 'tests/visual/.auth/user.json',
       },
     },
   ],

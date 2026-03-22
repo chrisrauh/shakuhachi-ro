@@ -65,7 +65,7 @@ digraph dev_workflow {
   "STOP: wait for merge confirmation" [shape=doublecircle];
   "4 cleanup commands (sequential)" [shape=box];
   "Remove task from TODO.md immediately" [shape=box];
-  "Ask: work on next task?" [shape=doublecircle];
+  "Read TODO.md, present next 3 tasks" [shape=doublecircle];
 
   "Task assigned" -> "Check branch";
   "Check branch" -> "On main?";
@@ -75,7 +75,7 @@ digraph dev_workflow {
   "Verify task in code" -> "Already done?";
   "Already done?" -> "Mark done, move on" [label="yes"];
   "Already done?" -> "Make changes" [label="no"];
-  "Mark done, move on" -> "Ask: work on next task?";
+  "Mark done, move on" -> "Read TODO.md, present next 3 tasks";
   "Make changes" -> "Run npm test";
   "Run npm test" -> "Tests pass?";
   "Tests pass?" -> "Fix failures" [label="no"];
@@ -99,7 +99,7 @@ digraph dev_workflow {
   "Push + gh pr create" -> "STOP: wait for merge confirmation";
   "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
   "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
-  "Remove task from TODO.md immediately" -> "Ask: work on next task?";
+  "Remove task from TODO.md immediately" -> "Read TODO.md, present next 3 tasks";
 }
 ```
 
@@ -257,7 +257,7 @@ git push origin --delete <branch>
 
 Then: **Remove the completed task from TODO.md immediately** (final cleanup, not when asked).
 
-Then: Ask the user if you should work on the next task.
+Then: Read `TODO.md` and present the next 3 pending tasks (in order). Ask the user which one to work on next, or if they'd like to stop.
 
 ---
 

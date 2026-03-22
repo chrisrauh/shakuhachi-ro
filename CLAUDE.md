@@ -241,6 +241,14 @@ Use chrome-devtools-mcp for visual verification (not Bash scripts, not saving to
 
 **Dev server:** Start once per session (port 3001), leave running throughout. Always verify both light and dark modes.
 
+```
+# Correct — use run_in_background parameter, no shell operators needed
+Bash("npm run dev -- --port 3001", run_in_background=true)
+
+# Wrong — shell operators trigger safety prompts and are unnecessary
+npm run dev -- --port 3001 2>&1 &
+```
+
 ### Visual Verification Patterns
 
 **For styling/layout work:**
