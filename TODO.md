@@ -31,7 +31,11 @@
   - Test mobile layout (375px): score in left half, annotation in right half
   - Test light and dark modes
 
-- [ ] review the copy to make it better and more to Christian's tone of voice, less choppy.
+- [ ] Adjust content pages typography and styling
+  - Fix bullet points left padding
+  - Adjust vertical rythm
+
+- [ ] Review the copy to make it better and more to Christian's tone of voice, less choppy.
 
 ### Score Editor
 
