@@ -16,15 +16,7 @@
 
 ## Prioritized Backlog
 
-### Errors and Warnings
-
-- [x] Update the AUTH-TESTING-GUIDE. It has old information that is causing errors and interruptions (queries for permission) durnig develpment.
-
 ### Info pages (About, Help, etc...)
-
-- [x] createa an /ai slash page (https://slashpages.net/#ai) and move the ai content there. Search for various /ai pages and suggest some content. Link to this page from the about page.
-
-- [x] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
 
 - [ ] [A:Low] Review the copy to make it better and more to Christian's tone of voice, less choppy.
 
@@ -63,9 +55,6 @@
   - `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - `ScoreLibrary` uses inline UI with a retry button; `ScoreEditor` uses `toast`; pick one pattern and apply consistently
 
-- [x] [A:High] Extract ScoreEditor inline CSS into a stylesheet
-  - `src/components/ScoreEditor.ts:653+` — `addStyles()` injects ~275 lines of CSS via a `<style>` tag at runtime. Move to `src/styles/score-editor.css` and import it in `edit.astro`. Removes ~30% of the file's line count and makes styles discoverable via normal CSS tooling.
-
 - [ ] [A:High] Extract score data validation out of ScoreEditor
   - `src/components/ScoreEditor.ts:151` — `validateScoreData()` handles JSON parsing, XML parsing via DOMParser, and error message formatting — all mixed into the editor class. Extract to `src/utils/score-validation.ts` as `validateScoreInput(data: string, format: ScoreDataFormat): { valid: boolean; error?: string }`. This makes validation testable in isolation and reusable for API-side or import validation.
 
@@ -95,8 +84,6 @@
 
 - [ ] [A:Medium] Add loading spinners and error states
 - [ ] [A:Medium] Polish form validation and error messages
-- [ ] [A:Low] Version history (track edits over time)
-- [ ] [A:Low] Visual score editor (point-and-click note entry)
 - [ ] [A:Medium] Multiple score input formats (import from ABC, etc.)
 
 ### Auth / Account
@@ -114,8 +101,6 @@
 
 - [ ] [A:High] Add unit tests for auth module
   - `src/api/auth.ts` and `src/api/authState.ts` have 0 tests. Test: `signUp`/`signIn`/`signOut` call correct Supabase methods and return expected results, `AuthStateManager.subscribe()` fires callback immediately, `isAuthenticated()` reflects current state, `onAuthStateChange` relays Supabase auth events.
-
-- [ ] [A:Low] Private scores (unlisted or private visibility)
 
 ### Design
 
@@ -162,9 +147,7 @@
   - explore how to implement a color theme on the site. Designer will provide references and color palettes.
   - implement 3 additional themes based on color palettes and inspiration provided by the Designer
 
-### Renderer Library
-
-- [ ] [A:High] Visual regression tests are showing two colors (white and gray) in the duration line in the dark mode test. Expected is to have a solid (white) line.
+### Shakuhachi Score Web Component
 
 - [ ] [A:Medium] Evaluate moving format parsing into the web component / renderer package
   - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
@@ -271,13 +254,6 @@
 - [ ] [A:Medium] MuraikiModifier (breathy tone)
 - [ ] [A:Medium] SuriModifier (sliding)
 - [ ] [A:Medium] OriModifier (pitch bend)
-- [ ] [A:High] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
-
-- [ ] [A:Low] Revisit column breaking with TeX-inspired badness algorithm
-  - [ ] Implement badness metric for column height variance
-  - [ ] Add demerits for orphans (single notes in columns)
-  - [ ] Add penalties for breaking at certain notation points
-  - [ ] Implement global optimization across score (Knuth-Plass approach)
 
 ### Content / Data
 
@@ -371,4 +347,13 @@
 - [ ] [A:Low] Pull request workflow (suggest changes to others' scores)
 - [ ] [A:Low] MIDI playback mapping
 - [ ] [A:Medium] Page-turn navigation for long scores (when score exceeds viewport height, allow keyboard/UI controls so players can advance through the score while performing)
+- [ ] [A:Low] Private scores (unlisted or private visibility)
+- [ ] [A:Low] Version history (track edits over time)
+- [ ] [A:Low] Visual score editor (point-and-click note entry)
+- [ ] [A:High] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
+- [ ] [A:Low] Revisit column breaking with TeX-inspired badness algorithm
+  - [ ] Implement badness metric for column height variance
+  - [ ] Add demerits for orphans (single notes in columns)
+  - [ ] Add penalties for breaking at certain notation points
+  - [ ] Implement global optimization across score (Knuth-Plass approach)
 - [ ] [A:Medium] Print optimization (CSS for clean printouts)
