@@ -14,7 +14,15 @@
 
 ---
 
-## Prioritized Backlog (Sorted by User Impact)
+## Prioritized Backlog
+
+### Errors and Warnings
+
+- [ ] Address this console message when going into score edit page:
+      ⏺ chrome-devtools-mcp - list_console_messages (MCP)(types: ["error","warn"])
+      ⎿  Emulating color scheme: dark ## Console messages
+      Showing 1-1 of 1 (Page 1 of 1).
+      msgid=22 [warn] ShakuhachiScore: dimensions are 0 after layout (unexpected) (1 args)
 
 ### Info pages (About, Help, etc...)
 
