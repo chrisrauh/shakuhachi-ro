@@ -112,17 +112,20 @@ test.describe('Score Editor Visual Regression', () => {
       });
     });
 
-    test('Empty notation - Minimal score data', async ({ page }) => {
+    test('Format mismatch error and empty preview', async ({ page }) => {
       await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
       await setTheme(page, 'light');
       await waitForEditor(page);
 
+      // Select MusicXML format then enter JSON data — triggers format mismatch
+      // error in the data section and an empty/error state in the preview.
+      await page.click('input[type="radio"][value="musicxml"]');
       const notationTextarea = page.locator('#score-data-input');
       await notationTextarea.clear();
       await notationTextarea.fill('{"notes":[]}');
       await page.waitForTimeout(500);
 
-      await expect(page).toHaveScreenshot('editor-empty-notation.png', {
+      await expect(page).toHaveScreenshot('editor-format-mismatch-error.png', {
         fullPage: false,
       });
     });
