@@ -22,7 +22,7 @@
 
 - [x] Add an annotation to the right of the embedded score with an arrow to the middle tree notes of the score saying how this part rquires a subtle meri action. Use a font that looks like it's a hand writtend annotation (but not too caligraphic, more like a handmade draft design, maye also use a blue-ish draft ink, or bic pen, color). Should come across a bit fun and iformal, like someone took a pen to the webpage. Finding the right font will be the hardest - caveat might be an option,
 
-- [ ] Review the copy to make it better and more to Christian's tone of voice, less choppy.
+- [ ] [A:Low] Review the copy to make it better and more to Christian's tone of voice, less choppy.
 
 ### Score Editor
 
@@ -33,7 +33,7 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [ ] [A:Medium] Consider slug update behavior when title changes
+- [ ] [A:Low] Consider slug update behavior when title changes
   - Currently: Slug is set on creation and never changes, even if title is updated
   - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
   - **Current behavior may be intentional** for URL stability (avoid breaking bookmarks/links)
@@ -65,7 +65,7 @@
 - [ ] [A:Medium] Investigate inconsistent save normalization in ScoreEditor
   - `src/components/ScoreEditor.ts:416-424` — ABC scores are converted to JSON before saving to Supabase, but MusicXML scores are saved as raw XML strings. This means the `data_format` in the DB is always `'json'` for ABC but `'musicxml'` for MusicXML. Decide if this is intentional (MusicXML fidelity) or an oversight, and document or standardize the behavior.
 
-- [ ] [A:Medium] Add license selector field to score editor
+- [ ] [A:High] Add license selector field to score editor
   - **Depends on**: "Handle score license requirements" in Content/Data — data field must exist first
   - Add a license dropdown to the score metadata section of the editor
   - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
@@ -74,9 +74,9 @@
   - Default to All Rights Reserved for new scores
   - Display selected license on score detail page
 
-- [ ] [A:High] Add loading spinners and error states
-- [ ] [A:High] Polish form validation and error messages
-- [ ] [A:Medium] Version history (track edits over time)
+- [ ] [A:Medium] Add loading spinners and error states
+- [ ] [A:Medium] Polish form validation and error messages
+- [ ] [A:Low] Version history (track edits over time)
 - [ ] [A:Low] Visual score editor (point-and-click note entry)
 - [ ] [A:Medium] Multiple score input formats (import from ABC, etc.)
 
@@ -96,7 +96,7 @@
 - [ ] [A:High] Add unit tests for auth module
   - `src/api/auth.ts` and `src/api/authState.ts` have 0 tests. Test: `signUp`/`signIn`/`signOut` call correct Supabase methods and return expected results, `AuthStateManager.subscribe()` fires callback immediately, `isAuthenticated()` reflects current state, `onAuthStateChange` relays Supabase auth events.
 
-- [ ] [A:Medium] Private scores (unlisted or private visibility)
+- [ ] [A:Low] Private scores (unlisted or private visibility)
 
 ### Design
 
@@ -131,7 +131,7 @@
     - Letter spacing should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
-- [ ] Update to a more colorful palette
+- [ ] [A:Low] Update to a more colorful palette
   - **Blocked by**: awaiting designer color palettes and references
   - implement theme selection, control the theme using a tweakpane
   - explore how to implement a color theme on the site. Designer will provide references and color palettes.
@@ -186,13 +186,13 @@
 - [ ] [A:High] Verify mock was called in convenience.test.ts
   - `src/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
 
-- [ ] [A:Medium] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
+- [ ] [A:High] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
   - `src/types/ScoreData.ts:45-52` — Three optional booleans (`meri`, `chu_meri`, `dai_meri`) allow invalid states: all three can be true simultaneously, which has no musical meaning. Replace with a single field `meriType?: 'meri' | 'chu_meri' | 'dai_meri'` that makes illegal states unrepresentable. This requires updating `ScoreParser`, `MusicXMLParser`, `KINKO_PITCH_MAP`, and all tests that reference these fields. Also fixes the naming inconsistency: `chu_meri` uses snake_case while the rest of the interface uses camelCase.
 
-- [ ] [A:Medium] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
+- [ ] [A:High] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
   - `src/api/scores.ts:15,27,36` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
 
-- [ ] [A:Medium] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
+- [ ] [A:High] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
   - `src/web-component/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` at lines 190, 307 when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
 
 - [ ] [A:Medium] Evaluate whether Formatter and VerticalSystem should be public API [Claude validated]
@@ -234,19 +234,19 @@
   - There is no formal `Parser` interface. `MusicXMLParser` is a concrete static class imported by name in `ScoreDetailClient` (line 83), `ScoreRenderer` (line 64), and `convenience.ts`. Format dispatch (`if format === 'musicxml' ... else if format === 'json'`) is scattered across 3 components. Define a `Parser` interface (`parse(content: string): ScoreData`), create a `ParserRegistry` keyed by `ScoreDataFormat`, and replace scattered conditionals with `ParserRegistry.get(format).parse(content)`. Adding a new format (e.g., ABC notation) then becomes one new file + one registry entry instead of touching 6 files.
   - **Validate first**: Read all files that reference `MusicXMLParser` or check `data_format`. Map every call site. Confirm that `ScoreParser` (which converts `ScoreData` → `ShakuNote[]`) is a separate concern and should NOT be part of this interface. Verify `ScoreDataFormat` type location (`api/scores.ts:5`) and whether it belongs in `types/`.
 
-- [ ] [A:High] Test geometricPrecision on shakuhachi SVG notes
+- [ ] [A:Medium] Test geometricPrecision on shakuhachi SVG notes
 - [ ] [A:Low] Evaluate whether to migrate the web component to Lit or a similar framework
   - Current implementation is vanilla custom elements. Would Lit reduce boilerplate and maintenance overhead?
   - Assess bundle size impact, migration cost, and long-term maintainability tradeoffs
 - [ ] [A:High] Add JSDoc comments to public APIs
 - [ ] [A:Medium] Write usage guide in reference/README.md
-- [ ] [A:Medium] Document score data format
+- [ ] [A:High] Document score data format
 
 - [ ] [A:Medium] YuriModifier (vibrato)
 - [ ] [A:Medium] MuraikiModifier (breathy tone)
 - [ ] [A:Medium] SuriModifier (sliding)
 - [ ] [A:Medium] OriModifier (pitch bend)
-- [ ] [A:Medium] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
+- [ ] [A:High] Centered duration line style (line passes horizontally through middle of note, alternative to current right-aligned style)
 
 - [ ] [A:Low] Revisit column breaking with TeX-inspired badness algorithm
   - [ ] Implement badness metric for column height variance
@@ -256,7 +256,7 @@
 
 ### Content / Data
 
-- [ ] [A:High] Handle score license requirements
+- [ ] [A:Medium] Handle score license requirements
   - Audit license types likely encountered: public domain, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, all-rights-reserved
   - Implement license metadata field on scores (store SPDX identifier or license name + URL)
   - Display license badge/notice on score detail page (required by CC licenses)
@@ -266,14 +266,14 @@
   - Ensure user-created scores can also declare a license
   - Block or warn on import of all-rights-reserved content without explicit permission
 
-- [ ] [A:Medium] Revisit attribution modules design and placement
+- [ ] [A:Low] Revisit attribution modules design and placement
   - Review how attribution (composer, source, license) is currently stored and displayed
   - Evaluate whether attribution belongs in score metadata, a separate DB field, or a dedicated module
   - Consider display placement: score detail page, score card in library, score header, footer
   - Ensure design scales to support imported scores (IMSLP, shin-itchiro) with varied attribution requirements
   - Align with any licensing obligations (e.g., CC license notices must be visible)
 
-- [ ] [A:Medium] Research and identify shakuhachi score sources
+- [ ] [A:High] Research and identify shakuhachi score sources
   - Survey publicly available shakuhachi score repositories (websites, archives, blogs, academic sources)
   - Identify sources with digital scores in machine-readable formats (MusicXML, ABC, MIDI, PDF)
   - Note each source's language, format, scope (honkyoku, minyo, Western adaptations, etc.)
@@ -323,7 +323,7 @@
 
 ### Tooling / Guidelines
 
-- [ ] [A:Medium] Review and prune toast visual regression tests
+- [ ] [A:High] Review and prune toast visual regression tests
   - `tests/visual/toast.spec.ts` has 18 tests across Desktop / Mobile / Tablet but many appear to capture the same visual output (e.g. individual variant tests at desktop repeat what the "all variants" grid already covers)
   - Review each test: does it cover a genuinely distinct visual state, or is it redundant with another test in the suite?
   - Goal: keep tests that catch real regressions; remove duplicates that just inflate baseline count and maintenance burden
@@ -336,10 +336,10 @@
 
 ### Future
 
-- [ ] [A:Medium] Collections (curated score groups)
-- [ ] [A:Medium] Comments/discussions on scores
+- [ ] [A:Low] Collections (curated score groups)
+- [ ] [A:Low] Comments/discussions on scores
 - [ ] [A:Medium] Export/download scores as files
-- [ ] [A:Medium] Western staff intermixing
+- [ ] [A:Low] Western staff intermixing
 - [ ] [A:Medium] Custom font support for traditional glyphs
 - [ ] [A:Medium] Score transposition tool
 - [ ] [A:Low] OCR tool (scan physical scores to MusicXML/JSON)
