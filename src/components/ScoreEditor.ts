@@ -5,6 +5,7 @@ import { ABCParser } from '../web-component/parser/ABCParser';
 import { toast } from './Toast';
 import { ConfirmDialog } from './ConfirmDialog';
 import { debounce } from '../utils/debounce';
+import { buildSpinnerSVG } from './LoadingSpinner';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 
@@ -42,15 +43,24 @@ export class ScoreEditor {
     this.scoreId = scoreId;
     this.slug = slug;
 
+    this.showLoadingPlaceholder();
     this.loadExistingScore(scoreId);
-    this.render();
-    this.setupLocalStorageAutoSave();
 
     window.addEventListener('beforeunload', (e) => {
       if (this.hasUnsavedChanges) {
         e.preventDefault();
       }
     });
+  }
+
+  private showLoadingPlaceholder(): void {
+    this.container.innerHTML = `
+      <div class="score-editor">
+        <div class="editor-loading">
+          ${buildSpinnerSVG()}
+        </div>
+      </div>
+    `;
   }
 
   private localStorageKey(): string {
@@ -66,6 +76,9 @@ export class ScoreEditor {
           ? STRINGS.ERRORS.ScoreEditor.loadError(result.error.message)
           : STRINGS.ERRORS.ScoreEditor.loadNotFound,
       );
+      // Render empty editor so user can still interact
+      this.render();
+      this.setupLocalStorageAutoSave();
       return;
     }
 
@@ -85,6 +98,7 @@ export class ScoreEditor {
     }
 
     this.render();
+    this.setupLocalStorageAutoSave();
     this.updatePreview();
     this.checkAndOfferDraftRestore();
   }
