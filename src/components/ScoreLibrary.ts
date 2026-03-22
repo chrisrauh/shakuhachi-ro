@@ -116,7 +116,6 @@ export class ScoreLibrary {
       this.container.innerHTML = `
         <div class="score-library-loading">
           ${buildSpinnerSVG()}
-          <p>Loading scores...</p>
         </div>
       `;
       return;
