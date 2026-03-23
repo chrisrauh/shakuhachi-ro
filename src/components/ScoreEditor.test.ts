@@ -9,6 +9,13 @@ vi.mock('./ConfirmDialog', () => ({
     show: vi.fn(),
   })),
 }));
+vi.mock('../utils/editor-autosave', () => ({
+  EditorAutosave: vi.fn().mockImplementation(() => ({
+    save: vi.fn(),
+    clear: vi.fn(),
+    checkAndOfferRestore: vi.fn(),
+  })),
+}));
 vi.mock('./LoadingSpinner', () => ({
   buildSpinnerSVG: vi.fn(() => '<svg class="spinner"></svg>'),
 }));
@@ -79,7 +86,6 @@ describe('ScoreEditor loading state', () => {
 describe('ScoreEditor.handleSave', () => {
   const SCORE_ID = 'score-123';
   const SLUG = 'test-slug';
-  const LOCAL_KEY = `shakuhachi-editor-${SLUG}`;
 
   let containerId: string;
   let container: HTMLDivElement;
@@ -167,6 +173,7 @@ describe('ScoreEditor.handleSave', () => {
     const { getCurrentUser } = await import('../api/auth');
     const { updateScore } = await import('../api/scores');
     const { toast } = await import('./Toast');
+    const { EditorAutosave } = await import('../utils/editor-autosave');
 
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: { id: 'user-1' } as any,
@@ -182,8 +189,6 @@ describe('ScoreEditor.handleSave', () => {
     editor['dataFormat'] = 'json';
     editor['metadata'] = { title: 'My Score', composer: '', description: '' };
 
-    localStorage.setItem(LOCAL_KEY, 'draft-data');
-
     await editor['handleSave']();
 
     expect(updateScore).toHaveBeenCalledWith(
@@ -191,7 +196,9 @@ describe('ScoreEditor.handleSave', () => {
       expect.objectContaining({ title: 'My Score', data_format: 'json' }),
     );
     expect(toast.success).toHaveBeenCalled();
-    expect(localStorage.getItem(LOCAL_KEY)).toBeNull();
+
+    const mockInstance = vi.mocked(EditorAutosave).mock.results[0].value;
+    expect(mockInstance.clear).toHaveBeenCalledOnce();
   });
 
   it('calls toast.error when API returns an error', async () => {
@@ -244,70 +251,6 @@ describe('ScoreEditor.handleSave', () => {
   });
 });
 
-// --- localStorage autosave ---
-
-describe('ScoreEditor localStorage autosave', () => {
-  const SCORE_ID = 'score-123';
-  const SLUG = 'test-slug';
-  const LOCAL_KEY = `shakuhachi-editor-${SLUG}`;
-
-  let containerId: string;
-  let container: HTMLDivElement;
-
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    vi.useFakeTimers();
-
-    containerId = 'ls-editor-container';
-    container = document.createElement('div');
-    container.id = containerId;
-    document.body.appendChild(container);
-
-    const { getScore } = await import('../api/scores');
-    vi.mocked(getScore).mockResolvedValue({
-      score: {
-        id: SCORE_ID,
-        slug: SLUG,
-        title: 'Test',
-        data_format: 'json',
-        data: {},
-        updated_at: '2024-01-01T00:00:00Z',
-      } as any,
-      error: null,
-    });
-  });
-
-  afterEach(() => {
-    container.remove();
-    localStorage.clear();
-    vi.useRealTimers();
-  });
-
-  it('saves to per-slug key after 2s of inactivity', async () => {
-    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
-    await vi.advanceTimersByTimeAsync(0);
-    editor['scoreData'] = '{"notes":[]}';
-    editor['handleDataChange']('{"notes":[]}');
-
-    vi.advanceTimersByTime(2000);
-
-    const saved = localStorage.getItem(LOCAL_KEY);
-    expect(saved).not.toBeNull();
-    const parsed = JSON.parse(saved!);
-    expect(parsed.scoreData).toBe('{"notes":[]}');
-    expect(parsed.savedAt).toBeDefined();
-  });
-
-  it('does not save to old global key', async () => {
-    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
-    await vi.advanceTimersByTimeAsync(0);
-    editor['handleDataChange']('{"notes":[]}');
-    vi.advanceTimersByTime(2000);
-
-    expect(localStorage.getItem('shakuhachi-editor-autosave')).toBeNull();
-  });
-});
-
 // --- unsaved changes indicator ---
 
 describe('ScoreEditor unsaved changes indicator', () => {
@@ -352,5 +295,85 @@ describe('ScoreEditor unsaved changes indicator', () => {
 
     const indicator = container.querySelector('#save-status-indicator');
     expect(indicator?.textContent).toContain('Unsaved');
+  });
+});
+
+// --- autosave integration ---
+
+describe('ScoreEditor autosave integration', () => {
+  const SCORE_ID = 'score-123';
+  const SLUG = 'test-slug';
+
+  let containerId: string;
+  let container: HTMLDivElement;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    containerId = 'autosave-integration-container';
+    container = document.createElement('div');
+    container.id = containerId;
+    document.body.appendChild(container);
+
+    const { getScore } = await import('../api/scores');
+    vi.mocked(getScore).mockResolvedValue({
+      score: {
+        id: SCORE_ID,
+        slug: SLUG,
+        title: 'Test',
+        data_format: 'json',
+        data: {},
+        updated_at: '2024-01-01T00:00:00Z',
+      } as any,
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    container.remove();
+    localStorage.clear();
+  });
+
+  it('calls autosave.save() when handleDataChange fires', async () => {
+    const { EditorAutosave } = await import('../utils/editor-autosave');
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    editor['handleDataChange']('new data');
+
+    const mockInstance = vi.mocked(EditorAutosave).mock.results[0].value;
+    expect(mockInstance.save).toHaveBeenCalledOnce();
+    expect(mockInstance.save).toHaveBeenCalledWith(
+      expect.objectContaining({ scoreData: 'new data' }),
+    );
+  });
+
+  it('calls autosave.save() when handleFormatChange fires', async () => {
+    const { EditorAutosave } = await import('../utils/editor-autosave');
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    // scoreData is '{}' after load (non-empty), so calling with the current
+    // format ('json') goes directly to the else branch and calls autosave.save()
+    await editor['handleFormatChange']('json');
+
+    const mockInstance = vi.mocked(EditorAutosave).mock.results[0].value;
+    expect(mockInstance.save).toHaveBeenCalled();
+  });
+
+  it('calls autosave.save() when handleMetadataChange fires', async () => {
+    const { EditorAutosave } = await import('../utils/editor-autosave');
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    editor['handleMetadataChange']('title', 'New Title');
+
+    const mockInstance = vi.mocked(EditorAutosave).mock.results[0].value;
+    expect(mockInstance.save).toHaveBeenCalledOnce();
+    expect(mockInstance.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: expect.objectContaining({ title: 'New Title' }),
+      }),
+    );
   });
 });

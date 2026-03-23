@@ -4,20 +4,12 @@ import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
 import { toast } from './Toast';
 import { ConfirmDialog } from './ConfirmDialog';
-import { debounce } from '../utils/debounce';
 import { buildSpinnerSVG } from './LoadingSpinner';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 import { validateScoreInput } from '../utils/score-validation';
-
-const AUTO_SAVE_LOCALSTORAGE_DEBOUNCE_MS = 2_000; // 2s inactivity
-const AUTO_SAVE_LOCALSTORAGE_MAX_WAIT_MS = 60_000; // 1min max
-
-interface ScoreMetadata {
-  title: string;
-  composer: string;
-  description: string;
-}
+import { EditorAutosave } from '../utils/editor-autosave';
+import type { ScoreMetadata } from '../utils/editor-autosave';
 
 export class ScoreEditor {
   private container: HTMLElement;
@@ -30,10 +22,9 @@ export class ScoreEditor {
   };
   private validationError: string | null = null;
   private scoreId: string;
-  private slug: string;
   private loadedAt: string = '';
   private hasUnsavedChanges: boolean = false;
-  private debouncedLocalStorageSave: (() => void) | null = null;
+  private autosave: EditorAutosave;
 
   constructor(containerId: string, scoreId: string, slug: string) {
     const container = document.getElementById(containerId);
@@ -42,7 +33,7 @@ export class ScoreEditor {
     }
     this.container = container;
     this.scoreId = scoreId;
-    this.slug = slug;
+    this.autosave = new EditorAutosave(slug);
 
     this.showLoadingPlaceholder();
     this.loadExistingScore(scoreId);
@@ -64,10 +55,6 @@ export class ScoreEditor {
     `;
   }
 
-  private localStorageKey(): string {
-    return `shakuhachi-editor-${this.slug}`;
-  }
-
   private async loadExistingScore(scoreId: string): Promise<void> {
     const result = await getScore(scoreId);
 
@@ -79,7 +66,6 @@ export class ScoreEditor {
       );
       // Render empty editor so user can still interact
       this.render();
-      this.setupLocalStorageAutoSave();
       return;
     }
 
@@ -99,60 +85,16 @@ export class ScoreEditor {
     }
 
     this.render();
-    this.setupLocalStorageAutoSave();
     this.updatePreview();
-    this.checkAndOfferDraftRestore();
-  }
-
-  private checkAndOfferDraftRestore(): void {
-    const saved = localStorage.getItem(this.localStorageKey());
-    if (!saved) return;
-
-    try {
-      const draft = JSON.parse(saved);
-      if (!draft.savedAt || !this.loadedAt) return;
-      if (draft.savedAt <= this.loadedAt) return;
-
-      new ConfirmDialog().show({
-        title: 'Unsaved changes',
-        message:
-          'You have unsaved changes from a previous session. Restore them?',
-        confirmText: 'Restore',
-        cancelText: 'Discard',
-        onConfirm: () => {
-          this.scoreData = draft.scoreData || '';
-          this.dataFormat = draft.dataFormat || 'json';
-          this.metadata = draft.metadata || this.metadata;
-          this.hasUnsavedChanges = true;
-          this.render();
-          this.updatePreview();
-          this.updateUnsavedIndicator();
-        },
-        onCancel: () => {
-          localStorage.removeItem(this.localStorageKey());
-        },
-      });
-    } catch {
-      localStorage.removeItem(this.localStorageKey());
-    }
-  }
-
-  private setupLocalStorageAutoSave(): void {
-    this.debouncedLocalStorageSave = debounce(
-      () => this.saveToLocalStorage(),
-      AUTO_SAVE_LOCALSTORAGE_DEBOUNCE_MS,
-      AUTO_SAVE_LOCALSTORAGE_MAX_WAIT_MS,
-    );
-  }
-
-  private saveToLocalStorage(): void {
-    const data = {
-      scoreData: this.scoreData,
-      dataFormat: this.dataFormat,
-      metadata: this.metadata,
-      savedAt: new Date().toISOString(),
-    };
-    localStorage.setItem(this.localStorageKey(), JSON.stringify(data));
+    this.autosave.checkAndOfferRestore(this.loadedAt, (draft) => {
+      this.scoreData = draft.scoreData || '';
+      this.dataFormat = draft.dataFormat || 'json';
+      this.metadata = draft.metadata || this.metadata;
+      this.hasUnsavedChanges = true;
+      this.render();
+      this.updatePreview();
+      this.updateUnsavedIndicator();
+    });
   }
 
   private updateUnsavedIndicator(): void {
@@ -170,7 +112,11 @@ export class ScoreEditor {
     this.validationError = error ?? null;
     this.renderValidation();
     this.updatePreview();
-    this.debouncedLocalStorageSave?.();
+    this.autosave.save({
+      scoreData: this.scoreData,
+      dataFormat: this.dataFormat,
+      metadata: this.metadata,
+    });
     this.updateUnsavedIndicator();
   }
 
@@ -211,7 +157,11 @@ export class ScoreEditor {
 
     this.hasUnsavedChanges = true;
     this.render();
-    this.debouncedLocalStorageSave?.();
+    this.autosave.save({
+      scoreData: this.scoreData,
+      dataFormat: this.dataFormat,
+      metadata: this.metadata,
+    });
   }
 
   private handleMetadataChange(
@@ -220,7 +170,11 @@ export class ScoreEditor {
   ): void {
     this.hasUnsavedChanges = true;
     this.metadata[field] = value;
-    this.debouncedLocalStorageSave?.();
+    this.autosave.save({
+      scoreData: this.scoreData,
+      dataFormat: this.dataFormat,
+      metadata: this.metadata,
+    });
     this.updateUnsavedIndicator();
   }
 
@@ -413,7 +367,7 @@ export class ScoreEditor {
       if (result.error) {
         toast.error(STRINGS.ERRORS.ScoreEditor.saveError(result.error.message));
       } else {
-        localStorage.removeItem(this.localStorageKey());
+        this.autosave.clear();
         this.hasUnsavedChanges = false;
         this.updateUnsavedIndicator();
         toast.success(STRINGS.SUCCESS.ScoreEditor.scoreSaved(true));
@@ -626,6 +580,6 @@ export class ScoreEditor {
   }
 
   public destroy(): void {
-    // No timer to clear
+    // autosave holds a debounce timer; pending saves complete naturally on page unload
   }
 }
