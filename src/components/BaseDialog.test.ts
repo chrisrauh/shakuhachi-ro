@@ -20,6 +20,7 @@ describe('BaseDialog', () => {
     overlay = document.createElement('div');
     dialogEl = document.createElement('div');
     dialogEl.setAttribute('role', 'dialog');
+    dialogEl.setAttribute('aria-modal', 'true');
     dialogEl.setAttribute('tabindex', '-1');
     overlay.appendChild(dialogEl);
     overlay.hidden = true;

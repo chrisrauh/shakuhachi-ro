@@ -26,6 +26,7 @@ export abstract class BaseDialog {
     this.overlay.hidden = false;
 
     this.clickHandler = (e: MouseEvent) => {
+      // Note: closeOverlay() nulls this.overlay — e.target comparison must happen before the call
       if (e.target === this.overlay) {
         onDismiss?.();
         this.closeOverlay();
