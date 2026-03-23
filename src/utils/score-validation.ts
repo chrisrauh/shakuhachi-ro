@@ -17,12 +17,9 @@ export function validateScoreInput(
       return { valid: true };
     } else {
       // format === 'musicxml'
-      // DOMParser.parseFromString never throws — errors appear as a <parseerror> element
+      // DOMParser.parseFromString never throws — errors appear as a <parsererror> element
       const doc = new DOMParser().parseFromString(data, 'text/xml');
-      if (
-        doc.querySelector('parseerror') ||
-        doc.documentElement?.tagName === 'parsererror'
-      ) {
+      if (doc.querySelector('parsererror')) {
         return {
           valid: false,
           error: STRINGS.VALIDATION.ScoreEditor.invalidMusicXML,
