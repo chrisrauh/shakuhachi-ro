@@ -8,6 +8,7 @@ import { debounce } from '../utils/debounce';
 import { buildSpinnerSVG } from './LoadingSpinner';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
+import { validateScoreInput } from '../utils/score-validation';
 
 const AUTO_SAVE_LOCALSTORAGE_DEBOUNCE_MS = 2_000; // 2s inactivity
 const AUTO_SAVE_LOCALSTORAGE_MAX_WAIT_MS = 60_000; // 1min max
@@ -162,47 +163,11 @@ export class ScoreEditor {
       : '';
   }
 
-  private validateScoreData(): boolean {
-    if (!this.scoreData.trim()) {
-      this.validationError = null;
-      return false;
-    }
-
-    try {
-      if (this.dataFormat === 'json') {
-        JSON.parse(this.scoreData);
-        this.validationError = null;
-        return true;
-      } else if (this.dataFormat === 'abc') {
-        ABCParser.parse(this.scoreData);
-        this.validationError = null;
-        return true;
-      } else {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(this.scoreData, 'text/xml');
-        const parseError = doc.querySelector('parsererror');
-
-        if (parseError) {
-          this.validationError = STRINGS.VALIDATION.ScoreEditor.invalidMusicXML;
-          return false;
-        }
-
-        this.validationError = null;
-        return true;
-      }
-    } catch (error) {
-      this.validationError =
-        error instanceof Error
-          ? error.message
-          : STRINGS.VALIDATION.ScoreEditor.invalidFormat;
-      return false;
-    }
-  }
-
   private handleDataChange(newData: string): void {
     this.hasUnsavedChanges = true;
     this.scoreData = newData;
-    this.validateScoreData();
+    const { error } = validateScoreInput(this.scoreData, this.dataFormat);
+    this.validationError = error ?? null;
     this.renderValidation();
     this.updatePreview();
     this.debouncedLocalStorageSave?.();
@@ -263,7 +228,12 @@ export class ScoreEditor {
     const externalPreview = document.getElementById('score-preview');
 
     if (externalPreview && !this.container.contains(externalPreview)) {
-      if (!this.validateScoreData() || !this.scoreData.trim()) {
+      const { valid, error } = validateScoreInput(
+        this.scoreData,
+        this.dataFormat,
+      );
+      this.validationError = error ?? null;
+      if (!valid) {
         externalPreview.innerHTML = `
           <div class="preview-placeholder">
             <p>Preview will appear here</p>
@@ -327,7 +297,12 @@ export class ScoreEditor {
     ) as HTMLElement;
     if (!previewContainer) return;
 
-    if (!this.validateScoreData() || !this.scoreData.trim()) {
+    const { valid, error } = validateScoreInput(
+      this.scoreData,
+      this.dataFormat,
+    );
+    this.validationError = error ?? null;
+    if (!valid) {
       previewContainer.innerHTML = `
         <div class="preview-placeholder">
           <p>Preview will appear here</p>
@@ -393,7 +368,12 @@ export class ScoreEditor {
       this.metadata.title = 'Untitled Score';
     }
 
-    if (!this.validateScoreData()) {
+    const { valid, error } = validateScoreInput(
+      this.scoreData,
+      this.dataFormat,
+    );
+    this.validationError = error ?? null;
+    if (!valid) {
       toast.error(STRINGS.ERRORS.ScoreEditor.saveValidationFailed);
       return;
     }

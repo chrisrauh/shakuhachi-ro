@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ScoreEditor } from './ScoreEditor';
-import type { ScoreDataFormat } from '../api/scores';
 
 vi.mock('../api/scores');
 vi.mock('../api/auth');
@@ -72,82 +71,6 @@ describe('ScoreEditor loading state', () => {
 
     expect(container.querySelector('.editor-loading')).toBeNull();
     expect(container.querySelector('#score-data-input')).not.toBeNull();
-  });
-});
-
-// --- validateScoreData() ---
-
-describe('ScoreEditor.validateScoreData', () => {
-  type Ctx = {
-    scoreData: string;
-    dataFormat: ScoreDataFormat;
-    validationError: string | null;
-  };
-
-  function callValidate(ctx: Ctx): boolean {
-    return ScoreEditor.prototype['validateScoreData'].call(ctx) as boolean;
-  }
-
-  it('returns false and null error for empty string', () => {
-    const ctx: Ctx = {
-      scoreData: '',
-      dataFormat: 'json',
-      validationError: 'previous',
-    };
-    expect(callValidate(ctx)).toBe(false);
-    expect(ctx.validationError).toBeNull();
-  });
-
-  it('returns false and null error for whitespace-only string', () => {
-    const ctx: Ctx = {
-      scoreData: '   \n\t',
-      dataFormat: 'json',
-      validationError: 'previous',
-    };
-    expect(callValidate(ctx)).toBe(false);
-    expect(ctx.validationError).toBeNull();
-  });
-
-  it('returns true for valid JSON', () => {
-    const ctx: Ctx = {
-      scoreData: '{"title":"Test","notes":[]}',
-      dataFormat: 'json',
-      validationError: 'previous',
-    };
-    expect(callValidate(ctx)).toBe(true);
-    expect(ctx.validationError).toBeNull();
-  });
-
-  it('returns false with error for invalid JSON', () => {
-    const ctx: Ctx = {
-      scoreData: '{invalid json',
-      dataFormat: 'json',
-      validationError: null,
-    };
-    expect(callValidate(ctx)).toBe(false);
-    expect(ctx.validationError).toBeTruthy();
-  });
-
-  it('returns true for valid ABC notation', () => {
-    const ctx: Ctx = {
-      scoreData: 'X:1\nT:Test\nM:4/4\nL:1/4\nK:C\nCDEF|',
-      dataFormat: 'abc',
-      validationError: null,
-    };
-    expect(callValidate(ctx)).toBe(true);
-    expect(ctx.validationError).toBeNull();
-  });
-
-  it('returns true for valid MusicXML', () => {
-    const validXML =
-      '<score-partwise version="3.1"><part id="P1"></part></score-partwise>';
-    const ctx: Ctx = {
-      scoreData: validXML,
-      dataFormat: 'musicxml',
-      validationError: 'previous',
-    };
-    expect(callValidate(ctx)).toBe(true);
-    expect(ctx.validationError).toBeNull();
   });
 });
 
