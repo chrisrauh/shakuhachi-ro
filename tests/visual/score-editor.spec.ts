@@ -155,6 +155,21 @@ test.describe('Score Editor Visual Regression', () => {
       });
     });
 
+    test('Invalid MusicXML shows validation error', async ({ page }) => {
+      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
+      await setTheme(page, 'light');
+      await waitForEditor(page);
+
+      await page.click('input[type="radio"][value="musicxml"]');
+      const textarea = page.locator('#score-data-input');
+      await textarea.clear();
+      await textarea.fill('<unclosed');
+
+      const validationError = page.locator('.validation-error');
+      await expect(validationError).toBeVisible();
+      await expect(validationError).toContainText('Invalid MusicXML');
+    });
+
     test('Format mismatch error and empty preview', async ({ page }) => {
       await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
       await setTheme(page, 'light');
