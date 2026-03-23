@@ -29,7 +29,7 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [ ] [A:Low] Consider slug update behavior when title changes
+- [x] [A:Low] Consider slug update behavior when title changes
   - Currently: Slug is set on creation and never changes, even if title is updated
   - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
   - **Current behavior may be intentional** for URL stability (avoid breaking bookmarks/links)
@@ -333,6 +333,10 @@
 ### Future
 
 - [ ] [A:Low] Collections (curated score groups)
+- [ ] [A:Low] Add slug editing to the score editor
+  - Slugs are currently immutable after creation (intentional — preserves stable URLs for bookmarks and shared links)
+  - Allow score owners to manually edit the slug from the editor, with a clear warning that changing it will break existing links
+  - Enforce uniqueness validation on save
 - [ ] [A:Low] Comments/discussions on scores
 - [ ] [A:Medium] Export/download scores as files
 - [ ] [A:Low] Western staff intermixing

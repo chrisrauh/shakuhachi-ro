@@ -47,6 +47,8 @@ export interface UpdateScoreData {
   source_url?: string;
   rights?: string;
   source_description?: string;
+  // slug is intentionally omitted — slugs are immutable after creation to preserve
+  // stable URLs (bookmarks, shared links). See TODO for future slug editing feature.
 }
 
 export interface ScoreResult {
