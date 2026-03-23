@@ -16,7 +16,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-large);
-  animation: 0.15s ease-out dialog-overlay-appear;
+  animation: var(--transition-fast) ease-out dialog-overlay-appear;
 }
 
 .dialog-overlay[hidden] {
@@ -42,7 +42,7 @@
   box-shadow: var(--shadow-x-large);
   max-width: var(--size-dialog-max-width);
   width: 100%;
-  animation: 0.2s cubic-bezier(0.33, 1, 0.68, 1) confirm-dialog-appear;
+  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1) confirm-dialog-appear;
 }
 
 .confirm-dialog-header {
