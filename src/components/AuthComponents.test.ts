@@ -53,7 +53,7 @@ describe('AuthWidget avatar render', () => {
     </div>
     <!-- AuthModal shell — required by AuthModal constructor -->
     <div id="auth-modal-overlay" hidden>
-      <div class="auth-modal-content" role="dialog" tabindex="-1">
+      <div class="auth-modal-content" role="dialog" aria-modal="true" tabindex="-1">
         <h2 id="auth-modal-title"></h2>
         <form id="auth-form">
           <input type="email" id="auth-email" />

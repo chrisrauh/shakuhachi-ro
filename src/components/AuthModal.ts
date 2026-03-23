@@ -27,6 +27,8 @@ export class AuthModal extends BaseDialog {
     const submitBtn = document.getElementById('auth-submit');
     const cancelBtn = document.getElementById('auth-cancel');
     const toggleBtn = document.getElementById('auth-toggle');
+    const submitBtnText = submitBtn?.querySelector('.btn-text') ?? null;
+    const toggleBtnText = toggleBtn?.querySelector('.btn-text') ?? null;
 
     if (
       !overlay ||
@@ -37,7 +39,9 @@ export class AuthModal extends BaseDialog {
       !errorDiv ||
       !submitBtn ||
       !cancelBtn ||
-      !toggleBtn
+      !toggleBtn ||
+      !submitBtnText ||
+      !toggleBtnText
     ) {
       throw new Error(
         'AuthModal: required elements not found — ensure SiteHeader.astro is rendered',
@@ -51,10 +55,10 @@ export class AuthModal extends BaseDialog {
     this.passwordInput = passwordInput as HTMLInputElement;
     this.errorDiv = errorDiv as HTMLDivElement;
     this.submitBtn = submitBtn as HTMLButtonElement;
-    this.submitBtnText = submitBtn.querySelector('.btn-text') as HTMLElement;
+    this.submitBtnText = submitBtnText as HTMLElement;
     this.cancelBtn = cancelBtn as HTMLButtonElement;
     this.toggleBtn = toggleBtn as HTMLButtonElement;
-    this.toggleBtnText = toggleBtn.querySelector('.btn-text') as HTMLElement;
+    this.toggleBtnText = toggleBtnText as HTMLElement;
 
     // Wire listeners once — these never change between show() calls
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
