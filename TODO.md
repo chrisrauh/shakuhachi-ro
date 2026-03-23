@@ -29,13 +29,6 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [x] [A:Low] Consider slug update behavior when title changes
-  - Currently: Slug is set on creation and never changes, even if title is updated
-  - Example: Score created with slug "evening-morning-bell" → user changes title to "Hello" → URL remains `/score/evening-morning-bell`
-  - **Current behavior may be intentional** for URL stability (avoid breaking bookmarks/links)
-  - **Document decision**: If intentional, add comment explaining why slug doesn't update
-  - **Alternative**: Add explicit "slug" field in editor for advanced users who want custom URLs
-
 - [ ] [A:Medium] Standardize error UX across components
   - `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
   - `ScoreLibrary` uses inline UI with a retry button; `ScoreEditor` uses `toast`; pick one pattern and apply consistently
