@@ -63,7 +63,7 @@
 
 .confirm-dialog-message {
   margin: 0;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-medium);
   color: var(--color-text-secondary);
   line-height: var(--line-height-normal);
 }
