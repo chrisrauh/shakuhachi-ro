@@ -17,6 +17,7 @@ import {
   type AuthModalInterface,
 } from '../components/AuthComponents';
 import { AuthModal } from '../components/AuthModal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MobileMenu, type MenuItem } from '../components/MobileMenu';
 import { onAuthReady, signOut } from '../api/auth';
 import { getIconHTML } from './icons';
@@ -168,6 +169,9 @@ const MENU_BUILDERS: Record<
   'score-edit': scoreEditMenuBuilder,
 };
 
+// Module-level singleton — initialized by initHeader(), imported by call sites
+export let confirmDialog: ConfirmDialog;
+
 export function initHeader(): void {
   new ThemeSwitcher();
 
@@ -180,6 +184,7 @@ export function initHeader(): void {
   }
 
   const authModal = new AuthModal();
+  confirmDialog = new ConfirmDialog();
   const authWidget = new AuthWidget('auth-widget', authModal);
   const mobileMenu = new MobileMenu('mobile-menu');
 

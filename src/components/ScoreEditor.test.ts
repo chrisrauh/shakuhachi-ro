@@ -4,10 +4,8 @@ import { ScoreEditor } from './ScoreEditor';
 vi.mock('../api/scores');
 vi.mock('../api/auth');
 vi.mock('./Toast');
-vi.mock('./ConfirmDialog', () => ({
-  ConfirmDialog: vi.fn().mockImplementation(() => ({
-    show: vi.fn(),
-  })),
+vi.mock('../utils/init-header', () => ({
+  confirmDialog: { show: vi.fn() },
 }));
 vi.mock('../utils/editor-autosave', () => ({
   EditorAutosave: vi.fn().mockImplementation(() => ({
