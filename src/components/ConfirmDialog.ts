@@ -1,5 +1,3 @@
-import { BaseDialog } from './BaseDialog';
-
 export interface ConfirmDialogOptions {
   title: string;
   message: string;
@@ -9,30 +7,40 @@ export interface ConfirmDialogOptions {
   onCancel?: () => void;
 }
 
-export class ConfirmDialog extends BaseDialog {
-  private overlayEl: HTMLElement;
+export class ConfirmDialog {
+  private dialogEl: HTMLDialogElement;
   private confirmBtn: HTMLButtonElement;
   private cancelBtn: HTMLButtonElement;
+  private currentOnDismiss: (() => void) | undefined;
 
   constructor() {
-    super();
-    const overlay = document.getElementById('confirm-dialog-overlay');
+    const dialog = document.getElementById('confirm-dialog');
     const confirmBtn = document.getElementById('confirm-dialog-confirm');
     const cancelBtn = document.getElementById('confirm-dialog-cancel');
 
-    if (!overlay || !confirmBtn || !cancelBtn) {
+    if (!dialog || !confirmBtn || !cancelBtn) {
       throw new Error(
-        'ConfirmDialog: required elements (#confirm-dialog-overlay, #confirm-dialog-confirm, #confirm-dialog-cancel) not found',
+        'ConfirmDialog: required elements (#confirm-dialog, #confirm-dialog-confirm, #confirm-dialog-cancel) not found',
       );
     }
 
-    this.overlayEl = overlay;
+    this.dialogEl = dialog as HTMLDialogElement;
     this.confirmBtn = confirmBtn as HTMLButtonElement;
     this.cancelBtn = cancelBtn as HTMLButtonElement;
+
+    // Register cancel handler once — handles Escape key via native <dialog> cancel event.
+    // e.preventDefault() suppresses the browser's automatic close so we control sequencing.
+    this.dialogEl.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      this.currentOnDismiss?.();
+      this.dialogEl.close();
+    });
   }
 
   public show(options: ConfirmDialogOptions): void {
-    // Populate dynamic content — textContent is inherently XSS-safe
+    this.currentOnDismiss = options.onCancel;
+
+    // Populate dynamic content — textContent is XSS-safe
     const titleEl = document.getElementById('confirm-dialog-title');
     const messageEl = document.getElementById('confirm-dialog-message');
     if (titleEl) titleEl.textContent = options.title;
@@ -47,13 +55,13 @@ export class ConfirmDialog extends BaseDialog {
     // Wire per-call callbacks via .onclick (replaces previous handler, no accumulation)
     this.confirmBtn.onclick = () => {
       options.onConfirm();
-      this.closeOverlay();
+      this.dialogEl.close();
     };
     this.cancelBtn.onclick = () => {
       options.onCancel?.();
-      this.closeOverlay();
+      this.dialogEl.close();
     };
 
-    this.openOverlay(this.overlayEl, () => options.onCancel?.());
+    this.dialogEl.showModal();
   }
 }
