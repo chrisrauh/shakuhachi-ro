@@ -186,7 +186,7 @@
 - [ ] [A:High] Add unit tests for modifier rendering logic
   - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
 
-- [ ] [A:High] Verify mock was called in convenience.test.ts
+- [x] [A:High] Verify mock was called in convenience.test.ts
   - `src/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
 
 - [ ] [A:High] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
