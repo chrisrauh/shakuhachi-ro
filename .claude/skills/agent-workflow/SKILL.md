@@ -18,6 +18,8 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 3. Announce: `"Working on: [task title]"`
 4. If no `[A:High]` tasks remain: report back and stop — do not pick `[A:Medium]` or `[A:Low]`
 
+**`[A:High]` means agent-ready:** the task description must contain enough detail (file paths, exact approach, constraints) to implement without asking any questions. If the description is vague, it should not be `[A:High]` — see the failure protocol.
+
 ---
 
 ## Phase 2: Setup
