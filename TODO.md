@@ -46,8 +46,13 @@
 - [ ] [A:Low] Move score validation strings out of `STRINGS.VALIDATION.ScoreEditor` namespace
   - `src/constants/strings.ts` — `invalidMusicXML` and `invalidFormat` live under `STRINGS.VALIDATION.ScoreEditor` but are now used by the standalone `validateScoreInput` utility (`src/utils/score-validation.ts`), which has no relationship to `ScoreEditor`. Move these keys to a dedicated `STRINGS.VALIDATION.scoreValidation` namespace and update all references.
 
-- [ ] [A:High] Extract localStorage autosave logic out of ScoreEditor
-  - `src/components/ScoreEditor.ts:125-141` — `setupLocalStorageAutoSave()`, `saveToLocalStorage()`, and `checkAndOfferDraftRestore()` form a self-contained persistence concern: debounce management, per-slug key naming, serialization format, and draft/DB timestamp comparison. Extract to `src/utils/editor-autosave.ts` (or a small `EditorAutosave` class) that takes a slug and serialization callbacks. Makes the logic testable without a full editor instance.
+- [ ] [A:Medium] Test autosave feature end-to-end in the editor
+  - Edit a score and wait for autosave (2s debounce) — verify "Saved X ago" indicator updates
+  - Reload the page — verify draft restore prompt appears
+  - Accept restore — verify content is restored correctly
+  - Decline restore — verify draft is discarded and current saved version loads
+  - Save the score — reload and verify no restore prompt appears (draft cleared on save)
+  - Test on mobile viewport for readability of the save indicator
 
 - [ ] [A:Low] Decompose ScoreEditor into model + view
   - `ScoreEditor.ts` is ~930 lines mixing 8+ concerns: state (instance variables), DOM generation (`innerHTML` templates), event wiring, API calls, validation, localStorage autosave, preview rendering, and CSS injection. This monolith makes adding versioning, collaboration, or format plugins require invasive surgery on a single file.
