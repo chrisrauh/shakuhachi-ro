@@ -13,6 +13,7 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 | Session start / new task / context cleared | Invoke `/get-ready` FIRST |
 | Development work, no plan OR Claude plan (EnterPlanMode) | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
 | Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development` |
+| Autonomous work on `[A:High]` TODO tasks | Invoke `/agent-workflow` — NOT `/dev-workflow` |
 | Before any `superpowers:*` skill | Invoke `/eng-principles` FIRST |
 
 **Red flags — if you think any of these, STOP:**
@@ -20,6 +21,7 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 - "This is a quick task, I don't need `/get-ready`" → You still do
 - "I already know the principles" → Still invoke `/eng-principles` before any superpowers skill
 - "There's a plan, so I'll use `superpowers:subagent-driven-development`" → Only if it's a superpowers plan (from `superpowers:writing-plans`). Claude plans (EnterPlanMode) → use `/dev-workflow`
+- "This is an `[A:High]` task, I'll use `/dev-workflow`" → Use `/agent-workflow` for autonomous execution
 
 ---
 
@@ -28,7 +30,8 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 Use project skills for structured workflows:
 
 - **`/get-ready`** — Review guidelines, architecture, and tasks at the start of a session
-- **`/dev-workflow`** — Branch setup, commits, PRs, and post-merge cleanup. Use for all development work.
+- **`/dev-workflow`** — Branch setup, commits, PRs, and post-merge cleanup. Use for human-led development work.
+- **`/agent-workflow`** — Autonomous execution of `[A:High]` tasks: task selection, worktree, implement, commit, PR. No human direction needed.
 - **`/eng-principles`** — Engineering principles, hard rules (including CSS), and project-specific lessons.
 
 ## Project Context
