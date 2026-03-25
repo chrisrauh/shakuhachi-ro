@@ -10,7 +10,9 @@
 
 ## Task Tags
 
-**Autonomy:** `[A:High]` = Can work independently | `[A:Medium]` = May need guidance | `[A:Low]` = Requires collaboration
+**Autonomy:** `[A:High]` = Agent-ready (see below) | `[A:Medium]` = May need guidance | `[A:Low]` = Requires collaboration
+
+**`[A:High]` means agent-ready:** The task description must be specific enough for an autonomous agent to implement without asking any questions — file paths, exact approach, known constraints. If a task needs clarification before it can be worked on, it is not `[A:High]`. Downgrade to `[A:Medium]` until fleshed out.
 
 ---
 
