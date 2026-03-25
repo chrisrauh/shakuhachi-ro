@@ -11,14 +11,18 @@ export class ConfirmDialog {
   private dialogEl: HTMLDialogElement;
   private confirmBtn: HTMLButtonElement;
   private cancelBtn: HTMLButtonElement;
+  private titleEl: HTMLElement;
+  private messageEl: HTMLElement;
   private currentOnDismiss: (() => void) | undefined;
 
   constructor() {
     const dialog = document.getElementById('confirm-dialog');
     const confirmBtn = document.getElementById('confirm-dialog-confirm');
     const cancelBtn = document.getElementById('confirm-dialog-cancel');
+    const titleEl = document.getElementById('confirm-dialog-title');
+    const messageEl = document.getElementById('confirm-dialog-message');
 
-    if (!dialog || !confirmBtn || !cancelBtn) {
+    if (!dialog || !confirmBtn || !cancelBtn || !titleEl || !messageEl) {
       throw new Error(
         'ConfirmDialog: required elements (#confirm-dialog, #confirm-dialog-confirm, #confirm-dialog-cancel) not found',
       );
@@ -27,6 +31,8 @@ export class ConfirmDialog {
     this.dialogEl = dialog as HTMLDialogElement;
     this.confirmBtn = confirmBtn as HTMLButtonElement;
     this.cancelBtn = cancelBtn as HTMLButtonElement;
+    this.titleEl = titleEl;
+    this.messageEl = messageEl;
 
     // Register cancel handler once — handles Escape key via native <dialog> cancel event.
     this.dialogEl.addEventListener('cancel', (e) => {
@@ -41,10 +47,8 @@ export class ConfirmDialog {
     this.currentOnDismiss = options.onCancel;
 
     // Populate dynamic content — textContent is XSS-safe
-    const titleEl = document.getElementById('confirm-dialog-title');
-    const messageEl = document.getElementById('confirm-dialog-message');
-    if (titleEl) titleEl.textContent = options.title;
-    if (messageEl) messageEl.textContent = options.message;
+    this.titleEl.textContent = options.title;
+    this.messageEl.textContent = options.message;
 
     // Update button labels — target .btn-text span to preserve text-box-trim wrapper
     const confirmText = this.confirmBtn.querySelector('.btn-text');

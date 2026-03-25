@@ -169,7 +169,7 @@ const MENU_BUILDERS: Record<
   'score-edit': scoreEditMenuBuilder,
 };
 
-// Module-level singleton — initialized by initHeader(), imported by call sites
+// Assigned inside initHeader() — undefined until initHeader() runs. Do not call at module load time.
 export let confirmDialog: ConfirmDialog;
 
 export function initHeader(): void {
