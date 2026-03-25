@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderScoreFromURL, renderScore } from './convenience';
 import { ScoreRenderer } from './ScoreRenderer';
+import { MusicXMLParser } from '../parser/MusicXMLParser';
 import type { ScoreData } from '../types/ScoreData';
 
 // Mock MusicXMLParser to avoid actual file loading
@@ -62,11 +63,10 @@ describe('Convenience Functions', () => {
 
   describe('renderScoreFromURL', () => {
     it('should render score from URL', async () => {
-      const renderer = await renderScoreFromURL(
-        container,
-        '/data/test.musicxml',
-      );
+      const url = '/data/test.musicxml';
+      const renderer = await renderScoreFromURL(container, url);
 
+      expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url);
       expect(renderer).toBeInstanceOf(ScoreRenderer);
       expect(container.querySelector('svg')).toBeTruthy();
     });
