@@ -39,7 +39,13 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 
 ## Phase 3: Implement
 
-- Use TDD: `superpowers:test-driven-development`
+- **Use TDD:** `superpowers:test-driven-development` — write the failing test first, then implement.
+- **TDD skip rule (strict):** Skip TDD ONLY when there is no new logic to implement:
+  - Adding assertions to existing tests
+  - Removing dead code or exports
+  - Renaming constants or extracting named values
+  - Documentation-only changes
+  - "It's simple" is NOT a valid reason to skip. If in doubt, use TDD.
 - **Scope discipline (hard rule):** Only change what the task description specifies.
   - If you notice an adjacent bug or improvement: add it to `TODO.md`, do not fix it now
   - If you notice a related refactor opportunity: add it to `TODO.md`, do not do it now
@@ -50,6 +56,8 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 ---
 
 ## Phase 4: Test
+
+**REQUIRED:** Use `superpowers:verification-before-completion` — verify test output before claiming pass.
 
 Run the full test suite:
 
@@ -76,9 +84,14 @@ If the task touches UI:
 
 ---
 
-## Phase 6: Commit + PR (pre-authorized — no gates)
+## Phase 6: Review, Commit + PR
 
-1. Commit with a clean message:
+**Step 1: Self-review the diff.** Use `superpowers:requesting-code-review` to review your own changes before committing. Verify:
+- Changes match the task description — nothing more, nothing less
+- No scope creep, no accidental edits
+- Code quality meets project standards (`/eng-principles`)
+
+**Step 2: Commit** with a clean message:
    ```bash
    git add <specific files>
    git commit -m "concise description"
@@ -86,25 +99,25 @@ If the task touches UI:
    - No `Co-Authored-By: Claude` or any attribution
    - No heredocs, no `&&`, no `$()` — sequential Bash calls only
 
-2. Mark the task `[x]` in `TODO.md` and commit — this is a workflow meta-step, not scope creep:
+**Step 3:** Mark the task `[x]` in `TODO.md` and commit — this is a workflow meta-step, not scope creep:
    ```bash
    git add TODO.md
    git commit -m "chore: mark [task name] complete in TODO"
    ```
 
-3. Push and create PR — no need to ask:
+**Step 4:** Push and create PR — no need to ask:
    - Write PR body to `tmp/pr-body.md` using the Write tool
    - `git push -u origin <branch>`
    - `gh pr create --title "..." --body-file tmp/pr-body.md`
    - Delete `tmp/pr-body.md`
 
-4. Remove the worktree:
+**Step 5:** Remove the worktree:
    ```bash
    git worktree remove .claude/worktrees/<name>
    git branch -d <branch>  # local only — remote stays for PR
    ```
 
-5. Report the PR URL and stop. **Never merge.**
+**Step 6:** Report the PR URL and stop. **Never merge.**
 
 ---
 
@@ -119,6 +132,9 @@ If the task touches UI:
 | NEVER use `&&`, heredocs, or `$()` in Bash | Sequential calls only |
 | NEVER add Claude attribution to commits or PRs | Clean messages only |
 | NEVER push a non-draft PR with failing tests | Use draft + failure notes instead |
+| NEVER skip TDD because "it's simple" | Use the strict skip rule — only skip when there is no new logic |
+| NEVER skip self-review before committing | Use `superpowers:requesting-code-review` on your diff |
+| NEVER claim tests pass without full verification | Use `superpowers:verification-before-completion` |
 | NEVER skip `npm test` | Full suite — type-check + lint + vitest |
 
 ---

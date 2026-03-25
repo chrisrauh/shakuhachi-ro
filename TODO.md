@@ -243,7 +243,6 @@
   - Assess bundle size impact, migration cost, and long-term maintainability tradeoffs
 - [ ] [A:High] Add JSDoc comments to public APIs
 - [ ] [A:Medium] Write usage guide in reference/README.md
-- [ ] [A:High] Document score data format
 
 - [ ] [A:Medium] YuriModifier (vibrato)
 - [ ] [A:Medium] MuraikiModifier (breathy tone)
