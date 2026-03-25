@@ -3,24 +3,16 @@
    Imported globally in Layout.astro (dialogs appear on every page)
    ============================================================ */
 
-/* Shared overlay backdrop */
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--overlay-background-color);
-  z-index: var(--z-index-dialog);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-large);
-  animation: var(--transition-fast) ease-out dialog-overlay-appear;
+/* Shared resets and backdrop for all <dialog> elements */
+dialog.app-dialog {
+  border: none;
+  padding: 0;
+  margin: auto;
 }
 
-.dialog-overlay[hidden] {
-  display: none;
+dialog.app-dialog::backdrop {
+  background: var(--overlay-background-color);
+  animation: var(--transition-fast) ease-out dialog-overlay-appear;
 }
 
 @keyframes dialog-overlay-appear {
