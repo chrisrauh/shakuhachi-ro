@@ -111,11 +111,13 @@ If the task touches UI:
    - `gh pr create --title "..." --body-file tmp/pr-body.md`
    - Delete `tmp/pr-body.md`
 
-**Step 5:** Remove the worktree:
+**Step 5:** Remove the worktree and clean up branches:
    ```bash
    git worktree remove .claude/worktrees/<name>
-   git branch -d <branch>  # local only — remote stays for PR
+   git branch -d <branch>
+   git push origin --delete <branch>
    ```
+   Note: if the PR is merged before you run cleanup, still delete both the local and remote branches.
 
 **Step 6:** Report the PR URL and stop. **Never merge.**
 
