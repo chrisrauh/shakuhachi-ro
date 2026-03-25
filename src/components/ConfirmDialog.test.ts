@@ -118,4 +118,21 @@ describe('ConfirmDialog', () => {
     ).click();
     expect(onCancel).not.toHaveBeenCalled();
   });
+
+  it('replaces callbacks on subsequent show() calls — no accumulation', () => {
+    const firstConfirm = vi.fn();
+    const secondConfirm = vi.fn();
+    const confirmDialog = new ConfirmDialog();
+    confirmDialog.show({ title: 'T', message: 'M', onConfirm: firstConfirm });
+    confirmDialog.show({
+      title: 'T2',
+      message: 'M2',
+      onConfirm: secondConfirm,
+    });
+    (
+      document.getElementById('confirm-dialog-confirm') as HTMLButtonElement
+    ).click();
+    expect(secondConfirm).toHaveBeenCalledOnce();
+    expect(firstConfirm).not.toHaveBeenCalled();
+  });
 });

@@ -29,8 +29,8 @@ export class ConfirmDialog {
     this.cancelBtn = cancelBtn as HTMLButtonElement;
 
     // Register cancel handler once — handles Escape key via native <dialog> cancel event.
-    // e.preventDefault() suppresses the browser's automatic close so we control sequencing.
     this.dialogEl.addEventListener('cancel', (e) => {
+      // Suppress the browser's automatic close so we control the sequence explicitly.
       e.preventDefault();
       this.currentOnDismiss?.();
       this.dialogEl.close();
