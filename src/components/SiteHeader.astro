@@ -68,35 +68,33 @@ const { mobileMenuType = 'standard' } = Astro.props;
       </button>
     </div>
   </div>
-  <div id="auth-modal-overlay" class="dialog-overlay" hidden>
-    <div class="auth-modal-content" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" tabindex="-1">
-      <h2 id="auth-modal-title" class="auth-modal-title"></h2>
-      <form id="auth-form">
-        <div class="auth-modal-field">
-          <label for="auth-email" class="auth-modal-label">Email</label>
-          <input type="email" id="auth-email" required class="auth-modal-input" />
-        </div>
-        <div class="auth-modal-field">
-          <label for="auth-password" class="auth-modal-label">Password</label>
-          <input type="password" id="auth-password" required minlength="6" class="auth-modal-input" />
-        </div>
-        <div id="auth-error" class="auth-modal-error" hidden></div>
-        <div class="auth-modal-actions">
-          <button type="button" id="auth-cancel" class="btn btn-secondary">
-            <span class="btn-text">Cancel</span>
-          </button>
-          <button type="submit" id="auth-submit" class="btn btn-primary">
-            <span class="btn-text">Log In</span>
-          </button>
-        </div>
-        <div class="auth-modal-toggle">
-          <button type="button" id="auth-toggle" class="btn btn-ghost">
-            <span class="btn-text">Need an account? Sign up</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <dialog id="auth-modal" class="app-dialog auth-modal-content" aria-labelledby="auth-modal-title">
+    <h2 id="auth-modal-title" class="auth-modal-title"></h2>
+    <form id="auth-form">
+      <div class="auth-modal-field">
+        <label for="auth-email" class="auth-modal-label">Email</label>
+        <input type="email" id="auth-email" required class="auth-modal-input" />
+      </div>
+      <div class="auth-modal-field">
+        <label for="auth-password" class="auth-modal-label">Password</label>
+        <input type="password" id="auth-password" required minlength="6" class="auth-modal-input" />
+      </div>
+      <div id="auth-error" class="auth-modal-error" hidden></div>
+      <div class="auth-modal-actions">
+        <button type="button" id="auth-cancel" class="btn btn-secondary">
+          <span class="btn-text">Cancel</span>
+        </button>
+        <button type="submit" id="auth-submit" class="btn btn-primary">
+          <span class="btn-text">Log In</span>
+        </button>
+      </div>
+      <div class="auth-modal-toggle">
+        <button type="button" id="auth-toggle" class="btn btn-ghost">
+          <span class="btn-text">Need an account? Sign up</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
 </header>
 
 <script>

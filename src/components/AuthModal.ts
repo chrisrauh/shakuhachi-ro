@@ -1,8 +1,7 @@
 import { signIn, signUp } from '../api/auth';
-import { BaseDialog } from './BaseDialog';
 
-export class AuthModal extends BaseDialog {
-  private overlayEl: HTMLElement;
+export class AuthModal {
+  private dialogEl: HTMLDialogElement;
   private form: HTMLFormElement;
   private titleEl: HTMLHeadingElement;
   private emailInput: HTMLInputElement;
@@ -16,9 +15,7 @@ export class AuthModal extends BaseDialog {
   private isLoginMode: boolean = true;
 
   constructor() {
-    super();
-
-    const overlay = document.getElementById('auth-modal-overlay');
+    const dialog = document.getElementById('auth-modal');
     const form = document.getElementById('auth-form');
     const titleEl = document.getElementById('auth-modal-title');
     const emailInput = document.getElementById('auth-email');
@@ -31,7 +28,7 @@ export class AuthModal extends BaseDialog {
     const toggleBtnText = toggleBtn?.querySelector('.btn-text') ?? null;
 
     if (
-      !overlay ||
+      !dialog ||
       !form ||
       !titleEl ||
       !emailInput ||
@@ -48,7 +45,7 @@ export class AuthModal extends BaseDialog {
       );
     }
 
-    this.overlayEl = overlay;
+    this.dialogEl = dialog as HTMLDialogElement;
     this.form = form as HTMLFormElement;
     this.titleEl = titleEl as HTMLHeadingElement;
     this.emailInput = emailInput as HTMLInputElement;
@@ -64,17 +61,18 @@ export class AuthModal extends BaseDialog {
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     this.cancelBtn.addEventListener('click', () => this.hide());
     this.toggleBtn.addEventListener('click', () => this.toggleMode());
+    // No cancel listener needed: native <dialog> closes on Escape by default
   }
 
   public show(mode: 'login' | 'signup' = 'login'): void {
     this.isLoginMode = mode === 'login';
-    this.updateModeUI(); // clears error state before reset
+    this.updateModeUI();
     this.form.reset();
-    this.openOverlay(this.overlayEl);
+    this.dialogEl.showModal();
   }
 
   public hide(): void {
-    this.closeOverlay();
+    this.dialogEl.close();
   }
 
   private async handleSubmit(e: Event): Promise<void> {
@@ -118,7 +116,6 @@ export class AuthModal extends BaseDialog {
 
   private updateModeUI(): void {
     this.errorDiv.hidden = true;
-
     if (this.isLoginMode) {
       this.titleEl.textContent = 'Log In';
       this.submitBtnText.textContent = 'Log In';
