@@ -69,19 +69,23 @@ const { mobileMenuType = 'standard' } = Astro.props;
     </div>
   </div>
 </header>
-<dialog id="auth-modal" class="app-dialog auth-modal-content" aria-labelledby="auth-modal-title">
-  <h2 id="auth-modal-title" class="auth-modal-title"></h2>
+<dialog id="auth-modal" class="app-dialog" aria-labelledby="auth-modal-title">
+  <div class="app-dialog-header">
+    <h2 id="auth-modal-title" class="app-dialog-title"></h2>
+  </div>
   <form id="auth-form">
-    <div class="auth-modal-field">
-      <label for="auth-email" class="auth-modal-label">Email</label>
-      <input type="email" id="auth-email" required class="auth-modal-input" />
+    <div class="app-dialog-body">
+      <div class="auth-modal-field">
+        <label for="auth-email" class="auth-modal-label">Email</label>
+        <input type="email" id="auth-email" required class="auth-modal-input" />
+      </div>
+      <div class="auth-modal-field">
+        <label for="auth-password" class="auth-modal-label">Password</label>
+        <input type="password" id="auth-password" required minlength="6" class="auth-modal-input" />
+      </div>
+      <div id="auth-error" class="auth-modal-error" hidden></div>
     </div>
-    <div class="auth-modal-field">
-      <label for="auth-password" class="auth-modal-label">Password</label>
-      <input type="password" id="auth-password" required minlength="6" class="auth-modal-input" />
-    </div>
-    <div id="auth-error" class="auth-modal-error" hidden></div>
-    <div class="auth-modal-actions">
+    <div class="app-dialog-footer auth-modal-footer">
       <button type="button" id="auth-cancel" class="btn btn-secondary">
         <span class="btn-text">Cancel</span>
       </button>
@@ -89,12 +93,12 @@ const { mobileMenuType = 'standard' } = Astro.props;
         <span class="btn-text">Log In</span>
       </button>
     </div>
-    <div class="auth-modal-toggle">
-      <button type="button" id="auth-toggle" class="btn btn-ghost">
-        <span class="btn-text">Need an account? Sign up</span>
-      </button>
-    </div>
   </form>
+  <div class="auth-modal-toggle">
+    <button type="button" id="auth-toggle" class="btn btn-ghost">
+      <span class="btn-text">Need an account? Sign up</span>
+    </button>
+  </div>
 </dialog>
 
 <script>

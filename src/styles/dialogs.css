@@ -3,11 +3,17 @@
    Imported globally in Layout.astro (dialogs appear on every page)
    ============================================================ */
 
-/* Shared resets and backdrop for all <dialog> elements */
+/* Shared box styling and backdrop for all <dialog> elements */
 dialog.app-dialog {
-  border: none;
+  border: var(--panel-border-width) solid var(--panel-border-color);
   padding: 0;
   margin: auto;
+  background: var(--page-background-color);
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow-x-large);
+  max-width: var(--size-dialog-max-width);
+  width: 100%;
+  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1) dialog-appear;
 }
 
 dialog.app-dialog::backdrop {
@@ -20,112 +26,86 @@ dialog.app-dialog::backdrop {
   to   { opacity: 1; }
 }
 
-/* ---- ConfirmDialog ---- */
-
-@keyframes confirm-dialog-appear {
+@keyframes dialog-appear {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-.confirm-dialog {
-  background: var(--page-background-color);
-  border: var(--panel-border-width) solid var(--panel-border-color);
-  border-radius: var(--border-radius-large);
-  box-shadow: var(--shadow-x-large);
-  max-width: var(--size-dialog-max-width);
-  width: 100%;
-  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1) confirm-dialog-appear;
+/* ---- Shared dialog section layout ---- */
+
+.app-dialog-header {
+  padding: var(--spacing-large) var(--spacing-large) var(--spacing-medium);
 }
 
-.confirm-dialog-header {
-  padding: var(--spacing-large);
-  border-bottom: var(--panel-border-width) solid var(--color-border);
-}
-
-.confirm-dialog-title {
+.app-dialog-title {
   margin: 0;
-  font-size: var(--font-size-medium);
+  font-size: var(--font-size-large);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
-.confirm-dialog-body {
-  padding: var(--spacing-large);
+.app-dialog-body {
+  padding: 0 var(--spacing-large) var(--spacing-medium);
 }
 
-.confirm-dialog-message {
+.app-dialog-message {
   margin: 0;
   font-size: var(--font-size-medium);
   color: var(--color-text-secondary);
   line-height: var(--line-height-normal);
 }
 
-.confirm-dialog-footer {
-  padding: var(--spacing-large);
-  border-top: var(--panel-border-width) solid var(--color-border);
+.app-dialog-footer {
+  padding: 0 var(--spacing-large) var(--spacing-medium);
   display: flex;
   gap: var(--spacing-small);
   justify-content: flex-end;
 }
 
-.confirm-dialog-cancel,
-.confirm-dialog-confirm {
+.app-dialog-footer .btn {
   min-width: var(--size-dialog-button-min-width);
 }
 
 /* Dialog-specific compact breakpoint — single column before standard 768px mobile breakpoint */
 @media (max-width: 480px) {
-  .confirm-dialog {
+  dialog.app-dialog {
     max-width: 100%;
   }
 
-  .confirm-dialog-header,
-  .confirm-dialog-body,
-  .confirm-dialog-footer {
-    padding: var(--spacing-medium);
-  }
-
-  .confirm-dialog-footer {
+  .app-dialog-footer {
     flex-direction: column-reverse;
   }
 
-  .confirm-dialog-cancel,
-  .confirm-dialog-confirm {
+  .app-dialog-footer .btn {
     width: 100%;
   }
 }
 
 /* ---- AuthModal ---- */
 
-.auth-modal-content {
-  background: var(--panel-background-color);
-  padding: var(--spacing-x-large);
-  border-radius: var(--border-radius-large);
-  max-width: var(--size-dialog-max-width);
-  width: 90%;
-}
-
-.auth-modal-title {
-  margin: 0 0 var(--spacing-large);
-}
-
 .auth-modal-field {
-  margin: var(--spacing-large) 0;
+  margin: var(--spacing-small) 0;
+}
+
+.auth-modal-field:first-child {
+  margin-top: 0;
 }
 
 .auth-modal-label {
   display: block;
   margin-bottom: var(--spacing-x-small);
+  font-size: var(--input-font-size-small);
+  color: var(--color-text-secondary);
 }
 
 .auth-modal-input {
   width: 100%;
-  padding: var(--input-spacing-small);
+  padding: var(--spacing-x-small) var(--spacing-small);
   border: var(--input-border-width) solid var(--input-border-color);
   border-radius: var(--input-border-radius-medium);
   background: var(--input-background-color);
   color: var(--input-color);
-  font-size: var(--input-font-size-medium);
+  font-size: var(--input-font-size-small);
   box-sizing: border-box;
 }
 
@@ -134,17 +114,12 @@ dialog.app-dialog::backdrop {
   margin: var(--spacing-small) 0;
 }
 
-.auth-modal-actions {
-  display: flex;
-  gap: var(--spacing-small);
-  margin: var(--spacing-large) 0;
-}
-
-.auth-modal-actions .btn {
-  flex: 1;
+.auth-modal-footer {
+  justify-content: center;
 }
 
 .auth-modal-toggle {
-  margin-top: var(--spacing-medium);
+  padding: 0 var(--spacing-large) var(--spacing-medium);
   text-align: center;
+  font-size: var(--font-size-small);
 }
