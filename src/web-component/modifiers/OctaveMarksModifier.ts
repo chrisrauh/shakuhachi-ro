@@ -27,7 +27,7 @@ export class OctaveMarksModifier extends Modifier {
   private fontSize: number = 12;
 
   /** Font weight for the octave mark */
-  private fontWeight: number = 400;
+  private fontWeight: number = 500;
 
   /** Font family */
   private fontFamily: string = 'Noto Sans JP, sans-serif';
