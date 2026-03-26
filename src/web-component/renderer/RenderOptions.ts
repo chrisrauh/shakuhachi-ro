@@ -64,7 +64,7 @@ export interface RenderOptions {
 
   /**
    * Font size for main note characters in pixels
-   * @default 28
+   * @default 32
    */
   noteFontSize?: number;
 
@@ -226,7 +226,7 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
   topMargin: 34, // Math.abs(-22) + 12
 
   // Note typography
-  noteFontSize: 28,
+  noteFontSize: 32,
   noteFontWeight: 400,
   noteVerticalSpacing: 44,
   noteFontFamily: 'Noto Sans JP, sans-serif',
