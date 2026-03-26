@@ -1,6 +1,6 @@
 import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
-import { ConfirmDialog } from './ConfirmDialog';
+import { confirmDialog } from '../utils/init-header';
 import { toast } from './Toast';
 import { ButtonLoadingState } from './LoadingSpinner';
 import type { Score } from '../api/scores';
@@ -149,7 +149,7 @@ export class ScoreDetailClient {
     if (!this.score) return;
 
     const dialog = STRINGS.DIALOGS.ScoreDetailClient.deleteScore;
-    new ConfirmDialog().show({
+    confirmDialog.show({
       title: dialog.title,
       message: dialog.message(this.score.title),
       confirmText: dialog.confirmText,
@@ -191,7 +191,7 @@ export class ScoreDetailClient {
 
     // Show confirmation dialog
     const dialog = STRINGS.DIALOGS.ScoreDetailClient.forkScore;
-    new ConfirmDialog().show({
+    confirmDialog.show({
       title: dialog.title,
       message: dialog.message(this.score.title),
       confirmText: dialog.confirmText,

@@ -1,0 +1,125 @@
+/* ============================================================
+   Dialog / Modal — shared overlay + ConfirmDialog + AuthModal
+   Imported globally in Layout.astro (dialogs appear on every page)
+   ============================================================ */
+
+/* Shared box styling and backdrop for all <dialog> elements */
+dialog.app-dialog {
+  border: var(--panel-border-width) solid var(--panel-border-color);
+  padding: 0;
+  margin: auto;
+  background: var(--page-background-color);
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow-x-large);
+  max-width: var(--size-dialog-max-width);
+  width: 100%;
+  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1) dialog-appear;
+}
+
+dialog.app-dialog::backdrop {
+  background: var(--overlay-background-color);
+  animation: var(--transition-fast) ease-out dialog-overlay-appear;
+}
+
+@keyframes dialog-overlay-appear {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dialog-appear {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Shared dialog section layout ---- */
+
+.app-dialog-header {
+  padding: var(--spacing-large) var(--spacing-large) var(--spacing-medium);
+}
+
+.app-dialog-title {
+  margin: 0;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.app-dialog-body {
+  padding: 0 var(--spacing-large) var(--spacing-medium);
+}
+
+.app-dialog-message {
+  margin: 0;
+  font-size: var(--font-size-medium);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.app-dialog-footer {
+  padding: 0 var(--spacing-large) var(--spacing-medium);
+  display: flex;
+  gap: var(--spacing-small);
+  justify-content: flex-end;
+}
+
+.app-dialog-footer .btn {
+  min-width: var(--size-dialog-button-min-width);
+}
+
+/* Dialog-specific compact breakpoint — single column before standard 768px mobile breakpoint */
+@media (max-width: 480px) {
+  dialog.app-dialog {
+    max-width: 100%;
+  }
+
+  .app-dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  .app-dialog-footer .btn {
+    width: 100%;
+  }
+}
+
+/* ---- AuthModal ---- */
+
+.auth-modal-field {
+  margin: var(--spacing-small) 0;
+}
+
+.auth-modal-field:first-child {
+  margin-top: 0;
+}
+
+.auth-modal-label {
+  display: block;
+  margin-bottom: var(--spacing-x-small);
+  font-size: var(--input-font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.auth-modal-input {
+  width: 100%;
+  padding: var(--spacing-x-small) var(--spacing-small);
+  border: var(--input-border-width) solid var(--input-border-color);
+  border-radius: var(--input-border-radius-medium);
+  background: var(--input-background-color);
+  color: var(--input-color);
+  font-size: var(--input-font-size-small);
+  box-sizing: border-box;
+}
+
+.auth-modal-error {
+  color: var(--color-text-danger);
+  margin: var(--spacing-small) 0;
+}
+
+.auth-modal-footer {
+  justify-content: center;
+}
+
+.auth-modal-toggle {
+  padding: 0 var(--spacing-large) var(--spacing-medium);
+  text-align: center;
+  font-size: var(--font-size-small);
+}

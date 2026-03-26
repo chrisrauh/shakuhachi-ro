@@ -51,11 +51,29 @@ describe('AuthWidget avatar render', () => {
         <span class="btn-text" id="auth-initials"></span>
       </button>
     </div>
+    <!-- AuthModal shell — required by AuthModal constructor -->
+    <dialog id="auth-modal">
+      <h2 id="auth-modal-title"></h2>
+      <form id="auth-form">
+        <input type="email" id="auth-email" />
+        <input type="password" id="auth-password" />
+        <div id="auth-error" hidden></div>
+        <button id="auth-submit" type="submit"><span class="btn-text">Log In</span></button>
+        <button id="auth-cancel" type="button"><span class="btn-text">Cancel</span></button>
+        <button id="auth-toggle" type="button"><span class="btn-text">Sign up</span></button>
+      </form>
+    </dialog>
   `;
 
   beforeEach(() => {
     document.body.innerHTML = FIXTURE_HTML;
     localStorage.clear();
+    // jsdom does not implement showModal/close
+    const dialog = document.getElementById('auth-modal') as HTMLDialogElement;
+    if (dialog) {
+      dialog.showModal = vi.fn();
+      dialog.close = vi.fn();
+    }
   });
 
   afterEach(() => {

@@ -698,6 +698,8 @@
      ============================================ */
 
   --size-toolbar-item: 2rem; /* 32px - height of icon buttons, small buttons, logo, and other header row items */
+  --size-dialog-max-width: 400px;
+  --size-dialog-button-min-width: 80px;
 
   /* ============================================
      LOGO
@@ -865,7 +867,6 @@
      ============================================ */
 
   --z-index-drawer: 700;
-  --z-index-dialog: 800;
   --z-index-dropdown: 900;
   --z-index-toast: 950;
   --z-index-tooltip: 1000;

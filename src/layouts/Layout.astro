@@ -2,6 +2,7 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import '../styles/theme.css';
 import '../styles/components.css';
+import '../styles/dialogs.css';
 
 interface Props {
   title: string;
@@ -151,6 +152,23 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false,
         background-color: var(--color-bg-active);
       }
     </style>
+
+    <dialog id="confirm-dialog" class="app-dialog" aria-labelledby="confirm-dialog-title">
+      <div class="app-dialog-header">
+        <h3 id="confirm-dialog-title" class="app-dialog-title"></h3>
+      </div>
+      <div class="app-dialog-body">
+        <p id="confirm-dialog-message" class="app-dialog-message"></p>
+      </div>
+      <div class="app-dialog-footer">
+        <button id="confirm-dialog-cancel" class="btn btn-secondary confirm-dialog-cancel">
+          <span class="btn-text">Cancel</span>
+        </button>
+        <button id="confirm-dialog-confirm" class="btn btn-primary confirm-dialog-confirm">
+          <span class="btn-text">Confirm</span>
+        </button>
+      </div>
+    </dialog>
 
   </body>
 </html>

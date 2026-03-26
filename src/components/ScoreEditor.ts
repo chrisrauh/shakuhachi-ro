@@ -128,7 +128,7 @@ export class ScoreEditor {
         this.dataFormat = format;
       } catch {
         const dialog = STRINGS.DIALOGS.ScoreEditor.formatConversionFailed;
-        new ConfirmDialog().show({
+        confirmDialog.show({
           title: dialog.title,
           message: dialog.message(this.dataFormat, format),
           confirmText: dialog.confirmText,
