@@ -68,9 +68,9 @@
 - [ ] [A:Medium] Investigate inconsistent save normalization in ScoreEditor
   - `src/components/ScoreEditor.ts:416-424` — ABC scores are converted to JSON before saving to Supabase, but MusicXML scores are saved as raw XML strings. This means the `data_format` in the DB is always `'json'` for ABC but `'musicxml'` for MusicXML. Decide if this is intentional (MusicXML fidelity) or an oversight, and document or standardize the behavior.
 
-- [ ] [A:High] Add license selector field to score editor
-  - **Depends on**: "Handle score license requirements" in Content/Data — data field must exist first
-  - Add a license dropdown to the score metadata section of the editor
+- [ ] [A:Medium] Add license selector field to score editor
+  - **Blocked**: "Handle score license requirements" (Content/Data section) must ship first — it defines the DB schema and `Score` type changes. The current `score.rights` field is free-text only; structured SPDX storage doesn't exist yet.
+  - Once unblocked: add a license dropdown to the score metadata section of the editor
   - Options: All Rights Reserved, CC BY, CC BY-SA, CC BY-NC, CC BY-NC-SA, Public Domain (CC0)
   - Show a brief description of each license to help users choose appropriately
   - Store selection as SPDX identifier in score metadata
@@ -83,19 +83,30 @@
 
 ### Auth / Account
 
-- [ ] [A:High] Refactor AuthModal to use ConfirmDialog (DRY violation)
-  - `src/components/AuthComponents.ts` and `src/components/ConfirmDialog.ts` have significant duplication
-  - Both implement overlay, modal container, escape key handling, click-to-close
-  - **Recommended approach**: Extend ConfirmDialog to accept custom body content
-  - AuthModal uses ConfirmDialog and passes form as custom body
-  - Shares all overlay/container/button logic
-  - Alternative: Create shared BaseDialog component that both extend
+- [ ] [A:Medium] Refactor AuthModal to use ConfirmDialog (DRY violation)
+  - **Re-evaluated**: Both `src/components/AuthModal.ts` and `src/components/ConfirmDialog.ts` already use native `<dialog>` with `showModal()` — the browser handles overlay, escape key, and backdrop click natively. The originally described duplication (custom overlay, click-to-close, escape handling) no longer exists.
+  - Remaining duplication: two separate `<dialog>` HTML structures in `SiteHeader.astro`; both classes share `dialogEl.showModal()` / `dialogEl.close()` calls.
+  - Re-evaluate whether refactor is still worth doing: `AuthModal` owns a full form with email/password/toggle-mode logic; folding it into `ConfirmDialog` as "custom body content" would complicate `ConfirmDialog` significantly.
+  - **If still desired**: a `BaseDialog` class that both extend (shared `showModal`, `close`, escape listener) is cleaner than AuthModal-uses-ConfirmDialog. Define scope before implementing.
 
-- [ ] [A:High] Extract auth subscription boilerplate into a shared page initializer
-  - `src/pages/index.astro:26-35`, `src/pages/editor.astro:21-30`, `src/pages/score/[slug].astro:90-99` — All three pages have an identical block: create `AuthWidget`, call `authState.subscribe()`, toggle `setUser()`/`clearUser()`. Extract to a function like `initPageAuth(widgetId: string)` in `src/utils/page-init.ts` and call it from each page.
+- [ ] [A:Medium] Extract auth subscription boilerplate into a shared page initializer
+  - **Stale paths**: `src/pages/editor.astro` no longer exists; edit page is `src/pages/score/[slug]/edit.astro`. The `authState` module referenced doesn't exist in the codebase.
+  - Re-validate actual auth patterns before implementing:
+    - `src/pages/score/[slug]/edit.astro:64-66` — `onAuthReady((user) => { checkAuthAndPermissions(user); })`
+    - `src/pages/index.astro` — delegates to `ScoreLibrary` which handles auth internally
+    - `src/pages/score/[slug].astro` — delegates to `ScoreDetailClient` which handles auth internally
+  - The "identical block" pattern may no longer exist across pages. Audit actual duplication before extracting.
 
 - [ ] [A:High] Add unit tests for auth module
-  - `src/api/auth.ts` and `src/api/authState.ts` have 0 tests. Test: `signUp`/`signIn`/`signOut` call correct Supabase methods and return expected results, `AuthStateManager.subscribe()` fires callback immediately, `isAuthenticated()` reflects current state, `onAuthStateChange` relays Supabase auth events.
+  - `src/api/auth.ts` has 0 tests. Note: `authState.ts` referenced in older versions of this task does not exist — auth state management is handled by `onAuthReady()` in `auth.ts`.
+  - File to create: `src/api/auth.test.ts`
+  - Mock approach: `vi.mock('./supabase', () => ({ supabase: { auth: { signUp: vi.fn(), signInWithPassword: vi.fn(), signOut: vi.fn(), getUser: vi.fn(), onAuthStateChange: vi.fn() } } }))`
+  - Tests to write:
+    - `signUp(email, password)` calls `supabase.auth.signUp({ email, password })` and returns `{ user, session, error }`
+    - `signIn(email, password)` calls `supabase.auth.signInWithPassword(...)` and returns `{ user, session, error }`
+    - `signOut()` calls `supabase.auth.signOut()` and returns `{ error }`
+    - `getCurrentUser()` calls `supabase.auth.getUser()` and returns `{ user, error }`
+    - `onAuthReady()`: fires callback on first auth event; suppresses TOKEN_REFRESHED when user ID is unchanged; fires again when user ID changes
 
 ### Design
 
@@ -136,6 +147,13 @@
     - Letter spacing should not apply to SVG-rendered score notation (already isolated)
     - Control panel only renders in dev mode (zero production impact)
 
+- [ ] [A:Low] Explore CSS `corner-shape` for UI polish
+  - New CSS property that goes beyond `border-radius` — controls the *shape* of corners (round, scoop/concave, bevel/chamfer, notch, squircle, etc.)
+  - Reference: https://www.smashingmagazine.com/2026/03/beyond-border-radius-css-corner-shape-property-ui/
+  - Candidate elements: score cards, buttons, modals, score editor panels, tag/badge chips
+  - **Blocked by**: browser support — check caniuse before adopting; consider progressive enhancement (fallback to `border-radius` only)
+  - When support is sufficient: evaluate which UI elements would benefit, prototype a few variants, align with the design language
+
 - [ ] [A:Low] Update to a more colorful palette
   - **Blocked by**: awaiting designer color palettes and references
   - implement theme selection, control the theme using a tweakpane
@@ -148,52 +166,60 @@
   - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
 
 - [ ] [A:High] Replace hardcoded fallback viewport 800×600 with explicit error or documented default
-  - `src/renderer/ScoreRenderer.ts:207-208` — `width: rect.width || 800, height: rect.height || 600` silently substitutes default dimensions when the container has zero size (common when container is hidden or not yet in the DOM). Either throw an error ("Container has zero dimensions — ensure it is visible before rendering") or define a named constant `DEFAULT_VIEWPORT = { width: 800, height: 600 }` so the fallback is discoverable.
+  - `src/web-component/renderer/ScoreRenderer.ts:204-212` — `getViewportDimensions()` returns `rect.width || 800` and `rect.height || 600`
+  - Preferred fix: define `const DEFAULT_VIEWPORT = { width: 800, height: 600 }` above the class and reference it — keeps the fallback discoverable without breaking callers in zero-dimension environments (tests, hidden containers)
+  - Alternative: throw `new Error('Container has zero dimensions — ensure it is visible before rendering')` if strict behavior is preferred
 
 - [ ] [A:High] Document or name the MusicXMLParser duration mapping thresholds
-  - `src/parser/MusicXMLParser.ts:80-89` — Duration mapping uses `>= 4` → whole, `>= 2` → half, else quarter. The thresholds are undocumented and lossy (a MusicXML duration of 3 maps to half note, but 3 divisions typically means dotted quarter). Add a comment block explaining the mapping decisions and known limitations, or extract to a named function `mapMusicXMLDuration(rawDuration: number): number`.
+  - `src/web-component/parser/MusicXMLParser.ts:82-91` — Duration mapping: `>= 4` → 4 (whole), `>= 2` → 2 (half), else 1 (quarter/eighth)
+  - The mapping is lossy (duration=3 maps to half, but 3 divisions typically means dotted quarter) and undocumented
+  - `isDotted` is detected at line 80 but has no effect on `shakuDuration` — a known limitation worth documenting
+  - Fix: extract to `mapMusicXMLDuration(rawDuration: number): number` with a comment block explaining the threshold logic, known lossy cases, and that MusicXML divisions-per-quarter (from `<divisions>` element) is currently ignored/assumed=1
 
 - [ ] [A:High] Name magic numbers in VerticalSystem separator drawing
-  - `src/renderer/VerticalSystem.ts:160-164` — `this.y - 20`, `this.y + this.columnHeight + 20`, `'#ccc'`, `1` are unexplained. Define named constants like `SEPARATOR_EXTENSION = 20`, `SEPARATOR_COLOR = '#ccc'`, `SEPARATOR_WIDTH = 1`, or better yet, derive from `RenderOptions`.
+  - `src/web-component/renderer/VerticalSystem.ts:160-165` — `drawLine` call in `drawColumnSeparators()` uses `this.y - 20`, `this.y + this.columnHeight + 20`, `'#ccc'`, `1`
+  - Define at top of file: `const SEPARATOR_EXTENSION = 20`, `const SEPARATOR_COLOR = '#ccc'`, `const SEPARATOR_WIDTH = 1`
+  - Separately: `src/web-component/renderer/ColumnLayoutCalculator.ts:198` has `const BOTTOM_PADDING = 20` with comment "From layout constants" but it's defined inline — extract to `layout-constants.ts` as `COLUMN_BOTTOM_PADDING = 20`
 
 - [ ] [A:High] Name magic number for rest vertical centering in ShakuNote
-  - `src/notes/ShakuNote.ts:144` — `this.y - this.fontSize * 0.4` uses an unexplained `0.4` multiplier to position the rest circle relative to the note baseline. Extract to a named constant like `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` with a comment explaining that Japanese characters are typically centered around 40% above the baseline.
+  - `src/web-component/notes/ShakuNote.ts:144` — `const circleY = this.y - this.fontSize * 0.4`
+  - Extract to: `const JAPANESE_CHAR_VERTICAL_CENTER_RATIO = 0.4` defined above the class, with comment: "Japanese characters are visually centered ~40% above the baseline — descenders are absent and visual weight concentrates in the upper portion of the em square"
 
 - [ ] [A:High] Name magic number for duration line baseline ratio
-  - `src/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
+  - `src/web-component/modifiers/DurationLineModifier.ts:58` — `-NOTE.fontSize * 0.25` uses a bare `0.25` to calculate the vertical middle of a note character. Define `const NOTE_VERTICAL_MIDDLE_RATIO = 0.25` and reference it, matching the comment already present ("approximately 25% above the baseline").
 
 - [ ] [A:High] Remove `undefined as any` hack from DEFAULT_RENDER_OPTIONS
-  - `src/renderer/RenderOptions.ts:256-257` — `width: undefined as any, height: undefined as any` is used to make these fields exist in the defaults object while keeping them "optional". Instead, separate the type: define `ViewportOptions = { width?: number; height?: number }` and merge it separately, avoiding the `any` cast that breaks `Required<RenderOptions>` semantics.
+  - `src/web-component/renderer/RenderOptions.ts:256-257` — `width: undefined as any, height: undefined as any` is used to make these fields exist in the defaults object while keeping them "optional". Instead, separate the type: define `ViewportOptions = { width?: number; height?: number }` and merge it separately, avoiding the `any` cast that breaks `Required<RenderOptions>` semantics.
 
 - [ ] [A:High] Move MusicXMLParser out of ScoreRenderer
-  - `src/renderer/ScoreRenderer.ts` imports `MusicXMLParser` for the `renderFromURL()` method. The renderer's job is to render `ScoreData`, not to fetch and parse XML files. Move `renderFromURL()` to the convenience functions module (`src/renderer/convenience.ts`) where it already lives as `renderScoreFromURL()`. This makes `ScoreRenderer` depend only on `ScoreData`, not on parsing.
+  - `src/web-component/renderer/ScoreRenderer.ts:15` imports `MusicXMLParser` for the `renderFromURL()` method. The renderer's job is to render `ScoreData`, not to fetch and parse XML files. Move `renderFromURL()` to the convenience functions module (`src/web-component/renderer/convenience.ts`) where it already lives as `renderScoreFromURL()`. This makes `ScoreRenderer` depend only on `ScoreData`, not on parsing.
 
 - [ ] [A:High] Remove TestModifier from public API exports [Claude validated]
   - `src/index.ts:50` — `TestModifier` is a testing utility, not a library feature. Exporting it as part of the public API makes it contractual — consumers may depend on it, preventing removal. Remove the export from `index.ts`. Test files can import directly from the source path.
 
 - [ ] [A:High] Move toJSON/convertToJSON off MusicXMLParser
-  - `src/parser/MusicXMLParser.ts:153-166` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
+  - `src/web-component/parser/MusicXMLParser.ts:157-169` — `toJSON()` and `convertToJSON()` are serialization methods on a parser class. A parser's job is to parse input into a structure; serializing a structure back to a string is a separate concern. Move these to a `ScoreSerializer` utility or simply use `JSON.stringify()` directly at call sites.
 
 - [ ] [A:High] Extract repeated error wrapping pattern in scores.ts
   - `src/api/scores.ts` — Six functions (`createScore`, `getUserScores`, `getScoreBySlug`, `updateScore`, `deleteScore`, `forkScore`) all share the same try/catch + `{ score: null, error: ... }` wrapping pattern. Each catch block has identical `error instanceof Error ? error : new Error('Unknown error ...')` logic. Extract a helper like `wrapScoreResult<T>(fn: () => Promise<T>): Promise<ScoreResult<T>>` to eliminate the repetition and ensure consistent error handling across all CRUD operations.
 
 - [ ] [A:High] ScoreRenderer.renderDebugLabel(): replace silent null check with assertion
-  - `src/renderer/ScoreRenderer.ts:154` — `if (!this.renderer) return;` silently skips rendering. After construction, `this.renderer` should always exist when `renderDebugLabel` is called (it's only called inside `renderNotes` which creates the renderer). Replace with a dev assertion or remove the guard since the invariant is guaranteed by the calling code.
+  - `src/web-component/renderer/ScoreRenderer.ts:157` — `if (!this.renderer) return;` silently skips rendering. After construction, `this.renderer` should always exist when `renderDebugLabel` is called (it's only called inside `renderNotes` which creates the renderer). Replace with a dev assertion or remove the guard since the invariant is guaranteed by the calling code.
 
 - [ ] [A:High] Add unit tests for SVGRenderer group management
-  - `src/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws, multiple groups at same level work.
+  - `src/web-component/renderer/SVGRenderer.ts` has 0 tests. The `openGroup()`/`closeGroup()` pair manages a group stack that determines SVG nesting. Test: open then close produces correct hierarchy, nested groups work, closeGroup with no open groups throws, multiple groups at same level work.
 
 - [ ] [A:High] Add unit tests for modifier rendering logic
-  - `src/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
+  - `src/web-component/modifiers/` has 6 modifier classes (`OctaveMarksModifier`, `MeriKariModifier`, `DurationDotModifier`, `DurationLineModifier`, `AtariModifier`, `Modifier` base) with 0 unit tests. Each modifier has offset calculations, font configuration setters, and render methods that position SVG elements relative to the parent note. Test that: setters update internal state, `getPosition()` returns correct offsets, and `render()` calls the expected SVGRenderer methods (using a mock/spy).
 
 - [x] [A:High] Verify mock was called in convenience.test.ts
-  - `src/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
+  - `src/web-component/renderer/convenience.test.ts:11-23` — Mocks `MusicXMLParser.parseFromURL` but never asserts it was called. Add `expect(MusicXMLParser.parseFromURL).toHaveBeenCalledWith(url)` after `renderScoreFromURL()` to verify the integration actually uses the parser.
 
 - [ ] [A:High] Replace meri/chu_meri/dai_meri boolean flags with a discriminated union
-  - `src/types/ScoreData.ts:45-52` — Three optional booleans (`meri`, `chu_meri`, `dai_meri`) allow invalid states: all three can be true simultaneously, which has no musical meaning. Replace with a single field `meriType?: 'meri' | 'chu_meri' | 'dai_meri'` that makes illegal states unrepresentable. This requires updating `ScoreParser`, `MusicXMLParser`, `KINKO_PITCH_MAP`, and all tests that reference these fields. Also fixes the naming inconsistency: `chu_meri` uses snake_case while the rest of the interface uses camelCase.
+  - `src/web-component/types/ScoreData.ts:45-52` — Three optional booleans (`meri`, `chu_meri`, `dai_meri`) allow invalid states: all three can be true simultaneously, which has no musical meaning. Replace with a single field `meriType?: 'meri' | 'chu_meri' | 'dai_meri'` that makes illegal states unrepresentable. This requires updating `ScoreParser`, `MusicXMLParser`, `KINKO_PITCH_MAP`, and all tests that reference these fields. Also fixes the naming inconsistency: `chu_meri` uses snake_case while the rest of the interface uses camelCase.
 
 - [ ] [A:High] Type the `data` field in Score/CreateScoreData/UpdateScoreData instead of `any`
-  - `src/api/scores.ts:15,27,36` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
+  - `src/api/scores.ts:19,34,46` — The `data` field is typed `any` on three interfaces. This disables type checking for the most important field in the system (the actual score content). Define `data: ScoreData | string` (JSON ScoreData for `data_format: 'json'`, MusicXML string for `data_format: 'musicxml'`) or at minimum `data: unknown` to force explicit checks at usage sites.
 
 - [ ] [A:High] Decouple ColumnLayoutCalculator from DurationDotModifier [Claude validated]
   - `src/web-component/renderer/ColumnLayoutCalculator.ts:11` — The layout calculator imports `DurationDotModifier` to check `instanceof` at lines 190, 307 when determining whether a note needs extra vertical spacing. This couples layout logic to a specific modifier type. Instead, add a method to `ShakuNote` like `needsExtraSpacing(): boolean` that checks its own modifiers, so the layout calculator only depends on the note interface.
