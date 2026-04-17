@@ -41,6 +41,10 @@ Location: `public/themes/<name>.json`
     "--color-text-primary-brand": "oklch(0.52 0.2 26)",
     "--color-link": "oklch(0.52 0.2 26)",
     "--color-input-border-color-focus": "oklch(0.55 0.22 26)"
+  },
+  "darkTokens": {
+    "--color-button-primary": "oklch(0.42 0.22 26)",
+    "--color-button-primary-hover": "oklch(0.36 0.22 26)"
   }
 }
 ```
@@ -48,14 +52,15 @@ Location: `public/themes/<name>.json`
 **Rules:**
 - Only override semantic tokens (purpose-based, e.g. `--color-button-primary`), never primitives
 - Only include tokens that differ from the base — omit tokens that stay the same
-- Light and dark overrides are separate keys within `tokens` (or separate files — TBD at implementation)
+- `tokens` apply in light mode; `darkTokens` apply additionally when `data-theme="dark"` is active
+- `darkTokens` is optional — omit it if the theme's dark appearance is handled by the existing primitive inversion in `theme.css`
 - The current gray/blue palette is captured as `public/themes/default.json` as a baseline
 
 **Color input is intentionally open-ended.** The JSON is the stable adapter. How you derive the values (image extraction, swatch, manual OKLCH input, design tool export) is left for a future step. The framework just consumes JSON.
 
 ## Theme Discovery
 
-Uses Vite's `import.meta.glob('../../public/themes/*.json')` — no hand-maintained manifest. Adding a new theme means dropping a JSON file; it appears in the Tweakpane panel automatically.
+Uses Vite's `import.meta.glob('../../public/themes/*.json')` — no hand-maintained manifest. Adding a new theme means dropping a JSON file into `public/themes/` and restarting the dev server (Vite's glob is resolved statically at server start, not per-request). Editing an existing theme file triggers HMR without a restart.
 
 ## ThemeLoader (`src/utils/theme-loader.ts`)
 
@@ -68,7 +73,7 @@ Uses Vite's `import.meta.glob('../../public/themes/*.json')` — no hand-maintai
 Responsibilities:
 - On load: read `?theme=name` URL param, fetch the matching JSON, apply token overrides to `document.documentElement`
 - Expose `applyTheme(name: string)` for Tweakpane to call without page reload
-- On failure: log a warning and silently fall back to base `theme.css` tokens — no broken page
+- On failure: log a console warning and silently fall back to base `theme.css` tokens — no broken page. Unknown token names (e.g. typos) are also silently skipped with a console warning per token.
 - No localStorage persistence — each page load starts from the URL param
 
 End-of-iteration cleanup (listed in the file):
@@ -96,7 +101,7 @@ End-of-iteration cleanup (listed in the file):
 - Panel contents:
   - Theme dropdown — populated from discovered JSON files, calls `ThemeLoader.applyTheme(name)`
   - Light/dark toggle — works independently of theme selection
-  - "Copy tokens" button — copies the current active token overrides as JSON to clipboard, for easy extraction of the winning values
+  - "Copy tokens" button — copies the full theme JSON (name, label, tokens, darkTokens) to clipboard, ready to save as a new theme file
 
 No coupling to any existing page component. Self-contained.
 
@@ -126,13 +131,17 @@ Layout: two columns side-by-side. Each column has:
 </div>
 ```
 
-Selecting a theme in one column does not affect the other column. Both columns always show light mode or both always show dark mode (controlled by a single toggle at the top of the page).
+Selecting a theme in one column does not affect the other column. Both columns always show light mode or both always show dark mode (controlled by a single toggle at the top of the page — sets `data-theme="dark"` on both column wrapper divs simultaneously).
+
+The component gallery inside each column is a minimum set: site header, score card, primary button, secondary button, form input, toast. Implementors may add more components if needed to cover theme edge cases.
 
 ## Dark Mode Interaction
 
-Dark mode continues to work independently. The existing `data-theme="dark"` mechanism on `:root` is untouched. Tweakpane has a separate light/dark toggle. Theme JSON files only define semantic token overrides — dark mode inversion of primitives (already in `theme.css`) handles the rest automatically.
+Dark mode continues to work independently. The existing `data-theme="dark"` mechanism on `:root` is untouched by `ThemeLoader`. Tweakpane has a separate light/dark toggle.
 
-If a theme needs dark-mode-specific overrides (e.g. a button color that needs different dark treatment), those are separate keys in the JSON — convention TBD at implementation.
+`ThemeLoader` applies `tokens` always, then additionally applies `darkTokens` when `data-theme="dark"` is active on `:root`. It watches for `data-theme` changes (via a `MutationObserver`) and re-applies the correct set without a page reload.
+
+On the comparison page, `data-theme="dark"` is set on each column's wrapper div (not `:root`) when dark mode is toggled, so the CSS scoping mechanism handles both theme and dark mode overrides within each column.
 
 ## Removal Checklist
 
