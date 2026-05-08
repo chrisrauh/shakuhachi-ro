@@ -3,7 +3,7 @@ import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
 import { toast } from './Toast';
-import { ConfirmDialog } from './ConfirmDialog';
+import { confirmDialog } from '../utils/init-header';
 import { buildSpinnerSVG } from './LoadingSpinner';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
@@ -59,13 +59,17 @@ export class ScoreEditor {
     const result = await getScore(scoreId);
 
     if (result.error || !result.score) {
-      toast.error(
-        result.error?.message
-          ? STRINGS.ERRORS.ScoreEditor.loadError(result.error.message)
-          : STRINGS.ERRORS.ScoreEditor.loadNotFound,
-      );
-      // Render empty editor so user can still interact
-      this.render();
+      const message = result.error?.message
+        ? STRINGS.ERRORS.ScoreEditor.loadError(result.error.message)
+        : STRINGS.ERRORS.ScoreEditor.loadNotFound;
+      this.container.innerHTML = `
+        <div class="score-editor">
+          <div class="page-error">
+            <p>${message}</p>
+            <a href="/" class="btn btn-secondary"><span class="btn-text">Return to library</span></a>
+          </div>
+        </div>
+      `;
       return;
     }
 

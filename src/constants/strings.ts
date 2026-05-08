@@ -35,6 +35,8 @@ export const STRINGS = {
     },
 
     ScoreDetailClient: {
+      parseError: 'Failed to load score data',
+      renderError: 'Failed to display score',
       forkLoginRequired: 'Please sign in to fork this score',
       forkError: (message: string) => `Error forking score: ${message}`,
       forkFailed: 'Failed to fork score',

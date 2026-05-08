@@ -123,8 +123,7 @@ export class ScoreLibrary {
 
     if (this.error) {
       this.container.innerHTML = `
-        <div class="score-library-error">
-          <h2>Error Loading Scores</h2>
+        <div class="page-error">
           <p>${this.error.message}</p>
           <button id="retry-btn" class="btn btn-small btn-primary"><span class="btn-text">Retry</span></button>
         </div>

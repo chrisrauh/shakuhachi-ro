@@ -206,6 +206,22 @@
   line-height: var(--line-height-denser);
 }
 
+/* ============================================
+   PAGE ERROR STATE
+   For blocking load failures (not transient action errors — use toast for those)
+   ============================================ */
+
+.page-error {
+  text-align: center;
+  padding: var(--spacing-3x-large) var(--spacing-large);
+  color: var(--color-text-danger);
+}
+
+.page-error p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-large);
+}
+
 /* Ensure the HTML `hidden` attribute hides elements even when component styles set display.
    Author styles override the UA stylesheet's `[hidden] { display: none }`, so we re-assert it here. */
 [hidden] {

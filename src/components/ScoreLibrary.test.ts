@@ -302,3 +302,33 @@ describe('ScoreLibrary clear button', () => {
     expect(btn!.classList.contains('search-bar-clear--visible')).toBe(true);
   });
 });
+
+// --- Error state ---
+
+describe('ScoreLibrary error state', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    document.body.innerHTML = '<div id="error-library"></div>';
+
+    const { onAuthReady } = await import('../api/auth');
+    vi.mocked(onAuthReady).mockImplementation((cb) => {
+      cb(null);
+      return { unsubscribe: vi.fn() } as any;
+    });
+  });
+
+  it('shows page-error with retry button when getAllScores fails', async () => {
+    const container = document.getElementById('error-library')!;
+    const { getAllScores } = await import('../api/scores');
+    vi.mocked(getAllScores).mockResolvedValue({
+      scores: [],
+      error: new Error('Network error'),
+    });
+
+    new ScoreLibrary('error-library');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(container.querySelector('.page-error')).not.toBeNull();
+    expect(container.querySelector('#retry-btn')).not.toBeNull();
+  });
+});

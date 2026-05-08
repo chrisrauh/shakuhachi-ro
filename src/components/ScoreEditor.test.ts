@@ -77,6 +77,23 @@ describe('ScoreEditor loading state', () => {
     expect(container.querySelector('.editor-loading')).toBeNull();
     expect(container.querySelector('#score-data-input')).not.toBeNull();
   });
+
+  it('shows inline page-error when getScore fails, does not render empty editor or call toast', async () => {
+    const { getScore } = await import('../api/scores');
+    const { toast } = await import('./Toast');
+
+    vi.mocked(getScore).mockResolvedValue({
+      score: null,
+      error: new Error('Score not found'),
+    });
+
+    new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    expect(container.querySelector('.page-error')).not.toBeNull();
+    expect(container.querySelector('#score-data-input')).toBeNull();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
 });
 
 // --- handleSave() ---
