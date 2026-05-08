@@ -297,20 +297,6 @@
   padding: var(--spacing-3x-large) var(--spacing-large);
 }
 
-.score-library-error {
-  text-align: center;
-  padding: var(--spacing-3x-large) var(--spacing-large);
-  color: var(--color-text-danger);
-}
-
-.score-library-error h2 {
-  margin-bottom: var(--spacing-small);
-}
-
-.score-library-error p {
-  margin-bottom: var(--spacing-large);
-  color: var(--color-text-secondary);
-}
 
 @media (max-width: 768px) {
   .score-grid-section {

@@ -24,13 +24,9 @@ export class ScoreDetailClient {
         const data = JSON.parse(dataEl.textContent || '{}') as ScoreData;
         this.score = data.score;
         // parentScore is rendered server-side, no need to store client-side
-      } catch (error) {
-        console.error('Failed to parse score data:', error);
-        // this.score remains null, renderScore() will display error UI
+      } catch {
+        // this.score remains null; renderScore() will display the error UI
       }
-    } else {
-      console.error('Score data element not found in page');
-      // this.score remains null, renderScore() will display error UI
     }
   }
 
@@ -77,12 +73,9 @@ export class ScoreDetailClient {
     // Handle missing score data
     if (!this.score) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: var(--color-text-danger);">
-          <h2 style="margin-bottom: 16px;">Score data not found</h2>
-          <p>The score data is empty.</p>
-          <p style="margin-top: 24px;">
-            <a href="/" style="color: var(--color-primary); text-decoration: underline;">Return to library</a>
-          </p>
+        <div class="page-error">
+          <p>${STRINGS.ERRORS.ScoreDetailClient.parseError}</p>
+          <a href="/" class="btn btn-secondary"><span class="btn-text">Return to library</span></a>
         </div>
       `;
       return;
@@ -124,10 +117,9 @@ export class ScoreDetailClient {
       container.setAttribute('data-score', JSON.stringify(scoreData));
     } catch (error) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: var(--color-text-danger);">
-          <p>Error rendering score: ${
-            error instanceof Error ? error.message : 'Unknown error'
-          }</p>
+        <div class="page-error">
+          <p>${STRINGS.ERRORS.ScoreDetailClient.renderError}</p>
+          <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
         </div>
       `;
     }
