@@ -232,6 +232,14 @@ Use chrome-devtools-mcp for visual verification (not Bash scripts, not saving to
 Bash("npm run dev -- --port 3001", run_in_background=true)
 ```
 
+**Stale Chrome process (MCP connection fails repeatedly):** When the MCP-controlled Chrome process doesn't exit cleanly (e.g. after a session crash), `list_pages` returns a "browser already running" lock error. Fix:
+
+```
+pkill -f "chrome-devtools-mcp"
+```
+
+Then run `/mcp` to reconnect. This kills the stale MCP Chrome without affecting the user's regular Chrome (they use separate user data dirs).
+
 ### Visual Verification Patterns
 
 **For styling/layout work:**
