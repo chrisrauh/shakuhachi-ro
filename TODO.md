@@ -31,10 +31,6 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [ ] [A:Medium] Standardize error UX across components
-  - `ScoreDetailClient:23-29` still logs `console.error` with no user-facing error UI on failed data parse
-  - `ScoreLibrary` uses inline UI with a retry button; `ScoreEditor` uses `toast`; pick one pattern and apply consistently
-
 - [ ] [A:Medium] Audit and fix parser lazy loading — static imports defeat the dynamic import optimization
   - `src/utils/score-data.ts` dynamically imports `ABCParser` and `MusicXMLParser` so JSON-only users load zero parser code. But static imports elsewhere pull these parsers into the main bundle unconditionally, making the lazy loading moot.
   - **Known static imports to investigate:**
