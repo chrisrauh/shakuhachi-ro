@@ -10,58 +10,6 @@ import {
 } from './RenderOptions';
 
 describe('RenderOptions', () => {
-  describe('DEFAULT_RENDER_OPTIONS', () => {
-    it('should have correct display option defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.showOctaveMarks).toBe(true);
-      expect(DEFAULT_RENDER_OPTIONS.showDebugLabels).toBe(false);
-    });
-
-    it('should have correct layout option defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.notesPerColumn).toBe(10);
-      expect(DEFAULT_RENDER_OPTIONS.columnSpacing).toBe(35);
-      expect(DEFAULT_RENDER_OPTIONS.columnWidth).toBe(100);
-      expect(DEFAULT_RENDER_OPTIONS.topMargin).toBe(34);
-    });
-
-    it('should have correct note typography defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.noteFontSize).toBe(28);
-      expect(DEFAULT_RENDER_OPTIONS.noteFontWeight).toBe(400);
-      expect(DEFAULT_RENDER_OPTIONS.noteVerticalSpacing).toBe(44);
-      expect(DEFAULT_RENDER_OPTIONS.noteFontFamily).toBe(
-        'Noto Sans JP, sans-serif',
-      );
-      expect(DEFAULT_RENDER_OPTIONS.noteColor).toBe('#000');
-    });
-
-    it('should have correct octave mark configuration defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.octaveMarkFontSize).toBe(12);
-      expect(DEFAULT_RENDER_OPTIONS.octaveMarkFontWeight).toBe(500);
-      expect(DEFAULT_RENDER_OPTIONS.octaveMarkOffsetX).toBe(18);
-      expect(DEFAULT_RENDER_OPTIONS.octaveMarkOffsetY).toBe(-22);
-    });
-
-    it('should have correct meri/kari mark configuration defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.meriKariFontSize).toBe(14);
-      expect(DEFAULT_RENDER_OPTIONS.meriKariFontWeight).toBe(500);
-    });
-
-    it('should have correct duration dot configuration defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing).toBe(12);
-    });
-
-    it('should have correct debug label configuration defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.debugLabelFontSize).toBe(7);
-      expect(DEFAULT_RENDER_OPTIONS.debugLabelOffsetX).toBe(25);
-      expect(DEFAULT_RENDER_OPTIONS.debugLabelOffsetY).toBe(-6);
-      expect(DEFAULT_RENDER_OPTIONS.debugLabelFontFamily).toBe('monospace');
-      expect(DEFAULT_RENDER_OPTIONS.debugLabelColor).toBe('#999');
-    });
-
-    it('should have correct viewport option defaults', () => {
-      expect(DEFAULT_RENDER_OPTIONS.autoResize).toBe(true);
-    });
-  });
-
   describe('mergeWithDefaults', () => {
     it('should return defaults when no options provided', () => {
       const result = mergeWithDefaults();

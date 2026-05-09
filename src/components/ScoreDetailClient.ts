@@ -1,6 +1,7 @@
 import { forkScore, deleteScore } from '../api/scores';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { confirmDialog } from '../utils/init-header';
+import { toScoreData } from '../utils/score-data';
 import { toast } from './Toast';
 import { ButtonLoadingState } from './LoadingSpinner';
 import type { Score } from '../api/scores';
@@ -83,8 +84,7 @@ export class ScoreDetailClient {
 
     try {
       // Convert score data to ScoreData format based on data_format
-      const { toScoreData } = await import('../utils/score-data');
-      const scoreData = await toScoreData(this.score);
+      const scoreData = toScoreData(this.score);
 
       // Detect mobile viewport
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
