@@ -22,7 +22,7 @@ export function validateScoreInput(
       if (doc.querySelector('parsererror')) {
         return {
           valid: false,
-          error: STRINGS.VALIDATION.ScoreEditor.invalidMusicXML,
+          error: STRINGS.VALIDATION.scoreInput.invalidMusicXML,
         };
       }
       return { valid: true };
@@ -34,7 +34,7 @@ export function validateScoreInput(
       error:
         error instanceof Error
           ? error.message
-          : STRINGS.VALIDATION.ScoreEditor.invalidFormat,
+          : STRINGS.VALIDATION.scoreInput.invalidFormat,
     };
   }
 }
