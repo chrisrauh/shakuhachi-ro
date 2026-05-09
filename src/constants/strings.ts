@@ -52,7 +52,7 @@ export const STRINGS = {
   },
 
   VALIDATION: {
-    ScoreEditor: {
+    scoreInput: {
       invalidMusicXML: 'Invalid MusicXML format',
       invalidFormat: 'Invalid format',
     },
