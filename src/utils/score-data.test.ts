@@ -71,63 +71,61 @@ function makeScore(data: unknown, format: 'json' | 'musicxml' | 'abc'): Score {
 
 describe('score-data', () => {
   describe('toScoreData()', () => {
-    it('should pass JSON data through as-is (no parsing)', async () => {
+    it('should pass JSON data through as-is (no parsing)', () => {
       const score = makeScore(sampleScoreData, 'json');
-      const result = await toScoreData(score);
+      const result = toScoreData(score);
 
       // Should be the same object reference — no parsing
       expect(result).toBe(sampleScoreData);
     });
 
-    it('should parse MusicXML string data', async () => {
+    it('should parse MusicXML string data', () => {
       const score = makeScore(sampleMusicXML, 'musicxml');
-      const result = await toScoreData(score);
+      const result = toScoreData(score);
 
       expect(result.title).toBe('Test');
       expect(result.notes).toHaveLength(1);
     });
 
-    it('should parse ABC string data', async () => {
+    it('should parse ABC string data', () => {
       const score = makeScore(sampleABC, 'abc');
-      const result = await toScoreData(score);
+      const result = toScoreData(score);
 
       expect(result.title).toBe('Test Score');
       expect(result.composer).toBe('Test Composer');
       expect(result.notes.length).toBeGreaterThan(0);
     });
 
-    it('should throw for unsupported format', async () => {
+    it('should throw for unsupported format', () => {
       const score = makeScore('data', 'unknown' as any);
-      await expect(toScoreData(score)).rejects.toThrow(
-        'Unsupported score format',
-      );
+      expect(() => toScoreData(score)).toThrow('Unsupported score format');
     });
   });
 
   describe('parseScoreText()', () => {
-    it('should parse JSON text', async () => {
-      const result = await parseScoreText(sampleJSON, 'json');
+    it('should parse JSON text', () => {
+      const result = parseScoreText(sampleJSON, 'json');
 
       expect(result.title).toBe('Test Score');
       expect(result.notes).toHaveLength(2);
     });
 
-    it('should parse MusicXML text', async () => {
-      const result = await parseScoreText(sampleMusicXML, 'musicxml');
+    it('should parse MusicXML text', () => {
+      const result = parseScoreText(sampleMusicXML, 'musicxml');
 
       expect(result.title).toBe('Test');
       expect(result.notes).toHaveLength(1);
     });
 
-    it('should parse ABC text', async () => {
-      const result = await parseScoreText(sampleABC, 'abc');
+    it('should parse ABC text', () => {
+      const result = parseScoreText(sampleABC, 'abc');
 
       expect(result.title).toBe('Test Score');
       expect(result.notes.length).toBeGreaterThan(0);
     });
 
-    it('should throw for unsupported format', async () => {
-      await expect(parseScoreText('data', 'unknown' as any)).rejects.toThrow(
+    it('should throw for unsupported format', () => {
+      expect(() => parseScoreText('data', 'unknown' as any)).toThrow(
         'Unsupported score format',
       );
     });

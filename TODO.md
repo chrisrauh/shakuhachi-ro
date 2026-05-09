@@ -31,15 +31,7 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [ ] [A:Medium] Audit and fix parser lazy loading — static imports defeat the dynamic import optimization
-  - `src/utils/score-data.ts` dynamically imports `ABCParser` and `MusicXMLParser` so JSON-only users load zero parser code. But static imports elsewhere pull these parsers into the main bundle unconditionally, making the lazy loading moot.
-  - **Known static imports to investigate:**
-    - `src/utils/score-validation.ts:1` — `import { ABCParser }` (static, added in PR #229)
-    - `src/utils/format-converter.ts:14,16` — `import { ABCParser }` and `import { MusicXMLParser }` (static)
-    - `src/components/ScoreEditor.ts:4` — `import { ABCParser }` (static)
-    - `src/web-component/renderer/ScoreRenderer.ts:15` — `import { MusicXMLParser }` (renderer bundle — may be a separate chunk, verify separately)
-  - **Research questions:** Which of these files are included in the platform bundle that runs on score detail/browse pages? Does bundling `format-converter.ts` or `ScoreEditor.ts` eagerly pull in both parsers? Use bundle analysis or trace the import graph from entry points.
-  - **If static imports defeat lazy loading:** convert them to dynamic imports at the call site (same pattern as `score-data.ts`), or restructure so parser code only loads when the relevant format is actually used. `score-validation.ts` is the most straightforward fix — `ABCParser` is only needed in the `'abc'` branch and can be dynamically imported there.
+- [x] [A:High] Simplify score-data.ts — replace dynamic parser imports with static imports
 
 - [ ] [A:Low] Move score validation strings out of `STRINGS.VALIDATION.ScoreEditor` namespace
   - `src/constants/strings.ts` — `invalidMusicXML` and `invalidFormat` live under `STRINGS.VALIDATION.ScoreEditor` but are now used by the standalone `validateScoreInput` utility (`src/utils/score-validation.ts`), which has no relationship to `ScoreEditor`. Move these keys to a dedicated `STRINGS.VALIDATION.scoreValidation` namespace and update all references.
@@ -292,6 +284,16 @@
 ### Architecture
 
 - [ ] [A:Medium] Investigate standardizing page padding to always use `main` instead of per-container overrides on fullHeight pages
+
+- [ ] [A:Medium] Investigate `strings.js` bundle size — 49 KB gzipped, loaded on every page
+  - `src/constants/strings.ts` compiles to a 181 KB (49 KB gzip) chunk that is shared across all pages. This is the single largest client-side chunk and dwarfs everything else (the next largest page-specific chunk is 5 KB gzip).
+  - **Research questions:** What's in it? Is it mostly string literals, or are there large objects/structures? Are all strings needed on every page, or could strings be split per-page or per-feature (editor strings, detail page strings, etc.)? Would tree-shaking help if strings were exported individually instead of as one nested object?
+  - **Context:** Discovered during bundle analysis on 2026-05-09. The chunk is `strings.A97qwdJE.js` in the Vite build output.
+
+- [ ] [A:Medium] Fix pointless dynamic import of supabase.ts in slug.ts
+  - Vite warns: `supabase.ts is dynamically imported by slug.ts but also statically imported by auth.ts, scores.ts — dynamic import will not move module into another chunk.`
+  - `src/utils/slug.ts` dynamically imports `src/api/supabase.ts`, but `auth.ts` and `scores.ts` already import it statically. Since static imports win, the dynamic import adds async complexity for zero benefit. Convert to a static import.
+  - **Context:** Discovered during bundle analysis on 2026-05-09.
   - **Goal**: Determine if all pages can get spacing from `main { padding: var(--spacing-medium) }` without each page's container needing its own padding.
   - **⚠️ Note**: Research below was done on 2026-03-22 — re-validate against current code before implementing, as the codebase may have changed.
   - **Current architecture (researched 2026-03-16, confirmed 2026-03-22):**

@@ -2,6 +2,7 @@ import { updateScore, getScore } from '../api/scores';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
+import { parseScoreText } from '../utils/score-data';
 import { toast } from './Toast';
 import { confirmDialog } from '../utils/init-header';
 import { buildSpinnerSVG } from './LoadingSpinner';
@@ -210,8 +211,7 @@ export class ScoreEditor {
       try {
         const isMobile = window.innerWidth < 768;
 
-        const { parseScoreText } = await import('../utils/score-data');
-        const scoreData = await parseScoreText(this.scoreData, this.dataFormat);
+        const scoreData = parseScoreText(this.scoreData, this.dataFormat);
 
         externalPreview.innerHTML =
           '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
@@ -276,8 +276,7 @@ export class ScoreEditor {
       const isMobile = window.innerWidth < 768;
 
       let scoreData;
-      const { parseScoreText } = await import('../utils/score-data');
-      scoreData = await parseScoreText(this.scoreData, this.dataFormat);
+      scoreData = parseScoreText(this.scoreData, this.dataFormat);
 
       previewContainer.innerHTML =
         '<shakuhachi-score id="score-renderer"></shakuhachi-score>';
