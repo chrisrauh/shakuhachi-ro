@@ -31,11 +31,6 @@
   - Test on mobile viewports for readability
   - Consider adding subtle animation when save completes
 
-- [x] [A:High] Simplify score-data.ts — replace dynamic parser imports with static imports
-
-- [ ] [A:Low] Move score validation strings out of `STRINGS.VALIDATION.ScoreEditor` namespace
-  - `src/constants/strings.ts` — `invalidMusicXML` and `invalidFormat` live under `STRINGS.VALIDATION.ScoreEditor` but are now used by the standalone `validateScoreInput` utility (`src/utils/score-validation.ts`), which has no relationship to `ScoreEditor`. Move these keys to a dedicated `STRINGS.VALIDATION.scoreValidation` namespace and update all references.
-
 - [ ] [A:Medium] Test autosave feature end-to-end in the editor
   - Edit a score and wait for autosave (2s debounce) — verify "Saved X ago" indicator updates
   - Reload the page — verify draft restore prompt appears
