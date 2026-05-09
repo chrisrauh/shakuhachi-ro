@@ -16,6 +16,13 @@
 
 ---
 
+## Next Session
+
+- [ ] [A:Medium] Migrate task tracking to GitHub Issues + slim TODO.md
+  - Create GitHub Issues from all current TODO.md tasks with labels for category and autonomy level
+  - Slim TODO.md to a "Current Focus" list of 3-5 items with `#issue` links
+  - Update CLAUDE.md workflow section to reflect the hybrid system
+
 ## Prioritized Backlog
 
 ### Info pages (About, Help, etc...)
