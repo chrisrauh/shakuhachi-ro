@@ -85,7 +85,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Note `@lucide/astro` now ships raw `.ts` source with no `main`/`module` (exports-map only); a bare-import resolution error would trace to that.
   - **Default, then flag:** ship the consolidated `Trash` glyph. Screenshot it at 16px beside the other header icons and put that in the PR body as a design decision to confirm — do not stop to ask.
 
-- [ ] [A:High] Upgrade Vite to 8 and Vitest to 5
+- [x] [A:High] Upgrade Vite to 8 and Vitest to 5
   - Bump together (vitest 5 peers `vite ^6.4 || ^7 || ^8`): `vite` 5.4.21 → 8.3.0, `vitest` 2.1.9 → 5.0.1, `@vitest/ui` → 5.0.1 (peered at exactly 5.0.1).
   - **Also fix a pre-existing gap:** add `@vitest/coverage-v8` at 5.0.1. It is currently NOT installed, yet `vitest.config.ts` sets `provider: 'v8'` and `npm run test:coverage` exists — vitest prompts to install on demand, which fails in any non-interactive context.
   - **Vite 8 replaces Rollup+esbuild with Rolldown+Oxc** (verified: `vite@8.3.0` depends on `rolldown` and `lightningcss`, with no `esbuild` or `rollup`). A compat layer auto-converts `rollupOptions`, so most of `vite.embed.config.ts` carries over. Two things do not:
