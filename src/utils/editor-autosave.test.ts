@@ -3,10 +3,12 @@ import { EditorAutosave } from './editor-autosave';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import type { ConfirmDialogOptions } from '../components/ConfirmDialog';
 
+// Class mocks must use `function` (not an arrow) so they remain constructible
+// with `new` — Vitest 5 rejects arrow-function implementations there.
 vi.mock('../components/ConfirmDialog', () => ({
-  ConfirmDialog: vi.fn().mockImplementation(() => ({
-    show: vi.fn(),
-  })),
+  ConfirmDialog: vi.fn().mockImplementation(function () {
+    return { show: vi.fn() };
+  }),
 }));
 
 describe('EditorAutosave', () => {
@@ -158,12 +160,11 @@ describe('EditorAutosave', () => {
     localStorage.setItem(KEY, JSON.stringify(draft));
     const onRestore = vi.fn();
 
-    vi.mocked(ConfirmDialog).mockImplementationOnce(
-      () =>
-        ({
-          show: (opts: ConfirmDialogOptions) => opts.onConfirm(),
-        }) as unknown as ConfirmDialog,
-    );
+    vi.mocked(ConfirmDialog).mockImplementationOnce(function () {
+      return {
+        show: (opts: ConfirmDialogOptions) => opts.onConfirm(),
+      } as unknown as ConfirmDialog;
+    });
 
     autosave.checkAndOfferRestore('2024-01-01T00:00:00Z', onRestore);
 
@@ -181,12 +182,11 @@ describe('EditorAutosave', () => {
       }),
     );
 
-    vi.mocked(ConfirmDialog).mockImplementationOnce(
-      () =>
-        ({
-          show: (opts: ConfirmDialogOptions) => opts.onCancel?.(),
-        }) as unknown as ConfirmDialog,
-    );
+    vi.mocked(ConfirmDialog).mockImplementationOnce(function () {
+      return {
+        show: (opts: ConfirmDialogOptions) => opts.onCancel?.(),
+      } as unknown as ConfirmDialog;
+    });
 
     autosave.checkAndOfferRestore('2024-01-01T00:00:00Z', vi.fn());
 

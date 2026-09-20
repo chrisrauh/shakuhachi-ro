@@ -17,12 +17,13 @@ export default defineConfig({
     },
     outDir: 'dist/embed',
     emptyOutDir: true,
-    minify: 'esbuild', // Use esbuild instead of terser (built-in)
+    // Browser support floor for the public embed bundle. Pinned explicitly so
+    // it stays a deliberate product decision rather than drifting with Vite's
+    // default target, which has risen twice (v7: Chrome 87->107, Safari
+    // 14->16.0; v8: Chrome 107->111, Safari 16.0->16.4).
+    target: ['chrome87', 'safari14', 'firefox78', 'edge88'],
     rollupOptions: {
       external: [], // Bundle everything (no external dependencies)
-      output: {
-        inlineDynamicImports: true, // Inline all imports into single file
-      },
     },
   },
 });
