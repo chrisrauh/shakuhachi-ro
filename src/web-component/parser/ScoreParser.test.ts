@@ -429,5 +429,16 @@ describe('ScoreParser', () => {
 
       expect(() => ScoreParser.parseJSON(invalidJson)).toThrow('Invalid JSON');
     });
+
+    it('should preserve the original parse error as cause', () => {
+      const invalidJson = '{ invalid json }';
+
+      try {
+        ScoreParser.parseJSON(invalidJson);
+        expect.unreachable('parseJSON should have thrown');
+      } catch (error) {
+        expect((error as Error).cause).toBeInstanceOf(SyntaxError);
+      }
+    });
   });
 });

@@ -81,7 +81,7 @@ export class MusicXMLParser {
 
       // Simple duration mapping (can be refined)
       // 1 = eighth, 2 = quarter, 3 = dotted quarter, 4 = half
-      let shakuDuration = 1;
+      let shakuDuration: number;
       if (duration >= 4) {
         shakuDuration = 4; // whole
       } else if (duration >= 2) {
