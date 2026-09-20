@@ -45,7 +45,15 @@
 
 Thirteen packages need major-version bumps. **Work these six entries strictly top to bottom.** Entry 4 must precede entry 5: astro 7 bundles `vite ^8.0.13`, so bringing the root vite to 8 first lets the astro install dedupe onto one copy. The rest are ordered cheapest-and-most-isolated first, so confidence accumulates and each failure is unambiguous.
 
-Every entry touches `package-lock.json`, which does not merge — so these cannot run in parallel or as stacked branches. One branch in flight at a time, regenerating the lockfile fresh in each.
+**Execution: `/agent-workflow`, as a stacked PR chain.** Deviations from that skill's standard setup:
+
+- **Branch from the previous entry's branch, not `main`.** Entry 1 branches from `main`, entry 2 from entry 1's branch, and so on. Every entry regenerates `package-lock.json`, which does not merge — a stack is what keeps each diff reviewable. Six branches cut from `main` would put six conflicting lockfiles in flight at once.
+- **Set the PR base explicitly:** `gh pr create --base <previous-branch>`. Only entry 1 targets `main`.
+- **State the stack position in the PR body** — which PR it sits on, which it blocks — so review order is unambiguous.
+- Do not wait for the previous PR to merge before starting the next. Do not rebase mid-stack unsolicited; if an earlier PR changes during review, rebase the rest of the stack then.
+- Merge stays human and bottom-up. Never merge.
+
+**Where an entry flags a judgment call** (the Lucide glyph shape, the Vite browser-support floor), take the stated default, implement it, and call it out in the PR body as a decision to confirm. Do not stop to ask — the PR is the gate. A `Bail out if` clause is different: that is a hard stop, per the agent-workflow failure protocol.
 
 Each entry is a brief plus the research, not a finished design — do a planning pass before starting one.
 
@@ -68,22 +76,21 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - **Watch:** `MusicXMLParser.test.ts` / `MusicXMLSerializer.test.ts` (`DOMParser` round-trips — jsdom's XML namespace and whitespace handling has shifted across majors) and `ShakuhachiScore.test.ts` (`customElements.define`; the ResizeObserver-unavailable test at line 305; the "Initial Render" block at 232).
   - **Bail out if:** XML tests fail from genuine parsing-semantics differences — downgrade rather than loosening assertions. A ResizeObserver stub that breaks resize behavior is fix-or-downgrade, never ship-anyway.
 
-- [ ] [A:Medium] Upgrade Lucide to v1 (both packages)
+- [ ] [A:High] Upgrade Lucide to v1 (both packages)
   - Bump `@lucide/astro` 0.563.0 → 1.47.0 and `lucide` 0.562.0 → 1.47.0 **together**, so the shared glyph change lands once across `.astro` and `.ts` call sites. Independent of the Astro upgrade — `@lucide/astro` peers `^4 || ^5 || ^6 || ^7`.
   - **This is a deliberate visual change, not just a version bump.** `Trash2` is now a deprecated alias onto the consolidated `Trash` glyph (`node_modules/@lucide/astro/src/aliases/aliases.ts`: *"The icon was combined with another icon that shares the same use case"*). It compiles either way, but the rendered icon changes shape.
   - Edits: `src/pages/score/[slug].astro:6,61` and `src/utils/init-header.ts:12,151` → `Trash2` to `Trash`. Also `src/utils/init-header.ts:5,98` → `HelpCircle` to `CircleHelp` (the codebase straddles both conventions; `src/utils/icons.ts` already uses `CircleHelp`).
-  - Optional: `AlertCircle` → `CircleAlert` in `src/utils/icons.ts:6,22`. **If done, the paired kebab string must change too** — `createIcons` derives `data-lucide="alert-circle"` from the PascalCase key, so `renderIcon('alert-circle')` at `src/components/ScoreEditor.ts:515` becomes `renderIcon('circle-alert')`.
-  - Also check: `Eye` and `Calendar` are registered in `initIcons()` with no matching `renderIcon()` call site. Drop if dead.
+  - **Out of scope, leave alone:** the `AlertCircle` → `CircleAlert` rename (tracked as its own entry below — it is a two-sided change, since `createIcons` derives `data-lucide="alert-circle"` from the PascalCase key, so `renderIcon('alert-circle')` at `src/components/ScoreEditor.ts:515` must move in lockstep), and the apparently-dead `Eye` and `Calendar` registrations in `initIcons()`. Neither is required by the version bump. If you confirm `Eye`/`Calendar` have no `renderIcon()` call site, add that finding to TODO rather than acting on it.
   - **Verify:** chrome-devtools-mcp, light and dark — header icons logged-out and logged-in, plus library and detail pages. A `Cannot read properties of undefined` from `createIcons`/`createElement` means a missing export. Then `npm run test:visual`, expecting **legitimate** diffs wherever `Trash` replaced `Trash2` — review each rather than blanket-accepting.
   - Note `@lucide/astro` now ships raw `.ts` source with no `main`/`module` (exports-map only); a bare-import resolution error would trace to that.
-  - **Raise, don't decide:** if the new `Trash` glyph reads poorly at 16px beside the other icons, that's a design question.
+  - **Default, then flag:** ship the consolidated `Trash` glyph. Screenshot it at 16px beside the other header icons and put that in the PR body as a design decision to confirm — do not stop to ask.
 
 - [ ] [A:High] Upgrade Vite to 8 and Vitest to 5
   - Bump together (vitest 5 peers `vite ^6.4 || ^7 || ^8`): `vite` 5.4.21 → 8.3.0, `vitest` 2.1.9 → 5.0.1, `@vitest/ui` → 5.0.1 (peered at exactly 5.0.1).
   - **Also fix a pre-existing gap:** add `@vitest/coverage-v8` at 5.0.1. It is currently NOT installed, yet `vitest.config.ts` sets `provider: 'v8'` and `npm run test:coverage` exists — vitest prompts to install on demand, which fails in any non-interactive context.
   - **Vite 8 replaces Rollup+esbuild with Rolldown+Oxc** (verified: `vite@8.3.0` depends on `rolldown` and `lightningcss`, with no `esbuild` or `rollup`). A compat layer auto-converts `rollupOptions`, so most of `vite.embed.config.ts` carries over. Two things do not:
     - **Required edit:** `build.minify: 'esbuild'` is deprecated and esbuild is no longer bundled — keeping it means adding esbuild as an explicit devDependency. Delete the line and take the Oxc default. This changes the embed bundle's bytes (different minifier), not its behavior. Baseline for comparison: 25.97 kB / 7.92 kB gzip.
-    - **Decision to raise:** the default browser target rose twice (v7: Chrome 87→107, Safari 14→16.0; v8: Chrome 107→111, Safari 16.0→16.4). For a **publicly embeddable** bundle that's a support-floor change. Either accept it or set an explicit `build.target`.
+    - **Default, then flag:** the default browser target rose twice (v7: Chrome 87→107, Safari 14→16.0; v8: Chrome 107→111, Safari 16.0→16.4). For a **publicly embeddable** bundle that is a product support-floor change, not a tooling detail. Default to preserving today's floor with an explicit `build.target: ['chrome87', 'safari14', 'firefox78', 'edge88']`, so the bump stays a pure tooling change and the floor becomes a visible, deliberate line in the config. Note in the PR body that dropping the pin to take Vite 8's newer default is the alternative, and let the human choose.
   - `import.meta.url` is no longer polyfilled in IIFE/UMD output. Zero occurrences in `src/`, but `external: []` inlines every dependency, so a bundled dep could still hit it.
   - **Unverified — check at build time:** whether `rolldownOptions.output.inlineDynamicImports` and `build.lib.fileName`-as-function behave identically under Rolldown. The embed build relies on both.
   - `vitest.config.ts` needs **no edits** — `globals`, `environment`, `include`, and the `coverage` block are all still valid, and the config avoids everything removed (`poolOptions`, `workspace`, `environmentMatchGlobs`, `deps.*`).
@@ -91,7 +98,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Expect a transient duplicate vite after install (root 8, astro 5's nested 6). Resolves in the next entry.
   - **Verify:** `npm run build:wc`, confirm the IIFE still works by loading a score page via chrome-devtools-mcp — this bundle is the product's most externally-visible artifact. Then `npm run test:coverage` (must run without prompting) and `npm run test:visual`.
 
-- [ ] [A:Medium] Upgrade Astro to 7 and migrate content collections
+- [ ] [A:High] Upgrade Astro to 7 and migrate content collections
   - Bump atomically (peer ranges force it): `astro` 5.17.1 → 7.3.3, `@astrojs/mdx` 4.3.13 → 8.0.1 (peers astro ^7.2.6), `@astrojs/netlify` 6.6.4 → 8.2.6 (^7.0.0), `@astrojs/node` 9.5.2 → 11.1.6 (^7.2.1). Astro 7 requires Node ≥22.12.
   - **Do the Vite/Vitest entry first** — astro 7 bundles `vite ^8.0.13`, so a root vite already at 8 dedupes cleanly.
   - **`@astrojs/node` appears unused** — `astro.config.mjs` registers only `netlify()` and no second build target references it. Confirm, then remove it from `devDependencies` rather than carrying a bumped dependency nothing imports.
@@ -101,14 +108,14 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
       `defineCollection({ loader: glob({ pattern: '**/*.mdx', base: './src/content/pages' }), schema: z.object({ title: z.string() }) })`
     - Update the three consumers — `src/pages/about.astro:4,10-11`, `src/pages/ai.astro`, `src/pages/help/notation-formats.astro`. Each does `const entry = await getEntry('pages','about'); const { Content } = await entry.render();` → change to `import { getEntry, render } from 'astro:content'` and `const { Content } = await render(entry);`.
     - **Entry IDs are preserved** — `generateIdDefault()` in `dist/content/loaders/glob.js` strips the extension and slugifies path segments, so `about.mdx` → id `about` and existing `getEntry('pages','about')` calls keep working, provided no custom `generateId` is passed. Still spot-check at runtime: `getEntry` returns `undefined` on a miss and these pages destructure immediately, so a mismatch surfaces as an unhelpful `TypeError`.
-    - **Fallback:** `legacy: { collectionsBackwardsCompat: true }` in `astro.config.mjs` unblocks everything else. Only as a deliberate deferral tracked here — Astro documents it as a temporary migration helper.
+    - **Do not reach for `legacy: { collectionsBackwardsCompat: true }`.** It would unblock the rest of the bump, but it defers the migration behind a flag Astro documents as temporary, and an agent silently opting into it hides the fact that the migration failed. If the Content Layer migration does not work, bail out and report.
   - Content files (`src/content/pages/{about,ai,notation-formats}.mdx`) need no changes — plain frontmatter plus Markdown with raw HTML/SVG, no component imports.
   - `astro.config.mjs` otherwise uses only stable keys (`output: 'server'`, `adapter: netlify()`, `integrations: [mdx()]`, `markdown.shikiConfig.themes`, `build.format: 'file'`, `vite.envPrefix`, `devToolbar`, `server.port`) — confirm each still validates. Astro 7 also pulls **zod 4**; the schema here is unaffected, but the major changed underneath.
   - Not applicable (confirmed absent): middleware, `src/pages/api/` endpoints, `getStaticPaths`, `Astro.glob`, `Astro.cookies`/`locals`, `astro:env`.
   - **Verify:** `tsc --noEmit` and `astro check` separately, then `npm test` and `npm run build`. chrome-devtools-mcp over `/`, `/about`, `/ai`, `/help/notation-formats`, `/score/test`, `/score/test/edit` in light and dark — the three MDX pages are the content-collection canaries.
   - **Bail out if:** the Netlify adapter build fails beyond a config rename — downgrade the group; SSR deploy is the platform's critical path.
 
-- [ ] [A:Medium] Upgrade TypeScript to 6
+- [ ] [A:High] Upgrade TypeScript to 6
   - Bump `typescript` 5.9.3 → 6.0.3 and `@astrojs/check` 0.9.6 → 0.9.10 (mandatory companion — 0.9.6 peers `typescript: ^5.0.0` and would block the install; 0.9.10 peers `^5.0.0 || ^6.0.0`).
   - **TS 7.0.2 is deliberately not attempted** — `@astrojs/check` caps at `^6.0.0` and typescript-eslint at `<6.1.0`. Forcing it with overrides risks `astro check` silently misreporting rather than failing loudly, and `type-check` is a required gate. Tracked separately below.
   - Do this last: TypeScript underpins `tsc`, `astro check`, and typescript-eslint's parser simultaneously, so a regression is only unambiguous once everything else is green.
@@ -121,7 +128,8 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - TS 7 is the native-compiler rewrite, so also verify `moduleResolution: "bundler"` parity in its release notes before committing to it.
 
 - [ ] [A:Low] Migrate remaining deprecated Lucide aliases
-  - `AlertCircle` → `CircleAlert` in `src/utils/icons.ts`, plus the paired `renderIcon('alert-circle')` → `renderIcon('circle-alert')` in `src/components/ScoreEditor.ts`. Skip if already done during the Lucide v1 upgrade.
+  - `AlertCircle` → `CircleAlert` in `src/utils/icons.ts:6,22`, plus the paired `renderIcon('alert-circle')` → `renderIcon('circle-alert')` in `src/components/ScoreEditor.ts:515`. Both sides must move together — `createIcons` derives the kebab `data-lucide` attribute from the PascalCase key.
+  - Deliberately excluded from the Lucide v1 upgrade above to keep that diff to the version bump. Unlike `Trash2`, this alias is a pure rename with no glyph change, so there is no visual risk and no deadline.
 
 ### Info pages (About, Help, etc...)
 
