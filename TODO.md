@@ -70,7 +70,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Also note `no-shadow-restricted-names` now flags `globalThis`. No impact from the eslintrc removal (already flat-config-only) or the removed `context`/`SourceCode` methods (no custom rules).
   - **Verify:** capture `npm run lint` and `npx eslint --print-config src/index.ts` as a baseline *before* bumping, then diff both after — the `--print-config` diff catches silent rule-set changes a passing lint run would hide. Then full `npm test`. No browser check needed.
 
-- [ ] [A:High] Upgrade jsdom to v29
+- [x] [A:High] Upgrade jsdom to v29
   - Bump `jsdom` 25.0.1 → 29.1.1. Test environment only — `vitest.config.ts` sets `environment: 'jsdom'`, nothing imports jsdom directly, no `setupFiles`.
   - **Probe before trusting the suite:** `node -e "const {JSDOM}=require('jsdom'); const w=new JSDOM('').window; console.log(typeof w.ResizeObserver, typeof w.fetch)"`. `ScoreRenderer.ts:296` and `ShakuhachiScore.ts:44` branch on `typeof ResizeObserver === 'undefined'` to install fallback timers. If jsdom 29 ships a **non-functional stub**, the guard passes but the callback never fires — tests stay green while behavior is silently wrong. Same for `fetch`, which `vi.stubGlobal` mocks rely on intercepting.
   - **Watch:** `MusicXMLParser.test.ts` / `MusicXMLSerializer.test.ts` (`DOMParser` round-trips — jsdom's XML namespace and whitespace handling has shifted across majors) and `ShakuhachiScore.test.ts` (`customElements.define`; the ResizeObserver-unavailable test at line 305; the "Initial Render" block at 232).
