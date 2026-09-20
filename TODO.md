@@ -61,7 +61,7 @@ Each entry is a brief plus the research, not a finished design — do a planning
 
 An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` → "wip: unvalidated major dep bumps"). Every target version is recorded below, so the stash is redundant and can be dropped.
 
-- [ ] [A:High] Upgrade ESLint toolchain to v10
+- [x] [A:High] Upgrade ESLint toolchain to v10
   - Bump atomically: `eslint` 9.39.2 → 10.11.0, `eslint-config-prettier` 9.1.2 → 10.1.8, `@typescript-eslint/eslint-plugin` + `@typescript-eslint/parser` 8.54.0 → 8.70.0. Ensure `eslint-plugin-prettier` resolves to ≥5.5.6.
   - **typescript-eslint has no v9** — 8.70.0 already peers `eslint: ^8.57.0 || ^9.0.0 || ^10.0.0`, so this is a minor bump, not a blocker. eslint-plugin-prettier 5.5.6 peers `eslint >=8.0.0` and `eslint-config-prettier ">= 7.0.0 <10.0.0 || >=10.1.0"` — both satisfied. ESLint 10 engines: `^20.19.0 || ^22.13.0 || >=24` (we run Node 24).
   - **`eslint.config.js` needs no edits.** Keep `...prettierConfig.rules` as-is. Do NOT switch to spreading the whole `prettierConfig` object — the spread sits inside a `rules: {}` block, so that would inject `rules` and `name` as bogus rule names. The whole-object pattern only applies when appending the config as its own array element.
