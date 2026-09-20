@@ -27,7 +27,7 @@
 
 ### Bugs
 
-- [ ] [A:Medium] Committed embed bundle is stale — live site renders notes at the wrong size and weight
+- [x] [A:Medium] Committed embed bundle is stale — live site renders notes at the wrong size and weight
   - `public/embed/shakuhachi-score.js` is checked into the repo and loaded directly by the detail and edit pages (`<script is:inline src="/embed/shakuhachi-score.js">`). It was last rebuilt at `6f6f3e3`, and source changed afterwards without a rebuild, so the deployed renderer does not match source.
   - Confirmed drift (3 bytes, identical file size — easy to miss in review):
 
@@ -240,6 +240,13 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
 
 ### Shakuhachi Score Web Component
 
+- [ ] [A:High] Remove or honour the dead `fontWeight` default on OctaveMarksModifier
+  - `src/web-component/modifiers/OctaveMarksModifier.ts:30` declares `private fontWeight: number = 500`, but the value never reaches the render path: `ModifierConfigurator.configureOctaveMark()` (`src/web-component/renderer/ModifierConfigurator.ts`) unconditionally calls `.setFontWeight(options.octaveMarkFontWeight)` before every render, and `DEFAULT_RENDER_OPTIONS.octaveMarkFontWeight` is already 500.
+  - **Evidence it is dead:** the committed embed bundle carried `fontWeight,400` and source carried `500`, yet the rendered SVG measured `font-weight="500"` under *both* bundles on `/score/akatombo`. PR #238 changed a value with zero rendered effect.
+  - The same pattern applies to `fontSize` on the modifier (12) and `MeriKariModifier` — check whether those are dead too, since `configureMeriKariMark()` overrides both.
+  - **Decide one way:** either delete the field-level defaults and require configuration, or stop overriding in the configurator when the caller did not set the option. Today's arrangement silently ignores edits to the modifier and will mislead the next person who changes one.
+  - Discovered 2026-09-20 while rebuilding the stale embed bundle.
+
 - [ ] [A:Medium] Evaluate moving format parsing into the web component / renderer package
   - `src/utils/score-data.ts` imports parsers from `src/web-component/parser/` — platform utilities reaching into the renderer's internals for format dispatch. If the web component already owns parsers (ABCParser, MusicXMLParser), it could expose a `parseScoreText(text, format)` function as part of its public API, or accept a `data-format` attribute alongside `data-score` and handle parsing internally. This would keep format knowledge inside the renderer boundary and let the platform pass raw data + format without knowing how to parse it.
 
@@ -423,6 +430,26 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
     - If it breaks height calculations: document why the override is required and add a code comment explaining the constraint
 
 ### Tooling / Guidelines
+
+- [ ] [A:High] Fix visual regression flakiness at the configured `workers: 3`
+  - All 17 `tests/visual/score-editor.spec.ts` tests time out at ~30.6s (the 30s `timeout`) when the machine is under load — observed 2026-09-20 with a dev server, an MCP-controlled Chrome, and a report server running alongside 3 Playwright workers. At `--workers=2`, and when the spec runs in isolation, all 17 pass.
+  - **The failure is badly disguised.** `waitForEditor()` (`tests/visual/score-editor.spec.ts:30`) waits on `#score-editor`, the title input, `#score-preview`, and an SVG in the component's shadow root. When the session is not valid the editor page redirects and none of those ever appear, so a timing problem surfaces as "auth broken / editor button missing" and invites chasing the wrong cause.
+  - Options: lower the default worker count; raise the per-test timeout; or make `waitForEditor` fail fast and loudly when the page has redirected away from `/edit` (assert the URL first), so a timeout is distinguishable from an auth failure. The third is the most valuable — it fixes the diagnosis, not just the symptom.
+
+- [ ] [A:Medium] Speed up the visual regression suite
+  - **Every lever below is an untested hypothesis.** They are reasoned from `playwright.config.ts`, not measured. Measure each one in isolation before adopting it, and keep the measurement in the PR body — a change that does not demonstrably pay for itself should be dropped rather than kept on plausibility.
+  - **Measured baseline (2026-09-20):** full suite = 60 tests in **1.3 min** at `--workers=2`; most individual tests 2–3s; editor tests ~3s. Re-measure before starting, on an otherwise idle machine, and take the median of 3 runs — the numbers above were taken with other processes running.
+  - **Hypothesis 1 — video recording costs time on passing tests.** `video: 'retain-on-failure'` (config line 49) records all 60 runs and discards the passing ones; `trace: 'retain-on-failure'` (line 52) likewise. On a ~95%-passing suite this may be significant overhead. *Test:* run the suite with `video: 'off'`, then with `trace: 'off'`, then both, comparing against baseline. *If confirmed:* disable locally, keep enabled in CI (`process.env.CI`) where the artifacts are the only debugging channel.
+  - **Hypothesis 2 — the Astro dev server dominates per-navigation time.** `webServer.command` is `npm run dev` (line 101), so every page load is on-demand SSR with Vite transforms in the request path. *Test:* point `webServer` at `astro build` + preview and compare. *Tradeoffs to weigh, not assume:* adds a build step (bad for single-test iteration, fine for full runs), and changes what is under test — arguably for the better, since it exercises the production output. **Check whether baselines shift**; if they do, that is itself a finding worth reporting, not something to silently re-baseline.
+  - **Hypothesis 3 — redundant coverage.** Toast (18 tests) is already tracked separately above; `web-component-columns` (9 tests) looks similarly heavy. *Test:* for each test, identify whether it captures a visual state no other test covers. Pruning is the only lever here that reduces maintenance burden as well as runtime.
+  - **Hypothesis 4 — more workers.** The config sets `workers: 3`. **Do the `waitForEditor` fix above first** — raising parallelism today buys minutes at the cost of false auth failures. *Test:* after that fix, sweep 2/3/4/6 workers and find where wall time stops improving or flakiness returns.
+  - **Temper expectations:** at 2–3s per test the ceiling looks modest — plausibly 1.3 min → ~40s, not an order of magnitude. That estimate is itself unverified. If measurement shows the ceiling is lower still, closing this task with "not worth it, here are the numbers" is a good outcome.
+
+- [ ] [A:Medium] Exclude generated Playwright artifacts from `astro check`
+  - `npm run type-check` walks `tests/visual/reports/` and type-checks the HTML reporter's bundled trace viewer (minified React and other vendor JS), producing ~5.3 MB of diagnostic output for a single run.
+  - **Measured 2026-09-20 — every hint comes from these generated files.** With the directories present: `Result (115 files): 0 errors, 0 warnings, 87 hints`. After deleting `tests/visual/reports/` and `tests/visual/test-results/`: `Result (110 files): 0 errors, 0 warnings, 0 hints`. So the long-standing "87 hints" baseline recorded elsewhere in this file is an artifact of whether a visual run happened recently — it is not a property of the source, and it fluctuates run to run.
+  - **Why it matters:** the signal-to-noise ratio makes the required `npm test` gate effectively unreadable, and a real error can scroll past unnoticed. There is prior history of a lint failure going unnoticed in long test output.
+  - Add the reports directory (and `tests/visual/test-results/`) to `tsconfig.json` `exclude`, or point the HTML reporter somewhere already excluded. Both directories are gitignored, so nothing is lost.
 
 - [ ] [A:High] Review and prune toast visual regression tests
   - `tests/visual/toast.spec.ts` has 18 tests across Desktop / Mobile / Tablet but many appear to capture the same visual output (e.g. individual variant tests at desktop repeat what the "all variants" grid already covers)
