@@ -15,6 +15,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
+  // page.setContent() rewrites the current document but keeps its origin, and a
+  // page that has never navigated has a null origin. The Vite 8 dev server that
+  // Astro 7 runs on rejects cross-origin requests with 403, so the embed script
+  // must be fetched from a page already on the dev server's own origin.
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/test/spinner');
+  });
+
   // Helper function to wait for web component to be ready
   async function waitForWebComponent(page: any) {
     // Wait for custom element to be defined
@@ -117,7 +125,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             .container { width: 600px; height: 400px; border: 1px solid #ccc; }
@@ -165,7 +173,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; display: flex; justify-content: center; }
             .container { border: 1px solid #ccc; }
@@ -210,7 +218,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             /* Container just provides context, doesn't constrain size */
@@ -261,7 +269,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             /* Container just provides context, doesn't constrain size */
@@ -312,7 +320,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             .container { width: 400px; height: 800px; border: 1px solid #ccc; }
@@ -347,7 +355,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             .container { width: 1000px; height: 200px; border: 1px solid #ccc; }
@@ -382,7 +390,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
           </style>
@@ -420,7 +428,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; display: flex; justify-content: center; background: white; }
             .container { width: 600px; height: 400px; border: 1px solid #ccc; }
@@ -471,7 +479,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <script src="http://localhost:3001/embed/shakuhachi-score.js"></script>
+          <script src="/embed/shakuhachi-score.js"></script>
           <style>
             body { margin: 0; padding: 20px; }
             .container { width: 600px; height: 400px; }

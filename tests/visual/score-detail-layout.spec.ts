@@ -14,6 +14,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Score Detail Page - Layout', () => {
+  // The header is located by tag, not by its `data-astro-cid-*` attribute: that
+  // hash is a build artifact of Astro's scoped styles and changes whenever Astro
+  // changes how it computes it (it did between Astro 5 and 7), which silently
+  // turns these assertions into 30s timeouts. There is exactly one <header>.
+
   test('score renderer fills full viewport height', async ({ page }) => {
     // Navigate to a score detail page
     await page.goto('/score/akatombo');
@@ -21,10 +26,7 @@ test.describe('Score Detail Page - Layout', () => {
 
     // Get viewport and score renderer dimensions
     const viewportHeight = page.viewportSize()!.height;
-    const headerHeight = await page
-      .locator('header[data-astro-cid-ctg3m53h]')
-      .first()
-      .boundingBox();
+    const headerHeight = await page.locator('header').first().boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     // Verify renderer exists and has dimensions
@@ -113,10 +115,7 @@ test.describe('Score Detail Page - Layout', () => {
     await page.waitForLoadState('networkidle');
 
     const viewportHeight = 720;
-    const headerHeight = await page
-      .locator('header[data-astro-cid-ctg3m53h]')
-      .first()
-      .boundingBox();
+    const headerHeight = await page.locator('header').first().boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();
@@ -133,10 +132,7 @@ test.describe('Score Detail Page - Layout', () => {
     await page.waitForLoadState('networkidle');
 
     const viewportHeight = 1024;
-    const headerHeight = await page
-      .locator('header[data-astro-cid-ctg3m53h]')
-      .first()
-      .boundingBox();
+    const headerHeight = await page.locator('header').first().boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();
@@ -153,10 +149,7 @@ test.describe('Score Detail Page - Layout', () => {
     await page.waitForLoadState('networkidle');
 
     const viewportHeight = 667;
-    const headerHeight = await page
-      .locator('header[data-astro-cid-ctg3m53h]')
-      .first()
-      .boundingBox();
+    const headerHeight = await page.locator('header').first().boundingBox();
     const rendererBox = await page.locator('#score-renderer').boundingBox();
 
     expect(rendererBox).not.toBeNull();

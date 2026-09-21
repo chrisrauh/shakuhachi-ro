@@ -1,14 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
-import { getEntry } from 'astro:content';
+import { getEntry, render } from 'astro:content';
 
 // Prerender this page at build time (static HTML)
 export const prerender = true;
 
 // Load MDX content
 const aiPage = await getEntry('pages', 'ai');
-const { Content } = await aiPage.render();
+const { Content } = await render(aiPage);
 ---
 
 <Layout title="AI - Shakuhachi.ro" currentPage="browse">
