@@ -17,12 +17,13 @@ export default defineConfig({
     },
     outDir: 'dist/embed',
     emptyOutDir: true,
-    minify: 'esbuild', // Use esbuild instead of terser (built-in)
+    // No `target`: the embed bundle takes Vite's default,
+    // 'baseline-widely-available' (Baseline = supported across all core
+    // browsers for 30 months). Deliberate — tracking that standard is a better
+    // support policy for this bundle than a hand-pinned version list, which
+    // goes stale unnoticed. The floor moves on Vite majors; check it then.
     rollupOptions: {
       external: [], // Bundle everything (no external dependencies)
-      output: {
-        inlineDynamicImports: true, // Inline all imports into single file
-      },
     },
   },
 });

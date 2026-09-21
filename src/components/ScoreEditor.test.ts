@@ -7,12 +7,16 @@ vi.mock('./Toast');
 vi.mock('../utils/init-header', () => ({
   confirmDialog: { show: vi.fn() },
 }));
+// Class mocks must use `function` (not an arrow) so they remain constructible
+// with `new` — Vitest 5 rejects arrow-function implementations there.
 vi.mock('../utils/editor-autosave', () => ({
-  EditorAutosave: vi.fn().mockImplementation(() => ({
-    save: vi.fn(),
-    clear: vi.fn(),
-    checkAndOfferRestore: vi.fn(),
-  })),
+  EditorAutosave: vi.fn().mockImplementation(function () {
+    return {
+      save: vi.fn(),
+      clear: vi.fn(),
+      checkAndOfferRestore: vi.fn(),
+    };
+  }),
 }));
 vi.mock('./LoadingSpinner', () => ({
   buildSpinnerSVG: vi.fn(() => '<svg class="spinner"></svg>'),

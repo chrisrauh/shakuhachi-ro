@@ -43,12 +43,15 @@
 
 ### Dependency Upgrades
 
-Thirteen packages need major-version bumps. **Work these six entries strictly top to bottom.** Entry 4 must precede entry 5: astro 7 bundles `vite ^8.0.13`, so bringing the root vite to 8 first lets the astro install dedupe onto one copy. The rest are ordered cheapest-and-most-isolated first, so confidence accumulates and each failure is unambiguous.
+Thirteen packages need major-version bumps. **Work these entries strictly top to bottom.** The Vite/Vitest entry must precede the Astro entry: astro 7 bundles `vite ^8.0.13`, so bringing the root vite to 8 first lets the astro install dedupe onto one copy. The rest are ordered cheapest-and-most-isolated first, so confidence accumulates and each failure is unambiguous.
+
+**Landed so far:** ESLint 10 (#244), jsdom 29 (#245), Lucide v1 (#246). Still open, bottom-up: Vite 8 / Vitest 5 (#247), Astro 7 (#248), TypeScript 6 (#249).
 
 **Execution: `/agent-workflow`, as a stacked PR chain.** Deviations from that skill's standard setup:
 
-- **Branch from the previous entry's branch, not `main`.** Entry 1 branches from `main`, entry 2 from entry 1's branch, and so on. Every entry regenerates `package-lock.json`, which does not merge — a stack is what keeps each diff reviewable. Six branches cut from `main` would put six conflicting lockfiles in flight at once.
-- **Set the PR base explicitly:** `gh pr create --base <previous-branch>`. Only entry 1 targets `main`.
+- **Branch from the previous entry's branch, not `main`** — unless that entry has already merged, in which case branch from `main`. Every entry regenerates `package-lock.json`, which does not merge — a stack is what keeps each diff reviewable. Branches cut from `main` in parallel would put conflicting lockfiles in flight at once.
+- **Set the PR base explicitly:** `gh pr create --base <previous-branch>`. An entry whose predecessor has merged targets `main`.
+- **Never delete a stack branch during post-merge cleanup.** Deleting a branch that an open PR uses as its base makes GitHub auto-close that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Skip the branch-delete steps entirely while the stack is in flight; clean up all branches once the whole chain has landed.
 - **State the stack position in the PR body** — which PR it sits on, which it blocks — so review order is unambiguous.
 - Do not wait for the previous PR to merge before starting the next. Do not rebase mid-stack unsolicited; if an earlier PR changes during review, rebase the rest of the stack then.
 - Merge stays human and bottom-up. Never merge.
@@ -70,12 +73,6 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Also note `no-shadow-restricted-names` now flags `globalThis`. No impact from the eslintrc removal (already flat-config-only) or the removed `context`/`SourceCode` methods (no custom rules).
   - **Verify:** capture `npm run lint` and `npx eslint --print-config src/index.ts` as a baseline *before* bumping, then diff both after — the `--print-config` diff catches silent rule-set changes a passing lint run would hide. Then full `npm test`. No browser check needed.
 
-- [x] [A:High] Upgrade jsdom to v29
-  - Bump `jsdom` 25.0.1 → 29.1.1. Test environment only — `vitest.config.ts` sets `environment: 'jsdom'`, nothing imports jsdom directly, no `setupFiles`.
-  - **Probe before trusting the suite:** `node -e "const {JSDOM}=require('jsdom'); const w=new JSDOM('').window; console.log(typeof w.ResizeObserver, typeof w.fetch)"`. `ScoreRenderer.ts:296` and `ShakuhachiScore.ts:44` branch on `typeof ResizeObserver === 'undefined'` to install fallback timers. If jsdom 29 ships a **non-functional stub**, the guard passes but the callback never fires — tests stay green while behavior is silently wrong. Same for `fetch`, which `vi.stubGlobal` mocks rely on intercepting.
-  - **Watch:** `MusicXMLParser.test.ts` / `MusicXMLSerializer.test.ts` (`DOMParser` round-trips — jsdom's XML namespace and whitespace handling has shifted across majors) and `ShakuhachiScore.test.ts` (`customElements.define`; the ResizeObserver-unavailable test at line 305; the "Initial Render" block at 232).
-  - **Bail out if:** XML tests fail from genuine parsing-semantics differences — downgrade rather than loosening assertions. A ResizeObserver stub that breaks resize behavior is fix-or-downgrade, never ship-anyway.
-
 - [x] [A:High] Upgrade Lucide to v1 (both packages)
   - Bump `@lucide/astro` 0.563.0 → 1.47.0 and `lucide` 0.562.0 → 1.47.0 **together**, so the shared glyph change lands once across `.astro` and `.ts` call sites. Independent of the Astro upgrade — `@lucide/astro` peers `^4 || ^5 || ^6 || ^7`.
   - **This is a deliberate visual change, not just a version bump.** `Trash2` is now a deprecated alias onto the consolidated `Trash` glyph (`node_modules/@lucide/astro/src/aliases/aliases.ts`: *"The icon was combined with another icon that shares the same use case"*). It compiles either way, but the rendered icon changes shape.
@@ -85,7 +82,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Note `@lucide/astro` now ships raw `.ts` source with no `main`/`module` (exports-map only); a bare-import resolution error would trace to that.
   - **Default, then flag:** ship the consolidated `Trash` glyph. Screenshot it at 16px beside the other header icons and put that in the PR body as a design decision to confirm — do not stop to ask.
 
-- [ ] [A:High] Upgrade Vite to 8 and Vitest to 5
+- [x] [A:High] Upgrade Vite to 8 and Vitest to 5
   - Bump together (vitest 5 peers `vite ^6.4 || ^7 || ^8`): `vite` 5.4.21 → 8.3.0, `vitest` 2.1.9 → 5.0.1, `@vitest/ui` → 5.0.1 (peered at exactly 5.0.1).
   - **Also fix a pre-existing gap:** add `@vitest/coverage-v8` at 5.0.1. It is currently NOT installed, yet `vitest.config.ts` sets `provider: 'v8'` and `npm run test:coverage` exists — vitest prompts to install on demand, which fails in any non-interactive context.
   - **Vite 8 replaces Rollup+esbuild with Rolldown+Oxc** (verified: `vite@8.3.0` depends on `rolldown` and `lightningcss`, with no `esbuild` or `rollup`). A compat layer auto-converts `rollupOptions`, so most of `vite.embed.config.ts` carries over. Two things do not:
