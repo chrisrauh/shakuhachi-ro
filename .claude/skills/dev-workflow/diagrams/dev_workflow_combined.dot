@@ -47,13 +47,11 @@ digraph dev_workflow_combined {
     "Ask user to review changes" [shape=box];
     "STOP: wait for user review response" [shape=doublecircle];
     "Commit (clean message, no attribution)" [shape=box];
-    "Mark [x] in TODO.md immediately" [shape=box];
     "Ask: Create PR?" [shape=box];
     "STOP: wait for PR decision" [shape=doublecircle];
     "Push + gh pr create" [shape=box];
     "STOP: wait for merge confirmation" [shape=doublecircle];
     "4 cleanup commands (sequential)" [shape=box];
-    "Remove task from TODO.md immediately" [shape=box];
     "Ask: work on next task?" [shape=doublecircle];
   
     "Task assigned" -> "Check branch";
@@ -81,13 +79,11 @@ digraph dev_workflow_combined {
     "Baselines need update?" -> "Ask user to review changes" [label="no"];
     "Ask user to review changes" -> "STOP: wait for user review response";
     "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
-    "Commit (clean message, no attribution)" -> "Mark [x] in TODO.md immediately";
-    "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
+    "Commit (clean message, no attribution)" -> "Ask: Create PR?";
     "Ask: Create PR?" -> "STOP: wait for PR decision";
     "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
     "Push + gh pr create" -> "STOP: wait for merge confirmation";
     "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
-    "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
-    "Remove task from TODO.md immediately" -> "Ask: work on next task?";
+    "4 cleanup commands (sequential)" -> "Ask: work on next task?";
   }
 }

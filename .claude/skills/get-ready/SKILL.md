@@ -23,20 +23,28 @@ Read the architecture documents to understand the system:
 **Renderer Library**: `./docs/ARCHITECTURE-RENDERER.MD`
 **Platform**: `./docs/ARCHITECTURE-PLATFORM.MD`
 
-### 3. Review Current Tasks (TODO.md)
+### 3. Review Current Tasks (GitHub Issues)
 
-Read `./TODO.md` to see:
+Tasks live in GitHub Issues, not in a file. Start with the focus set:
 
-- Current priorities
-- Pending tasks organized by category
-- Task status and blockers
+```bash
+gh issue list --label focus --state open
+```
+
+If that returns nothing, the focus set is empty — fall back to the full backlog and say so rather than guessing:
+
+```bash
+gh issue list --state open --limit 100
+```
+
+Useful filters: `--label autonomy:high` (agent-ready), `--label area:renderer` (or any other `area:*`), `--label type:idea` (speculative, usually excluded).
 
 ## After Review
 
 Once you've reviewed these documents:
 
 1. Summarize the most important points from the guidelines
-2. Ask the user which task they'd like to work on
-3. If unclear, suggest the highest priority task from TODO.md
+2. Ask the user which issue they'd like to work on, quoting issue numbers
+3. If unclear, suggest the top `focus` issue — or, if the focus set is empty, the top open `autonomy:high` issue
 
 **Remember**: This review ensures you have full context before starting work. Take time to understand the project's patterns and principles.

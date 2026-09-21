@@ -236,7 +236,7 @@ npm run test:visual
 - **[API.MD](./docs/API.MD)** - Complete API reference with examples
 - **[ARCHITECTURE-RENDERER.MD](./docs/ARCHITECTURE-RENDERER.MD)** - Renderer library architecture
 - **[ARCHITECTURE-PLATFORM.MD](./docs/ARCHITECTURE-PLATFORM.MD)** - Web platform architecture
-- **[TODO.md](./TODO.md)** - Project roadmap and active tasks
+- **[Issues](https://github.com/chrisrauh/shakuhachi-ro/issues)** - Project roadmap and active tasks
 - **[CLAUDE.md](./CLAUDE.md)** - Development workflow and coding standards
 
 ## API Reference (Quick Overview)
