@@ -431,10 +431,21 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
 
 ### Tooling / Guidelines
 
-- [ ] [A:High] Fix visual regression flakiness at the configured `workers: 3`
-  - All 17 `tests/visual/score-editor.spec.ts` tests time out at ~30.6s (the 30s `timeout`) when the machine is under load — observed 2026-09-20 with a dev server, an MCP-controlled Chrome, and a report server running alongside 3 Playwright workers. At `--workers=2`, and when the spec runs in isolation, all 17 pass.
-  - **The failure is badly disguised.** `waitForEditor()` (`tests/visual/score-editor.spec.ts:30`) waits on `#score-editor`, the title input, `#score-preview`, and an SVG in the component's shadow root. When the session is not valid the editor page redirects and none of those ever appear, so a timing problem surfaces as "auth broken / editor button missing" and invites chasing the wrong cause.
-  - Options: lower the default worker count; raise the per-test timeout; or make `waitForEditor` fail fast and loudly when the page has redirected away from `/edit` (assert the URL first), so a timeout is distinguishable from an auth failure. The third is the most valuable — it fixes the diagnosis, not just the symptom.
+- [x] [A:High] Fix visual regression flakiness at the configured `workers: 3`
+  - **Root cause was not load.** `auth-setup.ts` saved the storage state after a blind `waitForTimeout(500)` and asserted nothing about whether login had succeeded. Under `workers: 3` the Supabase token had frequently not reached `localStorage` yet, so an **empty** session was written to `tests/visual/.auth/user.json`. All 17 `score-editor` tests then ran unauthenticated, hit the editor's client-side redirect, and timed out at 30s each — which looked like a load problem. Confirmed by reading the saved state: 0 cookies, 0 origins at `workers: 3`; a 2263-byte `sb-*-auth-token` when setup ran alone.
+  - Fixed by waiting for the enabled account avatar (the modal hides on submit regardless of outcome) and asserting a Supabase token is present before proceeding, plus the `waitForEditor` redirect diagnosis. Verified with 3 consecutive 60/60 runs at `workers: 3`.
+
+- [ ] [A:Medium] CLAUDE.md documents the `/score/test` fixture incorrectly
+  - CLAUDE.md states the fixture is *"A test score titled 'Test' … Contains simple JSON data with 3 notes (ro, tsu, re)"*. The slug is right but the title is actually **"A Very Long Score Title That Will Definitely Wrap Across Multiple Lines on Mobile"** (verified 2026-09-21 against the running dev server).
+  - Low stakes on its own, but it cost real time during the flakiness investigation: a page snapshot showing that title looked like the test had landed on the *wrong score* rather than on the right score's view page after a redirect.
+  - Confirm what the fixture should be — the long title looks deliberate, for mobile wrapping — then correct the description rather than renaming the score.
+
+- [ ] [A:Medium] Supabase session lives in `localStorage`, contradicting the documented auth policy
+  - CLAUDE.md's auth verification checklist requires *"No auth tokens in localStorage (tokens belong in httpOnly cookies only)"*. In practice a logged-in browser holds `sb-<project-ref>-auth-token` (~2.3 kB) in `localStorage` and **zero** auth cookies — observed 2026-09-21 in the Playwright storage state captured by `tests/visual/auth-setup.ts`.
+  - This is the default `supabase-js` browser behaviour, so it is very likely that the checklist states an intent that was never implemented rather than a regression. Worth confirming against git history before treating it as a bug.
+  - **Decide which is true, then make them agree.** Either move the session to httpOnly cookies (`@supabase/ssr` with a cookie storage adapter) and keep the checklist, or amend the checklist to describe what the app actually does and record why. Leaving the two in conflict means the checklist cannot be used as a review gate.
+  - Note that `tests/visual/auth-setup.ts` now asserts on the `localStorage` token, so moving to cookies must update that assertion too.
+  - Found 2026-09-21 while fixing the visual suite flakiness.
 
 - [ ] [A:Medium] Speed up the visual regression suite
   - **Every lever below is an untested hypothesis.** They are reasoned from `playwright.config.ts`, not measured. Measure each one in isolation before adopting it, and keep the measurement in the PR body — a change that does not demonstrably pay for itself should be dropped rather than kept on plausibility.
