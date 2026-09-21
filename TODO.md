@@ -88,7 +88,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Expect a transient duplicate vite after install (root 8, astro 5's nested 6). Resolves in the next entry.
   - **Verify:** `npm run build:wc`, confirm the IIFE still works by loading a score page via chrome-devtools-mcp — this bundle is the product's most externally-visible artifact. Then `npm run test:coverage` (must run without prompting) and `npm run test:visual`.
 
-- [ ] [A:High] Upgrade Astro to 7 and migrate content collections
+- [x] [A:High] Upgrade Astro to 7 and migrate content collections
   - Bump atomically (peer ranges force it): `astro` 5.17.1 → 7.3.3, `@astrojs/mdx` 4.3.13 → 8.0.1 (peers astro ^7.2.6), `@astrojs/netlify` 6.6.4 → 8.2.6 (^7.0.0), `@astrojs/node` 9.5.2 → 11.1.6 (^7.2.1). Astro 7 requires Node ≥22.12.
   - **Do the Vite/Vitest entry first** — astro 7 bundles `vite ^8.0.13`, so a root vite already at 8 dedupes cleanly.
   - **`@astrojs/node` appears unused** — `astro.config.mjs` registers only `netlify()` and no second build target references it. Confirm, then remove it from `devDependencies` rather than carrying a bumped dependency nothing imports.
@@ -122,6 +122,12 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - **Dead registrations: `Eye`, `Calendar`, and `SquarePen`.** (`SquarePen` is a third case the original Lucide note did not mention — it is imported and used directly via `getIconHTML()` / the Astro component elsewhere, but has no `data-lucide="square-pen"` consumer, so its entry in the `createIcons` registry specifically is dead.)
   - Removing them only shrinks the registry object; it does not touch the direct `import { SquarePen }` usages, which are live. Verify with a visual pass that fork, help, and alert icons still render.
   - Confirmed 2026-09-20 during the Lucide v1 upgrade, which explicitly left this out of scope.
+
+- [ ] [A:High] Remove dead `:global()` selectors from the `is:global` style block in Layout.astro
+  - `src/layouts/Layout.astro:137,141,147,151` wrap Tweakpane selectors in `:global(...)` inside a `<style is:global>` block. Astro only strips `:global()` from *scoped* styles, so inside `is:global` the wrapper is emitted literally into the CSS (`.dev-panel :global(.tp-dfwv){…}`), which is invalid and never matches. These four dev-panel rules have never applied.
+  - Pre-existing, not introduced by the Astro 7 upgrade: verified byte-for-byte in the main checkout's Astro 5 build output (`dist/_astro/_slug_.*.css`) as well as the Astro 7 one.
+  - Fix is to drop the `:global(...)` wrapper and keep the bare selectors. Then check whether the rules were actually wanted: they may have been written against a Tweakpane version whose class names have since changed, in which case delete them instead.
+  - Surfaced because Vite 8's lightningcss minifier now warns on each one (`'global' is not recognized as a valid pseudo-class`) — four warnings on every `astro build`.
 
 - [ ] [A:Low] Migrate remaining deprecated Lucide aliases
   - `AlertCircle` → `CircleAlert` in `src/utils/icons.ts:6,22`, plus the paired `renderIcon('alert-circle')` → `renderIcon('circle-alert')` in `src/components/ScoreEditor.ts:515`. Both sides must move together — `createIcons` derives the kebab `data-lucide` attribute from the PascalCase key.
