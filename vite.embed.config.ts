@@ -17,11 +17,11 @@ export default defineConfig({
     },
     outDir: 'dist/embed',
     emptyOutDir: true,
-    // Browser support floor for the public embed bundle. Pinned explicitly so
-    // it stays a deliberate product decision rather than drifting with Vite's
-    // default target, which has risen twice (v7: Chrome 87->107, Safari
-    // 14->16.0; v8: Chrome 107->111, Safari 16.0->16.4).
-    target: ['chrome87', 'safari14', 'firefox78', 'edge88'],
+    // No `target`: the embed bundle takes Vite's default,
+    // 'baseline-widely-available' (Baseline = supported across all core
+    // browsers for 30 months). Deliberate — tracking that standard is a better
+    // support policy for this bundle than a hand-pinned version list, which
+    // goes stale unnoticed. The floor moves on Vite majors; check it then.
     rollupOptions: {
       external: [], // Bundle everything (no external dependencies)
     },
