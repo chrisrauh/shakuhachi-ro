@@ -76,7 +76,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - **Watch:** `MusicXMLParser.test.ts` / `MusicXMLSerializer.test.ts` (`DOMParser` round-trips — jsdom's XML namespace and whitespace handling has shifted across majors) and `ShakuhachiScore.test.ts` (`customElements.define`; the ResizeObserver-unavailable test at line 305; the "Initial Render" block at 232).
   - **Bail out if:** XML tests fail from genuine parsing-semantics differences — downgrade rather than loosening assertions. A ResizeObserver stub that breaks resize behavior is fix-or-downgrade, never ship-anyway.
 
-- [ ] [A:High] Upgrade Lucide to v1 (both packages)
+- [x] [A:High] Upgrade Lucide to v1 (both packages)
   - Bump `@lucide/astro` 0.563.0 → 1.47.0 and `lucide` 0.562.0 → 1.47.0 **together**, so the shared glyph change lands once across `.astro` and `.ts` call sites. Independent of the Astro upgrade — `@lucide/astro` peers `^4 || ^5 || ^6 || ^7`.
   - **This is a deliberate visual change, not just a version bump.** `Trash2` is now a deprecated alias onto the consolidated `Trash` glyph (`node_modules/@lucide/astro/src/aliases/aliases.ts`: *"The icon was combined with another icon that shares the same use case"*). It compiles either way, but the rendered icon changes shape.
   - Edits: `src/pages/score/[slug].astro:6,61` and `src/utils/init-header.ts:12,151` → `Trash2` to `Trash`. Also `src/utils/init-header.ts:5,98` → `HelpCircle` to `CircleHelp` (the codebase straddles both conventions; `src/utils/icons.ts` already uses `CircleHelp`).
@@ -126,6 +126,12 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
 - [ ] [A:Medium] Upgrade TypeScript to 7.x
   - **Blocked** on `@astrojs/check` (peers `^5.0.0 || ^6.0.0`) and typescript-eslint (peers `>=4.8.4 <6.1.0`). Recheck both peer ranges before attempting.
   - TS 7 is the native-compiler rewrite, so also verify `moduleResolution: "bundler"` parity in its release notes before committing to it.
+
+- [ ] [A:High] Remove dead icon registrations from `initIcons()`
+  - `src/utils/icons.ts:17-28` registers six icons with `createIcons()`, but `createIcons` only ever replaces elements carrying a matching `data-lucide` attribute. An exhaustive scan of `src/` for `renderIcon('…')` and literal `data-lucide="…"` finds only **three** names in use: `git-fork`, `circle-help`, `alert-circle`.
+  - **Dead registrations: `Eye`, `Calendar`, and `SquarePen`.** (`SquarePen` is a third case the original Lucide note did not mention — it is imported and used directly via `getIconHTML()` / the Astro component elsewhere, but has no `data-lucide="square-pen"` consumer, so its entry in the `createIcons` registry specifically is dead.)
+  - Removing them only shrinks the registry object; it does not touch the direct `import { SquarePen }` usages, which are live. Verify with a visual pass that fork, help, and alert icons still render.
+  - Confirmed 2026-09-20 during the Lucide v1 upgrade, which explicitly left this out of scope.
 
 - [ ] [A:Low] Migrate remaining deprecated Lucide aliases
   - `AlertCircle` → `CircleAlert` in `src/utils/icons.ts:6,22`, plus the paired `renderIcon('alert-circle')` → `renderIcon('circle-alert')` in `src/components/ScoreEditor.ts:515`. Both sides must move together — `createIcons` derives the kebab `data-lucide` attribute from the PascalCase key.

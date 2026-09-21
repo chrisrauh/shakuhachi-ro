@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
-import { GitFork, SquarePen, Trash2 } from '@lucide/astro';
+import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
 // (getStaticPaths not used - all score URLs render on-demand)
@@ -58,7 +58,7 @@ if (score?.forked_from) {
     <button id="delete-btn"
             class="btn btn-icon owner-btn"
             aria-label="Delete score">
-      <Trash2 size={16} />
+      <Trash size={16} />
     </button>
 
     <!-- Fork button -->

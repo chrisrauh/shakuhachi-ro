@@ -2,14 +2,14 @@ import {
   Book,
   Plus,
   Info,
-  HelpCircle,
+  CircleHelp,
   SunMoon,
   LogIn,
   LogOut,
   User,
   UserPlus,
   SquarePen,
-  Trash2,
+  Trash,
 } from 'lucide';
 import { ThemeSwitcher } from '../components/ThemeSwitcher';
 import {
@@ -95,7 +95,7 @@ export function buildUtilityItems(): MenuItem[] {
       id: 'help',
       label: 'Help',
       href: '/help/notation-formats',
-      icon: getIconHTML(HelpCircle),
+      icon: getIconHTML(CircleHelp),
     },
     {
       id: 'about',
@@ -148,7 +148,7 @@ function scoreEditMenuBuilder(
             (
               document.getElementById('delete-btn') as HTMLButtonElement
             )?.click(),
-          icon: getIconHTML(Trash2),
+          icon: getIconHTML(Trash),
         },
       ]
     : [];
