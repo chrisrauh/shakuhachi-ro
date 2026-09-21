@@ -27,19 +27,12 @@
 
 ### Bugs
 
-- [x] [A:Medium] Committed embed bundle is stale — live site renders notes at the wrong size and weight
-  - `public/embed/shakuhachi-score.js` is checked into the repo and loaded directly by the detail and edit pages (`<script is:inline src="/embed/shakuhachi-score.js">`). It was last rebuilt at `6f6f3e3`, and source changed afterwards without a rebuild, so the deployed renderer does not match source.
-  - Confirmed drift (3 bytes, identical file size — easy to miss in review):
-
-    | Value | Committed bundle | Source |
-    |-------|------------------|--------|
-    | `noteFontSize` | 28 | 32 — `src/web-component/renderer/RenderOptions.ts:229` |
-    | `fontWeight` | 400 | 500 — `src/web-component/constants/layout-constants.ts:20` |
-
-  - **First confirm the source values are the intended ones.** It is possible the bundle-level values were the deliberate choice and the source edit was never meant to ship. If source is correct, rebuild with `npm run build:wc` and commit the regenerated bundle.
-  - **Expect visual regression diffs.** Current baselines were captured against the stale bundle, so notes will render larger and heavier after the rebuild. Every score-rendering snapshot will change legitimately — go through the baseline-approval workflow and review each diff rather than blanket-accepting.
-  - **Root cause worth addressing separately:** a committed build artifact silently drifts from source with nothing to catch it. Consider a CI check that rebuilds and fails on a diff, or dropping the artifact from git and generating it at deploy time.
-  - Discovered 2026-09-20 while establishing a baseline for the dependency upgrades below.
+- [ ] [A:Medium] Stop the committed embed bundle from silently drifting from source
+  - `public/embed/shakuhachi-score.js` is a build artifact checked into git and loaded directly by the detail and edit pages (`<script is:inline src="/embed/shakuhachi-score.js">`). Nothing verifies it matches the source it was built from.
+  - **This has already bitten once.** The bundle sat 15 commits behind `7af3b83` and shipped notes at 28px while source said 32px (fixed in #243). The drift was 3 bytes in a file of identical byte length — invisible in review, and no test caught it because the unit suite never loads the bundle and the visual baselines had been captured against the stale one, so everything was self-consistently wrong.
+  - **Options:** (a) a CI step that runs `npm run build:wc` and fails if `git diff --exit-code public/embed/` is non-empty — cheap, keeps the artifact reviewable; (b) drop the artifact from git and generate it at deploy time — removes the failure mode entirely, but the embed URL must still be served in dev and preview, so check how Netlify builds it before committing to this.
+  - Prefer (a) unless the deploy pipeline makes (b) straightforward. (b) is the better end state.
+  - Root cause identified 2026-09-20 while fixing the stale bundle in #243.
 
 ### Dependency Upgrades
 
@@ -470,6 +463,16 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - Review each test: does it cover a genuinely distinct visual state, or is it redundant with another test in the suite?
   - Goal: keep tests that catch real regressions; remove duplicates that just inflate baseline count and maintenance burden
   - Also evaluate whether Desktop + Mobile + Tablet all-variants tests are all necessary, or whether one representative viewport per theme is sufficient
+
+- [ ] [A:Medium] Decide the browser support floor for the platform site — Astro hardcodes it to `esnext`
+
+  - **The two deliverables have unrelated floors, and one of them is nobody's decision.** The embed bundle takes Vite's default `'baseline-widely-available'` (chrome111, edge111, firefox114, safari16.4, ios16.4 — see `vite.embed.config.ts`). The Astro site's client JS is built at `esnext`, so Oxc does no syntax downleveling at all and the effective floor is whatever the source and dependencies happen to emit.
+  - **It is not overridable from `astro.config.mjs`.** Astro 7.3.3's `dist/core/build/vite-build-config.js:132` sets `target: "esnext"` inside the client environment's `build` object, and that object never spreads `...userClient?.build` — only `sourcemap`, `minify` and `rolldownOptions.output` are read from user config. Per-environment config beats top-level in Vite 8, so `vite: { build: { target: ... } }` does not reach it.
+  - **Verification level: source-read, not output-verified.** Read from the exact version in `package-lock.json`. Deliberately not confirmed against build output, because at `esnext` the output only differs if the source happens to use post-ES2022 syntax — absence of modern syntax would prove nothing.
+  - **Measure the real exposure first.** Run `npm run build:platform` and scan `dist/_astro/*.js` for syntax above the embed floor. If nothing post-Baseline is emitted today the risk is theoretical, and the right outcome may be to document the divergence and close this — record the numbers either way.
+  - **Then decide, in this order:** (a) accept `esnext` deliberately and write the site's floor down somewhere discoverable, noting it differs from the embed bundle's; (b) if the scan shows real exposure, look at whether Astro will take a patch to respect `vite.environments.client.build.target`, since a post-processing step over the client bundles is a poor trade for a public site.
+  - Note the asymmetry is defensible: the embed bundle is consumed by third-party sites whose audiences you do not control, while the site's audience is your own. Do not assume the two must match — just make the site's floor a choice rather than an accident.
+  - Found 2026-09-21 while resolving the `build.target` question on #247.
 
 ### Score Detail / View
 
