@@ -42,7 +42,7 @@ Invoke this skill when:
 
 | Rule | Detail |
 |------|--------|
-| NEVER use `!important` in CSS | It signals broken specificity or cascade order. Fix the root cause: refactor selectors, reorder stylesheets, review component architecture. |
+| NEVER use `!important` in CSS | See CLAUDE.md → Design System Hard Rules for the full rule and rationale. |
 | NEVER build for hypothetical future needs | YAGNI. Future requirements will change anyway — build what's needed now. |
 | NEVER create helpers or abstractions for one-time use | Three similar lines of code is better than a premature abstraction. |
 | NEVER mix data and presentation | Data format = WHAT. Rendering = HOW. Keep them strictly separate. |
@@ -57,7 +57,6 @@ These thoughts mean STOP — you're rationalizing complexity:
 | "I'll add this for future extensibility" | YAGNI — build what's needed now |
 | "Let me abstract this to avoid duplication" | Is it true duplication or accidental similarity? Premature DRY creates coupling. |
 | "I'll add `!important` to fix this quickly" | Stop — fix the underlying specificity problem instead |
-| "This helper will be useful later" | Don't build for hypothetical future needs |
 | "I need to handle this edge case just in case" | Only validate at system boundaries |
 | "This is clever" | Clever = implicit. Explicit beats clever every time. |
 | "Let me add a feature flag for this" | No backwards-compat shims. Just change the code. |
