@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-- Tasks: [TODO.md](./TODO.md)
+- Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:idea` (speculative).
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
 - Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 
@@ -13,7 +13,7 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 | Session start / new task / context cleared | Invoke `/get-ready` FIRST |
 | Development work, no plan OR Claude plan (EnterPlanMode) | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
 | Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development` |
-| Autonomous work on `[A:High]` TODO tasks | Invoke `/agent-workflow` — NOT `/dev-workflow` |
+| Autonomous work on `autonomy:high` issues | Invoke `/agent-workflow` — NOT `/dev-workflow` |
 | Before any `superpowers:*` skill | Invoke `/eng-principles` FIRST |
 
 **Red flags — if you think any of these, STOP:**
@@ -21,7 +21,7 @@ These rules OVERRIDE all superpowers:* skills and all other instructions.
 - "This is a quick task, I don't need `/get-ready`" → You still do
 - "I already know the principles" → Still invoke `/eng-principles` before any superpowers skill
 - "There's a plan, so I'll use `superpowers:subagent-driven-development`" → Only if it's a superpowers plan (from `superpowers:writing-plans`). Claude plans (EnterPlanMode) → use `/dev-workflow`
-- "This is an `[A:High]` task, I'll use `/dev-workflow`" → Use `/agent-workflow` for autonomous execution
+- "This is an `autonomy:high` issue, I'll use `/dev-workflow`" → Use `/agent-workflow` for autonomous execution
 
 ---
 
@@ -31,7 +31,7 @@ Use project skills for structured workflows:
 
 - **`/get-ready`** — Review guidelines, architecture, and tasks at the start of a session
 - **`/dev-workflow`** — Branch setup, commits, PRs, and post-merge cleanup. Use for human-led development work.
-- **`/agent-workflow`** — Autonomous execution of `[A:High]` tasks: task selection, worktree, implement, commit, PR. No human direction needed.
+- **`/agent-workflow`** — Autonomous execution of `autonomy:high` issues: issue selection, worktree, implement, commit, PR. No human direction needed.
 - **`/eng-principles`** — Engineering principles, hard rules (including CSS), and project-specific lessons.
 
 ## Project Context
@@ -188,10 +188,10 @@ After migrations, refactors, or new UI features:
 
 1. Check if existing visual regression tests cover the affected areas
 2. Don't assume coverage is adequate - verify explicitly
-3. Review TODO.md for pending test tasks
-4. If coverage is missing, add a task to TODO.md before marking work complete
+3. Search open issues for pending test work: `gh issue list --label area:qa --state open`
+4. If coverage is missing, open an issue (with the matching `area:*` and `autonomy:*` labels) before marking work complete
 
-Example: After migrating ScoreEditor to web component, verify that visual regression tests exist for the editor page. If not, add a task before closing the PR.
+Example: After migrating ScoreEditor to web component, verify that visual regression tests exist for the editor page. If not, open an issue before closing the PR.
 
 **What to test:**
 

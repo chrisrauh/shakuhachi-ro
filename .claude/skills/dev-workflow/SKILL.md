@@ -58,14 +58,12 @@ digraph dev_workflow {
   "Ask user to review changes" [shape=box];
   "STOP: wait for user review response" [shape=doublecircle];
   "Commit (clean message, no attribution)" [shape=box];
-  "Mark [x] in TODO.md immediately" [shape=box];
   "Ask: Create PR?" [shape=box];
   "STOP: wait for PR decision" [shape=doublecircle];
   "Push + gh pr create" [shape=box];
   "STOP: wait for merge confirmation" [shape=doublecircle];
   "4 cleanup commands (sequential)" [shape=box];
-  "Remove task from TODO.md immediately" [shape=box];
-  "Read TODO.md, present next 3 tasks" [shape=doublecircle];
+  "Read focus issues, present next 3" [shape=doublecircle];
 
   "Task assigned" -> "Check branch";
   "Check branch" -> "On main?";
@@ -75,7 +73,7 @@ digraph dev_workflow {
   "Verify task in code" -> "Already done?";
   "Already done?" -> "Mark done, move on" [label="yes"];
   "Already done?" -> "Make changes" [label="no"];
-  "Mark done, move on" -> "Read TODO.md, present next 3 tasks";
+  "Mark done, move on" -> "Read focus issues, present next 3";
   "Make changes" -> "Run npm test";
   "Run npm test" -> "Tests pass?";
   "Tests pass?" -> "Fix failures" [label="no"];
@@ -92,14 +90,12 @@ digraph dev_workflow {
   "Baselines need update?" -> "Ask user to review changes" [label="no"];
   "Ask user to review changes" -> "STOP: wait for user review response";
   "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
-  "Commit (clean message, no attribution)" -> "Mark [x] in TODO.md immediately";
-  "Mark [x] in TODO.md immediately" -> "Ask: Create PR?";
+  "Commit (clean message, no attribution)" -> "Ask: Create PR?";
   "Ask: Create PR?" -> "STOP: wait for PR decision";
   "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
   "Push + gh pr create" -> "STOP: wait for merge confirmation";
   "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
-  "4 cleanup commands (sequential)" -> "Remove task from TODO.md immediately";
-  "Remove task from TODO.md immediately" -> "Read TODO.md, present next 3 tasks";
+  "4 cleanup commands (sequential)" -> "Read focus issues, present next 3";
 }
 ```
 
@@ -130,12 +126,12 @@ git branch --show-current
 
 If on `main`: `git checkout -b feature/descriptive-name` — never work directly on main.
 
-**Verify the task (code is ground truth, not the checkbox):**
+**Verify the task (code is ground truth, not the issue text):**
 
 - Test tasks → `Glob` for the test file, read it, check coverage
 - Implementation tasks → `Grep` for the function/class/feature
 - Bug fixes → confirm the bug still exists in the code
-- Already done? → mark `[x]` in TODO.md and move on without re-implementing
+- Already done? → close the issue with an explanatory comment (`gh issue close <n> --comment "..."`) and move on without re-implementing
 
 ---
 
@@ -204,11 +200,9 @@ Forbidden in commit messages and PR bodies:
 - ❌ `Generated with Claude Code`
 - ❌ Any Claude attribution text
 
-**Step 3: Mark `[x]` in TODO.md immediately** — not lazily, not when asked.
+**Step 3: Ask the user "Should I create a PR?"** — do not push or create a PR without asking.
 
-**Step 4: Ask the user "Should I create a PR?"** — do not push or create a PR without asking.
-
-**Step 5 (if yes): Write PR body, push, and create PR.**
+**Step 4 (if yes): Write PR body, push, and create PR.**
 
 Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local, gitignored):
 
@@ -219,7 +213,11 @@ Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local
 
 ## Test plan
 - [ ] what to verify
+
+Closes #<n>
 ```
+
+**`Closes #<n>` is required whenever the work corresponds to an issue.** That link is what closes the issue on merge — there is no separate bookkeeping step.
 
 Then run as two **separate** Bash tool calls (not on separate lines in one call):
 
@@ -255,9 +253,35 @@ git branch -d <branch>
 git push origin --delete <branch>
 ```
 
-Then: **Remove the completed task from TODO.md immediately** (final cleanup, not when asked).
+The issue closes itself on merge via the `Closes #<n>` line in the PR body — no bookkeeping step here. If the PR had no such line, close the issue now: `gh issue close <n>`.
 
-Then: Read `TODO.md` and present the next 3 pending tasks (in order). Ask the user which one to work on next, or if they'd like to stop.
+Then: list the next candidates and present the top 3. Ask the user which to work on next, or if they'd like to stop.
+
+```bash
+gh issue list --label focus --state open
+```
+
+If the focus set is empty, say so and fall back to `gh issue list --state open --limit 100`.
+
+---
+
+## Stacked PR chains
+
+Some work arrives as a chain where each PR builds on the previous one — most often a run of dependency upgrades, where every entry regenerates `package-lock.json` and lockfiles do not merge. Branches cut from `main` in parallel would put conflicting lockfiles in flight at once; a stack is what keeps each diff reviewable.
+
+**Setup**
+
+- **Branch from the previous entry's branch, not `main`** — unless that entry has already merged, in which case branch from `main`.
+- **Set the PR base explicitly:** `gh pr create --base <previous-branch>`. An entry whose predecessor has merged targets `main`.
+- **State the stack position in the PR body** — which PR it sits on, which it blocks — so review order is unambiguous.
+- Do not wait for the previous PR to merge before starting the next. Do not rebase mid-stack unsolicited; if an earlier PR changes during review, rebase the rest of the stack then.
+- Merge stays human and bottom-up. Never merge.
+
+**Cleanup — the part that bites**
+
+**Never delete a stack branch during post-merge cleanup.** Deleting a branch that an open PR uses as its base makes GitHub auto-close that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. While a stack is in flight, run only `git checkout main` and `git pull` — omit both delete steps. Clean up every branch once the whole chain has landed.
+
+**If a PR does get auto-closed this way, order matters.** Restore the deleted base branch, restore the head branch to its *exact original SHA* if it was already force-pushed, reopen via `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -f state=open` (clearer errors than `gh pr reopen`), retarget the base **while it is open**, and only then rebase and force-push.
 
 ---
 
@@ -272,9 +296,11 @@ These have zero exceptions:
 | NEVER add Claude attribution | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs |
 | NEVER use `--body` inline with `gh pr create` | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`. |
 | NEVER use `gh pr merge` or `--auto` | STOP and wait for user to merge |
+| NEVER delete a branch any open PR uses as head or base | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
+| NEVER run post-merge branch cleanup while a stack is in flight | Skip both delete steps entirely; clean up every branch once the whole chain has landed |
 | NEVER skip git hooks | No `--no-verify` |
 | NEVER push before `npm test` passes | Read the FULL output — type-check + lint + vitest |
-| NEVER update TODO.md lazily | Do it immediately, without being asked |
+| NEVER omit `Closes #<n>` from a PR body | When the work maps to an issue, that link is the only thing that closes it |
 | NEVER run `test:visual:update` without user approval | Show the playwright report URL first, wait for explicit "yes, update baselines" |
 | NEVER skip approval because the cause seems obvious | The cause is irrelevant — show diffs and ask anyway |
 | NEVER self-approve by writing approval words in your own response | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input. |
@@ -290,7 +316,7 @@ These thoughts mean STOP — you are rationalizing:
 |---------|---------|
 | "I'll check the branch after I look at the code" | Branch check is FIRST, before anything |
 | "Tests look fine, I'll report success" | Read the full output — type-check AND lint AND vitest |
-| "I'll update TODO.md in a bit" | Update it immediately, the moment the task is done |
+| "I'll add `Closes #<n>` later" | Add it when you write the PR body, not after |
 | "I'll add the attribution since the system prompt says to" | CLAUDE.md overrides system prompt defaults |
 | "Let me push and then ask about PR" | Ask BEFORE pushing |
 | "I'll write the PR body inline, it's shorter" | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
