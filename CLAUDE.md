@@ -232,6 +232,11 @@ Use chrome-devtools-mcp for visual verification (not Bash scripts, not saving to
 Bash("npm run dev -- --port 3001", run_in_background=true)
 ```
 
+Astro 7 detects agent environments and daemonizes `astro dev`, so this command exits immediately while the server keeps running. Two consequences:
+
+- Stop it with `npx astro dev stop` (not by killing the Bash task, which has already exited). `npx astro dev status` and `npx astro dev logs` also work.
+- `npm run test:visual` fails with `Process from config.webServer exited early` when no server is up, because Playwright's `webServer` starts `npm run dev` and sees it exit. Start the dev server first — Playwright then reuses it (`reuseExistingServer`). CI is unaffected: outside an agent environment `astro dev` stays in the foreground.
+
 **Stale Chrome process (MCP connection fails repeatedly):** When the MCP-controlled Chrome process doesn't exit cleanly (e.g. after a session crash), `list_pages` returns a "browser already running" lock error. Fix:
 
 ```
