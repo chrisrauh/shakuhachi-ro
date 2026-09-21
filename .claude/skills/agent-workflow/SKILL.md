@@ -41,6 +41,7 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
    git worktree remove .claude/worktrees/<name>
    git branch -d <branch>
    ```
+   This is the one case where deleting the branch is safe: no PR exists yet, and nothing was pushed. Once a PR exists, the Phase 6 gate applies instead.
 
 ---
 
@@ -118,17 +119,36 @@ If the task touches UI:
    - `gh pr create --title "..." --body-file tmp/pr-body.md`
    - Delete `tmp/pr-body.md`
 
-**Step 4:** Remove the worktree and clean up branches:
+**Step 4: Remove the worktree.** Safe to run as soon as the PR exists — it touches nothing on the remote:
    ```bash
    git worktree remove .claude/worktrees/<name>
+   ```
+
+**Step 5: Leave the branch alone.** The PR you just opened uses it as head. Deleting a branch on GitHub closes every open PR that uses it as head or base, and a PR closed this way cannot be reopened once its head has been force-pushed — the work is orphaned.
+
+   Branch deletion is gated on the PR actually being merged. All three checks must pass first:
+   ```bash
+   gh pr view <branch> --json state,mergedAt
+   ```
+   ```bash
+   gh pr list --head <branch>
+   ```
+   ```bash
+   gh pr list --base <branch>
+   ```
+   `state` must be `MERGED` with a non-null `mergedAt`, and both list commands must come back empty — a non-empty `--base` result means a stacked PR targets this branch.
+
+   Only when all three pass:
+   ```bash
    git branch -d <branch>
+   ```
+   ```bash
    git push origin --delete <branch>
    ```
-   Note: if the PR is merged before you run cleanup, still delete both the local and remote branches.
 
-> ⚠️ **Step 4 has a known defect — see #339.** As written it deletes the head branch of the PR you just opened, which closes that PR on GitHub and orphans the work. Until #339 is fixed, only run the two delete commands once the PR is actually merged, and never while any open PR uses the branch as head or base.
+   In the normal autonomous flow the PR is still open when you finish, so both branches stay in place. That is the expected end state, not a missed step.
 
-**Step 5:** Report the PR URL and stop. **Never merge.**
+**Step 6:** Report the PR URL and stop. **Never merge.**
 
 ---
 
@@ -138,6 +158,8 @@ If the task touches UI:
 |------|--------|
 | NEVER pick `autonomy:medium` or `autonomy:low` issues | Those require human direction via `/dev-workflow` |
 | NEVER merge | Hard stop — wait for human |
+| NEVER delete the branch of the PR you just opened | Deletion is gated on merge. In the normal flow the PR is still open when you finish — leave the branch in place |
+| NEVER delete a branch any open PR uses as head or base | Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. Deleting it auto-closes that PR, and it cannot be reopened once its head has been force-pushed |
 | NEVER fix adjacent problems | Open a new issue, stay in scope |
 | NEVER omit `Closes #<n>` from the PR body | That link is what closes the issue on merge |
 | NEVER use `worktree-*` as a branch prefix | Use `feature/<slug>` |
