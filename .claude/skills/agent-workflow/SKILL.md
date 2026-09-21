@@ -1,11 +1,11 @@
 ---
 name: agent-workflow
-description: Use when working autonomously on [A:High] tasks from TODO.md — no human direction needed. Do NOT use for [A:Low] or [A:Medium] tasks — those require /dev-workflow.
+description: Use when working autonomously on `autonomy:high` GitHub issues — no human direction needed. Do NOT use for `autonomy:low` or `autonomy:medium` issues — those require /dev-workflow.
 ---
 
 # Agent Workflow — Autonomous Task Execution
 
-**This skill is for [A:High] tasks only.** For all other work, use `/dev-workflow`.
+**This skill is for `autonomy:high` issues only.** For all other work, use `/dev-workflow`.
 
 Commit and PR creation are pre-authorized. Merge is never performed. All consent gates from `/dev-workflow` are suspended except merge.
 
@@ -13,12 +13,19 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 
 ## Phase 1: Select Task
 
-1. Read `TODO.md`
-2. Find the first unchecked task tagged `[A:High]`, in top-to-bottom order
-3. Announce: `"Working on: [task title]"`
-4. If no `[A:High]` tasks remain: report back and stop — do not pick `[A:Medium]` or `[A:Low]`
+1. List the focus set, newest-first ordering is fine — these are the queued issues:
+   ```bash
+   gh issue list --label focus --label autonomy:high --state open
+   ```
+2. If that is empty, widen to the whole backlog:
+   ```bash
+   gh issue list --label autonomy:high --state open
+   ```
+3. Take the first result and read it in full: `gh issue view <n>`
+4. Announce: `"Working on: #<n> [issue title]"`
+5. If neither list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
 
-**`[A:High]` means agent-ready:** the task description must contain enough detail (file paths, exact approach, constraints) to implement without asking any questions. If the description is vague, it should not be `[A:High]` — see the failure protocol.
+**`autonomy:high` means agent-ready:** the issue body must contain enough detail (file paths, exact approach, constraints) to implement without asking any questions. If the description is vague, it should not carry that label — see the failure protocol.
 
 ---
 
@@ -46,12 +53,17 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
   - Renaming constants or extracting named values
   - Documentation-only changes
   - "It's simple" is NOT a valid reason to skip. If in doubt, use TDD.
-- **Scope discipline (hard rule):** Only change what the task description specifies.
-  - If you notice an adjacent bug or improvement: add it to `TODO.md`, do not fix it now
-  - If you notice a related refactor opportunity: add it to `TODO.md`, do not do it now
+- **Scope discipline (hard rule):** Only change what the issue specifies.
+  - If you notice an adjacent bug or improvement: open a new issue for it, do not fix it now
+  - If you notice a related refactor opportunity: open a new issue for it, do not do it now
   - Zero tolerance for scope creep — reviewability depends on it
 
-**If the task description is too vague to implement safely:** add a clarification note to `TODO.md`, remove the worktree (see early exit rule in Phase 2), and stop.
+  New issues get the matching `area:*` and `autonomy:*` labels, and no `focus` label (that is a human prioritization call):
+  ```bash
+  gh issue create --title "..." --body-file tmp/issue-body.md --label "area:renderer" --label "autonomy:medium"
+  ```
+
+**If the issue is too vague to implement safely:** add a clarification comment to the issue (`gh issue comment <n>`), remove the `autonomy:high` label, remove the worktree (see early exit rule in Phase 2), and stop.
 
 ---
 
@@ -99,19 +111,14 @@ If the task touches UI:
    - No `Co-Authored-By: Claude` or any attribution
    - No heredocs, no `&&`, no `$()` — sequential Bash calls only
 
-**Step 3:** Mark the task `[x]` in `TODO.md` and commit — this is a workflow meta-step, not scope creep:
-   ```bash
-   git add TODO.md
-   git commit -m "chore: mark [task name] complete in TODO"
-   ```
-
-**Step 4:** Push and create PR — no need to ask:
+**Step 3:** Push and create PR — no need to ask:
    - Write PR body to `tmp/pr-body.md` using the Write tool
+   - **The body must contain `Closes #<n>`** for the issue you worked on. That is what closes it on merge; there is no separate bookkeeping step.
    - `git push -u origin <branch>`
    - `gh pr create --title "..." --body-file tmp/pr-body.md`
    - Delete `tmp/pr-body.md`
 
-**Step 5:** Remove the worktree and clean up branches:
+**Step 4:** Remove the worktree and clean up branches:
    ```bash
    git worktree remove .claude/worktrees/<name>
    git branch -d <branch>
@@ -119,7 +126,9 @@ If the task touches UI:
    ```
    Note: if the PR is merged before you run cleanup, still delete both the local and remote branches.
 
-**Step 6:** Report the PR URL and stop. **Never merge.**
+> ⚠️ **Step 4 has a known defect — see #339.** As written it deletes the head branch of the PR you just opened, which closes that PR on GitHub and orphans the work. Until #339 is fixed, only run the two delete commands once the PR is actually merged, and never while any open PR uses the branch as head or base.
+
+**Step 5:** Report the PR URL and stop. **Never merge.**
 
 ---
 
@@ -127,9 +136,10 @@ If the task touches UI:
 
 | Rule | Detail |
 |------|--------|
-| NEVER pick `[A:Medium]` or `[A:Low]` tasks | Those require human direction via `/dev-workflow` |
+| NEVER pick `autonomy:medium` or `autonomy:low` issues | Those require human direction via `/dev-workflow` |
 | NEVER merge | Hard stop — wait for human |
-| NEVER fix adjacent issues | Add to TODO, stay in scope |
+| NEVER fix adjacent problems | Open a new issue, stay in scope |
+| NEVER omit `Closes #<n>` from the PR body | That link is what closes the issue on merge |
 | NEVER use `worktree-*` as a branch prefix | Use `feature/<slug>` |
 | NEVER use `&&`, heredocs, or `$()` in Bash | Sequential calls only |
 | NEVER add Claude attribution to commits or PRs | Clean messages only |
@@ -145,7 +155,7 @@ If the task touches UI:
 
 | Situation | Action |
 |-----------|--------|
-| Task too vague | Add clarification note to TODO, remove worktree (see Phase 2 early exit), stop |
+| Issue too vague | Comment on the issue, drop its `autonomy:high` label, remove worktree (see Phase 2 early exit), stop |
 | Tests fail after 2 fix attempts | Draft PR with failure details, stop |
 | Visual baselines fail | Draft PR with baseline note, stop |
-| No `[A:High]` tasks remain | Report back, stop |
+| No open `autonomy:high` issues remain | Report back, stop |
