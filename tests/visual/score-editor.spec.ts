@@ -28,7 +28,28 @@ const TEST_SCORE_SLUG = 'test'; // Test score fixture (see CLAUDE.md)
  * and mobile (hidden until toggled). The SVG check is the real readiness gate.
  */
 async function waitForEditor(page: any) {
-  await page.waitForSelector('#score-editor', { state: 'visible' });
+  // The editor's auth gate is client-side: an unauthenticated visit still gets
+  // HTTP 200, then `onAuthReady` redirects to the score view page. None of the
+  // selectors below ever appear, so a missing session reads as "the editor is
+  // broken". The timeout here must stay under the 30s test timeout, otherwise
+  // the test dies before this diagnosis can run.
+  try {
+    await page.waitForSelector('#score-editor', {
+      state: 'visible',
+      timeout: 15000,
+    });
+  } catch (error) {
+    if (!page.url().endsWith('/edit')) {
+      throw new Error(
+        `Editor never loaded: the page redirected to ${page.url()}, which means ` +
+          'the test session is not authenticated. Check tests/visual/auth-setup.ts ' +
+          'and the session it writes to tests/visual/.auth/user.json.',
+        { cause: error },
+      );
+    }
+    throw error;
+  }
+
   await page.waitForSelector('input[placeholder="Score title"]', {
     state: 'visible',
   });
