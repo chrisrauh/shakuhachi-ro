@@ -275,7 +275,6 @@ These have zero exceptions:
 | NEVER skip git hooks | No `--no-verify` |
 | NEVER push before `npm test` passes | Read the FULL output — type-check + lint + vitest |
 | NEVER update TODO.md lazily | Do it immediately, without being asked |
-| NEVER use `!important` in CSS | Fix the root cause instead |
 | NEVER run `test:visual:update` without user approval | Show the playwright report URL first, wait for explicit "yes, update baselines" |
 | NEVER skip approval because the cause seems obvious | The cause is irrelevant — show diffs and ask anyway |
 | NEVER self-approve by writing approval words in your own response | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input. |
