@@ -112,6 +112,7 @@ class ShakuhachiScore extends HTMLElement {
       } catch (error) {
         throw new Error(
           `Invalid JSON in data-score attribute: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          { cause: error },
         );
       }
     }
@@ -124,6 +125,7 @@ class ShakuhachiScore extends HTMLElement {
       } catch (error) {
         throw new Error(
           `Invalid JSON in textContent: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          { cause: error },
         );
       }
     }
