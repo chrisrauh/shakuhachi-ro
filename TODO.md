@@ -105,7 +105,7 @@ An unvalidated batch of these bumps was stashed on 2026-09-20 (`git stash list` 
   - **Verify:** `tsc --noEmit` and `astro check` separately, then `npm test` and `npm run build`. chrome-devtools-mcp over `/`, `/about`, `/ai`, `/help/notation-formats`, `/score/test`, `/score/test/edit` in light and dark — the three MDX pages are the content-collection canaries.
   - **Bail out if:** the Netlify adapter build fails beyond a config rename — downgrade the group; SSR deploy is the platform's critical path.
 
-- [ ] [A:High] Upgrade TypeScript to 6
+- [x] [A:High] Upgrade TypeScript to 6
   - Bump `typescript` 5.9.3 → 6.0.3 and `@astrojs/check` 0.9.6 → 0.9.10 (mandatory companion — 0.9.6 peers `typescript: ^5.0.0` and would block the install; 0.9.10 peers `^5.0.0 || ^6.0.0`).
   - **TS 7.0.2 is deliberately not attempted** — `@astrojs/check` caps at `^6.0.0` and typescript-eslint at `<6.1.0`. Forcing it with overrides risks `astro check` silently misreporting rather than failing loudly, and `type-check` is a required gate. Tracked separately below.
   - Do this last: TypeScript underpins `tsc`, `astro check`, and typescript-eslint's parser simultaneously, so a regression is only unambiguous once everything else is green.
