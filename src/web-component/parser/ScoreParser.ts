@@ -318,6 +318,7 @@ export class ScoreParser {
       if (error instanceof SyntaxError) {
         throw new Error(
           PARSER_STRINGS.ERRORS.ScoreParser.invalidJSON(error.message),
+          { cause: error },
         );
       }
       throw error;
@@ -346,6 +347,7 @@ export class ScoreParser {
       if (error instanceof Error) {
         throw new Error(
           PARSER_STRINGS.ERRORS.ScoreParser.loadFailedFromURL(error.message),
+          { cause: error },
         );
       }
       throw error;
