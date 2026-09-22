@@ -17,10 +17,11 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
    ```bash
    gh issue list --label focus --label autonomy:high --state open
    ```
-2. If that is empty, widen to the whole backlog:
+2. If that is empty, widen to the actionable backlog:
    ```bash
-   gh issue list --label autonomy:high --state open
+   gh issue list --label autonomy:high --state open --search "-label:type:idea"
    ```
+   `type:idea` issues are speculative and never agent work, whatever else they are labelled.
 3. Take the first result and read it in full: `gh issue view <n>`
 4. Announce: `"Working on: #<n> [issue title]"`
 5. If neither list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
