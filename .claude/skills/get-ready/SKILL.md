@@ -31,13 +31,15 @@ Tasks live in GitHub Issues, not in a file. Start with the focus set:
 gh issue list --label focus --state open
 ```
 
-If that returns nothing, the focus set is empty — fall back to the full backlog and say so rather than guessing:
+If that returns nothing, the focus set is empty — fall back to the actionable backlog and say so rather than guessing:
 
 ```bash
-gh issue list --state open --limit 100
+gh issue list --state open --search "-label:type:idea" --limit 100
 ```
 
-Useful filters: `--label autonomy:high` (agent-ready), `--label area:renderer` (or any other `area:*`), `--label type:idea` (speculative, usually excluded).
+**Always exclude `type:idea` from backlog views.** Those issues are speculative — future features that may never be built — and they are a large fraction of the open set, so including them buries the work that is actually queued. They are never candidates to pick up, and none of them carry `autonomy:high`.
+
+Useful filters: `--label autonomy:high` (agent-ready), `--label area:renderer` (or any other `area:*`). To look at the ideas deliberately — not to pick work from — use `--label type:idea` on its own.
 
 ## After Review
 
