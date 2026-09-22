@@ -2,10 +2,7 @@ import {
   createIcons,
   createElement,
   GitFork,
-  Eye,
   AlertCircle,
-  Calendar,
-  SquarePen,
   CircleHelp,
 } from 'lucide';
 
@@ -18,10 +15,7 @@ export function initIcons(): void {
   createIcons({
     icons: {
       GitFork,
-      Eye,
       AlertCircle,
-      Calendar,
-      SquarePen,
       CircleHelp,
     },
   });
@@ -29,7 +23,7 @@ export function initIcons(): void {
 
 /**
  * Creates an icon element HTML string
- * @param name - The icon name (e.g., 'git-fork', 'eye', 'alert-circle')
+ * @param name - The icon name (e.g., 'git-fork', 'circle-help', 'alert-circle')
  * @param className - Optional CSS class names
  * @returns HTML string for the icon placeholder
  */
