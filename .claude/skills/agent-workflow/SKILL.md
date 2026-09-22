@@ -36,8 +36,13 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 2. Create an isolated worktree using `superpowers:using-git-worktrees`
    - Branch name: `feature/<task-slug>` (e.g. `feature/extract-score-error-wrapping`)
    - **Never** use `worktree-*` as a branch prefix — that is a directory naming convention only
-3. Work exclusively in the worktree for all subsequent steps
-4. **Early exit rule:** if you need to abort before Phase 6 (task too vague, unresolvable failure), remove the worktree before stopping:
+3. Link the environment file into the worktree, from inside it:
+   ```bash
+   ln -s ../../../.env .env
+   ```
+   `.env` is gitignored, so it exists only in the main checkout. `npm test` passes without this (vitest supplies placeholder Supabase vars), but the **dev server and any visual verification need the real file** — without it the score library renders empty and score pages break. The symlink is itself gitignored, and the relative path resolves from `.claude/worktrees/<name>/` back to the repo root.
+4. Work exclusively in the worktree for all subsequent steps
+5. **Early exit rule:** if you need to abort before Phase 6 (task too vague, unresolvable failure), remove the worktree before stopping:
    ```bash
    git worktree remove .claude/worktrees/<name>
    git branch -d <branch>
