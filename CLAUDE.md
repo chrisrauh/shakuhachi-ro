@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-- Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:idea` (speculative).
+- Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
 - Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 

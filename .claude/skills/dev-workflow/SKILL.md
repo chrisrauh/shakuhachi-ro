@@ -261,7 +261,13 @@ Then: list the next candidates and present the top 3. Ask the user which to work
 gh issue list --label focus --state open
 ```
 
-If the focus set is empty, say so and fall back to `gh issue list --state open --limit 100`.
+If the focus set is empty, say so and fall back to the actionable backlog:
+
+```bash
+gh issue list --state open --search "-label:type:idea" --limit 100
+```
+
+`type:idea` issues are speculative and never candidates to pick up — exclude them from any backlog view. See `/get-ready`.
 
 ---
 
