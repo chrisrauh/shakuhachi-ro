@@ -238,6 +238,11 @@ export class ScoreEditor {
           container.style.height = '100%';
         }
 
+        container.setAttribute(
+          'notation-font',
+          document.documentElement.dataset.notationFont ?? 'sans',
+        );
+
         container.setAttribute('data-score', JSON.stringify(scoreData));
       } catch (error) {
         externalPreview.innerHTML = `
@@ -302,6 +307,11 @@ export class ScoreEditor {
         container.style.width = '100%';
         container.style.height = '100%';
       }
+
+      container.setAttribute(
+        'notation-font',
+        document.documentElement.dataset.notationFont ?? 'sans',
+      );
 
       container.setAttribute('data-score', JSON.stringify(scoreData));
     } catch (error) {
