@@ -11,6 +11,11 @@ describe('resolveNotationFont', () => {
     expect(resolveNotationFont('sans')).toBe(NOTATION_FONTS.sans);
   });
 
+  it('normalizes case and surrounding whitespace before lookup', () => {
+    expect(resolveNotationFont('Serif')).toBe(NOTATION_FONTS.serif);
+    expect(resolveNotationFont(' sans ')).toBe(NOTATION_FONTS.sans);
+  });
+
   it('falls back to sans for an absent value', () => {
     expect(resolveNotationFont(null)).toBe(NOTATION_FONTS.sans);
   });
@@ -23,5 +28,6 @@ describe('resolveNotationFont', () => {
   it('falls back to sans for inherited Object.prototype keys', () => {
     expect(resolveNotationFont('constructor')).toBe(NOTATION_FONTS.sans);
     expect(resolveNotationFont('toString')).toBe(NOTATION_FONTS.sans);
+    expect(resolveNotationFont('__proto__')).toBe(NOTATION_FONTS.sans);
   });
 });

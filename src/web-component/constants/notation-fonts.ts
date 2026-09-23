@@ -16,12 +16,26 @@ export type NotationFontKey = keyof typeof NOTATION_FONTS;
 export const DEFAULT_NOTATION_FONT: NotationFontKey = 'sans';
 
 /**
+ * Type guard verifying that a normalized string is one of the known
+ * notation font keys, so the compiler enforces the own-property check
+ * instead of trusting an unverified cast.
+ */
+function isNotationFontKey(key: string): key is NotationFontKey {
+  return Object.prototype.hasOwnProperty.call(NOTATION_FONTS, key);
+}
+
+/**
  * Resolves a keyword to a font stack, falling back to the default for
  * absent or unrecognised values.
+ *
+ * Matching is ASCII case-insensitive and tolerant of surrounding
+ * whitespace, mirroring how enumerated HTML attributes (e.g. `dir`,
+ * `loading`) are matched.
  */
 export function resolveNotationFont(key: string | null | undefined): string {
-  if (key && Object.prototype.hasOwnProperty.call(NOTATION_FONTS, key)) {
-    return NOTATION_FONTS[key as NotationFontKey];
+  const normalized = key?.trim().toLowerCase();
+  if (normalized && isNotationFontKey(normalized)) {
+    return NOTATION_FONTS[normalized];
   }
   return NOTATION_FONTS[DEFAULT_NOTATION_FONT];
 }
