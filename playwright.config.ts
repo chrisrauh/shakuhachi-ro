@@ -76,6 +76,7 @@ export default defineConfig({
         /web-component-columns\.spec\.ts/,
         /score-detail-layout\.spec\.ts/,
         /content-pages\.spec\.ts/,
+        /notation-font\.spec\.ts/,
       ],
       use: {
         ...devices['Desktop Chrome'],
