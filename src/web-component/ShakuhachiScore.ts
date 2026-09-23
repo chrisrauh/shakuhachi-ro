@@ -25,13 +25,14 @@ import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
 import type { ScoreData } from './types/ScoreData';
 import type { ShakuNote } from './notes/ShakuNote';
 import { DurationDotModifier } from './modifiers/DurationDotModifier';
+import { resolveNotationFont } from './constants/notation-fonts';
 
 class ShakuhachiScore extends HTMLElement {
   private renderer: ScoreRenderer | null = null;
   private shadow: ShadowRoot;
 
   static get observedAttributes() {
-    return ['data-score', 'columns', 'auto-resize'];
+    return ['data-score', 'columns', 'auto-resize', 'notation-font'];
   }
 
   constructor() {
@@ -364,7 +365,7 @@ class ShakuhachiScore extends HTMLElement {
         noteColor: 'var(--shakuhachi-note-color)',
         noteFontSize: DEFAULT_RENDER_OPTIONS.noteFontSize,
         noteFontWeight: DEFAULT_RENDER_OPTIONS.noteFontWeight,
-        noteFontFamily: DEFAULT_RENDER_OPTIONS.noteFontFamily,
+        noteFontFamily: resolveNotationFont(this.getAttribute('notation-font')),
         noteVerticalSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       };
 
