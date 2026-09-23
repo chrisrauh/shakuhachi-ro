@@ -81,6 +81,7 @@ export class ModifierConfigurator {
     modifier
       .setFontSize(options.octaveMarkFontSize)
       .setFontWeight(options.octaveMarkFontWeight)
+      .setFontFamily(options.noteFontFamily)
       .setColor(options.noteColor); // Use noteColor for consistency
   }
 
@@ -97,6 +98,7 @@ export class ModifierConfigurator {
     modifier
       .setFontSize(options.meriKariFontSize)
       .setFontWeight(options.meriKariFontWeight)
+      .setFontFamily(options.noteFontFamily)
       .setColor(options.noteColor); // Use noteColor for consistency
   }
 }
