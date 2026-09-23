@@ -1,0 +1,13 @@
+# Netlify build configuration.
+#
+# Only the build command is pinned here. Publish directory, functions and
+# redirects are handled by the @astrojs/netlify adapter.
+#
+# This must run `npm run build` (not `astro build`): the embed bundle at
+# public/embed/shakuhachi-score.js is generated rather than committed, and
+# `build:wc` is what generates it. Without that step the deploy would ship
+# without /embed/shakuhachi-score.js, 404ing the score pages and every
+# third-party site embedding the web component.
+
+[build]
+  command = "npm run build"

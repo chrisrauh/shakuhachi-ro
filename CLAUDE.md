@@ -71,8 +71,10 @@ Use the `/dev-workflow` skill for the full workflow (branch management, commits,
 The web component renderer lives in a separate package and must be built:
 
 - **Build command:** `npm run build:wc`
-- **Output:** `public/embed/shakuhachi-score.js`
+- **Output:** `public/embed/shakuhachi-score.js` — **generated, not committed** (gitignored)
 - **When to rebuild:** After any changes to renderer package code
+
+`npm run dev` and `npm run test:visual` build it automatically via `predev` / `pretest:visual` hooks, so a fresh clone needs no extra step. The manual rebuild below is still required when the dev server is **already running** — the hook only fires at server start.
 
 **Integration points:**
 
@@ -82,7 +84,7 @@ The web component renderer lives in a separate package and must be built:
 **Testing workflow:**
 
 1. Make renderer changes
-2. Run `npm run build:wc`
+2. Run `npm run build:wc` (needed only if the dev server is already running)
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes with chrome-devtools-mcp
 

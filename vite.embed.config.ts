@@ -3,11 +3,15 @@ import { defineConfig } from 'vite';
 /**
  * Vite configuration for building the embeddable shakuhachi-score web component
  *
- * Output: /dist/embed/shakuhachi-score.js (IIFE format)
+ * Output: /public/embed/shakuhachi-score.js (IIFE format)
  * Usage: <script src="/embed/shakuhachi-score.js"></script>
+ *
+ * Built straight into `public/` — where the dev server, the visual suite
+ * and `astro build` all read it from — and gitignored rather than committed.
  */
 export default defineConfig({
-  publicDir: false, // Don't copy public directory to dist/embed
+  // outDir lives inside public/ — without this Vite would copy public/ into itself
+  publicDir: false,
   build: {
     lib: {
       entry: 'src/web-component/ShakuhachiScore.ts',
@@ -15,7 +19,8 @@ export default defineConfig({
       formats: ['iife'],
       fileName: () => 'shakuhachi-score.js',
     },
-    outDir: 'dist/embed',
+    outDir: 'public/embed',
+    // The directory is wholly owned by this build — nothing else may live there
     emptyOutDir: true,
     // No `target`: the embed bundle takes Vite's default,
     // 'baseline-widely-available' (Baseline = supported across all core
