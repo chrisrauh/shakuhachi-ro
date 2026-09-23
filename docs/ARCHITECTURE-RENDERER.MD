@@ -80,6 +80,8 @@ The renderer is wrapped as a custom element `<shakuhachi-score>`:
 
 **Build:** `npm run build:wc` → `public/embed/shakuhachi-score.js` (IIFE, ~25KB)
 
+The bundle is a generated artifact and is gitignored, not committed. `npm run dev` and `npm run test:visual` rebuild it automatically; the Netlify deploy rebuilds it via `npm run build`, which `netlify.toml` pins.
+
 ## Rendering Pipeline
 
 ```
