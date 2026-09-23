@@ -273,6 +273,36 @@ describe('ModifierConfigurator', () => {
       );
     });
 
+    it('should still configure meri/kari marks when octave marks are hidden', () => {
+      const octaveMod = new OctaveMarksModifier('kan');
+      const meriMod = new MeriKariModifier('meri');
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.addModifier(octaveMod);
+      note.addModifier(meriMod);
+
+      const options = mergeWithDefaults({
+        showOctaveMarks: false,
+        noteFontFamily: 'Noto Serif JP, serif',
+      });
+      ModifierConfigurator.configureModifiers([note], options);
+
+      // Octave mark removed, meri mark kept and configured
+      expect(note.getModifiers()).toHaveLength(1);
+
+      const drawText = vi.fn();
+      meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+      expect(drawText).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        'Noto Serif JP, serif',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
     it('should pass the configured font family to octave marks', () => {
       const octaveMod = new OctaveMarksModifier('kan');
       const note = new ShakuNote({ symbol: 'ro' });
