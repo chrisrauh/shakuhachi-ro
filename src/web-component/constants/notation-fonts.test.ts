@@ -17,5 +17,11 @@ describe('resolveNotationFont', () => {
 
   it('falls back to sans for an unrecognised value', () => {
     expect(resolveNotationFont('comic-sans')).toBe(NOTATION_FONTS.sans);
+    expect(resolveNotationFont('')).toBe(NOTATION_FONTS.sans);
+  });
+
+  it('falls back to sans for inherited Object.prototype keys', () => {
+    expect(resolveNotationFont('constructor')).toBe(NOTATION_FONTS.sans);
+    expect(resolveNotationFont('toString')).toBe(NOTATION_FONTS.sans);
   });
 });

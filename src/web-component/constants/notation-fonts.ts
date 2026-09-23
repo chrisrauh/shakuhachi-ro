@@ -20,7 +20,7 @@ export const DEFAULT_NOTATION_FONT: NotationFontKey = 'sans';
  * absent or unrecognised values.
  */
 export function resolveNotationFont(key: string | null | undefined): string {
-  if (key && key in NOTATION_FONTS) {
+  if (key && Object.prototype.hasOwnProperty.call(NOTATION_FONTS, key)) {
     return NOTATION_FONTS[key as NotationFontKey];
   }
   return NOTATION_FONTS[DEFAULT_NOTATION_FONT];
