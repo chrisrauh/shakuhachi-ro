@@ -24,7 +24,7 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false,
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=Noto+Sans+JP:wght@100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=Noto+Sans+JP:wght@100..900&family=Noto+Serif+JP:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
@@ -34,6 +34,15 @@ const { title, currentPage: _currentPage, fullHeight = false, noPadding = false,
       (function() {
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+
+        // Notation font preference persists across sessions
+        var notationFont = 'sans';
+        try {
+          notationFont = localStorage.getItem('notation-font') === 'serif' ? 'serif' : 'sans';
+        } catch (e) {
+          // Private mode or blocked storage - fall back to the default
+        }
+        document.documentElement.setAttribute('data-notation-font', notationFont);
       })();
     </script>
   </head>
