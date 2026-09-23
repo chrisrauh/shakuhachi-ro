@@ -273,21 +273,24 @@ describe('ModifierConfigurator', () => {
       );
     });
 
-    it('should still configure meri/kari marks when octave marks are hidden', () => {
+    it('should still configure meri/kari and duration marks when octave marks are hidden', () => {
       const octaveMod = new OctaveMarksModifier('kan');
       const meriMod = new MeriKariModifier('meri');
+      const dotMod = new DurationDotModifier();
       const note = new ShakuNote({ symbol: 'ro' });
       note.addModifier(octaveMod);
       note.addModifier(meriMod);
+      note.addModifier(dotMod);
 
       const options = mergeWithDefaults({
         showOctaveMarks: false,
         noteFontFamily: 'Noto Serif JP, serif',
+        noteColor: '#123456',
       });
       ModifierConfigurator.configureModifiers([note], options);
 
-      // Octave mark removed, meri mark kept and configured
-      expect(note.getModifiers()).toHaveLength(1);
+      // Octave mark removed, meri mark and duration dot kept and configured
+      expect(note.getModifiers()).toHaveLength(2);
 
       const drawText = vi.fn();
       meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
@@ -300,6 +303,15 @@ describe('ModifierConfigurator', () => {
         expect.anything(),
         expect.anything(),
         expect.anything(),
+      );
+
+      const drawCircle = vi.fn();
+      dotMod.render({ drawCircle } as unknown as SVGRenderer, 0, 0);
+      expect(drawCircle).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        '#123456',
       );
     });
 
