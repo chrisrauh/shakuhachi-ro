@@ -44,7 +44,7 @@ export interface ShakuNoteOptions {
   /** Font weight (default: 400) */
   fontWeight?: number;
 
-  /** Font family (default: 'Noto Sans JP, sans-serif') */
+  /** Font family (default: DEFAULT_RENDER_OPTIONS.noteFontFamily) */
   fontFamily?: string;
 
   /** Text color (default: '#000') */
