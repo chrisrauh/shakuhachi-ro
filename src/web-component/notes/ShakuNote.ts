@@ -14,6 +14,7 @@ import {
   getSymbolByRomaji,
   type KinkoSymbol,
 } from '../constants/kinko-symbols';
+import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 /**
  * Duration for spacing calculations
@@ -43,7 +44,7 @@ export interface ShakuNoteOptions {
   /** Font weight (default: 400) */
   fontWeight?: number;
 
-  /** Font family (default: 'Noto Sans JP, sans-serif') */
+  /** Font family (default: DEFAULT_RENDER_OPTIONS.noteFontFamily) */
   fontFamily?: string;
 
   /** Text color (default: '#000') */
@@ -118,7 +119,8 @@ export class ShakuNote {
     this.duration = options.duration ?? 'q';
     this.fontSize = options.fontSize ?? 32;
     this.fontWeight = options.fontWeight ?? 400;
-    this.fontFamily = options.fontFamily ?? 'Noto Sans JP, sans-serif';
+    this.fontFamily =
+      options.fontFamily ?? DEFAULT_RENDER_OPTIONS.noteFontFamily;
     this.color = options.color ?? '#000';
     this.isRest = options.isRest ?? false;
 
@@ -334,6 +336,16 @@ export class ShakuNote {
    */
   setFontWeight(weight: number): this {
     this.fontWeight = weight;
+    this.bbox = null;
+    return this;
+  }
+
+  /**
+   * Sets the font family
+   * @returns this for chaining
+   */
+  setFontFamily(fontFamily: string): this {
+    this.fontFamily = fontFamily;
     this.bbox = null;
     return this;
   }

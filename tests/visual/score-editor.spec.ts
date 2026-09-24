@@ -18,7 +18,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { setTheme } from './helpers';
+import { setTheme, waitForScoreRendered } from './helpers';
 
 const TEST_SCORE_SLUG = 'test'; // Test score fixture (see CLAUDE.md)
 
@@ -54,10 +54,7 @@ async function waitForEditor(page: any) {
     state: 'visible',
   });
   await page.waitForSelector('#score-preview', { state: 'attached' });
-  await page.waitForFunction(() => {
-    const c = document.querySelector('shakuhachi-score');
-    return c?.shadowRoot?.querySelector('svg') !== null;
-  });
+  await waitForScoreRendered(page);
   // Wait for score data to be loaded into the textarea
   await page.waitForFunction(() => {
     const el = document.getElementById(

@@ -8,6 +8,11 @@
  * and documented in one place.
  */
 
+import {
+  NOTATION_FONTS,
+  DEFAULT_NOTATION_FONT,
+} from '../constants/notation-fonts';
+
 /**
  * Configuration options for rendering shakuhachi scores
  */
@@ -229,7 +234,7 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
   noteFontSize: 32,
   noteFontWeight: 400,
   noteVerticalSpacing: 44,
-  noteFontFamily: 'Noto Sans JP, sans-serif',
+  noteFontFamily: NOTATION_FONTS[DEFAULT_NOTATION_FONT],
   noteColor: '#000',
 
   // Octave mark configuration

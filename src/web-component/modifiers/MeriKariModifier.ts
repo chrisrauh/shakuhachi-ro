@@ -20,6 +20,7 @@
 
 import { Modifier, type ModifierPosition } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
+import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 export type MeriKariType = 'meri' | 'chu-meri' | 'dai-meri';
 
@@ -33,8 +34,8 @@ export class MeriKariModifier extends Modifier {
   /** Font weight for the meri/kari mark */
   private fontWeight: number = 400;
 
-  /** Font family */
-  private fontFamily: string = 'Noto Sans JP, sans-serif';
+  /** Font family — overridden by ModifierConfigurator from render options */
+  private fontFamily: string = DEFAULT_RENDER_OPTIONS.noteFontFamily;
 
   /** Color of the mark */
   private color: string = '#000'; // Black, like traditional notation

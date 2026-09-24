@@ -2,8 +2,9 @@
  * Integration tests for ScoreRenderer
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ScoreRenderer } from './ScoreRenderer';
+import { SVGRenderer } from './SVGRenderer';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
@@ -158,6 +159,33 @@ describe('ScoreRenderer', () => {
       // Note should have custom styling applied
       const notes = renderer.getNotes();
       expect(notes[0]).toBeTruthy();
+    });
+
+    it('should draw the note glyph with the configured noteFontFamily', () => {
+      // Note has no modifiers, so drawText is called exactly once for the
+      // glyph itself — this rules out the call being a modifier's drawText
+      // (a previous task already makes modifiers honour noteFontFamily).
+      const drawTextSpy = vi.spyOn(SVGRenderer.prototype, 'drawText');
+      const note = new ShakuNote({ symbol: 'ro' });
+
+      const renderer = new ScoreRenderer(container, {
+        noteFontFamily: 'Noto Serif JP, serif',
+      });
+      renderer.renderNotes([note]);
+
+      expect(drawTextSpy).toHaveBeenCalledTimes(1);
+      expect(drawTextSpy).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        'Noto Serif JP, serif',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+
+      drawTextSpy.mockRestore();
     });
 
     it('should render debug labels when enabled', () => {
