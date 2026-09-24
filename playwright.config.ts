@@ -77,6 +77,7 @@ export default defineConfig({
         /score-detail-layout\.spec\.ts/,
         /content-pages\.spec\.ts/,
         /notation-font\.spec\.ts/,
+        /helpers\.spec\.ts/,
       ],
       use: {
         ...devices['Desktop Chrome'],

@@ -58,6 +58,9 @@ test.describe('Notation Font Visual Regression', () => {
         .querySelectorAll('shakuhachi-score')
         .forEach((el) => el.setAttribute('notation-font', 'serif'));
     });
+    await waitForScoreRendered(page);
+    // The attribute change re-renders; confirm the new face actually landed
+    // before screenshotting, or a stale sans render could be captured.
     await page.waitForFunction(() =>
       [...document.querySelectorAll('shakuhachi-score')].every((el) =>
         el.shadowRoot

@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 /**
  * Set page theme via data-theme attribute and color scheme media emulation.
@@ -18,17 +18,28 @@ export async function setTheme(page: Page, theme: 'light' | 'dark') {
 }
 
 /**
- * Wait for a shakuhachi-score web component to finish rendering its SVG.
+ * Wait for every shakuhachi-score on the page to finish rendering its SVG.
  *
- * Must assert the SVG is actually present, not merely "not null". Optional
- * chaining yields `undefined` when the component is missing entirely, and
- * `undefined !== null` is true — so a looser check returns immediately on a
- * page with no score on it (a 404, say) and lets the caller screenshot it as
- * if it were a valid baseline.
+ * The component only draws after its bundle loads, the element upgrades and
+ * the score data parses, so the SVG landing in the shadow root is the real
+ * readiness signal. Playwright's CSS engine pierces open shadow DOM, so the
+ * SVG can be located directly rather than traversing `shadowRoot` by hand.
+ *
+ * Written as assertions rather than a `waitForFunction` predicate on purpose.
+ * A predicate that is accidentally true passes silently and the caller
+ * screenshots a page that never rendered — a hand-written version of this
+ * check returned immediately on a 404 and wrote it as a baseline. Requiring
+ * an element to be attached cannot succeed vacuously, and it reports what was
+ * missing instead of timing out anonymously.
+ *
+ * Waits for all components, not just the first: the renderer test page holds
+ * six, and stopping at the first leaves the rest possibly still blank.
  */
 export async function waitForScoreRendered(page: Page) {
-  await page.waitForFunction(() => {
-    const c = document.querySelector('shakuhachi-score');
-    return !!c?.shadowRoot?.querySelector('svg');
-  });
+  const scores = page.locator('shakuhachi-score');
+  await expect(scores.first()).toBeAttached();
+
+  for (const score of await scores.all()) {
+    await expect(score.locator('svg')).toBeAttached();
+  }
 }
