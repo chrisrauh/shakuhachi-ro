@@ -1,5 +1,5 @@
 ---
-import { Book, Plus, Info, SunMoon } from '@lucide/astro';
+import { Book, Plus, Info, SunMoon, Brush } from '@lucide/astro';
 
 interface Props {
   mobileMenuType?: 'standard' | 'score-edit';
@@ -42,6 +42,9 @@ const { mobileMenuType = 'standard' } = Astro.props;
       >
         <Info size={16} stroke-width={2} />
       </a>
+      <button id="notation-font-toggle" class="btn btn-icon" aria-label="Toggle notation font">
+        <Brush size={16} stroke-width={2} />
+      </button>
       <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">
         <SunMoon size={16} stroke-width={2} />
       </button>
@@ -162,7 +165,8 @@ const { mobileMenuType = 'standard' } = Astro.props;
     box-sizing: border-box;
   }
 
-  #theme-toggle {
+  #theme-toggle,
+  #notation-font-toggle {
     flex-shrink: 0;
   }
 

@@ -12,6 +12,7 @@ import {
   Trash,
 } from 'lucide';
 import { ThemeSwitcher } from '../components/ThemeSwitcher';
+import { NotationFontSwitcher } from '../components/NotationFontSwitcher';
 import {
   AuthWidget,
   type AuthModalInterface,
@@ -174,6 +175,7 @@ export let confirmDialog: ConfirmDialog;
 
 export function initHeader(): void {
   new ThemeSwitcher();
+  new NotationFontSwitcher();
 
   if (import.meta.env.DEV) {
     import('../components/LetterSpacingControl').then(

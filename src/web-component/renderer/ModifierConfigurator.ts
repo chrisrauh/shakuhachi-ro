@@ -25,9 +25,14 @@ export class ModifierConfigurator {
    * Configures all modifiers on notes according to render options
    *
    * This method:
-   * 1. Removes octave marks if disabled in options
+   * 1. Removes octave marks if disabled in options (the only modifier
+   *    that can be switched off entirely)
    * 2. Configures octave mark appearance (fontSize, fontWeight, color)
    * 3. Configures meri/kari mark appearance (fontSize, fontWeight, color)
+   * 4. Configures duration line/dot color
+   *
+   * Steps 2-4 run for every remaining modifier regardless of
+   * showOctaveMarks — that flag only controls octave mark removal.
    *
    * @param notes - Array of ShakuNote objects to configure
    * @param options - Render options specifying modifier configuration
@@ -37,34 +42,32 @@ export class ModifierConfigurator {
     options: Required<RenderOptions>,
   ): void {
     notes.forEach((note) => {
-      const modifiers = note.getModifiers();
-
-      // Remove octave marks if disabled
+      // Octave marks are the only modifier that can be switched off entirely
       if (!options.showOctaveMarks) {
-        const nonOctaveModifiers = modifiers.filter(
-          (mod) => !(mod instanceof OctaveMarksModifier),
-        );
+        const nonOctaveModifiers = note
+          .getModifiers()
+          .filter((mod) => !(mod instanceof OctaveMarksModifier));
         note.setModifiers(nonOctaveModifiers);
-      } else {
-        // Configure octave marks, meri/kari marks, and duration modifiers
-        modifiers.forEach((mod) => {
-          if (mod instanceof OctaveMarksModifier) {
-            this.configureOctaveMark(mod, options);
-          }
-
-          if (mod instanceof MeriKariModifier) {
-            this.configureMeriKariMark(mod, options);
-          }
-
-          if (mod instanceof DurationLineModifier) {
-            mod.setColor(options.noteColor);
-          }
-
-          if (mod instanceof DurationDotModifier) {
-            mod.setColor(options.noteColor);
-          }
-        });
       }
+
+      // Every remaining modifier is configured from render options
+      note.getModifiers().forEach((mod) => {
+        if (mod instanceof OctaveMarksModifier) {
+          this.configureOctaveMark(mod, options);
+        }
+
+        if (mod instanceof MeriKariModifier) {
+          this.configureMeriKariMark(mod, options);
+        }
+
+        if (mod instanceof DurationLineModifier) {
+          mod.setColor(options.noteColor);
+        }
+
+        if (mod instanceof DurationDotModifier) {
+          mod.setColor(options.noteColor);
+        }
+      });
     });
   }
 
@@ -81,6 +84,7 @@ export class ModifierConfigurator {
     modifier
       .setFontSize(options.octaveMarkFontSize)
       .setFontWeight(options.octaveMarkFontWeight)
+      .setFontFamily(options.noteFontFamily)
       .setColor(options.noteColor); // Use noteColor for consistency
   }
 
@@ -97,6 +101,7 @@ export class ModifierConfigurator {
     modifier
       .setFontSize(options.meriKariFontSize)
       .setFontWeight(options.meriKariFontWeight)
+      .setFontFamily(options.noteFontFamily)
       .setColor(options.noteColor); // Use noteColor for consistency
   }
 }

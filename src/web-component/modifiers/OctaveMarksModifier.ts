@@ -16,6 +16,7 @@
 
 import { Modifier } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
+import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 export type OctaveRegister = 'otsu' | 'kan' | 'daikan';
 
@@ -29,8 +30,8 @@ export class OctaveMarksModifier extends Modifier {
   /** Font weight for the octave mark */
   private fontWeight: number = 500;
 
-  /** Font family */
-  private fontFamily: string = 'Noto Sans JP, sans-serif';
+  /** Font family — overridden by ModifierConfigurator from render options */
+  private fontFamily: string = DEFAULT_RENDER_OPTIONS.noteFontFamily;
 
   /** Color of the mark */
   private color: string = '#000';

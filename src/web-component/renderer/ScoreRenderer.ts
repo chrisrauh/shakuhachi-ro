@@ -127,6 +127,7 @@ export class ScoreRenderer {
         // Set note styling and position
         note.setFontSize(this.options.noteFontSize);
         note.setFontWeight(this.options.noteFontWeight);
+        note.setFontFamily(this.options.noteFontFamily);
         note.setPosition(x, y);
         note.render(this.renderer!);
 

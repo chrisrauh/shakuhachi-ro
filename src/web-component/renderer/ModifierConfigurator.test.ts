@@ -2,13 +2,14 @@
  * Unit tests for ModifierConfigurator
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ModifierConfigurator } from './ModifierConfigurator';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
+import type { SVGRenderer } from './SVGRenderer';
 
 describe('ModifierConfigurator', () => {
   describe('configureModifiers', () => {
@@ -245,6 +246,98 @@ describe('ModifierConfigurator', () => {
       // Modifiers should still exist (configuration is internal)
       expect(note1.getModifiers().length).toBe(1);
       expect(note2.getModifiers().length).toBe(1);
+    });
+
+    it('should pass the configured font family to meri/kari marks', () => {
+      const meriMod = new MeriKariModifier('meri');
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.addModifier(meriMod);
+
+      const options = mergeWithDefaults({
+        noteFontFamily: 'Noto Serif JP, serif',
+      });
+      ModifierConfigurator.configureModifiers([note], options);
+
+      const drawText = vi.fn();
+      meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+
+      expect(drawText).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        'Noto Serif JP, serif',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it('should still configure meri/kari and duration marks when octave marks are hidden', () => {
+      const octaveMod = new OctaveMarksModifier('kan');
+      const meriMod = new MeriKariModifier('meri');
+      const dotMod = new DurationDotModifier();
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.addModifier(octaveMod);
+      note.addModifier(meriMod);
+      note.addModifier(dotMod);
+
+      const options = mergeWithDefaults({
+        showOctaveMarks: false,
+        noteFontFamily: 'Noto Serif JP, serif',
+        noteColor: '#123456',
+      });
+      ModifierConfigurator.configureModifiers([note], options);
+
+      // Octave mark removed, meri mark and duration dot kept and configured
+      expect(note.getModifiers()).toHaveLength(2);
+
+      const drawText = vi.fn();
+      meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+      expect(drawText).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        'Noto Serif JP, serif',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+
+      const drawCircle = vi.fn();
+      dotMod.render({ drawCircle } as unknown as SVGRenderer, 0, 0);
+      expect(drawCircle).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        '#123456',
+      );
+    });
+
+    it('should pass the configured font family to octave marks', () => {
+      const octaveMod = new OctaveMarksModifier('kan');
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.addModifier(octaveMod);
+
+      const options = mergeWithDefaults({
+        noteFontFamily: 'Noto Serif JP, serif',
+      });
+      ModifierConfigurator.configureModifiers([note], options);
+
+      const drawText = vi.fn();
+      octaveMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+
+      expect(drawText).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        'Noto Serif JP, serif',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
     });
   });
 });

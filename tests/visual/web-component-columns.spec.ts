@@ -14,6 +14,8 @@
 
 import { test, expect } from '@playwright/test';
 
+import { waitForScoreRendered } from './helpers';
+
 test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
   // page.setContent() rewrites the current document but keeps its origin, and a
   // page that has never navigated has a null origin. The Vite 8 dev server that
@@ -22,24 +24,6 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/test/spinner');
   });
-
-  // Helper function to wait for web component to be ready
-  async function waitForWebComponent(page: any) {
-    // Wait for custom element to be defined
-    await page.waitForFunction(() => {
-      return customElements.get('shakuhachi-score') !== undefined;
-    });
-
-    // Wait for component to render
-    await page.waitForFunction(() => {
-      const component = document.querySelector('shakuhachi-score');
-      return (
-        component &&
-        component.shadowRoot &&
-        component.shadowRoot.querySelector('svg')
-      );
-    });
-  }
 
   // Sample score data with enough notes to test multi-column layout
   const sampleScoreData = {
@@ -142,7 +126,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Take screenshot of auto mode (default)
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -190,7 +174,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Take screenshot of single column mode
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -236,7 +220,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Verify component calculated its own dimensions
     const dimensions = await page.evaluate(() => {
@@ -287,7 +271,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Verify component calculated its own dimensions
     const dimensions = await page.evaluate(() => {
@@ -338,7 +322,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Take screenshot of auto mode with tall container
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -373,7 +357,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Take screenshot of auto mode with short container
     await expect(page.locator('.container')).toHaveScreenshot(
@@ -403,7 +387,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Verify uses browser width (800 - 40px padding = 760px)
     const svgDimensions = await page.evaluate(() => {
@@ -446,7 +430,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Take screenshot in light mode
     await page.emulateMedia({ colorScheme: 'light' });
@@ -498,7 +482,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
       </html>
     `);
 
-    await waitForWebComponent(page);
+    await waitForScoreRendered(page);
 
     // Verify explicit dimensions override container
     const svgDimensions = await page.evaluate(() => {

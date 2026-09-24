@@ -70,12 +70,14 @@ The renderer is wrapped as a custom element `<shakuhachi-score>`:
 <shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
 <shakuhachi-score columns="6" data-score='...'></shakuhachi-score>
 <shakuhachi-score auto-resize="false" data-score='...'></shakuhachi-score>
+<shakuhachi-score notation-font="serif" data-score='...'></shakuhachi-score>
 ```
 
 **Attributes:**
 - `data-score` - JSON score data (required, must contain `notes` array)
 - `columns` - `"auto"` (default), `"1"` (single column), or explicit number
 - `auto-resize` - Enable ResizeObserver (default: `true`)
+- `notation-font` - `"sans"` (default) or `"serif"`. Matched case-insensitively; an unrecognised value falls back to `"sans"`.
 - `debug` - Show debug labels (optional)
 
 **Build:** `npm run build:wc` → `public/embed/shakuhachi-score.js` (IIFE, ~25KB)
