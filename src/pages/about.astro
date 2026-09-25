@@ -22,7 +22,6 @@ const { Content } = await render(aboutPage);
 
   <!-- Load web component for score examples -->
   <script is:inline src="/embed/shakuhachi-score.js"></script>
-
   <style>
     .about-page {
       max-width: 720px;
@@ -95,7 +94,9 @@ const { Content } = await render(aboutPage);
     }
 
     .about-section :global(code) {
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+      font-family:
+        'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro',
+        monospace;
     }
 
     .about-section :global(p code) {
@@ -123,17 +124,17 @@ const { Content } = await render(aboutPage);
        Applied via style="stop-color: var(...)" on SVG <stop> elements, not as
        presentation attributes (which don't support custom properties). */
     :root {
-      --annotation-pen-1: #8BB0EE;
-      --annotation-pen-2: #5F8ADE;
-      --annotation-pen-3: #4070CC;
-      --annotation-pen-4: #2855AE;
+      --annotation-pen-1: #8bb0ee;
+      --annotation-pen-2: #5f8ade;
+      --annotation-pen-3: #4070cc;
+      --annotation-pen-4: #2855ae;
     }
 
     :global([data-theme='dark']) {
       --annotation-pen-1: #172554;
-      --annotation-pen-2: #1E3A8A;
-      --annotation-pen-3: #1D4ED8;
-      --annotation-pen-4: #2855AE;
+      --annotation-pen-2: #1e3a8a;
+      --annotation-pen-3: #1d4ed8;
+      --annotation-pen-4: #2855ae;
     }
 
     /* Desktop annotation: absolutely positioned right of centered score. */

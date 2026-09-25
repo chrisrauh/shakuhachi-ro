@@ -1,6 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { buildSpinnerSVG, buildButtonSpinnerSVG } from '../../components/LoadingSpinner';
+import {
+  buildSpinnerSVG,
+  buildButtonSpinnerSVG,
+} from '../../components/LoadingSpinner';
 
 const title = 'Loading Spinner';
 const spinner = buildSpinnerSVG();
@@ -27,23 +30,73 @@ const btnSpinner = buildButtonSpinnerSVG();
       <h2>In Buttons</h2>
       <p>Click each button to toggle loading state.</p>
       <div class="button-demo-row">
-        <button class="btn btn-primary" data-btn-demo data-loading-text="Loading…">
+        <button
+          class="btn btn-primary"
+          data-btn-demo
+          data-loading-text="Loading…"
+        >
           Load
         </button>
         <button class="btn btn-secondary" data-btn-demo>
           Save
         </button>
-        <button class="btn btn-danger" data-btn-demo data-loading-text="Deleting…">
+        <button
+          class="btn btn-danger"
+          data-btn-demo
+          data-loading-text="Deleting…"
+        >
           Delete
         </button>
-        <button class="btn btn-primary btn-sm" data-btn-demo data-loading-text="Saving…">
+        <button
+          class="btn btn-primary btn-sm"
+          data-btn-demo
+          data-loading-text="Saving…"
+        >
           Small
         </button>
-        <button class="btn btn-icon btn-primary" aria-label="Trigger loading" data-btn-demo data-icon-btn>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <button
+          class="btn btn-icon btn-primary"
+          aria-label="Trigger loading"
+          data-btn-demo
+          data-icon-btn
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
         </button>
-        <button class="btn btn-icon" aria-label="Trigger loading" data-btn-demo data-icon-btn>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <button
+          class="btn btn-icon"
+          aria-label="Trigger loading"
+          data-btn-demo
+          data-icon-btn
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
         </button>
       </div>
     </section>
@@ -52,15 +105,46 @@ const btnSpinner = buildButtonSpinnerSVG();
       <h2>Loading States</h2>
       <p>Static examples — already in loading state.</p>
       <div class="button-demo-row">
-        <button class="btn btn-primary loading" disabled aria-busy="true" set:html={`${btnSpinner}\nSaving…`} />
-        <button class="btn btn-secondary loading" disabled aria-busy="true" set:html={`${btnSpinner}\nLoading…`} />
-        <button class="btn btn-danger loading" disabled aria-busy="true" set:html={`${btnSpinner}\nDeleting…`} />
-        <button class="btn btn-primary btn-sm loading" disabled aria-busy="true" set:html={`${btnSpinner}\nSaving…`} />
-        <button class="btn btn-icon btn-primary loading" aria-label="Loading" disabled aria-busy="true" set:html={btnSpinner} />
-        <button class="btn btn-icon loading" aria-label="Loading" disabled aria-busy="true" set:html={btnSpinner} />
+        <button
+          class="btn btn-primary loading"
+          disabled
+          aria-busy="true"
+          set:html={`${btnSpinner}\nSaving…`}
+        />
+        <button
+          class="btn btn-secondary loading"
+          disabled
+          aria-busy="true"
+          set:html={`${btnSpinner}\nLoading…`}
+        />
+        <button
+          class="btn btn-danger loading"
+          disabled
+          aria-busy="true"
+          set:html={`${btnSpinner}\nDeleting…`}
+        />
+        <button
+          class="btn btn-primary btn-sm loading"
+          disabled
+          aria-busy="true"
+          set:html={`${btnSpinner}\nSaving…`}
+        />
+        <button
+          class="btn btn-icon btn-primary loading"
+          aria-label="Loading"
+          disabled
+          aria-busy="true"
+          set:html={btnSpinner}
+        />
+        <button
+          class="btn btn-icon loading"
+          aria-label="Loading"
+          disabled
+          aria-busy="true"
+          set:html={btnSpinner}
+        />
       </div>
     </section>
-
   </div>
 </Layout>
 
@@ -119,7 +203,7 @@ const btnSpinner = buildButtonSpinnerSVG();
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
-    margin-top:0;;
+    margin-top: 0;
   }
 
   .demo-section > p {
@@ -133,12 +217,15 @@ const btnSpinner = buildButtonSpinnerSVG();
     gap: 0.75rem;
     align-items: center;
   }
-
 </style>
 
 <script>
   import { Pane } from 'tweakpane';
-  import { buildSpinnerSVG, buildButtonSpinnerSVG, ButtonLoadingState } from '../../components/LoadingSpinner';
+  import {
+    buildSpinnerSVG,
+    buildButtonSpinnerSVG,
+    ButtonLoadingState,
+  } from '../../components/LoadingSpinner';
 
   // Default params (match buildSpinnerSVG defaults)
   const params = {
@@ -171,22 +258,52 @@ const btnSpinner = buildButtonSpinnerSVG();
     paneEl.style.bottom = '1rem';
   }
   pane
-    .addBinding(params, 'radius', { label: 'radius (px)', min: 0, max: 16, step: 0.5 })
+    .addBinding(params, 'radius', {
+      label: 'radius (px)',
+      min: 0,
+      max: 16,
+      step: 0.5,
+    })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'gap', { label: 'gap (px)', min: 0, max: 16, step: 0.5 })
+    .addBinding(params, 'gap', {
+      label: 'gap (px)',
+      min: 0,
+      max: 16,
+      step: 0.5,
+    })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'strokeWidth', { label: 'stroke (px)', min: 0, max: 3, step: 0.1 })
+    .addBinding(params, 'strokeWidth', {
+      label: 'stroke (px)',
+      min: 0,
+      max: 3,
+      step: 0.1,
+    })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'stepDuration', { label: 'step (s)', min: 0, max: 1.5, step: 0.05 })
+    .addBinding(params, 'stepDuration', {
+      label: 'step (s)',
+      min: 0,
+      max: 1.5,
+      step: 0.05,
+    })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'fadeIn', { label: 'fade-in (s)', min: 0, max: 1, step: 0.01 })
+    .addBinding(params, 'fadeIn', {
+      label: 'fade-in (s)',
+      min: 0,
+      max: 1,
+      step: 0.01,
+    })
     .on('change', updateAll);
   pane
-    .addBinding(params, 'fadeOut', { label: 'fade-out (s)', min: 0, max: 1, step: 0.01 })
+    .addBinding(params, 'fadeOut', {
+      label: 'fade-out (s)',
+      min: 0,
+      max: 1,
+      step: 0.01,
+    })
     .on('change', updateAll);
 
   // Button spinner params
@@ -216,13 +333,28 @@ const btnSpinner = buildButtonSpinnerSVG();
     btnPaneEl.style.right = '260px';
   }
   btnPane
-    .addBinding(btnParams, 'radius', { label: 'radius (px)', min: 2, max: 16, step: 0.5 })
+    .addBinding(btnParams, 'radius', {
+      label: 'radius (px)',
+      min: 2,
+      max: 16,
+      step: 0.5,
+    })
     .on('change', updateButtonSpinners);
   btnPane
-    .addBinding(btnParams, 'strokeWidth', { label: 'stroke (px)', min: 0, max: 3, step: 0.1 })
+    .addBinding(btnParams, 'strokeWidth', {
+      label: 'stroke (px)',
+      min: 0,
+      max: 3,
+      step: 0.1,
+    })
     .on('change', updateButtonSpinners);
   btnPane
-    .addBinding(btnParams, 'stepDuration', { label: 'step (s)', min: 0, max: 1.5, step: 0.05 })
+    .addBinding(btnParams, 'stepDuration', {
+      label: 'step (s)',
+      min: 0,
+      max: 1.5,
+      step: 0.05,
+    })
     .on('change', updateButtonSpinners);
 
   // Toggle button loading state on click
