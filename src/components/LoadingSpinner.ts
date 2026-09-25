@@ -90,14 +90,20 @@ export function createSpinnerSVG(): string {
   return buildButtonSpinnerSVG();
 }
 
+/**
+ * Shows a spinner on a button while an action runs.
+ *
+ * The spinner is laid over the button's content rather than replacing it.
+ * The content stays in place (hidden by `.btn-spinner ~ *` in components.css),
+ * so the button keeps the width its own label gives it and doesn't jump.
+ */
 export class ButtonLoadingState {
   private button: HTMLElement;
-  private originalContent: string;
   private originalDisabled: boolean;
+  private spinner: HTMLElement | null = null;
 
   constructor(button: HTMLElement) {
     this.button = button;
-    this.originalContent = button.innerHTML;
     this.originalDisabled = (button as HTMLButtonElement).disabled || false;
   }
 
@@ -109,12 +115,19 @@ export class ButtonLoadingState {
     this.button.classList.add('loading');
     this.button.setAttribute('aria-busy', 'true');
 
-    // Update content
-    this.button.innerHTML = createSpinnerSVG();
+    if (!this.spinner) {
+      this.spinner = document.createElement('span');
+      this.spinner.className = 'btn-spinner';
+      this.spinner.setAttribute('aria-hidden', 'true');
+      this.spinner.innerHTML = createSpinnerSVG();
+      // First child, so the `.btn-spinner ~ *` rule hides everything after it
+      this.button.prepend(this.spinner);
+    }
   }
 
   hide(): void {
-    this.button.innerHTML = this.originalContent;
+    this.spinner?.remove();
+    this.spinner = null;
     this.button.classList.remove('loading');
     this.button.setAttribute('aria-busy', 'false');
 
