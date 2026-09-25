@@ -21,11 +21,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
     <div class="header-nav-separator" aria-hidden="true"></div>
     <!-- Desktop navigation (hidden on mobile) -->
     <div class="header-desktop-nav">
-      <a
-        href="/"
-        class="btn btn-icon"
-        aria-label="View scores"
-      >
+      <a href="/" class="btn btn-icon" aria-label="View scores">
         <Book size={16} stroke-width={2} />
       </a>
       <button
@@ -35,14 +31,14 @@ const { mobileMenuType = 'standard' } = Astro.props;
       >
         <Plus size={16} stroke-width={2} />
       </button>
-      <a
-        href="/about"
-        class="btn btn-icon"
-        aria-label="About"
-      >
+      <a href="/about" class="btn btn-icon" aria-label="About">
         <Info size={16} stroke-width={2} />
       </a>
-      <button id="notation-font-toggle" class="btn btn-icon" aria-label="Toggle notation font">
+      <button
+        id="notation-font-toggle"
+        class="btn btn-icon"
+        aria-label="Toggle notation font"
+      >
         <Brush size={16} stroke-width={2} />
       </button>
       <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">
@@ -56,17 +52,41 @@ const { mobileMenuType = 'standard' } = Astro.props;
         <button id="auth-signup" class="btn btn-small btn-neutral">
           <span class="btn-text">Sign Up</span>
         </button>
-        <button id="auth-avatar" class="btn btn-icon auth-avatar-btn"
-          hidden aria-label="Account menu" aria-expanded="false" aria-haspopup="menu">
+        <button
+          id="auth-avatar"
+          class="btn btn-icon auth-avatar-btn"
+          hidden
+          aria-label="Account menu"
+          aria-expanded="false"
+          aria-haspopup="menu"
+        >
           <span class="btn-text" id="auth-initials"></span>
         </button>
       </div>
     </div>
     <!-- Mobile menu (shown on mobile) -->
-    <div id="mobile-menu" class="mobile-menu-container" data-menu-type={mobileMenuType}>
-      <button id="mobile-menu-toggle" class="btn btn-icon" aria-label="Menu" aria-expanded="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+    <div
+      id="mobile-menu"
+      class="mobile-menu-container"
+      data-menu-type={mobileMenuType}
+    >
+      <button
+        id="mobile-menu-toggle"
+        class="btn btn-icon"
+        aria-label="Menu"
+        aria-expanded="false"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="5" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="12" cy="19" r="1" />
         </svg>
       </button>
     </div>
@@ -79,12 +99,22 @@ const { mobileMenuType = 'standard' } = Astro.props;
   <form id="auth-form">
     <div class="app-dialog-body">
       <div class="auth-modal-field">
-        <label for="auth-email" class="auth-modal-label">Email</label>
+        <label for="auth-email" class="auth-modal-label">
+          Email
+        </label>
         <input type="email" id="auth-email" required class="auth-modal-input" />
       </div>
       <div class="auth-modal-field">
-        <label for="auth-password" class="auth-modal-label">Password</label>
-        <input type="password" id="auth-password" required minlength="6" class="auth-modal-input" />
+        <label for="auth-password" class="auth-modal-label">
+          Password
+        </label>
+        <input
+          type="password"
+          id="auth-password"
+          required
+          minlength="6"
+          class="auth-modal-input"
+        />
       </div>
       <div id="auth-error" class="auth-modal-error" hidden></div>
     </div>

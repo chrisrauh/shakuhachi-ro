@@ -20,8 +20,12 @@ if (!score) return new Response(null, { status: 404 });
 
   <div class="edit-layout">
     <div class="mobile-toggle">
-      <button id="toggle-preview" class="btn"><span class="btn-text">Preview</span></button>
-      <button id="toggle-editor" class="btn btn-primary"><span class="btn-text">Edit</span></button>
+      <button id="toggle-preview" class="btn">
+        <span class="btn-text">Preview</span>
+      </button>
+      <button id="toggle-editor" class="btn btn-primary">
+        <span class="btn-text">Edit</span>
+      </button>
     </div>
 
     <div class="preview-panel" id="preview-panel">
@@ -36,10 +40,13 @@ if (!score) return new Response(null, { status: 404 });
   <!-- Always embed score data — safe because 404 above ensures score is non-null.
        embedJson, not JSON.stringify: score fields are user-supplied and
        JSON.stringify does not escape `</script`. -->
-  <script id="score-data" type="application/json" is:inline set:html={embedJson({ score })}></script>
-
+  <script
+    id="score-data"
+    type="application/json"
+    is:inline
+    set:html={embedJson({ score })}
+  ></script>
   <script is:inline src="/embed/shakuhachi-score.js"></script>
-
   <script>
     import { ScoreEditor } from '../../../components/ScoreEditor';
     import { onAuthReady } from '../../../api/auth';
@@ -48,7 +55,9 @@ if (!score) return new Response(null, { status: 404 });
 
     // Simplified auth check — no "create mode" branch
     const checkAuthAndPermissions = (user: any) => {
-      const scoreData = JSON.parse(document.getElementById('score-data')!.textContent!);
+      const scoreData = JSON.parse(
+        document.getElementById('score-data')!.textContent!,
+      );
 
       if (!user) {
         window.location.href = `/score/${scoreData.score.slug}`;
@@ -56,7 +65,9 @@ if (!score) return new Response(null, { status: 404 });
       }
 
       if (user.id !== scoreData.score.user_id) {
-        toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, { duration: 2000 });
+        toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, {
+          duration: 2000,
+        });
         setTimeout(() => {
           window.location.href = `/score/${scoreData.score.slug}`;
         }, 2000);
@@ -69,10 +80,11 @@ if (!score) return new Response(null, { status: 404 });
     });
 
     // scoreId and slug always present — SSR 404 above ensures page is never served without a score
-    const scoreData = JSON.parse(document.getElementById('score-data')!.textContent!);
+    const scoreData = JSON.parse(
+      document.getElementById('score-data')!.textContent!,
+    );
     new ScoreEditor('score-editor', scoreData.score.id, scoreData.score.slug);
   </script>
-
   <style>
     .edit-layout {
       display: grid;
@@ -82,7 +94,9 @@ if (!score) return new Response(null, { status: 404 });
       padding: var(--spacing-medium);
     }
 
-    .mobile-toggle { display: none; }
+    .mobile-toggle {
+      display: none;
+    }
 
     .preview-panel,
     .editor-panel {
@@ -116,10 +130,14 @@ if (!score) return new Response(null, { status: 404 });
         margin-bottom: var(--spacing-medium);
       }
 
-      .mobile-toggle button { flex: 1; }
+      .mobile-toggle button {
+        flex: 1;
+      }
 
       .preview-panel.hidden,
-      .editor-panel.hidden { display: none; }
+      .editor-panel.hidden {
+        display: none;
+      }
     }
   </style>
 
