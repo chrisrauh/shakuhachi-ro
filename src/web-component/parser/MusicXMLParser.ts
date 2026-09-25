@@ -9,6 +9,23 @@ import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
+/**
+ * Converts a MusicXML <duration> to a ScoreNote duration (1 = quarter note).
+ *
+ * <duration> is counted in divisions, and it is the *sounding* length, so it
+ * already includes the dot. ScoreNote splits those apart: `duration` holds the
+ * base value and `dotted` extends it by half. A dotted note therefore divides
+ * back out by 1.5 to recover its base.
+ */
+function toBaseDuration(
+  raw: number,
+  divisions: number,
+  dotted: boolean,
+): number {
+  const sounding = raw / divisions;
+  return dotted ? sounding / 1.5 : sounding;
+}
+
 export class MusicXMLParser {
   /**
    * Parses a MusicXML file and converts to shakuhachi JSON format
@@ -28,24 +45,39 @@ export class MusicXMLParser {
     const composerElement = xmlDoc.querySelector('creator[type="composer"]');
     const composer = composerElement?.textContent || undefined;
 
+    // <divisions> is divisions-per-quarter-note. Absent means 1. A score may
+    // redefine it per measure; we read the first and apply it throughout,
+    // which matches how this parser already flattens every measure into one
+    // note list.
+    const divisionsValue = parseInt(
+      xmlDoc.querySelector('divisions')?.textContent ?? '',
+      10,
+    );
+    const divisions =
+      Number.isFinite(divisionsValue) && divisionsValue > 0
+        ? divisionsValue
+        : 1;
+
     // Extract all notes from all measures
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
 
     noteElements.forEach((noteElement, i) => {
+      const rawDuration = parseInt(
+        noteElement.querySelector('duration')?.textContent || '1',
+        10,
+      );
+      const isDotted = noteElement.querySelector('dot') !== null;
+      const duration = toBaseDuration(rawDuration, divisions, isDotted);
+
       // Check for rests
       const restElement = noteElement.querySelector('rest');
       if (restElement) {
-        // Extract duration for rest
-        const durationElement =
-          noteElement.querySelector('duration')?.textContent || '1';
-        const duration = parseInt(durationElement, 10);
-
-        // Create rest note (following MusicXML structure)
-        notes.push({
-          rest: true,
-          duration,
-        });
+        const rest: ScoreNote = { rest: true, duration };
+        if (isDotted) {
+          rest.dotted = true;
+        }
+        notes.push(rest);
         return;
       }
 
@@ -70,39 +102,13 @@ export class MusicXMLParser {
         return;
       }
 
-      // Extract duration (simplified - just map to basic durations)
-      const durationElement =
-        noteElement.querySelector('duration')?.textContent || '1';
-      const duration = parseInt(durationElement, 10);
-
-      // Check if note is dotted
-      const dotElement = noteElement.querySelector('dot');
-      const isDotted = dotElement !== null;
-
-      // Map MusicXML <duration> to a shakuhachi duration (1 = quarter).
-      //
-      // Two known limitations:
-      //  - <divisions> is ignored, so this assumes 1 division per quarter note.
-      //    MusicXMLSerializer writes 2, so a round trip doubles every duration
-      //    (see #350).
-      //  - Buckets are lossy and drop dots: 3 divisions is a dotted quarter but
-      //    lands on half. <dot> is read separately into `dotted`.
-      let shakuDuration: number;
-      if (duration >= 4) {
-        shakuDuration = 4; // whole
-      } else if (duration >= 2) {
-        shakuDuration = 2; // half
-      } else {
-        shakuDuration = 1; // quarter or shorter
-      }
-
       // Create note
       const note: ScoreNote = {
         pitch: {
           step: shakuPitch.step,
           octave: shakuPitch.octave,
         },
-        duration: shakuDuration,
+        duration,
       };
 
       // Add meri modifier if needed
