@@ -11,7 +11,11 @@ export {
   renderScoreFromURL,
   renderScore,
 } from './web-component/renderer/convenience';
-export type { RenderOptions } from './web-component/renderer/RenderOptions';
+export type {
+  RenderOptions,
+  ViewportOptions,
+  ResolvedRenderOptions,
+} from './web-component/renderer/RenderOptions';
 export {
   mergeWithDefaults,
   DEFAULT_RENDER_OPTIONS,

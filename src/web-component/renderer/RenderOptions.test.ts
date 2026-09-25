@@ -197,5 +197,14 @@ describe('RenderOptions', () => {
       expect(result.showOctaveMarks).toBe(false);
       expect(result.autoResize).toBe(false);
     });
+
+    it('should leave width and height unset unless provided', () => {
+      expect('width' in DEFAULT_RENDER_OPTIONS).toBe(false);
+      expect('height' in DEFAULT_RENDER_OPTIONS).toBe(false);
+
+      const result = mergeWithDefaults({ width: 640 });
+      expect(result.width).toBe(640);
+      expect('height' in result).toBe(false);
+    });
   });
 });

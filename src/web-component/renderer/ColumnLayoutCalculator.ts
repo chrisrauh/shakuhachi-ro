@@ -7,7 +7,7 @@
  */
 
 import type { ShakuNote } from '../notes/ShakuNote';
-import type { RenderOptions } from './RenderOptions';
+import type { ResolvedRenderOptions } from './RenderOptions';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 
 /**
@@ -95,7 +95,7 @@ export class ColumnLayoutCalculator {
     notes: ShakuNote[],
     svgWidth: number,
     svgHeight: number,
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): ColumnLayout {
     // Extract layout parameters from options
     const columnWidth = options.columnWidth;
@@ -170,7 +170,7 @@ export class ColumnLayoutCalculator {
     svgHeight: number,
     startY: number,
     verticalSpacing: number,
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): ColumnBreak[] {
     // Handle empty notes array
     if (notes.length === 0) {
@@ -246,7 +246,7 @@ export class ColumnLayoutCalculator {
     noteEndIndex: number,
     verticalSpacing: number,
     notes: ShakuNote[],
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): ColumnInfo {
     // Calculate column X position (reverse order: rightmost is first)
     const xPosition =
@@ -288,7 +288,7 @@ export class ColumnLayoutCalculator {
     startY: number,
     verticalSpacing: number,
     notes: ShakuNote[],
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): NotePosition[] {
     const positions: NotePosition[] = [];
     let currentY = startY;
