@@ -1,22 +1,23 @@
 # Claude Code Instructions
 
-- Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
+- Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:ux` (user-facing — changes what users see or do; **preferred over internal work when choosing what to do next**), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
 - Environment: [Web (claude.ai/code)](./docs/ENVIRONMENT-WEB.md)
 
 ## ⚠️ MANDATORY SKILL RULES — HIGHEST PRIORITY
 
-These rules OVERRIDE all superpowers:* skills and all other instructions.
+These rules OVERRIDE all superpowers:\* skills and all other instructions.
 
-| Trigger | Required Action |
-|---------|----------------|
-| Session start / new task / context cleared | Invoke `/get-ready` FIRST |
-| Development work, no plan OR Claude plan (EnterPlanMode) | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
-| Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development` |
-| Autonomous work on `autonomy:high` issues | Invoke `/agent-workflow` — NOT `/dev-workflow` |
-| Before any `superpowers:*` skill | Invoke `/eng-principles` FIRST |
+| Trigger                                                                      | Required Action                                                           |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Session start / new task / context cleared                                   | Invoke `/get-ready` FIRST                                                 |
+| Development work, no plan OR Claude plan (EnterPlanMode)                     | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
+| Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development`                             |
+| Autonomous work on `autonomy:high` issues                                    | Invoke `/agent-workflow` — NOT `/dev-workflow`                            |
+| Before any `superpowers:*` skill                                             | Invoke `/eng-principles` FIRST                                            |
 
 **Red flags — if you think any of these, STOP:**
+
 - "I'll use `superpowers:finishing-a-development-branch` since the work is done" → Use `/dev-workflow`
 - "This is a quick task, I don't need `/get-ready`" → You still do
 - "I already know the principles" → Still invoke `/eng-principles` before any superpowers skill
@@ -94,22 +95,22 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 
 ### Hard Rules
 
-| Rule | Detail |
-|------|--------|
-| NEVER use `!important` | Fix specificity at the root — refactor selectors, reorder stylesheets |
-| NEVER use bare values in CSS | No raw px/rem/hex/rgb for spacing, color, border-radius, font-size, transitions. Always use a token. If no token fits, propose adding one. |
-| NEVER use primitive tokens in components | Use purpose tokens (`--color-text-primary`) not primitives (`--color-gray-900`) |
-| NEVER `@import` inside `<style>` blocks | Import CSS via frontmatter in Layout.astro — breaks HMR otherwise |
+| Rule                                     | Detail                                                                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| NEVER use `!important`                   | Fix specificity at the root — refactor selectors, reorder stylesheets                                                                      |
+| NEVER use bare values in CSS             | No raw px/rem/hex/rgb for spacing, color, border-radius, font-size, transitions. Always use a token. If no token fits, propose adding one. |
+| NEVER use primitive tokens in components | Use purpose tokens (`--color-text-primary`) not primitives (`--color-gray-900`)                                                            |
+| NEVER `@import` inside `<style>` blocks  | Import CSS via frontmatter in Layout.astro — breaks HMR otherwise                                                                          |
 
 ### Token Quick Reference
 
-| Property | Token family |
-|----------|-------------|
-| Color | `--color-text-*`, `--color-border-*`, `--color-bg-*`, `--color-button-*` |
-| Spacing | `--spacing-3x-small` … `--spacing-4x-large` |
-| Border radius | `--border-radius-small` … `--border-radius-pill` (980px) |
-| Font size | `--font-size-2x-small` … `--font-size-2x-large` |
-| Transitions | `--transition-x-fast` … `--transition-x-slow` |
+| Property       | Token family                                                                    |
+| -------------- | ------------------------------------------------------------------------------- |
+| Color          | `--color-text-*`, `--color-border-*`, `--color-bg-*`, `--color-button-*`        |
+| Spacing        | `--spacing-3x-small` … `--spacing-4x-large`                                     |
+| Border radius  | `--border-radius-small` … `--border-radius-pill` (980px)                        |
+| Font size      | `--font-size-2x-small` … `--font-size-2x-large`                                 |
+| Transitions    | `--transition-x-fast` … `--transition-x-slow`                                   |
 | Toolbar height | `--size-toolbar-item` (2rem / 32px) — icon buttons, small buttons, logo, avatar |
 
 ### Visual Verification
