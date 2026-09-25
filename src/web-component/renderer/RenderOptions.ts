@@ -2,7 +2,7 @@
  * RenderOptions - Configuration interface for ScoreRenderer
  *
  * Provides type-safe configuration for all aspects of shakuhachi score rendering.
- * All options are optional - defaults will be applied from layout-constants.ts.
+ * All options are optional - defaults come from DEFAULT_RENDER_OPTIONS below.
  *
  * Following "Explicit Over Implicit" principle - all configuration is visible
  * and documented in one place.
@@ -78,8 +78,7 @@ export interface RenderOptions extends ViewportOptions {
 
   /**
    * Top margin in pixels to prevent octave mark clipping
-   * If not specified, calculated dynamically based on octave mark size
-   * @default Math.abs(OCTAVE_MARK.offsetY) + OCTAVE_MARK.fontSize
+   * @default 34 (|octaveMarkOffsetY| + octaveMarkFontSize with the default values)
    */
   topMargin?: number;
 
@@ -232,7 +231,6 @@ export type ResolvedRenderOptions = Required<
 
 /**
  * Default values for all render options
- * Sourced from layout-constants.ts
  */
 export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   // Display options

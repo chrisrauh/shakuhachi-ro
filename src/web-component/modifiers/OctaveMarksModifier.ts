@@ -24,11 +24,11 @@ export class OctaveMarksModifier extends Modifier {
   /** Octave register indicator */
   private register: OctaveRegister;
 
-  /** Font size for the octave mark (smaller than main note) */
-  private fontSize: number = 12;
+  /** Font size — overridden by ModifierConfigurator from render options */
+  private fontSize: number = DEFAULT_RENDER_OPTIONS.octaveMarkFontSize;
 
-  /** Font weight for the octave mark */
-  private fontWeight: number = 500;
+  /** Font weight — overridden by ModifierConfigurator from render options */
+  private fontWeight: number = DEFAULT_RENDER_OPTIONS.octaveMarkFontWeight;
 
   /** Font family — overridden by ModifierConfigurator from render options */
   private fontFamily: string = DEFAULT_RENDER_OPTIONS.noteFontFamily;
