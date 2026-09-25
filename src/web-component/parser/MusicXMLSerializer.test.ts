@@ -87,10 +87,10 @@ describe('MusicXMLSerializer', () => {
       const xml = MusicXMLSerializer.serialize(scoreData);
 
       expect(xml).toContain('<rest/>');
-      expect(xml).toContain('<duration>4</duration>'); // 2 * 2 divisions
+      expect(xml).toContain('<duration>16</duration>'); // 2 quarters * 8 divisions
     });
 
-    it('should serialize dotted notes', () => {
+    it('should serialize dotted notes with the sounding duration', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
@@ -102,6 +102,26 @@ describe('MusicXMLSerializer', () => {
       const xml = MusicXMLSerializer.serialize(scoreData);
 
       expect(xml).toContain('<dot/>');
+      // <duration> is the sounding length and includes the dot:
+      // 1 quarter * 1.5 * 8 divisions
+      expect(xml).toContain('<duration>12</duration>');
+      // ...while <type> stays the base value.
+      expect(xml).toContain('<type>quarter</type>');
+    });
+
+    it('should order note children per the MusicXML DTD (type before dot)', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1, dotted: true },
+        ],
+      };
+
+      const xml = MusicXMLSerializer.serialize(scoreData);
+
+      expect(xml.indexOf('<type>')).toBeLessThan(xml.indexOf('<dot/>'));
+      expect(xml.indexOf('<duration>')).toBeLessThan(xml.indexOf('<type>'));
     });
 
     it('should serialize different durations with correct types', () => {
@@ -171,6 +191,29 @@ describe('MusicXMLSerializer', () => {
 
       // Should preserve dotted flag
       expect(reparsed.notes[3].dotted).toBe(true);
+
+      // Should preserve durations. Asserting only structure is what let the
+      // <divisions> bug survive: every duration used to come back doubled.
+      expect(reparsed.notes.map((n) => n.duration)).toEqual([2, 1, 1, 1]);
+    });
+
+    it('should round-trip every supported duration exactly, dotted and plain', () => {
+      const durations = [4, 2, 1, 0.5, 0.25];
+      const notes: ScoreData['notes'] = durations.flatMap((duration) => [
+        { pitch: { step: 'ro' as const, octave: 0 }, duration },
+        { pitch: { step: 'ro' as const, octave: 0 }, duration, dotted: true },
+      ]);
+
+      const reparsed = MusicXMLParser.parse(
+        MusicXMLSerializer.serialize({ title: 'Durations', notes }),
+      );
+
+      expect(reparsed.notes.map((n) => n.duration)).toEqual(
+        notes.map((n) => n.duration),
+      );
+      expect(reparsed.notes.map((n) => n.dotted ?? false)).toEqual(
+        notes.map((n) => n.dotted ?? false),
+      );
     });
   });
 });

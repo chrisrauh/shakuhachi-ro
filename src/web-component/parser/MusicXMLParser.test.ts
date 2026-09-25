@@ -40,8 +40,13 @@ function makeNote(
   </note>`;
 }
 
-function makeRest(duration = 2): string {
-  return `<note><rest/><duration>${duration}</duration></note>`;
+function makeRest(duration = 2, extras = ''): string {
+  return `<note><rest/><duration>${duration}</duration>${extras}</note>`;
+}
+
+/** An <attributes> block declaring divisions-per-quarter-note. */
+function makeAttributes(divisions: number): string {
+  return `<attributes><divisions>${divisions}</divisions></attributes>`;
 }
 
 describe('MusicXMLParser', () => {
@@ -74,6 +79,44 @@ describe('MusicXMLParser', () => {
       expect(score.notes).toHaveLength(1);
       expect(score.notes[0].rest).toBe(true);
       expect(score.notes[0].duration).toBe(4);
+    });
+
+    it('should scale duration by <divisions>', () => {
+      // 4 divisions at 4-per-quarter is one quarter note, not a whole note.
+      const xml = makeXML(makeAttributes(4) + makeNote('D', 4, 4));
+
+      const score = MusicXMLParser.parse(xml);
+
+      expect(score.notes[0].duration).toBe(1);
+    });
+
+    it('should default to 1 division per quarter when <divisions> is absent', () => {
+      const xml = makeXML(makeNote('D', 4, 2));
+
+      const score = MusicXMLParser.parse(xml);
+
+      expect(score.notes[0].duration).toBe(2);
+    });
+
+    it('should split a dotted duration into base duration + dotted flag', () => {
+      // How other notation software writes a dotted quarter: <duration> is the
+      // sounding length (3 half-quarters), with the dot carried separately.
+      const xml = makeXML(makeAttributes(2) + makeNote('D', 4, 3, '<dot/>'));
+
+      const score = MusicXMLParser.parse(xml);
+
+      expect(score.notes[0].duration).toBe(1);
+      expect(score.notes[0].dotted).toBe(true);
+    });
+
+    it('should apply divisions and the dot to rests as well as notes', () => {
+      const xml = makeXML(makeAttributes(2) + makeRest(6, '<dot/>'));
+
+      const score = MusicXMLParser.parse(xml);
+
+      expect(score.notes[0].rest).toBe(true);
+      expect(score.notes[0].duration).toBe(2);
+      expect(score.notes[0].dotted).toBe(true);
     });
 
     it('should produce dotted: true for note with <dot> element', () => {
