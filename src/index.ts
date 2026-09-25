@@ -39,6 +39,7 @@ export type { VerticalSystemOptions } from './web-component/renderer/VerticalSys
 
 // Parser exports
 export { ScoreParser } from './web-component/parser/ScoreParser';
+export { MusicXMLParser } from './web-component/parser/MusicXMLParser';
 
 // Note exports
 export { ShakuNote } from './web-component/notes/ShakuNote';

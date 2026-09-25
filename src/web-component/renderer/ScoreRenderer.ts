@@ -12,7 +12,6 @@
 
 import type { ScoreData } from '../types/ScoreData';
 import type { ShakuNote } from '../notes/ShakuNote';
-import { MusicXMLParser } from '../parser/MusicXMLParser';
 import { ScoreParser } from '../parser/ScoreParser';
 import { SVGRenderer } from './SVGRenderer';
 import { ModifierConfigurator } from './ModifierConfigurator';
@@ -64,18 +63,6 @@ export class ScoreRenderer {
     if (this.options.autoResize) {
       this.setupResizeObserver();
     }
-  }
-
-  /**
-   * Renders a score from a MusicXML URL
-   *
-   * @param url - URL to MusicXML file
-   * @returns Promise that resolves when rendering is complete
-   */
-  async renderFromURL(url: string): Promise<void> {
-    const scoreData = await MusicXMLParser.parseFromURL(url);
-    this.currentScoreData = scoreData;
-    await this.renderFromScoreData(scoreData);
   }
 
   /**

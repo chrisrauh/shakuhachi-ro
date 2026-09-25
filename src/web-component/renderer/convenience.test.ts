@@ -71,6 +71,17 @@ describe('Convenience Functions', () => {
       expect(container.querySelector('svg')).toBeTruthy();
     });
 
+    it('should reject without rendering when parsing fails', async () => {
+      vi.mocked(MusicXMLParser.parseFromURL).mockRejectedValueOnce(
+        new Error('Failed to load MusicXML: 404 Not Found'),
+      );
+
+      await expect(
+        renderScoreFromURL(container, '/data/missing.musicxml'),
+      ).rejects.toThrow('404');
+      expect(container.querySelector('svg')).toBeNull();
+    });
+
     it('should render with default options', async () => {
       const renderer = await renderScoreFromURL(
         container,

@@ -57,14 +57,14 @@ renderer.setOptions({ showDebugLabels: true });
 
 **Class-based API:**
 ```typescript
-import { ScoreRenderer } from 'shakuhachi-ro';
+import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
 
 const renderer = new ScoreRenderer(container, {
   notesPerColumn: 8,
   showOctaveMarks: false
 });
 
-await renderer.renderFromURL('/score.musicxml');
+await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 ```
 
 ## Best Practices
@@ -125,11 +125,11 @@ new ScoreRenderer(container, {
 **Don't ignore errors:**
 ```typescript
 // Bad - silently fails
-await renderer.renderFromURL('/score.musicxml');
+await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 
 // Good - handle errors
 try {
-  await renderer.renderFromURL('/score.musicxml');
+  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 } catch (error) {
   console.error('Failed to load score:', error);
   showErrorToUser(error.message);
@@ -152,7 +152,7 @@ import { ScoreRenderer } from 'shakuhachi-ro';
 **React:**
 ```typescript
 import { useEffect, useRef } from 'react';
-import { ScoreRenderer } from 'shakuhachi-ro';
+import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
 
 function ScoreView({ scoreUrl, options }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -164,9 +164,11 @@ function ScoreView({ scoreUrl, options }) {
     const renderer = new ScoreRenderer(containerRef.current, options);
     rendererRef.current = renderer;
 
-    renderer.renderFromURL(scoreUrl).catch(error => {
-      console.error('Failed to render:', error);
-    });
+    MusicXMLParser.parseFromURL(scoreUrl)
+      .then((scoreData) => renderer.renderFromScoreData(scoreData))
+      .catch((error) => {
+        console.error('Failed to render:', error);
+      });
 
     return () => {
       renderer.destroy();
@@ -180,7 +182,7 @@ function ScoreView({ scoreUrl, options }) {
 **Vue 3:**
 ```typescript
 import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { ScoreRenderer } from 'shakuhachi-ro';
+import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
 
 export default {
   setup(props) {
@@ -195,7 +197,7 @@ export default {
       });
 
       try {
-        await renderer.renderFromURL(props.scoreUrl);
+        await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(props.scoreUrl));
       } catch (error) {
         console.error('Render failed:', error);
       }
@@ -227,7 +229,7 @@ class ScoreWidget {
 
   async loadScore(url: string): Promise<void> {
     try {
-      await this.renderer.renderFromURL(url);
+      await this.renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
     } catch (error) {
       this.handleError(error);
     }
@@ -290,7 +292,7 @@ updateLayout();
 ```typescript
 async function loadScore(url: string) {
   try {
-    await renderer.renderFromURL(url);
+    await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
   } catch (error) {
     if (error instanceof Error && error.message.includes('404')) {
       showMessage('Score not found');
@@ -309,7 +311,7 @@ async function loadScore(url: string) {
 async function loadScoreWithRetry(url: string, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      await renderer.renderFromURL(url);
+      await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
       return;
     } catch (error) {
       if (i === maxRetries - 1) throw error;
@@ -385,22 +387,6 @@ const renderer = new ScoreRenderer(
 ```
 
 ### Methods
-
-#### renderFromURL()
-
-```typescript
-async renderFromURL(url: string): Promise<void>
-```
-
-Loads and renders a score from a MusicXML URL.
-
-**Parameters:**
-- `url`: Path to MusicXML file
-
-**Example:**
-```typescript
-await renderer.renderFromURL('/data/Akatombo.musicxml');
-```
 
 #### renderFromScoreData()
 
@@ -903,6 +889,20 @@ new ShakuNote(options: ShakuNoteOptions)
 
 ## Advanced APIs
 
+### MusicXMLParser
+
+Fetches and parses MusicXML into ScoreData. `ScoreRenderer` only renders ScoreData, so to load a URL into an existing renderer, parse first. `renderScoreFromURL()` does both in one call.
+
+```typescript
+import { MusicXMLParser } from 'shakuhachi-ro';
+
+const scoreData = await MusicXMLParser.parseFromURL('/data/Akatombo.musicxml');
+await renderer.renderFromScoreData(scoreData);
+
+// Or from a string you already have
+const fromString = MusicXMLParser.parse(xmlString);
+```
+
 ### ScoreParser
 
 Converts ScoreData to ShakuNote arrays. Used internally by ScoreRenderer.
@@ -970,7 +970,7 @@ All async methods can throw errors. Always use try/catch:
 
 ```typescript
 try {
-  await renderer.renderFromURL('/score.musicxml');
+  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 } catch (error) {
   console.error('Failed to render:', error);
   container.innerHTML = `<div class="error">${error.message}</div>`;
@@ -1141,13 +1141,13 @@ oldRenderer.destroy(); // Free memory
 // Bad - creates new renderer each time
 function displayScore(url) {
   const renderer = new ScoreRenderer(container);
-  await renderer.renderFromURL(url);
+  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
 }
 
 // Good - reuse renderer
 const renderer = new ScoreRenderer(container);
 function displayScore(url) {
-  await renderer.renderFromURL(url); // Clears and re-renders
+  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url)); // Clears and re-renders
 }
 ```
 
@@ -1156,7 +1156,7 @@ function displayScore(url) {
 **Measure render time:**
 ```typescript
 const start = performance.now();
-await renderer.renderFromURL('/score.musicxml');
+await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 const duration = performance.now() - start;
 console.log(`Rendered in ${duration.toFixed(2)}ms`);
 ```
@@ -1164,7 +1164,7 @@ console.log(`Rendered in ${duration.toFixed(2)}ms`);
 **Profile in DevTools:**
 ```typescript
 performance.mark('render-start');
-await renderer.renderFromURL('/score.musicxml');
+await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 performance.mark('render-end');
 performance.measure('score-render', 'render-start', 'render-end');
 ```

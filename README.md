@@ -74,14 +74,14 @@ await renderScoreFromURL(container, '/score.musicxml', {
 ### Class-Based API
 
 ```javascript
-import { ScoreRenderer } from 'shakuhachi-ro';
+import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
 
 const renderer = new ScoreRenderer(container, {
   notesPerColumn: 10,
   showOctaveMarks: true,
 });
 
-await renderer.renderFromURL('/score.musicxml');
+await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
 
 // Dynamic updates
 renderer.setOptions({ showDebugLabels: true });
@@ -250,13 +250,16 @@ renderScore(container, scoreData, options?): Promise<ScoreRenderer>
 
 // Class-based (for more control)
 new ScoreRenderer(container, options?)
-  .renderFromURL(url): Promise<void>
   .renderFromScoreData(scoreData): Promise<void>
   .renderNotes(notes): void
   .setOptions(options, autoRefresh?): void
   .refresh(): void
   .resize(width, height): void
   .clear(): void
+
+// Parsing (feed the result to renderFromScoreData)
+MusicXMLParser.parseFromURL(url): Promise<ScoreData>
+MusicXMLParser.parse(xml): ScoreData
 ```
 
 ### Note Symbols (Kinko-ryū)
