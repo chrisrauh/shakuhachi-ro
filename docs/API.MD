@@ -23,7 +23,6 @@ Complete API reference for the Shakuhachi Score Renderer.
 **Internal APIs (Not Recommended):**
 - `ScoreParser` (used internally by ScoreRenderer)
 - kinko-symbols utilities (implementation details)
-- `TestModifier` (testing only)
 
 ## Quick Start
 
