@@ -44,7 +44,6 @@ const DEFAULT_VIEWPORT = { width: 800, height: 600 } as const;
 export class ScoreRenderer {
   private container: HTMLElement;
   private options: ResolvedRenderOptions;
-  private renderer: SVGRenderer | null = null;
   private currentNotes: ShakuNote[] = [];
   private currentScoreData: ScoreData | null = null;
   private resizeObserver?: ResizeObserver;
@@ -97,7 +96,7 @@ export class ScoreRenderer {
     // Get viewport dimensions
     const { width, height } = this.getViewportDimensions();
 
-    this.renderer = new SVGRenderer(this.container, width, height);
+    const renderer = new SVGRenderer(this.container, width, height);
 
     // Configure modifiers based on options
     ModifierConfigurator.configureModifiers(notes, this.options);
@@ -128,11 +127,11 @@ export class ScoreRenderer {
         note.setFontWeight(this.options.noteFontWeight);
         note.setFontFamily(this.options.noteFontFamily);
         note.setPosition(x, y);
-        note.render(this.renderer!);
+        note.render(renderer);
 
         // Render debug label if enabled
         if (this.options.showDebugLabels) {
-          this.renderDebugLabel(note, notePosition.noteIndex, x, y);
+          this.renderDebugLabel(renderer, note, notePosition.noteIndex, x, y);
         }
       });
     });
@@ -143,19 +142,19 @@ export class ScoreRenderer {
    *
    * Shows note index, romanji, octave, and meri info
    *
+   * @param renderer - SVGRenderer to draw into
    * @param note - ShakuNote to create label for
    * @param globalIndex - Global index of note in score
    * @param x - X position of note
    * @param y - Y position of note
    */
   private renderDebugLabel(
+    renderer: SVGRenderer,
     note: ShakuNote,
     globalIndex: number,
     x: number,
     y: number,
   ): void {
-    if (!this.renderer) return;
-
     const symbolInfo = note.getSymbolInfo();
     const isRest = !symbolInfo;
     const romanji = isRest ? 'rest' : symbolInfo?.romaji || 'unknown';
@@ -178,7 +177,7 @@ export class ScoreRenderer {
 
     const label = `${globalIndex + 1} ${romanji} ${octave} ${meriInfo}`.trim();
 
-    this.renderer.drawText(
+    renderer.drawText(
       label,
       x + this.options.debugLabelOffsetX,
       y + this.options.debugLabelOffsetY,
@@ -282,7 +281,6 @@ export class ScoreRenderer {
    */
   clear(): void {
     this.container.innerHTML = '';
-    this.renderer = null;
     this.currentNotes = [];
     this.currentScoreData = null;
   }
