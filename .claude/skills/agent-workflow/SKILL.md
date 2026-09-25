@@ -72,6 +72,7 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
   - Zero tolerance for scope creep — reviewability depends on it
 
   New issues get the matching `area:*` and `autonomy:*` labels, plus `type:ux` if the issue changes what users see or do, and no `focus` label (that is a human prioritization call):
+
   ```bash
   gh issue create --title "..." --body-file tmp/issue-body.md --label "area:renderer" --label "autonomy:medium"
   ```
@@ -93,6 +94,7 @@ npm test
 Read the **entire** output — type-check, lint, and vitest must all pass.
 
 **If tests fail:**
+
 - Attempt to fix (max 2 tries)
 - If still failing after 2 attempts: commit the work-in-progress, create a draft PR with failure details, clean up the worktree, stop
 - Never push known-failing code as a non-draft PR
@@ -102,6 +104,7 @@ Read the **entire** output — type-check, lint, and vitest must all pass.
 ## Phase 5: Visual Changes (if applicable)
 
 If the task touches UI:
+
 - Use `chrome-devtools-mcp` to verify visually (light + dark mode)
 - Run `npm run test:visual`
 - **If baselines fail:** do NOT wait for approval — note the failing tests in the PR body and mark the PR as draft
@@ -112,53 +115,64 @@ If the task touches UI:
 ## Phase 6: Review, Commit + PR
 
 **Step 1: Self-review the diff.** Use `superpowers:requesting-code-review` to review your own changes before committing. Verify:
+
 - Changes match the task description — nothing more, nothing less
 - No scope creep, no accidental edits
 - Code quality meets project standards (`/eng-principles`)
 
 **Step 2: Commit** with a clean message:
-   ```bash
-   git add <specific files>
-   git commit -m "concise description"
-   ```
-   - No `Co-Authored-By: Claude` or any attribution
-   - No heredocs, no `&&`, no `$()` — sequential Bash calls only
+
+```bash
+git add <specific files>
+git commit -m "concise description"
+```
+
+- No `Co-Authored-By: Claude` or any attribution
+- No heredocs, no `&&`, no `$()` — sequential Bash calls only
 
 **Step 3:** Push and create PR — no need to ask:
-   - Write PR body to `tmp/pr-body.md` using the Write tool
-   - **The body must contain `Closes #<n>`** for the issue you worked on. That is what closes it on merge; there is no separate bookkeeping step.
-   - `git push -u origin <branch>`
-   - `gh pr create --title "..." --body-file tmp/pr-body.md`
-   - Delete `tmp/pr-body.md`
+
+- Write PR body to `tmp/pr-body.md` using the Write tool
+- **The body must contain `Closes #<n>`** for the issue you worked on. That is what closes it on merge; there is no separate bookkeeping step.
+- `git push -u origin <branch>`
+- `gh pr create --title "..." --body-file tmp/pr-body.md`
+- Delete `tmp/pr-body.md`
 
 **Step 4: Remove the worktree.** Safe to run as soon as the PR exists — it touches nothing on the remote:
-   ```bash
-   git worktree remove .claude/worktrees/<name>
-   ```
+
+```bash
+git worktree remove .claude/worktrees/<name>
+```
 
 **Step 5: Leave the branch alone.** The PR you just opened uses it as head. Deleting a branch on GitHub closes every open PR that uses it as head or base, and a PR closed this way cannot be reopened once its head has been force-pushed — the work is orphaned.
 
-   Branch deletion is gated on the PR actually being merged. All three checks must pass first:
-   ```bash
-   gh pr view <branch> --json state,mergedAt
-   ```
-   ```bash
-   gh pr list --head <branch>
-   ```
-   ```bash
-   gh pr list --base <branch>
-   ```
-   `state` must be `MERGED` with a non-null `mergedAt`, and both list commands must come back empty — a non-empty `--base` result means a stacked PR targets this branch.
+Branch deletion is gated on the PR actually being merged. All three checks must pass first:
 
-   Only when all three pass:
-   ```bash
-   git branch -d <branch>
-   ```
-   ```bash
-   git push origin --delete <branch>
-   ```
+```bash
+gh pr view <branch> --json state,mergedAt
+```
 
-   In the normal autonomous flow the PR is still open when you finish, so both branches stay in place. That is the expected end state, not a missed step.
+```bash
+gh pr list --head <branch>
+```
+
+```bash
+gh pr list --base <branch>
+```
+
+`state` must be `MERGED` with a non-null `mergedAt`, and both list commands must come back empty — a non-empty `--base` result means a stacked PR targets this branch.
+
+Only when all three pass:
+
+```bash
+git branch -d <branch>
+```
+
+```bash
+git push origin --delete <branch>
+```
+
+In the normal autonomous flow the PR is still open when you finish, so both branches stay in place. That is the expected end state, not a missed step.
 
 **Step 6:** Report the PR URL and stop. **Never merge.**
 
@@ -166,30 +180,30 @@ If the task touches UI:
 
 ## NEVER
 
-| Rule | Detail |
-|------|--------|
-| NEVER pick `autonomy:medium` or `autonomy:low` issues | Those require human direction via `/dev-workflow` |
-| NEVER merge | Hard stop — wait for human |
-| NEVER delete the branch of the PR you just opened | Deletion is gated on merge. In the normal flow the PR is still open when you finish — leave the branch in place |
+| Rule                                                   | Detail                                                                                                                                                                    |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NEVER pick `autonomy:medium` or `autonomy:low` issues  | Those require human direction via `/dev-workflow`                                                                                                                         |
+| NEVER merge                                            | Hard stop — wait for human                                                                                                                                                |
+| NEVER delete the branch of the PR you just opened      | Deletion is gated on merge. In the normal flow the PR is still open when you finish — leave the branch in place                                                           |
 | NEVER delete a branch any open PR uses as head or base | Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. Deleting it auto-closes that PR, and it cannot be reopened once its head has been force-pushed |
-| NEVER fix adjacent problems | Open a new issue, stay in scope |
-| NEVER omit `Closes #<n>` from the PR body | That link is what closes the issue on merge |
-| NEVER use `worktree-*` as a branch prefix | Use `feature/<slug>` |
-| NEVER use `&&`, heredocs, or `$()` in Bash | Sequential calls only |
-| NEVER add Claude attribution to commits or PRs | Clean messages only |
-| NEVER push a non-draft PR with failing tests | Use draft + failure notes instead |
-| NEVER skip TDD because "it's simple" | Use the strict skip rule — only skip when there is no new logic |
-| NEVER skip self-review before committing | Use `superpowers:requesting-code-review` on your diff |
-| NEVER claim tests pass without full verification | Use `superpowers:verification-before-completion` |
-| NEVER skip `npm test` | Full suite — type-check + lint + vitest |
+| NEVER fix adjacent problems                            | Open a new issue, stay in scope                                                                                                                                           |
+| NEVER omit `Closes #<n>` from the PR body              | That link is what closes the issue on merge                                                                                                                               |
+| NEVER use `worktree-*` as a branch prefix              | Use `feature/<slug>`                                                                                                                                                      |
+| NEVER use `&&`, heredocs, or `$()` in Bash             | Sequential calls only                                                                                                                                                     |
+| NEVER add Claude attribution to commits or PRs         | Clean messages only                                                                                                                                                       |
+| NEVER push a non-draft PR with failing tests           | Use draft + failure notes instead                                                                                                                                         |
+| NEVER skip TDD because "it's simple"                   | Use the strict skip rule — only skip when there is no new logic                                                                                                           |
+| NEVER skip self-review before committing               | Use `superpowers:requesting-code-review` on your diff                                                                                                                     |
+| NEVER claim tests pass without full verification       | Use `superpowers:verification-before-completion`                                                                                                                          |
+| NEVER skip `npm test`                                  | Full suite — type-check + lint + vitest                                                                                                                                   |
 
 ---
 
 ## Failure Protocol
 
-| Situation | Action |
-|-----------|--------|
-| Issue too vague | Comment on the issue, drop its `autonomy:high` label, remove worktree (see Phase 2 early exit), stop |
-| Tests fail after 2 fix attempts | Draft PR with failure details, stop |
-| Visual baselines fail | Draft PR with baseline note, stop |
-| No open `autonomy:high` issues remain | Report back, stop |
+| Situation                             | Action                                                                                               |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Issue too vague                       | Comment on the issue, drop its `autonomy:high` label, remove worktree (see Phase 2 early exit), stop |
+| Tests fail after 2 fix attempts       | Draft PR with failure details, stop                                                                  |
+| Visual baselines fail                 | Draft PR with baseline note, stop                                                                    |
+| No open `autonomy:high` issues remain | Report back, stop                                                                                    |
