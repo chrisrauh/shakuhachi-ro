@@ -497,7 +497,7 @@ renderer.resize(1000, 800);
 #### getOptions()
 
 ```typescript
-getOptions(): Required<RenderOptions>
+getOptions(): ResolvedRenderOptions
 ```
 
 Returns a copy of current render options.
@@ -708,10 +708,10 @@ interface RenderOptions {
 #### mergeWithDefaults()
 
 ```typescript
-function mergeWithDefaults(options?: RenderOptions): Required<RenderOptions>
+function mergeWithDefaults(options?: RenderOptions): ResolvedRenderOptions
 ```
 
-Merges user options with defaults.
+Merges user options with defaults. `ResolvedRenderOptions` has every option defined except `width` and `height`, which stay optional (auto-detected from the container when unset).
 
 **Example:**
 ```typescript
@@ -725,7 +725,7 @@ const options = mergeWithDefaults({ notesPerColumn: 8 });
 #### DEFAULT_RENDER_OPTIONS
 
 ```typescript
-const DEFAULT_RENDER_OPTIONS: Required<RenderOptions>
+const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions
 ```
 
 Default configuration values.
@@ -789,7 +789,7 @@ static calculateLayout(
   notes: ShakuNote[],
   svgWidth: number,
   svgHeight: number,
-  options: Required<RenderOptions>
+  options: ResolvedRenderOptions
 ): ColumnLayout
 ```
 
@@ -846,7 +846,7 @@ Configures note modifiers.
 ```typescript
 static configureModifiers(
   notes: ShakuNote[],
-  options: Required<RenderOptions>
+  options: ResolvedRenderOptions
 ): void
 ```
 

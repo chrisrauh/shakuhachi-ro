@@ -14,9 +14,29 @@ import {
 } from '../constants/notation-fonts';
 
 /**
+ * SVG viewport dimensions. Kept separate from the other options because they
+ * have no default: when unset, dimensions are auto-detected from the container.
+ */
+export interface ViewportOptions {
+  /**
+   * SVG viewport width in pixels
+   * If not specified, uses container element dimensions
+   * @default undefined (auto-detect from container)
+   */
+  width?: number;
+
+  /**
+   * SVG viewport height in pixels
+   * If not specified, uses container element dimensions
+   * @default undefined (auto-detect from container)
+   */
+  height?: number;
+}
+
+/**
  * Configuration options for rendering shakuhachi scores
  */
-export interface RenderOptions {
+export interface RenderOptions extends ViewportOptions {
   // =========================================================================
   // Display Options
   // =========================================================================
@@ -190,22 +210,8 @@ export interface RenderOptions {
   debugLabelColor?: string;
 
   // =========================================================================
-  // Viewport Options
+  // Viewport Options (width/height live in ViewportOptions)
   // =========================================================================
-
-  /**
-   * SVG viewport width in pixels
-   * If not specified, uses container element dimensions
-   * @default undefined (auto-detect from container)
-   */
-  width?: number;
-
-  /**
-   * SVG viewport height in pixels
-   * If not specified, uses container element dimensions
-   * @default undefined (auto-detect from container)
-   */
-  height?: number;
 
   /**
    * Automatically re-render when container size changes.
@@ -216,10 +222,19 @@ export interface RenderOptions {
 }
 
 /**
+ * Render options after defaults are applied: every option is defined except
+ * the viewport dimensions, which stay optional.
+ */
+export type ResolvedRenderOptions = Required<
+  Omit<RenderOptions, keyof ViewportOptions>
+> &
+  ViewportOptions;
+
+/**
  * Default values for all render options
  * Sourced from layout-constants.ts
  */
-export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
+export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   // Display options
   showOctaveMarks: true,
   showDebugLabels: false,
@@ -257,9 +272,7 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
   debugLabelFontFamily: 'monospace',
   debugLabelColor: '#999',
 
-  // Viewport options
-  width: undefined as any, // Will be auto-detected
-  height: undefined as any, // Will be auto-detected
+  // Viewport options (width/height are auto-detected when unset)
   autoResize: true,
 };
 
@@ -267,11 +280,11 @@ export const DEFAULT_RENDER_OPTIONS: Required<RenderOptions> = {
  * Merges user-provided options with defaults
  *
  * @param options - User-provided options (partial)
- * @returns Complete options object with all values defined
+ * @returns Options with all values defined except width/height
  */
 export function mergeWithDefaults(
   options: RenderOptions = {},
-): Required<RenderOptions> {
+): ResolvedRenderOptions {
   return {
     ...DEFAULT_RENDER_OPTIONS,
     ...options,

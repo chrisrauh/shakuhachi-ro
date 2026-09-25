@@ -7,7 +7,7 @@
  */
 
 import type { ShakuNote } from '../notes/ShakuNote';
-import type { RenderOptions } from './RenderOptions';
+import type { ResolvedRenderOptions } from './RenderOptions';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
@@ -39,7 +39,7 @@ export class ModifierConfigurator {
    */
   static configureModifiers(
     notes: ShakuNote[],
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): void {
     notes.forEach((note) => {
       // Octave marks are the only modifier that can be switched off entirely
@@ -79,7 +79,7 @@ export class ModifierConfigurator {
    */
   private static configureOctaveMark(
     modifier: OctaveMarksModifier,
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): void {
     modifier
       .setFontSize(options.octaveMarkFontSize)
@@ -96,7 +96,7 @@ export class ModifierConfigurator {
    */
   private static configureMeriKariMark(
     modifier: MeriKariModifier,
-    options: Required<RenderOptions>,
+    options: ResolvedRenderOptions,
   ): void {
     modifier
       .setFontSize(options.meriKariFontSize)

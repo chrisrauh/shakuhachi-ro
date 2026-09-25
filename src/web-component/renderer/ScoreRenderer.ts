@@ -17,7 +17,11 @@ import { ScoreParser } from '../parser/ScoreParser';
 import { SVGRenderer } from './SVGRenderer';
 import { ModifierConfigurator } from './ModifierConfigurator';
 import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
-import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
+import {
+  mergeWithDefaults,
+  type RenderOptions,
+  type ResolvedRenderOptions,
+} from './RenderOptions';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 
@@ -40,7 +44,7 @@ const DEFAULT_VIEWPORT = { width: 800, height: 600 } as const;
  */
 export class ScoreRenderer {
   private container: HTMLElement;
-  private options: Required<RenderOptions>;
+  private options: ResolvedRenderOptions;
   private renderer: SVGRenderer | null = null;
   private currentNotes: ShakuNote[] = [];
   private currentScoreData: ScoreData | null = null;
@@ -264,7 +268,7 @@ export class ScoreRenderer {
    *
    * @returns Current options
    */
-  getOptions(): Required<RenderOptions> {
+  getOptions(): ResolvedRenderOptions {
     return { ...this.options };
   }
 
