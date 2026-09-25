@@ -1,22 +1,15 @@
 /**
  * Web Component for embeddable shakuhachi score rendering
  *
- * Usage:
  *   <script src="/embed/shakuhachi-score.js"></script>
- *   <shakuhachi-score data-score='{"title":"...","notes":[...]}'></shakuhachi-score>
+ *   <shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
  *
- * Features:
- *   - Automatic intrinsic sizing (no manual width/height needed)
- *   - Theme support via CSS custom properties
- *   - Shadow DOM for style isolation
- *   - Error handling with visible feedback
+ * Attributes, sizing modes and theming are documented in ./README.md, which is
+ * the single source of truth for the consumer-facing surface.
  *
- * CSS Custom Properties:
- *   --shakuhachi-note-color: Color of notes and lines (default: #000)
- *   --shakuhachi-note-font-size: Font size of notes (default: 28px)
- *   --shakuhachi-note-font-weight: Font weight of notes (default: 400)
- *   --shakuhachi-note-font-family: Font family (default: 'Noto Sans JP', sans-serif)
- *   --shakuhachi-note-vertical-spacing: Vertical spacing between notes (default: 44px)
+ * Only --shakuhachi-note-color is honoured of the properties declared on :host
+ * below; the rest are inert because render() reads those values from
+ * DEFAULT_RENDER_OPTIONS. See #353.
  */
 
 import { ScoreRenderer } from './renderer/ScoreRenderer';
