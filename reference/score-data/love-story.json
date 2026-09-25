@@ -13,11 +13,7 @@
     { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "chi", "octave": 1 }, "duration": 1 },
-    {
-      "pitch": { "step": "chi", "octave": 1 },
-      "chu_meri": true,
-      "duration": 2
-    },
+    { "pitch": { "step": "chi", "octave": 1 }, "chu_meri": true, "duration": 2 },
     { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },
@@ -27,11 +23,7 @@
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "chi", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
-    {
-      "pitch": { "step": "chi", "octave": 1 },
-      "chu_meri": true,
-      "duration": 2
-    },
+    { "pitch": { "step": "chi", "octave": 1 }, "chu_meri": true, "duration": 2 },
     { "rest": true, "duration": 2 },
     { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },

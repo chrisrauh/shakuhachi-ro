@@ -9,13 +9,11 @@ This document analyzes the traditional Kinko-ryū shakuhachi score "Akatombo" to
 ## Layout Structure
 
 ### Reading Direction
-
 - **Vertical orientation**: Notes read top to bottom within each column
 - **Right-to-left progression**: Columns progress from right to left across the page
 - **Column count**: 4 columns in this example
 
 ### Visual Elements
-
 - Vertical separator lines between columns
 - Consistent horizontal spacing between columns
 - Variable column heights based on musical content
@@ -90,7 +88,6 @@ Visual markers indicating note length:
 ### Column Properties Observed
 
 Each column contains:
-
 - Variable number of notes (appears to range from 5-12 notes per column)
 - Mix of different note types and modifiers
 - Natural phrase groupings
@@ -98,7 +95,6 @@ Each column contains:
 ### Column Breaks
 
 Column breaks appear to occur at:
-
 - Musical phrase boundaries
 - Natural breathing points
 - To maintain readable column height
@@ -131,7 +127,6 @@ Based on this analysis, the score data format must support:
 ## Example Note Representation
 
 A note might need to encode:
-
 ```
 Note: tsu (ツ)
 Duration: quarter
@@ -145,7 +140,6 @@ Technique: atari (percussive)
 With this analysis complete, the next task is to design the score data format that can efficiently represent all these elements while remaining human-readable and easy to work with.
 
 Considerations:
-
 - JSON: Good structure, widely supported, easy to parse
 - Custom DSL: More concise, music-specific syntax
 - Extended Markdown: Human-readable, familiar format
