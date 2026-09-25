@@ -32,6 +32,7 @@ export const STRINGS = {
       autoSaveFailed: (message: string) => `Auto-save failed: ${message}`,
       createScoreFailed: 'Failed to create score. Please try again.',
       editPermissionDenied: 'You do not have permission to edit this score.',
+      previewError: 'Preview Error',
     },
 
     ScoreDetailClient: {

@@ -18,9 +18,16 @@ vi.mock('../utils/editor-autosave', () => ({
     };
   }),
 }));
-vi.mock('./LoadingSpinner', () => ({
+vi.mock('./LoadingSpinner', async (importOriginal) => ({
+  // Real ButtonLoadingState, so the save-button tests exercise its behaviour
+  ...(await importOriginal<typeof import('./LoadingSpinner')>()),
   buildSpinnerSVG: vi.fn(() => '<svg class="spinner"></svg>'),
 }));
+// Pass-through, so a test can make the preview parse fail after validation passes
+vi.mock('../utils/score-data', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/score-data')>();
+  return { ...actual, parseScoreText: vi.fn(actual.parseScoreText) };
+});
 vi.mock('../utils/icons', () => ({
   renderIcon: vi.fn(() => ''),
   initIcons: vi.fn(),
@@ -325,6 +332,129 @@ describe('ScoreEditor.handleSave', () => {
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining('Network error'),
     );
+  });
+
+  it('shows the button spinner while saving and restores the label afterwards', async () => {
+    const { getCurrentUser } = await import('../api/auth');
+    const { updateScore } = await import('../api/scores');
+
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: 'user-1' } as any,
+      error: null,
+    });
+
+    const editor = await makeEditorLoaded();
+    editor['scoreData'] = '{"title":"t","style":"kinko","notes":[]}';
+    editor['dataFormat'] = 'json';
+    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    const saveBtn = container.querySelector('#save-btn') as HTMLButtonElement;
+
+    // Two saves in a row: the label must survive more than one round trip
+    for (let round = 0; round < 2; round++) {
+      let finishSave!: () => void;
+      vi.mocked(updateScore).mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishSave = () =>
+              resolve({ score: null, error: new Error('DB fail') });
+          }),
+      );
+
+      const saving = editor['handleSave']();
+      await vi.waitFor(() =>
+        expect(updateScore).toHaveBeenCalledTimes(round + 1),
+      );
+
+      expect(saveBtn.getAttribute('aria-busy')).toBe('true');
+      expect(saveBtn.disabled).toBe(true);
+      expect(saveBtn.classList.contains('loading')).toBe(true);
+      // Spinner overlays the label; the label stays so the width doesn't change
+      expect(saveBtn.querySelector('.btn-spinner')).not.toBeNull();
+      expect(saveBtn.querySelector('.btn-text')?.textContent).toBe(
+        'Save Score',
+      );
+
+      finishSave();
+      await saving;
+
+      expect(saveBtn.getAttribute('aria-busy')).toBe('false');
+      expect(saveBtn.disabled).toBe(false);
+      expect(saveBtn.classList.contains('loading')).toBe(false);
+      expect(saveBtn.querySelector('.btn-spinner')).toBeNull();
+      expect(saveBtn.querySelector('.btn-text')?.textContent).toBe(
+        'Save Score',
+      );
+    }
+  });
+});
+
+// --- preview error state ---
+
+describe('ScoreEditor preview error', () => {
+  const SCORE_ID = 'score-123';
+  const SLUG = 'test-slug';
+
+  let containerId: string;
+  let container: HTMLDivElement;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    containerId = 'preview-error-container';
+    container = document.createElement('div');
+    container.id = containerId;
+    document.body.appendChild(container);
+
+    const { getScore } = await import('../api/scores');
+    vi.mocked(getScore).mockResolvedValue({
+      score: {
+        id: SCORE_ID,
+        slug: SLUG,
+        title: 'Test',
+        data_format: 'json',
+        data: { notes: [] },
+        updated_at: '2024-01-01T00:00:00Z',
+      } as any,
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    container.remove();
+    document.getElementById('score-preview')?.remove();
+    localStorage.clear();
+  });
+
+  async function renderPreviewError(): Promise<void> {
+    const { parseScoreText } = await import('../utils/score-data');
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+    vi.mocked(parseScoreText).mockImplementationOnce(() => {
+      throw new Error('bad <b>markup</b> here');
+    });
+    await editor['updatePreview']();
+  }
+
+  function expectEscapedError(root: ParentNode | null): void {
+    const errorEl = root?.querySelector('.preview-error');
+    expect(errorEl).not.toBeNull();
+    expect(errorEl!.textContent).toContain('Preview Error');
+    expect(errorEl!.textContent).toContain('bad <b>markup</b> here');
+    expect(errorEl!.querySelector('b')).toBeNull();
+  }
+
+  it('escapes the error message in the inline preview pane', async () => {
+    await renderPreviewError();
+    expectEscapedError(container.querySelector('#preview-pane'));
+  });
+
+  it('escapes the error message in the external preview', async () => {
+    const external = document.createElement('div');
+    external.id = 'score-preview';
+    document.body.appendChild(external);
+
+    await renderPreviewError();
+    expectEscapedError(external);
   });
 });
 
