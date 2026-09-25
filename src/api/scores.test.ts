@@ -75,7 +75,7 @@ describe('createScore', () => {
     const result = await createScore({
       title: 'Test',
       data_format: 'json',
-      data: {},
+      data: { notes: [] },
     });
 
     expect(result.score).toBeNull();
@@ -101,7 +101,7 @@ describe('createScore', () => {
     const result = await createScore({
       title: '!!!',
       data_format: 'json',
-      data: {},
+      data: { notes: [] },
     });
 
     expect(result.score).toBeNull();
@@ -127,7 +127,7 @@ describe('createScore', () => {
     const result = await createScore({
       title: 'Test',
       data_format: 'json',
-      data: {},
+      data: { notes: [] },
     });
 
     expect(result.score).toBeNull();
