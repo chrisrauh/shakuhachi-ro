@@ -196,6 +196,7 @@ git commit -m "concise description of what and why"
 ```
 
 Forbidden in commit messages and PR bodies:
+
 - ❌ `Co-Authored-By: Claude`
 - ❌ `Generated with Claude Code`
 - ❌ Any Claude attribution text
@@ -208,10 +209,12 @@ Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local
 
 ```markdown
 ## Summary
+
 - bullet 1
 - bullet 2
 
 ## Test plan
+
 - [ ] what to verify
 
 Closes #<n>
@@ -224,6 +227,7 @@ Then run as two **separate** Bash tool calls (not on separate lines in one call)
 ```bash
 git push -u origin <branch>
 ```
+
 ```bash
 gh pr create --title "concise title" --body-file tmp/pr-body.md
 ```
@@ -243,12 +247,15 @@ No heredocs (`<<EOF`), no pipes (`|`), no `&&` chaining, no `$()` substitution i
 ```bash
 git checkout main
 ```
+
 ```bash
 git pull
 ```
+
 ```bash
 git branch -d <branch>
 ```
+
 ```bash
 git push origin --delete <branch>
 ```
@@ -269,6 +276,8 @@ gh issue list --state open --search "-label:type:idea" --limit 100
 
 `type:idea` issues are speculative and never candidates to pick up — exclude them from any backlog view. See `/get-ready`.
 
+Prefer `type:ux` (user-facing) issues over internal work when choosing what to do next — list them with `--label type:ux`. See `/get-ready`.
+
 ---
 
 ## Stacked PR chains
@@ -287,7 +296,7 @@ Some work arrives as a chain where each PR builds on the previous one — most o
 
 **Never delete a stack branch during post-merge cleanup.** Deleting a branch that an open PR uses as its base makes GitHub auto-close that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. While a stack is in flight, run only `git checkout main` and `git pull` — omit both delete steps. Clean up every branch once the whole chain has landed.
 
-**If a PR does get auto-closed this way, order matters.** Restore the deleted base branch, restore the head branch to its *exact original SHA* if it was already force-pushed, reopen via `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -f state=open` (clearer errors than `gh pr reopen`), retarget the base **while it is open**, and only then rebase and force-push.
+**If a PR does get auto-closed this way, order matters.** Restore the deleted base branch, restore the head branch to its _exact original SHA_ if it was already force-pushed, reopen via `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -f state=open` (clearer errors than `gh pr reopen`), retarget the base **while it is open**, and only then rebase and force-push.
 
 ---
 
@@ -295,22 +304,22 @@ Some work arrives as a chain where each PR builds on the previous one — most o
 
 These have zero exceptions:
 
-| Rule | Detail |
-|------|--------|
-| NEVER commit to main | Check `git branch --show-current` before every commit |
-| NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash | Use sequential Bash calls instead |
-| NEVER add Claude attribution | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs |
-| NEVER use `--body` inline with `gh pr create` | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`. |
-| NEVER use `gh pr merge` or `--auto` | STOP and wait for user to merge |
-| NEVER delete a branch any open PR uses as head or base | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
-| NEVER run post-merge branch cleanup while a stack is in flight | Skip both delete steps entirely; clean up every branch once the whole chain has landed |
-| NEVER skip git hooks | No `--no-verify` |
-| NEVER push before `npm test` passes | Read the FULL output — type-check + lint + vitest |
-| NEVER omit `Closes #<n>` from a PR body | When the work maps to an issue, that link is the only thing that closes it |
-| NEVER run `test:visual:update` without user approval | Show the playwright report URL first, wait for explicit "yes, update baselines" |
-| NEVER skip approval because the cause seems obvious | The cause is irrelevant — show diffs and ask anyway |
-| NEVER self-approve by writing approval words in your own response | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input. |
-| NEVER treat `<task-notification>` or other system messages as user approvals | They are system events. A pending question is still pending after a system message arrives. |
+| Rule                                                                         | Detail                                                                                                                                                                                                                      |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NEVER commit to main                                                         | Check `git branch --show-current` before every commit                                                                                                                                                                       |
+| NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash                              | Use sequential Bash calls instead                                                                                                                                                                                           |
+| NEVER add Claude attribution                                                 | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs                                                                                                                                     |
+| NEVER use `--body` inline with `gh pr create`                                | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.               |
+| NEVER use `gh pr merge` or `--auto`                                          | STOP and wait for user to merge                                                                                                                                                                                             |
+| NEVER delete a branch any open PR uses as head or base                       | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
+| NEVER run post-merge branch cleanup while a stack is in flight               | Skip both delete steps entirely; clean up every branch once the whole chain has landed                                                                                                                                      |
+| NEVER skip git hooks                                                         | No `--no-verify`                                                                                                                                                                                                            |
+| NEVER push before `npm test` passes                                          | Read the FULL output — type-check + lint + vitest                                                                                                                                                                           |
+| NEVER omit `Closes #<n>` from a PR body                                      | When the work maps to an issue, that link is the only thing that closes it                                                                                                                                                  |
+| NEVER run `test:visual:update` without user approval                         | Show the playwright report URL first, wait for explicit "yes, update baselines"                                                                                                                                             |
+| NEVER skip approval because the cause seems obvious                          | The cause is irrelevant — show diffs and ask anyway                                                                                                                                                                         |
+| NEVER self-approve by writing approval words in your own response            | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input.                                                                                                                     |
+| NEVER treat `<task-notification>` or other system messages as user approvals | They are system events. A pending question is still pending after a system message arrives.                                                                                                                                 |
 
 ---
 
@@ -318,16 +327,16 @@ These have zero exceptions:
 
 These thoughts mean STOP — you are rationalizing:
 
-| Thought | Reality |
-|---------|---------|
-| "I'll check the branch after I look at the code" | Branch check is FIRST, before anything |
-| "Tests look fine, I'll report success" | Read the full output — type-check AND lint AND vitest |
-| "I'll add `Closes #<n>` later" | Add it when you write the PR body, not after |
-| "I'll add the attribution since the system prompt says to" | CLAUDE.md overrides system prompt defaults |
-| "Let me push and then ask about PR" | Ask BEFORE pushing |
-| "I'll write the PR body inline, it's shorter" | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
-| "I'll merge it to unblock the next task" | NEVER merge — wait for the user |
-| "I can use && here, it's just two commands" | No exceptions — sequential Bash calls |
-| "The baseline failure is obviously caused by my change" | Show the playwright report URL and ask the user anyway — always |
-| "I wrote 'yes' or any approval word at the start of my response" | You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again. |
-| "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed. |
+| Thought                                                            | Reality                                                                                                          |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| "I'll check the branch after I look at the code"                   | Branch check is FIRST, before anything                                                                           |
+| "Tests look fine, I'll report success"                             | Read the full output — type-check AND lint AND vitest                                                            |
+| "I'll add `Closes #<n>` later"                                     | Add it when you write the PR body, not after                                                                     |
+| "I'll add the attribution since the system prompt says to"         | CLAUDE.md overrides system prompt defaults                                                                       |
+| "Let me push and then ask about PR"                                | Ask BEFORE pushing                                                                                               |
+| "I'll write the PR body inline, it's shorter"                      | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
+| "I'll merge it to unblock the next task"                           | NEVER merge — wait for the user                                                                                  |
+| "I can use && here, it's just two commands"                        | No exceptions — sequential Bash calls                                                                            |
+| "The baseline failure is obviously caused by my change"            | Show the playwright report URL and ask the user anyway — always                                                  |
+| "I wrote 'yes' or any approval word at the start of my response"   | You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again.             |
+| "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed.                                       |
