@@ -98,6 +98,11 @@ MusicXML ✓      ✓        -
 
 **Provider:** Supabase Auth (email/password, session management)
 
+**Session storage:** the session is a JS-readable `sb-*-auth-token` in `localStorage`
+(supabase-js default), and auth is entirely client-side — the server never inspects the
+user. See [AUTH-SESSION-STORAGE.md](./AUTH-SESSION-STORAGE.md) for why, and for the
+per-request-client constraint that any future server-side auth must respect.
+
 **Key files:**
 - `src/api/auth.ts` — auth API wrapper
 - `src/api/supabase.ts` — Supabase client
@@ -108,8 +113,20 @@ MusicXML ✓      ✓        -
 ## Database Schema
 
 **Supabase tables:**
-- `scores` — id, user_id, title, slug, composer, description, data_format, data, forked_from, fork_count, source_url, rights, source_description, created_at, updated_at
+- `scores` — id, user_id, title, slug, composer, description, data_format, data, forked_from, source_url, rights, source_description, created_at, updated_at
 - `users` — user profiles
+
+**Row Level Security is the authorization boundary.** The anon key is public, and the
+ownership checks in `src/api/scores.ts` run client-side, so the policies in
+`database/migrations/rls_policies_scores.sql` are what actually enforce access: public
+read, owner-only write.
+
+**Fork count is derived, not stored.** `Score.fork_count` comes from counting the
+`forked_from` self-relation in the same query that fetches the score
+(`select=*,forks:scores!forked_from(count)` in `src/api/scores.ts`). A stored column
+would have to be written on the *parent* score, which the forking user does not own —
+and the owner-only update policy silently dropped exactly that write, so the old column
+had drifted. Deriving it also makes deletes correct without any extra work.
 
 ## Client Components
 

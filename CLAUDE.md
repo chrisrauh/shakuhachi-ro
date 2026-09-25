@@ -349,7 +349,9 @@ When testing authenticated features (score editor, creating scores, forking):
 - Session persists across page reload
 - Protected pages (e.g. `/score/test/edit`) redirect when logged out
 - No auth-related console errors
-- No auth tokens in localStorage (tokens belong in httpOnly cookies only)
+- Session token is in localStorage (`sb-*-auth-token`) — this is expected; see [docs/AUTH-SESSION-STORAGE.md](./docs/AUTH-SESSION-STORAGE.md)
+- Authorization is enforced by RLS, not by the client-side checks in `src/api/scores.ts`
+- Any user-supplied data embedded in HTML uses `embedJson()` or `escapeHtml()` (never a bare attribute — `escapeHtml()` does not escape quotes)
 - `npm test` passes
 
 ## Key Learnings
