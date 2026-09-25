@@ -36,7 +36,28 @@
 }
 
 .btn.loading {
+  position: relative;
+}
+
+/* Spinner shown inline next to text (static markup). Not for ButtonLoadingState,
+   whose overlay spinner must not change the spacing of the hidden content. */
+.btn.loading:not(:has(> .btn-spinner)) {
   gap: 8px;
+}
+
+/* ButtonLoadingState: the spinner is laid over the button's content, and the
+   content is hidden but kept in place, so the button keeps the width its own
+   label gives it instead of shrinking to the spinner. */
+.btn-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-spinner ~ * {
+  visibility: hidden;
 }
 
 /* Owner-only buttons (score detail page) — hidden by default, shown via JS class toggle */

@@ -5,7 +5,7 @@ import { ABCParser } from '../web-component/parser/ABCParser';
 import { parseScoreText } from '../utils/score-data';
 import { toast } from './Toast';
 import { confirmDialog } from '../utils/init-header';
-import { buildSpinnerSVG } from './LoadingSpinner';
+import { buildSpinnerSVG, ButtonLoadingState } from './LoadingSpinner';
 import type { ScoreContent, ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 import { validateScoreInput } from '../utils/score-validation';
@@ -243,8 +243,8 @@ export class ScoreEditor {
       } catch (error) {
         externalPreview.innerHTML = `
           <div class="preview-error">
-            <p>Preview Error</p>
-            <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
+            <p>${STRINGS.ERRORS.ScoreEditor.previewError}</p>
+            <p>${this.escapeHtml(error instanceof Error ? error.message : 'Unknown error')}</p>
           </div>
         `;
       }
@@ -309,8 +309,8 @@ export class ScoreEditor {
     } catch (error) {
       previewContainer.innerHTML = `
         <div class="preview-error">
-          <p>Preview Error</p>
-          <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
+          <p>${STRINGS.ERRORS.ScoreEditor.previewError}</p>
+          <p>${this.escapeHtml(error instanceof Error ? error.message : 'Unknown error')}</p>
         </div>
       `;
     }
@@ -337,13 +337,10 @@ export class ScoreEditor {
       return;
     }
 
-    const saveBtn = this.container.querySelector(
-      '#save-btn',
-    ) as HTMLButtonElement;
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
-    }
+    const saveBtn =
+      this.container.querySelector<HTMLButtonElement>('#save-btn');
+    const saveLoading = saveBtn ? new ButtonLoadingState(saveBtn) : null;
+    saveLoading?.show();
 
     try {
       let data: ScoreContent;
@@ -385,10 +382,7 @@ export class ScoreEditor {
         ),
       );
     } finally {
-      if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Score';
-      }
+      saveLoading?.hide();
     }
   }
 
