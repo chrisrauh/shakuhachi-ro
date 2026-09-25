@@ -7,9 +7,11 @@
  * Attributes, sizing modes and theming are documented in ./README.md, which is
  * the single source of truth for the consumer-facing surface.
  *
- * Only --shakuhachi-note-color is honoured of the properties declared on :host
- * below; the rest are inert because render() reads those values from
- * DEFAULT_RENDER_OPTIONS. See #353.
+ * --shakuhachi-note-color is the only CSS custom property. It works because it
+ * is passed through to the SVG as a literal var() string the browser resolves,
+ * so it tracks theme changes with no re-render. Anything that feeds the layout
+ * maths — font size, note spacing — cannot work that way and belongs in an
+ * observed attribute instead, the way `notation-font` does.
  */
 
 import { ScoreRenderer } from './renderer/ScoreRenderer';
@@ -303,10 +305,6 @@ class ShakuhachiScore extends HTMLElement {
           contain-intrinsic-size: 300px 150px;
           ${hostWidth}
           --shakuhachi-note-color: #000;
-          --shakuhachi-note-font-size: 28px;
-          --shakuhachi-note-font-weight: 400;
-          --shakuhachi-note-font-family: 'Noto Sans JP', sans-serif;
-          --shakuhachi-note-vertical-spacing: 44px;
         }
         .shakuhachi-score-container {
           overflow: visible;
