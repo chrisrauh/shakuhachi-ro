@@ -11,6 +11,7 @@
 import type { SVGRenderer } from './SVGRenderer';
 import type { ShakuNote } from '../notes/ShakuNote';
 import { Formatter, type FormatterOptions } from './Formatter';
+import { COLUMN_SEPARATOR } from '../constants/layout-constants';
 
 /**
  * Options for vertical system rendering
@@ -157,11 +158,11 @@ export class VerticalSystem {
       // Draw vertical line
       renderer.drawLine(
         separatorX,
-        this.y - 20, // Extend slightly above
+        this.y - COLUMN_SEPARATOR.extension,
         separatorX,
-        this.y + this.columnHeight + 20, // Extend slightly below
-        '#ccc', // Light gray color
-        1, // Line width
+        this.y + this.columnHeight + COLUMN_SEPARATOR.extension,
+        COLUMN_SEPARATOR.color,
+        COLUMN_SEPARATOR.width,
       );
     }
   }

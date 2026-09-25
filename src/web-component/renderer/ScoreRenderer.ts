@@ -22,6 +22,14 @@ import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 
 /**
+ * Viewport used when the container measures zero, which happens while it is
+ * hidden or not yet in the DOM. Rendering into a 0x0 viewport produces a blank
+ * score, so a plausible size is substituted and corrected by the ResizeObserver
+ * once the container is laid out.
+ */
+const DEFAULT_VIEWPORT = { width: 800, height: 600 } as const;
+
+/**
  * ScoreRenderer - Main class for rendering shakuhachi notation
  *
  * Following VexFlow pattern:
@@ -193,8 +201,8 @@ export class ScoreRenderer {
   /**
    * Gets viewport dimensions for rendering
    *
-   * Uses explicit width/height from options if provided,
-   * otherwise uses container dimensions
+   * Uses explicit width/height from options if provided, otherwise the
+   * container's measured size, falling back to DEFAULT_VIEWPORT when it is zero.
    *
    * @returns Width and height for SVG viewport
    */
@@ -205,11 +213,11 @@ export class ScoreRenderer {
       width:
         this.options.width !== undefined
           ? this.options.width
-          : rect.width || 800,
+          : rect.width || DEFAULT_VIEWPORT.width,
       height:
         this.options.height !== undefined
           ? this.options.height
-          : rect.height || 600,
+          : rect.height || DEFAULT_VIEWPORT.height,
     };
   }
 

@@ -17,6 +17,15 @@ import {
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 /**
+ * Where a kana glyph's optical centre sits above its baseline, as a fraction of
+ * the font size. Used to align the rest circle with the surrounding characters.
+ *
+ * Measured for the notation fonts at fontSize 32; not the same as the 0.25 in
+ * DurationLineModifier, which aligns line ends rather than glyph centres.
+ */
+const KANA_OPTICAL_CENTER_RATIO = 0.4;
+
+/**
  * Duration for spacing calculations
  * Mirrors VexFlow's duration notation
  */
@@ -142,8 +151,7 @@ export class ShakuNote {
       // Stroke width proportional to the circle size
       const strokeWidth = Math.max(1.5, radius / 1.9);
       // Center circle vertically with the note characters
-      // Japanese characters are typically centered around y - fontSize * 0.4
-      const circleY = this.y - this.fontSize * 0.4;
+      const circleY = this.y - this.fontSize * KANA_OPTICAL_CENTER_RATIO;
 
       renderer.drawCircle(
         this.x,
