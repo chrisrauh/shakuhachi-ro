@@ -338,10 +338,10 @@ When testing authenticated features (score editor, creating scores, forking):
 
 **Test Score for Editor Testing:**
 
-- A test score titled "Test" is available at `/score/test` (slug: `test`)
-- Owned by the test account for editor testing
-- Contains simple JSON data with 3 notes (ro, tsu, re)
-- Use this score to test the editor functionality: `http://localhost:3001/score/test/edit`
+- Slug `test` — view at `/score/test`, edit at `http://localhost:3001/score/test/edit`
+- Owned by the test account
+- Title is **"A Very Long Score Title That Will Definitely Wrap Across Multiple Lines on Mobile"**. This is deliberate: it exercises title wrapping in the header. Seeing it in a page snapshot means you are on the right score, not the wrong one.
+- Format is **MusicXML**, not JSON. Three notes — D4, F4, G4, rendering as ro, tsu, re. Switch the format radio to convert if you need JSON or ABC.
 
 **Auth Verification Checklist (after auth-related changes):**
 
