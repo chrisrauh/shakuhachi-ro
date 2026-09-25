@@ -19,7 +19,6 @@ import { ScoreParser } from './parser/ScoreParser';
 import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
 import type { ScoreData } from './types/ScoreData';
 import type { ShakuNote } from './notes/ShakuNote';
-import { DurationDotModifier } from './modifiers/DurationDotModifier';
 import { resolveNotationFont } from './constants/notation-fonts';
 
 class ShakuhachiScore extends HTMLElement {
@@ -226,15 +225,11 @@ class ShakuhachiScore extends HTMLElement {
 
       for (let i = startIdx; i < endIdx; i++) {
         const note = notes[i];
-        const hasDurationDot = note
-          .getModifiers()
-          .some((mod) => mod instanceof DurationDotModifier);
-
         // Only add spacing between notes (not before first note)
         if (i > startIdx) {
           columnHeight += verticalSpacing;
         }
-        if (hasDurationDot) {
+        if (note.needsExtraSpacing()) {
           columnHeight += durationDotExtraSpacing;
         }
       }

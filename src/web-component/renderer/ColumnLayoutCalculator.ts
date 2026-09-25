@@ -8,7 +8,6 @@
 
 import type { ShakuNote } from '../notes/ShakuNote';
 import type { ResolvedRenderOptions } from './RenderOptions';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 
 /**
  * Position of a note within a column
@@ -184,12 +183,9 @@ export class ColumnLayoutCalculator {
     for (let i = 0; i < notes.length; i++) {
       const note = notes[i];
 
-      // Check if this note has a duration dot (requires extra spacing)
-      const hasDurationDot = note
-        .getModifiers()
-        .some((mod) => mod instanceof DurationDotModifier);
-
-      const extraSpacing = hasDurationDot ? options.durationDotExtraSpacing : 0;
+      const extraSpacing = note.needsExtraSpacing()
+        ? options.durationDotExtraSpacing
+        : 0;
       const noteHeight = verticalSpacing + extraSpacing;
 
       // Check if this note + bottom padding would exceed available height
@@ -303,12 +299,9 @@ export class ColumnLayoutCalculator {
       });
 
       // Calculate spacing to next note
-      // If this note has a duration dot, add extra spacing
-      const hasDurationDot = note
-        .getModifiers()
-        .some((mod) => mod instanceof DurationDotModifier);
-
-      const extraSpacing = hasDurationDot ? options.durationDotExtraSpacing : 0;
+      const extraSpacing = note.needsExtraSpacing()
+        ? options.durationDotExtraSpacing
+        : 0;
       currentY += verticalSpacing + extraSpacing;
     }
 
