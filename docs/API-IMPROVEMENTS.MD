@@ -316,7 +316,7 @@ unsubscribe();
 ### Issue: Mixed Async/Sync Methods
 
 ```typescript
-async renderFromURL(url: string): Promise<void>      // Async
+async renderScoreFromURL(container, url, options?)  // Async (convenience)
 async renderFromScoreData(data: ScoreData): Promise<void>  // Async (why?)
 renderNotes(notes: ShakuNote[]): void                // Sync
 ```
@@ -326,14 +326,15 @@ renderNotes(notes: ShakuNote[]): void                // Sync
 ### Recommendation: Make Async Where Needed
 
 ```typescript
-class ScoreRenderer {
-  // Async: actually needs to fetch
-  async renderFromURL(url: string): Promise<void> {
-    const scoreData = await MusicXMLParser.parseFromURL(url);
-    this.currentScoreData = scoreData;
-    this.renderFromScoreData(scoreData);  // Sync call
-  }
+// Async: actually needs to fetch (convenience.ts — ScoreRenderer does not fetch)
+async function renderScoreFromURL(container, url, options?): Promise<ScoreRenderer> {
+  const scoreData = await MusicXMLParser.parseFromURL(url);
+  const renderer = new ScoreRenderer(container, options);
+  renderer.renderFromScoreData(scoreData);  // Sync call
+  return renderer;
+}
 
+class ScoreRenderer {
   // Sync: no async operations
   renderFromScoreData(scoreData: ScoreData): void {
     this.currentScoreData = scoreData;
@@ -371,7 +372,7 @@ async renderFromScoreDataAsync(data: ScoreData): Promise<void> {
 
 ```typescript
 try {
-  await renderer.renderFromURL('/invalid.xml');
+  await renderScoreFromURL(container, '/invalid.xml');
 } catch (error) {
   // What kind of error is this?
   // Network? Parse error? Invalid XML?
@@ -411,7 +412,7 @@ export class ValidationError extends RendererError {
 
 // Usage:
 try {
-  await renderer.renderFromURL('/score.xml');
+  await renderScoreFromURL(container, '/score.xml');
 } catch (error) {
   if (error instanceof NetworkError) {
     console.error(`Failed to fetch ${error.url}`);

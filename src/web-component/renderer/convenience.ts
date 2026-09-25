@@ -6,14 +6,15 @@
  */
 
 import { ScoreRenderer } from './ScoreRenderer';
+import { MusicXMLParser } from '../parser/MusicXMLParser';
 import type { RenderOptions } from './RenderOptions';
 import type { ScoreData } from '../types/ScoreData';
 
 /**
  * Renders a score from a MusicXML URL into a container element
  *
- * One-line convenience function that creates a ScoreRenderer and
- * calls renderFromURL().
+ * One-line convenience function that fetches and parses the MusicXML,
+ * then creates a ScoreRenderer and calls renderFromScoreData().
  *
  * @param container - DOM element to render into
  * @param url - URL to MusicXML file
@@ -41,8 +42,9 @@ export async function renderScoreFromURL(
   url: string,
   options?: RenderOptions,
 ): Promise<ScoreRenderer> {
+  const scoreData = await MusicXMLParser.parseFromURL(url);
   const renderer = new ScoreRenderer(container, options);
-  await renderer.renderFromURL(url);
+  await renderer.renderFromScoreData(scoreData);
   return renderer;
 }
 
