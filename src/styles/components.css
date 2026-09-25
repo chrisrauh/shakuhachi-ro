@@ -40,11 +40,17 @@
 }
 
 /* Owner-only buttons (score detail page) — hidden by default, shown via JS class toggle */
-.btn.owner-btn { display: none; }
-.btn.owner-btn.owner-visible { display: inline-flex; }
+.btn.owner-btn {
+  display: none;
+}
+.btn.owner-btn.owner-visible {
+  display: inline-flex;
+}
 
 @media (max-width: 768px) {
-  .btn.owner-btn.owner-visible { display: none; }
+  .btn.owner-btn.owner-visible {
+    display: none;
+  }
 }
 
 /* Icon button - toolbar item size, square */

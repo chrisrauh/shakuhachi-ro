@@ -7,12 +7,14 @@
 **Environment:** Development (Vite dev server)
 
 ### Metrics (Current)
+
 - **LCP:** 1,366 ms (Target: < 1,000 ms)
 - **TTFB:** 1,028 ms ⚠️ (Target: < 600 ms)
 - **Render Delay:** 338 ms
 - **CLS:** 0.00 ✅ (Perfect!)
 
 ### Critical Path Latency
+
 - **Max:** 1,343 ms (fonts blocking render)
 
 ---
@@ -20,6 +22,7 @@
 ## Priority 1: Font Optimization (Est. Savings: 300-500ms)
 
 ### Current Issue
+
 ```html
 <!-- Current: loads 235.8 kB, 1,343ms critical path -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -31,6 +34,7 @@
 ```
 
 **Problems:**
+
 1. Loads entire variable font range (100-900 weights = ~80KB per file)
 2. 3 separate WOFF2 files downloaded
 3. Blocks render despite `display=swap`
@@ -49,6 +53,7 @@
 ```
 
 **Audit which weights are used:**
+
 ```bash
 # Search CSS for font-weight usage
 grep -r "font-weight" src/
@@ -66,6 +71,7 @@ grep -r "font-weight" src/
    - Place in `/public/fonts/`
 
 2. **Update Layout.astro:**
+
 ```html
 <!-- Remove Google Fonts -->
 <!-- <link href="https://fonts.googleapis.com/..." /> -->
@@ -74,6 +80,7 @@ grep -r "font-weight" src/
 ```
 
 3. **Create `/src/styles/fonts.css`:**
+
 ```css
 @font-face {
   font-family: 'Noto Sans JP';
@@ -101,6 +108,7 @@ grep -r "font-weight" src/
 ```
 
 4. **Preload critical fonts:**
+
 ```html
 <head>
   <!-- Preload only the most critical font (Regular 400) -->
@@ -115,6 +123,7 @@ grep -r "font-weight" src/
 ```
 
 **Benefits:**
+
 - No external request (fonts served from same origin)
 - Only load weights you actually use
 - Preload critical fonts
@@ -129,16 +138,20 @@ grep -r "font-weight" src/
 Use system fonts instead of custom fonts:
 
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP',
-  'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+font-family:
+  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP',
+  'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo',
+  sans-serif;
 ```
 
 **Benefits:**
+
 - Zero font loading time
 - No network requests
 - Instant render
 
 **Trade-offs:**
+
 - Different fonts on different OSs
 - Less brand consistency
 
@@ -149,6 +162,7 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP',
 ## Priority 2: Server Response Time (Est. Savings: 400-600ms)
 
 ### Current Issue
+
 - **TTFB:** 1,028 ms (75% of LCP time!)
 - **No compression** applied
 - **Slow dev server** response
@@ -185,11 +199,13 @@ export default defineConfig({
 #### 1. Enable Compression at CDN/Host Level
 
 **Netlify (current host):**
+
 - Brotli compression enabled automatically
 - Gzip fallback for older browsers
 - No configuration needed
 
 Verify in production:
+
 ```bash
 curl -H "Accept-Encoding: br, gzip" https://shakuhachi.ro -I | grep -i encoding
 # Should show: content-encoding: br
@@ -203,14 +219,12 @@ If using SSR (Server-Side Rendering):
 // Reduce work done on server
 export async function getStaticPaths() {
   // Pre-generate static pages at build time
-  return [
-    { params: { slug: 'akatombo' } },
-    { params: { slug: 'love-story' } },
-  ];
+  return [{ params: { slug: 'akatombo' } }, { params: { slug: 'love-story' } }];
 }
 ```
 
 **Consider:**
+
 - Static Site Generation (SSG) for public pages
 - ISR (Incremental Static Regeneration) for frequently changing content
 - Client-side data fetching for user-specific data
@@ -233,12 +247,14 @@ Verify with Supabase dashboard → Database → Indexes.
 ### Measurement
 
 **Dev:**
+
 ```bash
 # Slow in dev is expected (no compression, hot reload overhead)
 curl -o /dev/null -s -w "Time: %{time_total}s\n" http://localhost:3003/
 ```
 
 **Production:**
+
 ```bash
 # Should be < 600ms
 curl -o /dev/null -s -w "Time: %{time_total}s\n" https://shakuhachi.ro/
@@ -249,7 +265,9 @@ curl -o /dev/null -s -w "Time: %{time_total}s\n" https://shakuhachi.ro/
 ## Priority 3: JavaScript Optimization (Est. Savings: 200-400ms)
 
 ### Current Issue
+
 Deep dependency chains causing sequential module loads:
+
 ```
 index.js → create-score-handler → scores.ts → supabase.ts
 → @supabase/supabase-js → API request
@@ -330,6 +348,7 @@ npx vite-bundle-visualizer
 ### Images
 
 1. **Use WebP/AVIF formats:**
+
 ```html
 <picture>
   <source srcset="image.avif" type="image/avif" />
@@ -339,11 +358,13 @@ npx vite-bundle-visualizer
 ```
 
 2. **Lazy load off-screen images:**
+
 ```html
 <img src="..." loading="lazy" />
 ```
 
 3. **Use responsive images:**
+
 ```html
 <img
   src="image-800w.jpg"
@@ -401,7 +422,7 @@ self.addEventListener('install', (event) => {
         '/styles/main.css',
         '/fonts/NotoSansJP-Regular.woff2',
       ]);
-    })
+    }),
   );
 });
 ```
@@ -422,10 +443,7 @@ const scores = await getAllScores();
 
 ```javascript
 // Good: Parallel
-const [user, scores] = await Promise.all([
-  authState.getUser(),
-  getAllScores(),
-]);
+const [user, scores] = await Promise.all([authState.getUser(), getAllScores()]);
 ```
 
 ### Prefetch Data
@@ -559,12 +577,14 @@ jobs:
 ### 1. Migrate to Edge Functions
 
 Deploy to edge locations (Cloudflare Workers, Vercel Edge, Netlify Edge):
+
 - **TTFB:** < 100ms globally
 - **Cold start:** < 50ms
 
 ### 2. Implement HTTP/3
 
 Upgrade to HTTP/3 (QUIC):
+
 - Faster connection establishment
 - Better handling of packet loss
 - Multiplexing without head-of-line blocking
@@ -572,6 +592,7 @@ Upgrade to HTTP/3 (QUIC):
 ### 3. Use CDN for Static Assets
 
 Serve fonts, images, JS from CDN:
+
 - Cloudflare
 - Fastly
 - CloudFront
