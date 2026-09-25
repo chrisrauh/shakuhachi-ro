@@ -224,10 +224,6 @@ export class ScoreEditor {
           '--shakuhachi-note-color',
           'var(--color-text-primary)',
         );
-        container.style.setProperty(
-          '--shakuhachi-note-vertical-spacing',
-          isMobile ? '40px' : '44px',
-        );
 
         if (isMobile) {
           container.setAttribute('columns', '1');
@@ -293,10 +289,6 @@ export class ScoreEditor {
       container.style.setProperty(
         '--shakuhachi-note-color',
         'var(--color-text-primary)',
-      );
-      container.style.setProperty(
-        '--shakuhachi-note-vertical-spacing',
-        isMobile ? '40px' : '44px',
       );
 
       if (isMobile) {
