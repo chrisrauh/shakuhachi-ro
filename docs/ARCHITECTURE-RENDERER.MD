@@ -87,7 +87,8 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 ## Rendering Pipeline
 
 ```
-1. Load     renderFromURL() → MusicXMLParser → ScoreData
+1. Load     MusicXMLParser.parseFromURL() → ScoreData
+           (outside ScoreRenderer; renderScoreFromURL() does 1 + render)
 2. Parse    ScoreParser.parse() → ShakuNote[]
 3. Configure ModifierConfigurator.configureModifiers()
 4. Layout   ColumnLayoutCalculator.calculateLayout()
