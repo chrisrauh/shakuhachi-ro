@@ -158,26 +158,4 @@ export class MusicXMLParser {
     const xmlContent = await response.text();
     return this.parse(xmlContent);
   }
-
-  /**
-   * Converts ScoreData to JSON string
-   *
-   * @param scoreData - The score data to convert
-   * @param pretty - Whether to pretty-print the JSON (default: true)
-   * @returns JSON string
-   */
-  static toJSON(scoreData: ScoreData, pretty: boolean = true): string {
-    return JSON.stringify(scoreData, null, pretty ? 2 : 0);
-  }
-
-  /**
-   * Parses MusicXML and saves to JSON format
-   *
-   * @param xmlContent - The MusicXML content
-   * @returns JSON string ready to save
-   */
-  static convertToJSON(xmlContent: string): string {
-    const scoreData = this.parse(xmlContent);
-    return this.toJSON(scoreData);
-  }
 }
