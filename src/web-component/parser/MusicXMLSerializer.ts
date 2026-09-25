@@ -7,6 +7,18 @@
 
 import type { ScoreData, ScoreNote, PitchStep } from '../types/ScoreData';
 
+/**
+ * Divisions per quarter note.
+ *
+ * MusicXML defines no standard value; exporters derive one per score from the
+ * shortest note present. 8 is that value for this format — the shortest
+ * duration is a sixteenth (0.25) and dotting it gives 0.375, so divisions must
+ * be a multiple of 8 for every duration to stay a whole number. Being a power
+ * of two also keeps a parse/serialize round trip exact in binary floating
+ * point. Well under the 16383 ceiling the spec names for MIDI compatibility.
+ */
+const DIVISIONS_PER_QUARTER = 8;
+
 interface WesternPitch {
   step: string; // C, D, E, F, G, A, B
   octave: number; // 4, 5, 6
@@ -78,7 +90,7 @@ export class MusicXMLSerializer {
     // Measure with attributes
     parts.push('    <measure number="1">');
     parts.push('      <attributes>');
-    parts.push('        <divisions>2</divisions>'); // 2 divisions per quarter note
+    parts.push(`        <divisions>${DIVISIONS_PER_QUARTER}</divisions>`);
     parts.push('        <key>');
     parts.push('          <fifths>2</fifths>'); // D major (2 sharps)
     parts.push('        </key>');
@@ -130,19 +142,23 @@ export class MusicXMLSerializer {
       parts.push('        </pitch>');
     }
 
-    // Duration (in divisions - 2 divisions per quarter note)
-    // ScoreNote duration: 1 = quarter, 2 = half, 4 = whole
-    const divisions = Math.round(note.duration * 2);
-    parts.push(`        <duration>${divisions}</duration>`);
+    // <duration> is the sounding length, so it includes the dot. ScoreNote
+    // keeps the two apart: `duration` is the base value and `dotted` extends
+    // it by half. Every supported value lands on a whole number of divisions,
+    // so there is nothing to round.
+    const sounding = note.duration * (note.dotted ? 1.5 : 1);
+    parts.push(
+      `        <duration>${sounding * DIVISIONS_PER_QUARTER}</duration>`,
+    );
 
-    // Dotted note
+    // <type> is the base note value; the dot is carried by <dot/> beside it.
+    // The DTD orders these children `type?, dot*`, so type must come first.
+    const type = this.getDurationType(note.duration);
+    parts.push(`        <type>${type}</type>`);
+
     if (note.dotted) {
       parts.push('        <dot/>');
     }
-
-    // Note type
-    const type = this.getDurationType(note.duration);
-    parts.push(`        <type>${type}</type>`);
 
     parts.push('      </note>');
 
