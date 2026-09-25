@@ -28,11 +28,11 @@ export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
   private type: MeriKariType;
 
-  /** Font size for the meri/kari mark (slightly smaller than main note) */
-  private fontSize: number = 16;
+  /** Font size — overridden by ModifierConfigurator from render options */
+  private fontSize: number = DEFAULT_RENDER_OPTIONS.meriKariFontSize;
 
-  /** Font weight for the meri/kari mark */
-  private fontWeight: number = 400;
+  /** Font weight — overridden by ModifierConfigurator from render options */
+  private fontWeight: number = DEFAULT_RENDER_OPTIONS.meriKariFontWeight;
 
   /** Font family — overridden by ModifierConfigurator from render options */
   private fontFamily: string = DEFAULT_RENDER_OPTIONS.noteFontFamily;
