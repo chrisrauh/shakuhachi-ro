@@ -63,6 +63,18 @@ export const COLUMN = {
 } as const;
 
 /**
+ * Separator lines drawn between columns
+ */
+export const COLUMN_SEPARATOR = {
+  /** How far the line extends past the column, top and bottom */
+  extension: 20,
+  /** Light gray — the separator must not compete with the notes */
+  color: '#ccc',
+  /** Line thickness */
+  width: 1,
+} as const;
+
+/**
  * Minimum top margin needed to prevent octave mark clipping
  *
  * Computed dynamically based on octave mark positioning:

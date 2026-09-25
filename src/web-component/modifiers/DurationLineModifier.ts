@@ -17,6 +17,13 @@ import { Modifier } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 import { NOTE } from '../constants/layout-constants';
 
+/**
+ * Where a duration line meets a note, as a fraction of the font size above the
+ * baseline. Tuned so consecutive segments join cleanly; this is not the glyph's
+ * optical centre (see KANA_OPTICAL_CENTER_RATIO in ShakuNote).
+ */
+const NOTE_VERTICAL_MIDDLE_RATIO = 0.25;
+
 export class DurationLineModifier extends Modifier {
   /** Number of lines to render */
   private lineCount: number;
@@ -53,9 +60,8 @@ export class DurationLineModifier extends Modifier {
     this.lineCount = lineCount;
 
     // Calculate line length based on position in sequence
-    // For Japanese characters with fontSize=32, the vertical center is
-    // approximately 25% above the baseline (around y=-8)
-    const verticalMiddleOfCurrentNote = -NOTE.fontSize * 0.25; // ≈ -8px
+    const verticalMiddleOfCurrentNote =
+      -NOTE.fontSize * NOTE_VERTICAL_MIDDLE_RATIO; // ≈ -8px
     const startOffsetY = -22;
 
     if (isLastInSequence) {

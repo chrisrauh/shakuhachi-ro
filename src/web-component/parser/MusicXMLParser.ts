@@ -79,15 +79,21 @@ export class MusicXMLParser {
       const dotElement = noteElement.querySelector('dot');
       const isDotted = dotElement !== null;
 
-      // Simple duration mapping (can be refined)
-      // 1 = eighth, 2 = quarter, 3 = dotted quarter, 4 = half
+      // Map MusicXML <duration> to a shakuhachi duration (1 = quarter).
+      //
+      // Two known limitations:
+      //  - <divisions> is ignored, so this assumes 1 division per quarter note.
+      //    MusicXMLSerializer writes 2, so a round trip doubles every duration
+      //    (see #350).
+      //  - Buckets are lossy and drop dots: 3 divisions is a dotted quarter but
+      //    lands on half. <dot> is read separately into `dotted`.
       let shakuDuration: number;
       if (duration >= 4) {
         shakuDuration = 4; // whole
       } else if (duration >= 2) {
         shakuDuration = 2; // half
       } else {
-        shakuDuration = 1; // quarter or eighth
+        shakuDuration = 1; // quarter or shorter
       }
 
       // Create note
