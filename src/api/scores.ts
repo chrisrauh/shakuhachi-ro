@@ -5,8 +5,15 @@ import {
   ensureUniqueSlug,
   generateUniqueRandomSlug,
 } from '../utils/slug';
+import type { ScoreData } from '../web-component/types/ScoreData';
 
 export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
+
+/**
+ * Stored score content: a ScoreData object when data_format is 'json',
+ * the raw text when it is 'musicxml' or 'abc'.
+ */
+export type ScoreContent = ScoreData | string;
 
 export interface Score {
   id: string;
@@ -16,7 +23,7 @@ export interface Score {
   composer: string | null;
   description: string | null;
   data_format: ScoreDataFormat;
-  data: any;
+  data: ScoreContent;
   forked_from: string | null;
   fork_count: number;
   source_url: string | null;
@@ -31,7 +38,7 @@ export interface CreateScoreData {
   composer?: string;
   description?: string;
   data_format: ScoreDataFormat;
-  data: any;
+  data: ScoreContent;
   forked_from?: string;
   source_url?: string;
   rights?: string;
@@ -43,7 +50,7 @@ export interface UpdateScoreData {
   composer?: string;
   description?: string;
   data_format?: ScoreDataFormat;
-  data?: any;
+  data?: ScoreContent;
   source_url?: string;
   rights?: string;
   source_description?: string;

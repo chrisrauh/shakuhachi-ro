@@ -32,7 +32,7 @@ function makeScore(overrides: Partial<Score> = {}): Score {
     composer: 'Traditional',
     description: null,
     data_format: 'json',
-    data: {},
+    data: { notes: [] },
     forked_from: null,
     fork_count: 0,
     source_url: null,
