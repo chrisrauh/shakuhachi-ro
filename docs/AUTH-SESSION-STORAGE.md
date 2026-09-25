@@ -17,8 +17,8 @@ checks exist for UX — hiding buttons, redirecting — and nothing more.
 
 ## Why not httpOnly cookies
 
-CLAUDE.md previously required *"No auth tokens in localStorage (tokens belong in
-httpOnly cookies only)"*. That line was never implemented. It first appeared in
+CLAUDE.md previously required _"No auth tokens in localStorage (tokens belong in
+httpOnly cookies only)"_. That line was never implemented. It first appeared in
 `docs/AUTH-TESTING-GUIDE.md` (Feb 2026) as an aspirational "expected behavior" bullet,
 a month after auth shipped with the supabase-js defaults, and was later condensed into
 CLAUDE.md. `docs/AUTH-REQUIREMENTS.md`, the only actual auth design record, deliberately
@@ -27,13 +27,13 @@ chose client-side auth and never mentions cookies.
 The requirement was also aimed at the wrong target. httpOnly does not prevent XSS
 damage — an attacker with script execution can issue authenticated requests from the
 victim's browser regardless of where the token is kept. What it prevents is token
-*exfiltration*: it downgrades "permanent account takeover from the attacker's machine"
+_exfiltration_: it downgrades "permanent account takeover from the attacker's machine"
 to "abuse while the page is open." Real, but second-order to preventing script
 execution in the first place.
 
 Two alternatives were considered and rejected:
 
-**`@supabase/ssr` with cookie storage** gives *zero* XSS improvement. Its
+**`@supabase/ssr` with cookie storage** gives _zero_ XSS improvement. Its
 `createBrowserClient` reads the session from `document.cookie`, so the cookie must stay
 JS-readable — an attacker reads it exactly as easily as `localStorage`. The real gains
 (server-side route guards, no avatar flash on load) are UX and correctness, not
@@ -44,7 +44,7 @@ exfiltration, but it requires every mutation to move behind our own endpoints ca
 an ambient cookie. That creates a CSRF requirement the current bearer-token model does
 not have, and it pressures toward a service-role key on the server — replacing a
 declarative, fail-closed boundary (RLS) with hand-written checks in every endpoint.
-That is a plausible net security *regression*, and disproportionate for a public
+That is a plausible net security _regression_, and disproportionate for a public
 library of shakuhachi scores.
 
 ## Constraint for any future migration

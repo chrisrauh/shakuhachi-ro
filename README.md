@@ -81,7 +81,9 @@ const renderer = new ScoreRenderer(container, {
   showOctaveMarks: true,
 });
 
-await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+await renderer.renderFromScoreData(
+  await MusicXMLParser.parseFromURL('/score.musicxml'),
+);
 
 // Dynamic updates
 renderer.setOptions({ showDebugLabels: true });
@@ -128,30 +130,36 @@ The easiest way to embed shakuhachi notation on any website:
 <script src="https://shakuhachi.ro/embed/shakuhachi-score.js"></script>
 
 <!-- Minimal usage - just notes -->
-<shakuhachi-score data-score='{
+<shakuhachi-score
+  data-score='{
   "notes": [
     { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
     { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 }
   ]
-}'></shakuhachi-score>
+}'
+></shakuhachi-score>
 
 <!-- With optional metadata -->
-<shakuhachi-score data-score='{
+<shakuhachi-score
+  data-score='{
   "title": "My Score",
   "style": "kinko",
   "composer": "Traditional",
   "notes": [...]
-}'></shakuhachi-score>
+}'
+></shakuhachi-score>
 ```
 
 **Data Format:**
+
 - `notes` (required) - Array of note objects
 - `title` (optional) - Score title for display
 - `style` (optional) - Notation style: "kinko" or "tozan"
 - `composer`, `tempo`, `key` (optional) - Additional metadata
 
 **Attributes:**
+
 - `columns="auto"` (default) - Auto-detect layout based on container height
 - `columns="1"` - Single column with intrinsic height
 - `columns="6"` - Exactly 6 columns
@@ -159,6 +167,7 @@ The easiest way to embed shakuhachi notation on any website:
 - `width`/`height` - Explicit dimensions (overrides CSS)
 
 **Styling with CSS:**
+
 ```css
 shakuhachi-score {
   width: 100%;

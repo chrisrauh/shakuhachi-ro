@@ -40,6 +40,7 @@ Note = {
 ## Column Layout
 
 **Important**: Column breaks are NOT stored in the data format. The renderer determines column layout dynamically based on:
+
 - Available space (screen width, paper size)
 - Number of notes
 - Column height preferences
@@ -71,6 +72,7 @@ This separation allows the same score data to be rendered differently on mobile,
 ## Future Extensions
 
 When needed, we can add:
+
 - `kari` - For kari pitch marks
 - `atari` - For atari technique marks
 - More pitch modifiers

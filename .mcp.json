@@ -2,11 +2,7 @@
   "mcpServers": {
     "code-mcp": {
       "command": "aifx",
-      "args": [
-        "mcp",
-        "run",
-        "code-mcp"
-      ]
+      "args": ["mcp", "run", "code-mcp"]
     },
     "chrome-devtools-mcp": {
       "command": "npx",

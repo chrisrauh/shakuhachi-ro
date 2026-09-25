@@ -7,37 +7,43 @@ Complete API reference for the Shakuhachi Score Renderer.
 **Current Version:** 1.x (Stable)
 
 **Stability Levels:**
+
 - 🟢 **Stable** - Recommended for production use, won't change without major version bump
 - 🟡 **Experimental** - Available but may change in minor versions
 - 🔴 **Internal** - Exported but not intended for public use, may change anytime
 
 **Stable APIs (Recommended):**
+
 - `ScoreRenderer` class
 - `renderScoreFromURL()`, `renderScore()` convenience functions
 - `RenderOptions` interface
 - All modifier classes (OctaveMarksModifier, MeriKariModifier, etc.)
 
 **Experimental APIs:**
+
 - `Formatter`, `VerticalSystem` (alternative layout system, not used by ScoreRenderer)
 
 **Internal APIs (Not Recommended):**
+
 - `ScoreParser` (used internally by ScoreRenderer)
 - kinko-symbols utilities (implementation details)
 
 ## Quick Start
 
 **Simplest usage:**
+
 ```typescript
 import { renderScoreFromURL } from 'shakuhachi-ro';
 
 // Render a score with one line
 await renderScoreFromURL(
   document.getElementById('container'),
-  '/path/to/score.musicxml'
+  '/path/to/score.musicxml',
 );
 ```
 
 **With configuration:**
+
 ```typescript
 import { renderScoreFromURL } from 'shakuhachi-ro';
 
@@ -47,8 +53,8 @@ const renderer = await renderScoreFromURL(
   {
     showOctaveMarks: true,
     notesPerColumn: 10,
-    autoResize: true
-  }
+    autoResize: true,
+  },
 );
 
 // Can still manipulate after rendering
@@ -56,15 +62,18 @@ renderer.setOptions({ showDebugLabels: true });
 ```
 
 **Class-based API:**
+
 ```typescript
 import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
 
 const renderer = new ScoreRenderer(container, {
   notesPerColumn: 8,
-  showOctaveMarks: false
+  showOctaveMarks: false,
 });
 
-await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+await renderer.renderFromScoreData(
+  await MusicXMLParser.parseFromURL('/score.musicxml'),
+);
 ```
 
 ## Best Practices
@@ -72,11 +81,13 @@ await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.mus
 ### ✅ Do
 
 **Use convenience functions for simple cases:**
+
 ```typescript
 await renderScoreFromURL(container, '/score.musicxml');
 ```
 
 **Always call destroy() when done:**
+
 ```typescript
 // React
 useEffect(() => {
@@ -92,12 +103,14 @@ window.addEventListener('beforeunload', () => renderer.destroy());
 ```
 
 **Use autoResize for responsive layouts:**
+
 ```typescript
 new ScoreRenderer(container, { autoResize: true });
 // Automatically adjusts when container resizes
 ```
 
 **Validate user input before passing to renderer:**
+
 ```typescript
 const notesPerColumn = Math.max(1, Math.min(50, userInput));
 const renderer = new ScoreRenderer(container, { notesPerColumn });
@@ -106,6 +119,7 @@ const renderer = new ScoreRenderer(container, { notesPerColumn });
 ### ❌ Don't
 
 **Don't create multiple renderers for the same container:**
+
 ```typescript
 // Bad - creates memory leaks
 new ScoreRenderer(container);
@@ -113,23 +127,29 @@ new ScoreRenderer(container); // Overwrites first one without cleanup
 ```
 
 **Don't set extreme values without validation:**
+
 ```typescript
 // Bad - will produce broken rendering
 new ScoreRenderer(container, {
-  notesPerColumn: -5,  // Invalid
-  columnSpacing: 0,    // Causes overlap
-  noteFontSize: 1000   // Unreadable
+  notesPerColumn: -5, // Invalid
+  columnSpacing: 0, // Causes overlap
+  noteFontSize: 1000, // Unreadable
 });
 ```
 
 **Don't ignore errors:**
+
 ```typescript
 // Bad - silently fails
-await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+await renderer.renderFromScoreData(
+  await MusicXMLParser.parseFromURL('/score.musicxml'),
+);
 
 // Good - handle errors
 try {
-  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+  await renderer.renderFromScoreData(
+    await MusicXMLParser.parseFromURL('/score.musicxml'),
+  );
 } catch (error) {
   console.error('Failed to load score:', error);
   showErrorToUser(error.message);
@@ -137,6 +157,7 @@ try {
 ```
 
 **Don't use experimental APIs in production:**
+
 ```typescript
 // Bad - experimental, may change
 import { Formatter, VerticalSystem } from 'shakuhachi-ro';
@@ -150,6 +171,7 @@ import { ScoreRenderer } from 'shakuhachi-ro';
 ### Framework Integration
 
 **React:**
+
 ```typescript
 import { useEffect, useRef } from 'react';
 import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
@@ -180,6 +202,7 @@ function ScoreView({ scoreUrl, options }) {
 ```
 
 **Vue 3:**
+
 ```typescript
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { ScoreRenderer, MusicXMLParser } from 'shakuhachi-ro';
@@ -193,43 +216,51 @@ export default {
       if (!container.value) return;
 
       renderer = new ScoreRenderer(container.value, {
-        autoResize: true
+        autoResize: true,
       });
 
       try {
-        await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(props.scoreUrl));
+        await renderer.renderFromScoreData(
+          await MusicXMLParser.parseFromURL(props.scoreUrl),
+        );
       } catch (error) {
         console.error('Render failed:', error);
       }
     });
 
-    watch(() => props.showOctaveMarks, (show) => {
-      renderer?.setOptions({ showOctaveMarks: show });
-    });
+    watch(
+      () => props.showOctaveMarks,
+      (show) => {
+        renderer?.setOptions({ showOctaveMarks: show });
+      },
+    );
 
     onUnmounted(() => {
       renderer?.destroy();
     });
 
     return { container };
-  }
+  },
 };
 ```
 
 **Vanilla JavaScript:**
+
 ```typescript
 class ScoreWidget {
   private renderer: ScoreRenderer;
 
   constructor(container: HTMLElement) {
     this.renderer = new ScoreRenderer(container, {
-      autoResize: true
+      autoResize: true,
     });
   }
 
   async loadScore(url: string): Promise<void> {
     try {
-      await this.renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
+      await this.renderer.renderFromScoreData(
+        await MusicXMLParser.parseFromURL(url),
+      );
     } catch (error) {
       this.handleError(error);
     }
@@ -253,25 +284,27 @@ class ScoreWidget {
 ### Dynamic Option Updates
 
 **Toggle features:**
+
 ```typescript
 const renderer = new ScoreRenderer(container);
 
 // Toggle octave marks
 document.getElementById('toggle-octave').addEventListener('change', (e) => {
   renderer.setOptions({
-    showOctaveMarks: e.target.checked
+    showOctaveMarks: e.target.checked,
   });
 });
 
 // Change notes per column
 document.getElementById('notes-slider').addEventListener('input', (e) => {
   renderer.setOptions({
-    notesPerColumn: parseInt(e.target.value)
+    notesPerColumn: parseInt(e.target.value),
   });
 });
 ```
 
 **Responsive column count:**
+
 ```typescript
 const renderer = new ScoreRenderer(container, { autoResize: false });
 
@@ -289,6 +322,7 @@ updateLayout();
 ### Error Handling
 
 **Graceful degradation:**
+
 ```typescript
 async function loadScore(url: string) {
   try {
@@ -307,15 +341,18 @@ async function loadScore(url: string) {
 ```
 
 **Retry logic:**
+
 ```typescript
 async function loadScoreWithRetry(url: string, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
+      await renderer.renderFromScoreData(
+        await MusicXMLParser.parseFromURL(url),
+      );
       return;
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
     }
   }
 }
@@ -375,15 +412,17 @@ new ScoreRenderer(container: HTMLElement, options?: RenderOptions)
 ```
 
 **Parameters:**
+
 - `container`: DOM element to render into
 - `options`: Optional render configuration
 
 **Example:**
+
 ```typescript
-const renderer = new ScoreRenderer(
-  document.getElementById('score'),
-  { showOctaveMarks: false, notesPerColumn: 8 }
-);
+const renderer = new ScoreRenderer(document.getElementById('score'), {
+  showOctaveMarks: false,
+  notesPerColumn: 8,
+});
 ```
 
 ### Methods
@@ -397,16 +436,16 @@ async renderFromScoreData(scoreData: ScoreData): Promise<void>
 Renders a score from a ScoreData object.
 
 **Parameters:**
+
 - `scoreData`: Parsed score data
 
 **Example:**
+
 ```typescript
 const scoreData = {
   title: 'My Score',
   style: 'kinko',
-  notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: 1 }
-  ]
+  notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
 };
 await renderer.renderFromScoreData(scoreData);
 ```
@@ -420,13 +459,15 @@ renderNotes(notes: ShakuNote[]): void
 Renders an array of ShakuNote objects. This is the core rendering method.
 
 **Parameters:**
+
 - `notes`: Array of ShakuNote objects to render
 
 **Example:**
+
 ```typescript
 const notes = [
   new ShakuNote({ symbol: 'ro' }),
-  new ShakuNote({ symbol: 'tsu' })
+  new ShakuNote({ symbol: 'tsu' }),
 ];
 renderer.renderNotes(notes);
 ```
@@ -440,10 +481,12 @@ setOptions(options: RenderOptions, autoRefresh?: boolean): void
 Updates render options. By default, automatically re-renders.
 
 **Parameters:**
+
 - `options`: New options to merge with current options
 - `autoRefresh`: Whether to automatically re-render (default: true)
 
 **Example:**
+
 ```typescript
 renderer.setOptions({ showDebugLabels: true });
 renderer.setOptions({ notesPerColumn: 5 }, false); // Don't re-render
@@ -458,6 +501,7 @@ refresh(): void
 Re-renders the current score with current options.
 
 **Example:**
+
 ```typescript
 renderer.setOptions({ showOctaveMarks: false }, false);
 renderer.refresh(); // Now re-render with new options
@@ -472,10 +516,12 @@ resize(width: number, height: number): void
 Updates viewport dimensions and re-renders.
 
 **Parameters:**
+
 - `width`: New viewport width
 - `height`: New viewport height
 
 **Example:**
+
 ```typescript
 renderer.resize(1000, 800);
 ```
@@ -491,6 +537,7 @@ Returns a copy of current render options.
 **Returns:** Complete options object with all values defined
 
 **Example:**
+
 ```typescript
 const options = renderer.getOptions();
 console.log(options.notesPerColumn); // 10
@@ -507,6 +554,7 @@ Returns a copy of currently rendered notes.
 **Returns:** Array of ShakuNote objects
 
 **Example:**
+
 ```typescript
 const notes = renderer.getNotes();
 console.log(notes.length);
@@ -523,6 +571,7 @@ Returns the current score data (if loaded from URL or ScoreData).
 **Returns:** ScoreData object or null if rendering notes directly
 
 **Example:**
+
 ```typescript
 const scoreData = renderer.getScoreData();
 if (scoreData) {
@@ -539,6 +588,7 @@ clear(): void
 Clears the rendered score and resets internal state.
 
 **Example:**
+
 ```typescript
 renderer.clear();
 ```
@@ -554,6 +604,7 @@ Cleans up resources (ResizeObserver) when disposing of the ScoreRenderer.
 **Important:** Call this when removing the renderer to prevent memory leaks, especially when `autoResize` is enabled.
 
 **Example:**
+
 ```typescript
 // In React cleanup
 useEffect(() => {
@@ -580,8 +631,8 @@ Simple one-line functions for common use cases.
 async function renderScoreFromURL(
   container: HTMLElement,
   url: string,
-  options?: RenderOptions
-): Promise<ScoreRenderer>
+  options?: RenderOptions,
+): Promise<ScoreRenderer>;
 ```
 
 Creates a ScoreRenderer and renders from a URL.
@@ -589,11 +640,12 @@ Creates a ScoreRenderer and renders from a URL.
 **Returns:** ScoreRenderer instance for further manipulation
 
 **Example:**
+
 ```typescript
 const renderer = await renderScoreFromURL(
   document.getElementById('score'),
   '/data/Akatombo.musicxml',
-  { showOctaveMarks: false }
+  { showOctaveMarks: false },
 );
 
 // Can still manipulate the renderer
@@ -606,8 +658,8 @@ renderer.setOptions({ showDebugLabels: true });
 async function renderScore(
   container: HTMLElement,
   scoreData: ScoreData,
-  options?: RenderOptions
-): Promise<ScoreRenderer>
+  options?: RenderOptions,
+): Promise<ScoreRenderer>;
 ```
 
 Creates a ScoreRenderer and renders from ScoreData.
@@ -615,12 +667,9 @@ Creates a ScoreRenderer and renders from ScoreData.
 **Returns:** ScoreRenderer instance for further manipulation
 
 **Example:**
+
 ```typescript
-const renderer = await renderScore(
-  container,
-  scoreData,
-  { notesPerColumn: 8 }
-);
+const renderer = await renderScore(container, scoreData, { notesPerColumn: 8 });
 ```
 
 ## RenderOptions
@@ -630,46 +679,46 @@ Configuration interface for rendering.
 ```typescript
 interface RenderOptions {
   // Display Options
-  showOctaveMarks?: boolean;        // default: true
-  showDebugLabels?: boolean;        // default: false
+  showOctaveMarks?: boolean; // default: true
+  showDebugLabels?: boolean; // default: false
 
   // Layout Options
-  notesPerColumn?: number;          // default: 10
-  columnSpacing?: number;           // default: 35
-  columnWidth?: number;             // default: 100
-  topMargin?: number;               // default: 34
+  notesPerColumn?: number; // default: 10
+  columnSpacing?: number; // default: 35
+  columnWidth?: number; // default: 100
+  topMargin?: number; // default: 34
 
   // Note Typography
-  noteFontSize?: number;            // default: 28
-  noteFontWeight?: number;          // default: 400
-  noteVerticalSpacing?: number;     // default: 44
-  noteFontFamily?: string;          // default: 'Noto Sans JP, sans-serif'
-  noteColor?: string;               // default: '#000'
+  noteFontSize?: number; // default: 28
+  noteFontWeight?: number; // default: 400
+  noteVerticalSpacing?: number; // default: 44
+  noteFontFamily?: string; // default: 'Noto Sans JP, sans-serif'
+  noteColor?: string; // default: '#000'
 
   // Octave Mark Configuration
-  octaveMarkFontSize?: number;      // default: 12
-  octaveMarkFontWeight?: number;    // default: 500
-  octaveMarkOffsetX?: number;       // default: 18
-  octaveMarkOffsetY?: number;       // default: -22
+  octaveMarkFontSize?: number; // default: 12
+  octaveMarkFontWeight?: number; // default: 500
+  octaveMarkOffsetX?: number; // default: 18
+  octaveMarkOffsetY?: number; // default: -22
 
   // Meri/Kari Mark Configuration
-  meriKariFontSize?: number;        // default: 14
-  meriKariFontWeight?: number;      // default: 500
+  meriKariFontSize?: number; // default: 14
+  meriKariFontWeight?: number; // default: 500
 
   // Duration Dot Configuration
   durationDotExtraSpacing?: number; // default: 12
 
   // Debug Label Configuration
-  debugLabelFontSize?: number;      // default: 7
-  debugLabelOffsetX?: number;       // default: 25
-  debugLabelOffsetY?: number;       // default: -6
-  debugLabelFontFamily?: string;    // default: 'monospace'
-  debugLabelColor?: string;         // default: '#999'
+  debugLabelFontSize?: number; // default: 7
+  debugLabelOffsetX?: number; // default: 25
+  debugLabelOffsetY?: number; // default: -6
+  debugLabelFontFamily?: string; // default: 'monospace'
+  debugLabelColor?: string; // default: '#999'
 
   // Viewport Options
-  width?: number;                   // default: auto-detect
-  height?: number;                  // default: auto-detect
-  autoResize?: boolean;             // default: true
+  width?: number; // default: auto-detect
+  height?: number; // default: auto-detect
+  autoResize?: boolean; // default: true
 }
 ```
 
@@ -677,15 +726,15 @@ interface RenderOptions {
 
 **Important:** While the API accepts any numbers, certain ranges produce better results:
 
-| Option | Valid Range | Recommended | Notes |
-|--------|-------------|-------------|-------|
-| `notesPerColumn` | 1-50 | 8-12 | Too few = wasted space, too many = cramped |
-| `columnSpacing` | 0-100 | 30-50 | 0 causes overlap, >100 wastes space |
-| `columnWidth` | 50-200 | 100-120 | Affects horizontal centering |
-| `noteFontSize` | 10-60 | 24-32 | Affects readability |
-| `noteVerticalSpacing` | 20-80 | 40-50 | Must be > noteFontSize to avoid overlap |
-| `octaveMarkFontSize` | 8-20 | 10-14 | Too small = unreadable |
-| `meriKariFontSize` | 10-24 | 12-16 | Should be visible but not dominant |
+| Option                | Valid Range | Recommended | Notes                                      |
+| --------------------- | ----------- | ----------- | ------------------------------------------ |
+| `notesPerColumn`      | 1-50        | 8-12        | Too few = wasted space, too many = cramped |
+| `columnSpacing`       | 0-100       | 30-50       | 0 causes overlap, >100 wastes space        |
+| `columnWidth`         | 50-200      | 100-120     | Affects horizontal centering               |
+| `noteFontSize`        | 10-60       | 24-32       | Affects readability                        |
+| `noteVerticalSpacing` | 20-80       | 40-50       | Must be > noteFontSize to avoid overlap    |
+| `octaveMarkFontSize`  | 8-20        | 10-14       | Too small = unreadable                     |
+| `meriKariFontSize`    | 10-24       | 12-16       | Should be visible but not dominant         |
 
 **Current limitation:** Invalid values are accepted but produce broken rendering. Future versions will validate and warn/error. See [API-IMPROVEMENTS.MD](./API-IMPROVEMENTS.MD#5-options-validation).
 
@@ -694,12 +743,13 @@ interface RenderOptions {
 #### mergeWithDefaults()
 
 ```typescript
-function mergeWithDefaults(options?: RenderOptions): ResolvedRenderOptions
+function mergeWithDefaults(options?: RenderOptions): ResolvedRenderOptions;
 ```
 
 Merges user options with defaults. `ResolvedRenderOptions` has every option defined except `width` and `height`, which stay optional (auto-detected from the container when unset).
 
 **Example:**
+
 ```typescript
 import { mergeWithDefaults } from 'shakuhachi-ro';
 
@@ -711,12 +761,13 @@ const options = mergeWithDefaults({ notesPerColumn: 8 });
 #### DEFAULT_RENDER_OPTIONS
 
 ```typescript
-const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions
+const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions;
 ```
 
 Default configuration values.
 
 **Example:**
+
 ```typescript
 import { DEFAULT_RENDER_OPTIONS } from 'shakuhachi-ro';
 
@@ -728,6 +779,7 @@ console.log(DEFAULT_RENDER_OPTIONS.notesPerColumn); // 10
 By default, the renderer automatically re-renders when the container size changes using `autoResize: true`. This is powered by the `ResizeObserver` API.
 
 **Default behavior (autoResize: true):**
+
 ```typescript
 const renderer = new ScoreRenderer(container);
 // Automatically re-renders when container is resized
@@ -735,6 +787,7 @@ const renderer = new ScoreRenderer(container);
 ```
 
 **Manual control (autoResize: false):**
+
 ```typescript
 const renderer = new ScoreRenderer(container, { autoResize: false });
 
@@ -782,16 +835,12 @@ static calculateLayout(
 **Returns:** Complete layout information
 
 **Example:**
+
 ```typescript
 import { ColumnLayoutCalculator, mergeWithDefaults } from 'shakuhachi-ro';
 
 const options = mergeWithDefaults({ notesPerColumn: 10 });
-const layout = ColumnLayoutCalculator.calculateLayout(
-  notes,
-  800,
-  600,
-  options
-);
+const layout = ColumnLayoutCalculator.calculateLayout(notes, 800, 600, options);
 
 console.log(layout.totalColumns); // 3
 console.log(layout.columns[0].xPosition); // 400
@@ -839,6 +888,7 @@ static configureModifiers(
 Configures modifiers on notes according to options.
 
 **Example:**
+
 ```typescript
 import { ModifierConfigurator, mergeWithDefaults } from 'shakuhachi-ro';
 
@@ -858,6 +908,7 @@ new SVGRenderer(element: HTMLElement, width: number, height: number)
 ```
 
 **Methods:**
+
 - `drawText()`: Draw text at position
 - `drawLine()`: Draw line
 - `drawCircle()`: Draw circle
@@ -873,6 +924,7 @@ new ShakuNote(options: ShakuNoteOptions)
 ```
 
 **Methods:**
+
 - `setPosition(x, y)`: Set note position
 - `setFontSize(size)`: Set font size
 - `setFontWeight(weight)`: Set font weight
@@ -923,7 +975,7 @@ import {
   getSymbolByKana,
   getSymbolByRomaji,
   getSymbolByPitch,
-  parseNote
+  parseNote,
 } from 'shakuhachi-ro';
 
 // Get all symbols
@@ -958,7 +1010,7 @@ formatter.format(notes, 500); // Format within 500px width
 const system = new VerticalSystem(svgRenderer, {
   x: 100,
   y: 50,
-  columnHeight: 500
+  columnHeight: 500,
 });
 system.addNotes(notes);
 system.render();
@@ -970,7 +1022,9 @@ All async methods can throw errors. Always use try/catch:
 
 ```typescript
 try {
-  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+  await renderer.renderFromScoreData(
+    await MusicXMLParser.parseFromURL('/score.musicxml'),
+  );
 } catch (error) {
   console.error('Failed to render:', error);
   container.innerHTML = `<div class="error">${error.message}</div>`;
@@ -980,16 +1034,20 @@ try {
 ### Common Errors and Solutions
 
 **"Failed to fetch"**
+
 - **Cause**: Network error, file not found, CORS issue
 - **Solution**: Check URL, verify file exists, ensure CORS headers if cross-origin
 
 **"Invalid MusicXML format"**
+
 - **Cause**: Malformed XML, unsupported MusicXML version
 - **Solution**: Validate XML, check MusicXML version (only 3.0+ supported)
 
 **"Container not found" / "Cannot read property of null"**
+
 - **Cause**: Container element doesn't exist in DOM
 - **Solution**: Ensure element exists before creating renderer
+
   ```typescript
   // Bad
   const renderer = new ScoreRenderer(document.getElementById('container'));
@@ -1001,6 +1059,7 @@ try {
   ```
 
 **Nothing renders / blank screen**
+
 - **Cause**: Container has zero dimensions
 - **Solution**: Set container size with CSS
   ```css
@@ -1011,10 +1070,12 @@ try {
   ```
 
 **Notes are cut off / overlapping**
+
 - **Cause**: Invalid option values
 - **Solution**: Check option ranges (see [Valid Option Ranges](#valid-option-ranges))
 
 **Memory leak in SPA**
+
 - **Cause**: Not calling `destroy()` when component unmounts
 - **Solution**: Always clean up in unmount lifecycle
   ```typescript
@@ -1025,8 +1086,10 @@ try {
   ```
 
 **"ResizeObserver loop limit exceeded" warning**
+
 - **Cause**: Rapid resize events (harmless warning)
 - **Solution**: Disable autoResize and debounce manually if needed
+
   ```typescript
   const renderer = new ScoreRenderer(container, { autoResize: false });
 
@@ -1047,12 +1110,14 @@ renderer.setOptions({ showDebugLabels: true });
 ```
 
 This shows:
+
 - Note index (1, 2, 3...)
 - Romanji (ro, tsu, re...)
 - Octave register (otsu, kan)
 - Meri/kari status (meri, dai-meri, kari)
 
 Useful for:
+
 - Verifying note parsing is correct
 - Checking modifier application
 - Understanding layout decisions
@@ -1066,7 +1131,7 @@ import type {
   RenderOptions,
   ColumnLayout,
   ColumnInfo,
-  ScoreData
+  ScoreData,
 } from 'shakuhachi-ro';
 ```
 
@@ -1081,6 +1146,7 @@ import type {
 ### Optimize Initial Render
 
 **Use appropriate notesPerColumn:**
+
 ```typescript
 // Bad - too many columns = slower layout calculation
 new ScoreRenderer(container, { notesPerColumn: 3 });
@@ -1090,17 +1156,19 @@ new ScoreRenderer(container, { notesPerColumn: 10 });
 ```
 
 **Disable features you don't need:**
+
 ```typescript
 new ScoreRenderer(container, {
-  showOctaveMarks: false,  // Skip octave rendering if not needed
-  showDebugLabels: false,  // Never enable in production
-  autoResize: false        // Disable if container size is fixed
+  showOctaveMarks: false, // Skip octave rendering if not needed
+  showDebugLabels: false, // Never enable in production
+  autoResize: false, // Disable if container size is fixed
 });
 ```
 
 ### Optimize Updates
 
 **Batch option changes:**
+
 ```typescript
 // Bad - triggers 3 re-renders
 renderer.setOptions({ showOctaveMarks: false });
@@ -1111,11 +1179,12 @@ renderer.setOptions({ showDebugLabels: true });
 renderer.setOptions({
   showOctaveMarks: false,
   notesPerColumn: 8,
-  showDebugLabels: true
+  showDebugLabels: true,
 });
 ```
 
 **Disable auto-refresh for multiple changes:**
+
 ```typescript
 // Set multiple options without re-rendering
 renderer.setOptions({ showOctaveMarks: false }, false);
@@ -1129,6 +1198,7 @@ renderer.refresh();
 ### Optimize Memory Usage
 
 **Destroy unused renderers:**
+
 ```typescript
 // When switching scores
 const oldRenderer = renderer;
@@ -1137,6 +1207,7 @@ oldRenderer.destroy(); // Free memory
 ```
 
 **Reuse renderer instances:**
+
 ```typescript
 // Bad - creates new renderer each time
 function displayScore(url) {
@@ -1154,27 +1225,35 @@ function displayScore(url) {
 ### Monitor Performance
 
 **Measure render time:**
+
 ```typescript
 const start = performance.now();
-await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+await renderer.renderFromScoreData(
+  await MusicXMLParser.parseFromURL('/score.musicxml'),
+);
 const duration = performance.now() - start;
 console.log(`Rendered in ${duration.toFixed(2)}ms`);
 ```
 
 **Profile in DevTools:**
+
 ```typescript
 performance.mark('render-start');
-await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL('/score.musicxml'));
+await renderer.renderFromScoreData(
+  await MusicXMLParser.parseFromURL('/score.musicxml'),
+);
 performance.mark('render-end');
 performance.measure('score-render', 'render-start', 'render-end');
 ```
 
 **Typical performance:**
+
 - Simple score (50 notes): ~10-20ms
 - Medium score (200 notes): ~30-50ms
 - Complex score (500+ notes): ~100-200ms
 
 If rendering is slower, check:
+
 - Container dimensions (very large = slower)
 - Number of modifiers (many octave changes = slower)
 - Number of columns (many short columns = slower)
@@ -1184,23 +1263,27 @@ If rendering is slower, check:
 **Planning for v2.0:** We're planning several improvements to the API. See [API-IMPROVEMENTS.MD](./API-IMPROVEMENTS.MD) for details.
 
 **Planned Breaking Changes:**
+
 - Cleaner public API (fewer exports, clearer boundaries)
 - Synchronous `renderFromScoreData()` (currently async but does no async work)
 - Fluent API with method chaining (`renderer.setOptions().resize().refresh()`)
 - Property getters instead of getter methods (`renderer.options` vs `renderer.getOptions()`)
 
 **Planned Non-Breaking Additions:**
+
 - Options validation with helpful warnings
 - Typed error classes (ParseError, NetworkError, ValidationError)
 - Event system for lifecycle hooks (render:start, render:complete, etc.)
 - Better TypeScript types
 
 **Migration Path:**
+
 - v1.x will add deprecation warnings for breaking changes
 - v1.x will be maintained for 6-12 months after v2.0 release
 - Migration guide will be provided with v2.0
 
 **How to prepare:**
+
 - Avoid using experimental APIs (Formatter, VerticalSystem)
 - Avoid using internal APIs (ScoreParser, kinko-symbols utilities)
 - Always call `destroy()` for cleanup

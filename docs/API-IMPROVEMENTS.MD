@@ -5,7 +5,9 @@ This document outlines suggestions for improving the Shakuhachi.ro renderer API 
 ## 1. API Surface Clarity
 
 ### Issue: Too Many Exports
+
 Currently exports **55+ items** from `index.ts`, mixing:
+
 - High-level user APIs (ScoreRenderer, renderScoreFromURL)
 - Internal utilities (ScoreParser, TestModifier)
 - Experimental features (Formatter, VerticalSystem)
@@ -14,15 +16,23 @@ Currently exports **55+ items** from `index.ts`, mixing:
 ### Recommendation: Tiered API Strategy
 
 **Tier 1 - Primary API (keep as default exports):**
+
 ```typescript
 // What 95% of users need
 export { ScoreRenderer } from './web-component/renderer/ScoreRenderer';
-export { renderScoreFromURL, renderScore } from './web-component/renderer/convenience';
+export {
+  renderScoreFromURL,
+  renderScore,
+} from './web-component/renderer/convenience';
 export type { RenderOptions } from './web-component/renderer/RenderOptions';
-export { mergeWithDefaults, DEFAULT_RENDER_OPTIONS } from './web-component/renderer/RenderOptions';
+export {
+  mergeWithDefaults,
+  DEFAULT_RENDER_OPTIONS,
+} from './web-component/renderer/RenderOptions';
 ```
 
 **Tier 2 - Advanced API (explicit import path):**
+
 ```typescript
 // For power users who need low-level control
 // Import via: import { ScoreParser } from 'shakuhachi-ro/advanced'
@@ -33,6 +43,7 @@ export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 ```
 
 **Tier 3 - Internal/Unstable (remove from public API):**
+
 ```typescript
 // Should NOT be exported
 - TestModifier (testing only)
@@ -41,6 +52,7 @@ export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 ```
 
 **Benefits:**
+
 - Clearer API surface
 - Better tree-shaking
 - Signals stability guarantees
@@ -53,16 +65,19 @@ export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 ### Issue: Inconsistent Naming Patterns
 
 **Class names:**
+
 - ✅ Good: `ScoreRenderer`, `ColumnLayoutCalculator` (noun phrases)
 - ❌ Mixed: `Formatter` (too generic), `ModifierConfigurator` (verbose)
 
 **Function names:**
+
 - ✅ Good: `renderScoreFromURL`, `renderScore` (verb phrases)
 - ❌ Inconsistent: `mergeWithDefaults` (utility function mixed with API)
 
 ### Recommendation: Establish Naming Conventions
 
 **Classes:**
+
 ```typescript
 // Pattern: <Domain><Role>
 ScoreRenderer       // ✓
@@ -72,6 +87,7 @@ ModifierConfigurator → ModifierManager     // More conventional
 ```
 
 **Functions:**
+
 ```typescript
 // Pattern: <verb><noun><preposition?>
 renderScore()        // ✓
@@ -80,9 +96,10 @@ mergeWithDefaults() → mergeOptions()  // More descriptive
 ```
 
 **Constants:**
+
 ```typescript
 // Pattern: SCREAMING_SNAKE_CASE for true constants
-DEFAULT_RENDER_OPTIONS  // ✓
+DEFAULT_RENDER_OPTIONS; // ✓
 ```
 
 ---
@@ -92,6 +109,7 @@ DEFAULT_RENDER_OPTIONS  // ✓
 ### Issue: Inconsistent Return Types
 
 **Current:**
+
 ```typescript
 setOptions(options, autoRefresh?): void  // Returns nothing
 resize(width, height): void               // Returns nothing
@@ -107,7 +125,7 @@ class ScoreRenderer {
   setOptions(options: RenderOptions, autoRefresh = true): this {
     this.options = mergeWithDefaults({ ...this.options, ...options });
     if (autoRefresh) this.refresh();
-    return this;  // Enable chaining
+    return this; // Enable chaining
   }
 
   resize(width: number, height: number): this {
@@ -131,6 +149,7 @@ renderer
 ```
 
 **Benefits:**
+
 - More ergonomic API
 - Follows VexFlow pattern (which you're inspired by)
 - Common in builder/configurator patterns
@@ -151,7 +170,10 @@ new ScoreRenderer(container: HTMLElement, options?: RenderOptions)
 
 ```typescript
 class ScoreRenderer {
-  constructor(containerOrOptions?: HTMLElement | RenderOptions, options?: RenderOptions) {
+  constructor(
+    containerOrOptions?: HTMLElement | RenderOptions,
+    options?: RenderOptions,
+  ) {
     if (containerOrOptions instanceof HTMLElement) {
       this.container = containerOrOptions;
       this.options = mergeWithDefaults(options);
@@ -171,12 +193,13 @@ class ScoreRenderer {
 }
 
 // Usage patterns:
-const renderer = new ScoreRenderer(container, options);  // Current
-const renderer = new ScoreRenderer(options).attachTo(container);  // Deferred
-const renderer = new ScoreRenderer().attachTo(container);  // Minimal
+const renderer = new ScoreRenderer(container, options); // Current
+const renderer = new ScoreRenderer(options).attachTo(container); // Deferred
+const renderer = new ScoreRenderer().attachTo(container); // Minimal
 ```
 
 **Benefits:**
+
 - More flexible initialization
 - Better for framework integrations (React refs, Vue $refs)
 - Can configure before attaching
@@ -197,7 +220,9 @@ new ScoreRenderer(container, { octaveMarkFontSize: 1000 });
 ### Recommendation: Add Validation
 
 ```typescript
-export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderOptions> {
+export function mergeWithDefaults(
+  options: RenderOptions = {},
+): Required<RenderOptions> {
   const merged = { ...DEFAULT_RENDER_OPTIONS, ...options };
 
   // Validate ranges
@@ -220,7 +245,9 @@ export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderO
 **Alternative: Soft Validation with Warnings**
 
 ```typescript
-export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderOptions> {
+export function mergeWithDefaults(
+  options: RenderOptions = {},
+): Required<RenderOptions> {
   const merged = { ...DEFAULT_RENDER_OPTIONS, ...options };
 
   // Warn instead of throw
@@ -234,6 +261,7 @@ export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderO
 ```
 
 **Benefits:**
+
 - Fail fast with clear errors
 - Better developer experience
 - Prevent subtle rendering bugs
@@ -245,6 +273,7 @@ export function mergeWithDefaults(options: RenderOptions = {}): Required<RenderO
 ### Issue: No Way to Hook Into Lifecycle
 
 Users can't be notified when:
+
 - Rendering starts/completes
 - Errors occur
 - Options change
@@ -254,11 +283,11 @@ Users can't be notified when:
 
 ```typescript
 type RendererEvent =
-  | { type: 'render:start', noteCount: number }
-  | { type: 'render:complete', duration: number }
-  | { type: 'render:error', error: Error }
-  | { type: 'options:change', options: Required<RenderOptions> }
-  | { type: 'resize', width: number, height: number };
+  | { type: 'render:start'; noteCount: number }
+  | { type: 'render:complete'; duration: number }
+  | { type: 'render:error'; error: Error }
+  | { type: 'options:change'; options: Required<RenderOptions> }
+  | { type: 'resize'; width: number; height: number };
 
 type EventListener = (event: RendererEvent) => void;
 
@@ -274,7 +303,7 @@ class ScoreRenderer {
   }
 
   private emit(event: RendererEvent): void {
-    this.listeners.forEach(listener => listener(event));
+    this.listeners.forEach((listener) => listener(event));
   }
 
   renderNotes(notes: ShakuNote[]): void {
@@ -293,7 +322,7 @@ class ScoreRenderer {
 }
 
 // Usage:
-const unsubscribe = renderer.on(event => {
+const unsubscribe = renderer.on((event) => {
   if (event.type === 'render:complete') {
     console.log(`Rendered in ${event.duration}ms`);
   }
@@ -304,6 +333,7 @@ unsubscribe();
 ```
 
 **Benefits:**
+
 - Enables performance monitoring
 - Better error handling in frameworks
 - Can show loading states
@@ -327,10 +357,14 @@ renderNotes(notes: ShakuNote[]): void                // Sync
 
 ```typescript
 // Async: actually needs to fetch (convenience.ts — ScoreRenderer does not fetch)
-async function renderScoreFromURL(container, url, options?): Promise<ScoreRenderer> {
+async function renderScoreFromURL(
+  container,
+  url,
+  options?,
+): Promise<ScoreRenderer> {
   const scoreData = await MusicXMLParser.parseFromURL(url);
   const renderer = new ScoreRenderer(container, options);
-  renderer.renderFromScoreData(scoreData);  // Sync call
+  renderer.renderFromScoreData(scoreData); // Sync call
   return renderer;
 }
 
@@ -350,12 +384,14 @@ class ScoreRenderer {
 ```
 
 **Benefits:**
+
 - More predictable API
 - Better performance (avoid microtasks)
 - Clearer about what's async
 
 **Migration:**
 Keep async version for backward compatibility with deprecation warning:
+
 ```typescript
 /** @deprecated Use synchronous renderFromScoreData instead */
 async renderFromScoreDataAsync(data: ScoreData): Promise<void> {
@@ -383,28 +419,40 @@ try {
 
 ```typescript
 export class RendererError extends Error {
-  constructor(message: string, public readonly code: string) {
+  constructor(
+    message: string,
+    public readonly code: string,
+  ) {
     super(message);
     this.name = 'RendererError';
   }
 }
 
 export class ParseError extends RendererError {
-  constructor(message: string, public readonly xml?: string) {
+  constructor(
+    message: string,
+    public readonly xml?: string,
+  ) {
     super(message, 'PARSE_ERROR');
     this.name = 'ParseError';
   }
 }
 
 export class NetworkError extends RendererError {
-  constructor(message: string, public readonly url: string) {
+  constructor(
+    message: string,
+    public readonly url: string,
+  ) {
     super(message, 'NETWORK_ERROR');
     this.name = 'NetworkError';
   }
 }
 
 export class ValidationError extends RendererError {
-  constructor(message: string, public readonly field: string) {
+  constructor(
+    message: string,
+    public readonly field: string,
+  ) {
     super(message, 'VALIDATION_ERROR');
     this.name = 'ValidationError';
   }
@@ -423,6 +471,7 @@ try {
 ```
 
 **Benefits:**
+
 - Type-safe error handling
 - Better error messages
 - Easier debugging
@@ -446,11 +495,11 @@ getScoreData(): ScoreData | null        // Method
 ```typescript
 class ScoreRenderer {
   get options(): Required<RenderOptions> {
-    return { ...this.options };  // Return copy
+    return { ...this.options }; // Return copy
   }
 
   get notes(): ShakuNote[] {
-    return [...this.currentNotes];  // Return copy
+    return [...this.currentNotes]; // Return copy
   }
 
   get scoreData(): ScoreData | null {
@@ -459,16 +508,18 @@ class ScoreRenderer {
 }
 
 // Usage:
-console.log(renderer.options.notesPerColumn);  // More natural
-const notes = renderer.notes;                   // More natural
+console.log(renderer.options.notesPerColumn); // More natural
+const notes = renderer.notes; // More natural
 ```
 
 **Benefits:**
+
 - More idiomatic JavaScript
 - Aligns with framework patterns (Vue computed, React state)
 - Still returns defensive copies
 
 **Keep methods for actions:**
+
 ```typescript
 refresh(): void      // Method - performs action
 clear(): this        // Method - performs action
@@ -505,10 +556,10 @@ export interface RenderOptions {
 export type ResolvedRenderOptions = Required<RenderOptions>;
 
 class ScoreRenderer {
-  private options: ResolvedRenderOptions;  // Always complete
+  private options: ResolvedRenderOptions; // Always complete
 
   constructor(container: HTMLElement, options: RenderOptions = {}) {
-    this.options = mergeWithDefaults(options);  // Returns ResolvedRenderOptions
+    this.options = mergeWithDefaults(options); // Returns ResolvedRenderOptions
   }
 
   setOptions(options: RenderOptions): this {
@@ -524,6 +575,7 @@ class ScoreRenderer {
 ```
 
 **Benefits:**
+
 - No undefined checks in implementation
 - Type system enforces completeness
 - Better autocomplete
@@ -535,10 +587,11 @@ class ScoreRenderer {
 ### Issue: Container Management Is Unclear
 
 ```typescript
-new ScoreRenderer(container, options)
+new ScoreRenderer(container, options);
 ```
 
 **Questions:**
+
 - What if container is removed from DOM?
 - What if I want to move renderer to different container?
 - Can I render to multiple containers?
@@ -561,19 +614,19 @@ class ScoreRenderer {
 
   detachFrom(container: HTMLElement): this {
     this.containers.delete(container);
-    container.innerHTML = '';  // Clear container
+    container.innerHTML = ''; // Clear container
     return this;
   }
 
   detachAll(): this {
-    this.containers.forEach(c => c.innerHTML = '');
+    this.containers.forEach((c) => (c.innerHTML = ''));
     this.containers.clear();
     return this;
   }
 
   renderNotes(notes: ShakuNote[]): void {
     this.currentNotes = notes;
-    this.containers.forEach(container => {
+    this.containers.forEach((container) => {
       this.renderToContainer(container);
     });
   }
@@ -586,12 +639,13 @@ class ScoreRenderer {
 // Usage:
 const renderer = new ScoreRenderer(options);
 renderer.attachTo(container1);
-renderer.attachTo(container2);  // Same score, two places
+renderer.attachTo(container2); // Same score, two places
 
-renderer.setOptions({ showOctaveMarks: false });  // Updates both
+renderer.setOptions({ showOctaveMarks: false }); // Updates both
 ```
 
 **Benefits:**
+
 - Reuse renderer across components
 - Better framework integration
 - Clearer lifecycle
@@ -609,13 +663,14 @@ import {
   ScoreRenderer,
   renderScoreFromURL,
   mergeWithDefaults,
-  DEFAULT_RENDER_OPTIONS
+  DEFAULT_RENDER_OPTIONS,
 } from 'shakuhachi-ro';
 ```
 
 ### Recommendation: Subpath Exports
 
 **package.json:**
+
 ```json
 {
   "exports": {
@@ -628,6 +683,7 @@ import {
 ```
 
 **Usage:**
+
 ```typescript
 // Main API
 import { ScoreRenderer } from 'shakuhachi-ro';
@@ -640,6 +696,7 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 ```
 
 **Benefits:**
+
 - Better tree-shaking
 - Clearer API boundaries
 - Can version subpaths independently
@@ -649,18 +706,21 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 ## Priority Ranking
 
 ### High Priority (Do First)
+
 1. **API Surface Clarity** - Remove internal exports, reduce public API
 2. **Async API Consistency** - Make `renderFromScoreData` synchronous
 3. **Options Validation** - Add basic validation to prevent broken states
 4. **destroy() Documentation** - Already critical, properly document lifecycle
 
 ### Medium Priority (Do Soon)
+
 5. **Fluent API Pattern** - Return `this` from setters for chaining
 6. **Getters vs Methods** - Use getters for simple property access
 7. **Error Handling** - Add typed error classes
 8. **Responsive Rendering** - Document autoResize feature better
 
 ### Low Priority (Nice to Have)
+
 9. **Event System** - Add lifecycle hooks for advanced use cases
 10. **Container Handling** - Multi-container support (probably not needed)
 11. **Constructor Overloads** - Deferred attachment (probably not needed)
@@ -671,6 +731,7 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 ## Breaking vs Non-Breaking Changes
 
 ### ✅ Non-Breaking (Can Do Now)
+
 - Add `destroy()` documentation ✓ (done)
 - Add validation with warnings (not errors)
 - Add event system (additive)
@@ -679,6 +740,7 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 - Add typed error classes
 
 ### ⚠️ Breaking (Need Major Version)
+
 - Remove exports from public API
 - Change async methods to sync
 - Rename classes/methods
@@ -686,6 +748,7 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 - Remove deprecated methods
 
 ### Migration Strategy
+
 1. Release v1.x with deprecation warnings
 2. Document migration path
 3. Release v2.0 with breaking changes
