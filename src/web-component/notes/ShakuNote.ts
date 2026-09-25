@@ -10,6 +10,7 @@
 
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 import type { Modifier } from '../modifiers/Modifier';
+import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import {
   getSymbolByRomaji,
   type KinkoSymbol,
@@ -209,6 +210,14 @@ export class ShakuNote {
    */
   getModifiers(): Modifier[] {
     return [...this.modifiers];
+  }
+
+  /**
+   * Whether this note needs extra vertical space below it in a column.
+   * True when it carries a duration dot, which sits below the note.
+   */
+  needsExtraSpacing(): boolean {
+    return this.modifiers.some((mod) => mod instanceof DurationDotModifier);
   }
 
   /**
