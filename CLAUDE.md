@@ -130,7 +130,7 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 - Visual tests (Browser): Rendering, layout
 - **Always test visual changes with chrome-devtools-mcp** - See "Chrome DevTools MCP" section
 - **When you find an error during development, implement a unit test that would have caught that error**
-- **Run full test suite after each task**: `npm test` (includes type-check, lint, and vitest)
+- **Run full test suite after each task**: `npm test` (includes type-check, lint, format check, and vitest; fix formatting with `npm run format`)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
 
 **Writing Tests**

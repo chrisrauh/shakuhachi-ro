@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Type-check, lint, format check and unit tests. No secrets needed:
+      # vitest.config.ts supplies placeholder Supabase env vars.
+      - run: npm test
+
+      # Catches a broken embed bundle. The platform build runs on Netlify.
+      - run: npm run build:wc

@@ -63,16 +63,16 @@ CREATE TABLE scores (
 
 ## Migrations
 
-| Migration | Description |
-|-----------|-------------|
-| `add_slug_to_scores.sql` | Adds slug field for human-readable URLs |
-| `add_attribution_to_scores.sql` | Adds source_url, rights, source_description fields |
-| `remove_difficulty_from_scores.sql` | Removes unused difficulty field |
-| `remove_tags_from_scores.sql` | Removes unused tags field |
-| `remove_view_count_from_scores.sql` | Removes unused view_count field |
-| `rls_policies_scores.sql` | Row Level Security policies (public read, owner-only write) |
-| `derive_fork_count.sql` | Drops stored `fork_count`; the count is derived from `forked_from` |
-| `seed_scores.sql` | Seeds 7 shakuhachi songs with full attribution |
+| Migration                           | Description                                                        |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `add_slug_to_scores.sql`            | Adds slug field for human-readable URLs                            |
+| `add_attribution_to_scores.sql`     | Adds source_url, rights, source_description fields                 |
+| `remove_difficulty_from_scores.sql` | Removes unused difficulty field                                    |
+| `remove_tags_from_scores.sql`       | Removes unused tags field                                          |
+| `remove_view_count_from_scores.sql` | Removes unused view_count field                                    |
+| `rls_policies_scores.sql`           | Row Level Security policies (public read, owner-only write)        |
+| `derive_fork_count.sql`             | Drops stored `fork_count`; the count is derived from `forked_from` |
+| `seed_scores.sql`                   | Seeds 7 shakuhachi songs with full attribution                     |
 
 ## Seeded Songs
 
@@ -89,7 +89,9 @@ The seed script adds these songs to your library:
 ## Troubleshooting
 
 ### "No users found" error when seeding
+
 Create an account through the web app first, then run the seed script.
 
 ### Duplicate slug error
+
 The seed script uses fixed slugs. If a score already exists with that slug, you may need to delete it first or skip that INSERT.

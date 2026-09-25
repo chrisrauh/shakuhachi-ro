@@ -12,10 +12,12 @@ The site needs a way to iterate on color palettes: define a theme from an input 
 This is a **dev-only, temporary framework**. It has two distinct layers:
 
 **Permanent (stays forever):**
+
 - The CSS token architecture in `theme.css` (unchanged)
 - The JSON theme file format (used during iteration, then deleted)
 
 **Temporary tooling (deleted after final palette chosen):**
+
 - `ThemeLoader` utility
 - Tweakpane dev panel
 - Comparison page
@@ -50,6 +52,7 @@ Location: `public/themes/<name>.json`
 ```
 
 **Rules:**
+
 - Only override semantic tokens (purpose-based, e.g. `--color-button-primary`), never primitives
 - Only include tokens that differ from the base — omit tokens that stay the same
 - `tokens` apply in light mode; `darkTokens` apply additionally when `data-theme="dark"` is active
@@ -71,12 +74,14 @@ Uses Vite's `import.meta.glob('../../public/themes/*.json')` — no hand-maintai
 ```
 
 Responsibilities:
+
 - On load: read `?theme=name` URL param, fetch the matching JSON, apply token overrides to `document.documentElement`
 - Expose `applyTheme(name: string)` for Tweakpane to call without page reload
 - On failure: log a console warning and silently fall back to base `theme.css` tokens — no broken page. Unknown token names (e.g. typos) are also silently skipped with a console warning per token.
 - No localStorage persistence — each page load starts from the URL param
 
 End-of-iteration cleanup (listed in the file):
+
 1. Identify the winning theme JSON
 2. Copy its `tokens` values into the semantic token section of `theme.css`
 3. Delete `public/themes/` directory
@@ -96,7 +101,9 @@ End-of-iteration cleanup (listed in the file):
 - Injected via a single conditional `<script>` tag in `Layout.astro`:
   ```html
   <!-- THEME TOOLING: remove this tag and delete theme-dev-panel.ts when done -->
-  {import.meta.env.DEV && <script src="...theme-dev-panel.ts"></script>}
+  {import.meta.env.DEV &&
+  <script src="...theme-dev-panel.ts"></script>
+  }
   ```
 - Panel contents:
   - Theme dropdown — populated from discovered JSON files, calls `ThemeLoader.applyTheme(name)`
@@ -115,11 +122,13 @@ No coupling to any existing page component. Self-contained.
 Route: `/dev/themes`
 
 Protected by a redirect in production:
+
 ```ts
 if (!import.meta.env.DEV) return Astro.redirect('/');
 ```
 
 Layout: two columns side-by-side. Each column has:
+
 - A theme selector dropdown (lists all discovered themes)
 - A component gallery: site header, score card, primary button, secondary button, form input, toast
 

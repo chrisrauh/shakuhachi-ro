@@ -26,7 +26,7 @@ The design system uses a three-tier token hierarchy:
 
 1. **Primitives** provide the raw color values. Changing `--color-blue-500` updates all blues.
 2. **Semantic Palettes** map roles to primitives. Changing `--color-primary-*` from blue to indigo is one line.
-3. **Purpose-Based Tokens** describe what colors are *for*. Components reference these, making theming and dark mode automatic.
+3. **Purpose-Based Tokens** describe what colors are _for_. Components reference these, making theming and dark mode automatic.
 
 ## Token Groups
 
@@ -35,6 +35,7 @@ The design system uses a three-tier token hierarchy:
 Raw OKLCH color values from the Tailwind CSS v4 palette. These define the actual color values.
 
 **Neutral Families** (for UI chrome, text, backgrounds):
+
 - `--color-slate-*` — Cool gray with blue undertone
 - `--color-gray-*` — True neutral gray
 - `--color-zinc-*` — Slightly warmer neutral
@@ -42,15 +43,18 @@ Raw OKLCH color values from the Tailwind CSS v4 palette. These define the actual
 - `--color-stone-*` — Warm gray with slight brown
 
 **Chromatic Families** (for accents, status, branding):
+
 - `--color-red-*` through `--color-rose-*` — Full spectrum
 
 **Scale**: Each family has steps from 25 to 975:
+
 ```
 25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500,
 550, 600, 650, 700, 750, 800, 850, 900, 925, 950, 975
 ```
 
 **Absolute Colors**:
+
 - `--color-neutral-0` — Pure white
 - `--color-neutral-1000` — Pure black
 
@@ -58,15 +62,16 @@ Raw OKLCH color values from the Tailwind CSS v4 palette. These define the actual
 
 Map abstract roles to primitive color families. These allow brand customization without touching component code.
 
-| Palette | Maps To | Purpose |
-|---------|---------|---------|
-| `--color-primary-*` | `--color-blue-*` | Primary actions, links, focus states |
-| `--color-success-*` | `--color-green-*` | Success states, confirmations |
-| `--color-warning-*` | `--color-amber-*` | Warnings, caution states |
-| `--color-danger-*` | `--color-red-*` | Errors, destructive actions |
-| `--color-neutral-*` | `--color-gray-*` | Text, borders, backgrounds |
+| Palette             | Maps To           | Purpose                              |
+| ------------------- | ----------------- | ------------------------------------ |
+| `--color-primary-*` | `--color-blue-*`  | Primary actions, links, focus states |
+| `--color-success-*` | `--color-green-*` | Success states, confirmations        |
+| `--color-warning-*` | `--color-amber-*` | Warnings, caution states             |
+| `--color-danger-*`  | `--color-red-*`   | Errors, destructive actions          |
+| `--color-neutral-*` | `--color-gray-*`  | Text, borders, backgrounds           |
 
 To change the primary color from blue to indigo:
+
 ```css
 --color-primary-500: var(--color-indigo-500);
 /* ... repeat for all steps */
@@ -74,41 +79,41 @@ To change the primary color from blue to indigo:
 
 ### 3. Purpose-Based Tokens
 
-These describe *what* the color is for, not *what shade* it is. Components should only use these tokens.
+These describe _what_ the color is for, not _what shade_ it is. Components should only use these tokens.
 
 #### Text Colors
 
-| Token | Value (Light) | Usage |
-|-------|---------------|-------|
-| `--color-text-heading` | neutral-900 | Primary headings (h1, h2) |
-| `--color-text-primary` | neutral-700 | Body text, main content |
-| `--color-text-secondary` | neutral-600 | Metadata, descriptions, labels |
-| `--color-text-tertiary` | neutral-500 | Muted text, hints, placeholders |
-| `--color-text-disabled` | neutral-400 | Disabled states |
-| `--color-text-on-dark` | neutral-0 | Text on colored backgrounds |
+| Token                    | Value (Light) | Usage                           |
+| ------------------------ | ------------- | ------------------------------- |
+| `--color-text-heading`   | neutral-900   | Primary headings (h1, h2)       |
+| `--color-text-primary`   | neutral-700   | Body text, main content         |
+| `--color-text-secondary` | neutral-600   | Metadata, descriptions, labels  |
+| `--color-text-tertiary`  | neutral-500   | Muted text, hints, placeholders |
+| `--color-text-disabled`  | neutral-400   | Disabled states                 |
+| `--color-text-on-dark`   | neutral-0     | Text on colored backgrounds     |
 
 #### Border Colors
 
-| Token | Value (Light) | Usage |
-|-------|---------------|-------|
-| `--color-border` | neutral-300 | Default borders (inputs, cards) |
-| `--color-border-subtle` | neutral-200 | Subtle dividers, separators |
-| `--color-border-hover` | neutral-400 | Border color on hover |
+| Token                   | Value (Light) | Usage                           |
+| ----------------------- | ------------- | ------------------------------- |
+| `--color-border`        | neutral-300   | Default borders (inputs, cards) |
+| `--color-border-subtle` | neutral-200   | Subtle dividers, separators     |
+| `--color-border-hover`  | neutral-400   | Border color on hover           |
 
 #### Background Colors
 
-| Token | Value (Light) | Usage |
-|-------|---------------|-------|
-| `--color-bg-subtle` | neutral-50 | Subtle backgrounds (cards) |
-| `--color-bg-hover` | neutral-100 | Hover states |
-| `--color-bg-active` | neutral-200 | Active/pressed states |
+| Token               | Value (Light) | Usage                      |
+| ------------------- | ------------- | -------------------------- |
+| `--color-bg-subtle` | neutral-50    | Subtle backgrounds (cards) |
+| `--color-bg-hover`  | neutral-100   | Hover states               |
+| `--color-bg-active` | neutral-200   | Active/pressed states      |
 
 #### Special Tokens
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--color-separator` | neutral-400 | Visual separators between items |
-| `--color-logo` | neutral-700 (light), neutral-600 (dark) | Logo color |
+| Token               | Value                                   | Usage                           |
+| ------------------- | --------------------------------------- | ------------------------------- |
+| `--color-separator` | neutral-400                             | Visual separators between items |
+| `--color-logo`      | neutral-700 (light), neutral-600 (dark) | Logo color                      |
 
 ### 4. Component Tokens
 
@@ -187,12 +192,18 @@ Some tokens need explicit dark mode overrides:
 ```css
 /* System preference (default) */
 @media (prefers-color-scheme: dark) {
-  :root { /* dark tokens */ }
+  :root {
+    /* dark tokens */
+  }
 }
 
 /* Manual override (higher specificity) */
-:root[data-theme="dark"] { /* dark tokens */ }
-:root[data-theme="light"] { /* light tokens */ }
+:root[data-theme='dark'] {
+  /* dark tokens */
+}
+:root[data-theme='light'] {
+  /* light tokens */
+}
 ```
 
 ## Non-Color Tokens
@@ -202,25 +213,25 @@ Some tokens need explicit dark mode overrides:
 Based on Shoelace design system. Uses rem units for accessibility (respects user font size preferences).
 
 ```css
---spacing-3x-small: 0.125rem;  /* 2px */
---spacing-2x-small: 0.25rem;   /* 4px */
---spacing-x-small: 0.5rem;     /* 8px */
---spacing-small: 0.75rem;      /* 12px */
---spacing-medium: 1rem;        /* 16px */
---spacing-large: 1.25rem;      /* 20px */
---spacing-x-large: 1.75rem;    /* 28px */
---spacing-2x-large: 2.25rem;   /* 36px */
---spacing-3x-large: 3rem;      /* 48px */
---spacing-4x-large: 4.5rem;    /* 72px */
+--spacing-3x-small: 0.125rem; /* 2px */
+--spacing-2x-small: 0.25rem; /* 4px */
+--spacing-x-small: 0.5rem; /* 8px */
+--spacing-small: 0.75rem; /* 12px */
+--spacing-medium: 1rem; /* 16px */
+--spacing-large: 1.25rem; /* 20px */
+--spacing-x-large: 1.75rem; /* 28px */
+--spacing-2x-large: 2.25rem; /* 36px */
+--spacing-3x-large: 3rem; /* 48px */
+--spacing-4x-large: 4.5rem; /* 72px */
 ```
 
 ### Border Radius
 
 ```css
---border-radius-small: 0.1875rem;   /* 3px */
---border-radius-medium: 0.25rem;    /* 4px */
---border-radius-large: 0.5rem;      /* 8px */
---border-radius-x-large: 1rem;      /* 16px */
+--border-radius-small: 0.1875rem; /* 3px */
+--border-radius-medium: 0.25rem; /* 4px */
+--border-radius-large: 0.5rem; /* 8px */
+--border-radius-x-large: 1rem; /* 16px */
 --border-radius-circle: 50%;
 --border-radius-pill: 9999px;
 ```
@@ -229,13 +240,13 @@ Based on Shoelace design system. Uses rem units for accessibility (respects user
 
 ```css
 /* Sizes */
---font-size-2x-small: 0.625rem;   /* 10px */
---font-size-x-small: 0.75rem;     /* 12px */
---font-size-small: 0.875rem;      /* 14px */
---font-size-medium: 1rem;         /* 16px */
---font-size-large: 1.25rem;       /* 20px */
---font-size-x-large: 1.5rem;      /* 24px */
---font-size-2x-large: 2.25rem;    /* 36px */
+--font-size-2x-small: 0.625rem; /* 10px */
+--font-size-x-small: 0.75rem; /* 12px */
+--font-size-small: 0.875rem; /* 14px */
+--font-size-medium: 1rem; /* 16px */
+--font-size-large: 1.25rem; /* 20px */
+--font-size-x-large: 1.5rem; /* 24px */
+--font-size-2x-large: 2.25rem; /* 36px */
 
 /* Weights */
 --font-weight-light: 300;
@@ -288,20 +299,32 @@ Shadows use gray-500 as the shadow color with varying opacity. In dark mode, sha
 
 ```css
 /* Use purpose-based tokens */
-.heading { color: var(--color-text-heading); }
-.card { border: 1px solid var(--color-border); }
-.button:hover { background: var(--color-bg-hover); }
+.heading {
+  color: var(--color-text-heading);
+}
+.card {
+  border: 1px solid var(--color-border);
+}
+.button:hover {
+  background: var(--color-bg-hover);
+}
 ```
 
 ### Don't
 
 ```css
 /* Don't use primitives directly in components */
-.heading { color: var(--color-gray-900); }        /* Bad */
-.card { border: 1px solid var(--color-gray-300); } /* Bad */
+.heading {
+  color: var(--color-gray-900);
+} /* Bad */
+.card {
+  border: 1px solid var(--color-gray-300);
+} /* Bad */
 
 /* Don't use raw color values */
-.heading { color: #1a1a1a; }  /* Bad */
+.heading {
+  color: #1a1a1a;
+} /* Bad */
 ```
 
 ### Adding New Purpose Tokens
@@ -314,6 +337,7 @@ When you need a color for a new purpose:
 4. Document it in this file
 
 Example:
+
 ```css
 /* In :root (light theme) */
 --color-badge-background: var(--color-neutral-100);

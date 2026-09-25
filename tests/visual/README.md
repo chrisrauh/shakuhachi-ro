@@ -11,6 +11,7 @@ Visual regression tests ensure that refactoring doesn't introduce unintended vis
 ### Prerequisites
 
 1. **Install @playwright/test** (required):
+
    ```bash
    npm install --save-dev @playwright/test
    ```
@@ -46,6 +47,7 @@ npm run test:visual
 ```
 
 On first run, Playwright will:
+
 - Start the dev server (localhost:3001)
 - Generate baseline screenshots
 - Store them in `tests/visual/__screenshots__/`
@@ -58,6 +60,7 @@ npm run test:visual
 ```
 
 Playwright will:
+
 - Take new screenshots
 - Compare against baselines
 - Report any visual differences
@@ -80,6 +83,7 @@ npm run test:visual:report
 ```
 
 Opens an HTML report showing:
+
 - Which tests passed/failed
 - Side-by-side comparison of baseline vs. actual
 - Diff highlighting showing exact pixel differences
@@ -97,16 +101,19 @@ Runs tests with Playwright Inspector for debugging.
 ### During Refactoring
 
 1. **Before starting a phase:**
+
    ```bash
    npm run test:visual  # Ensure all tests pass
    ```
 
 2. **After completing changes:**
+
    ```bash
    npm run test:visual  # Check for visual regressions
    ```
 
 3. **If tests fail:**
+
    ```bash
    npm run test:visual:report  # View diff report
    ```
@@ -140,6 +147,7 @@ npm run test:visual:update             # Update baselines
 ## Baseline Images
 
 Baseline screenshots are stored in:
+
 ```
 tests/visual/
   visual-regression.spec.ts-snapshots/
@@ -151,6 +159,7 @@ tests/visual/
 ```
 
 **These files are committed to the repository** so that:
+
 - Everyone has the same baselines
 - CI/CD can run visual regression tests
 - Visual changes are tracked in git history
@@ -166,6 +175,7 @@ maxDiffPixelRatio: 0.01,  // Max 1% of pixels can differ
 ```
 
 These strict settings ensure high fidelity but allow for:
+
 - Minor anti-aliasing differences
 - Font rendering variations across systems
 - Small floating-point rounding differences
@@ -173,20 +183,24 @@ These strict settings ensure high fidelity but allow for:
 ## Troubleshooting
 
 ### Tests fail on first run
+
 - This is expected! First run generates baselines.
 - Run `npm run test:visual` again to compare.
 
 ### Tests fail with small differences
+
 - Check the diff report: `npm run test:visual:report`
 - If differences are from font rendering, consider:
   - Increasing `maxDiffPixels` slightly
   - Using Docker for consistent rendering
 
 ### Dev server doesn't start
+
 - Ensure port 3001 is available
 - Check `npm run dev` works independently
 
 ### Baselines look wrong
+
 - Delete `tests/visual/__screenshots__/` directory
 - Run `npm run test:visual` to regenerate
 

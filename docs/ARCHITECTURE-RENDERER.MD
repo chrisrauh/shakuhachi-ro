@@ -66,6 +66,7 @@ src/web-component/
 
 The renderer is wrapped as a custom element `<shakuhachi-score>`:
 
+<!-- prettier-ignore -->
 ```html
 <shakuhachi-score data-score='{"notes":[...]}'></shakuhachi-score>
 <shakuhachi-score columns="6" data-score='...'></shakuhachi-score>
@@ -74,6 +75,7 @@ The renderer is wrapped as a custom element `<shakuhachi-score>`:
 ```
 
 **Attributes:**
+
 - `data-score` - JSON score data (required, must contain `notes` array)
 - `columns` - `"auto"` (default), `"1"` (single column), or explicit number
 - `auto-resize` - Enable ResizeObserver (default: `true`)

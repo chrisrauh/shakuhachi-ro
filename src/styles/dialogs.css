@@ -13,7 +13,8 @@ dialog.app-dialog {
   box-shadow: var(--shadow-x-large);
   max-width: var(--size-dialog-max-width);
   width: 100%;
-  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1) dialog-appear;
+  animation: var(--transition-medium) cubic-bezier(0.33, 1, 0.68, 1)
+    dialog-appear;
 }
 
 dialog.app-dialog::backdrop {
@@ -22,13 +23,23 @@ dialog.app-dialog::backdrop {
 }
 
 @keyframes dialog-overlay-appear {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes dialog-appear {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ---- Shared dialog section layout ---- */

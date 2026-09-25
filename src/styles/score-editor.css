@@ -135,7 +135,9 @@
   transition: opacity var(--transition-fast);
 }
 
-.help-link:hover { opacity: 1; }
+.help-link:hover {
+  opacity: 1;
+}
 
 .help-link svg {
   display: block;
@@ -220,9 +222,13 @@
   color: var(--color-text-secondary);
 }
 
-.preview-hint { font-size: var(--font-size-small); }
+.preview-hint {
+  font-size: var(--font-size-small);
+}
 
-.preview-error { color: var(--color-text-danger); }
+.preview-error {
+  color: var(--color-text-danger);
+}
 
 .save-status {
   font-size: 0.875rem;
@@ -261,5 +267,7 @@
     gap: var(--spacing-medium);
   }
 
-  .metadata-grid { grid-template-columns: 1fr; }
+  .metadata-grid {
+    grid-template-columns: 1fr;
+  }
 }

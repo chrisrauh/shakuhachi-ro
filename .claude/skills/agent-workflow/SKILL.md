@@ -91,7 +91,7 @@ Run the full test suite:
 npm test
 ```
 
-Read the **entire** output — type-check, lint, and vitest must all pass.
+Read the **entire** output — type-check, lint, format check, and vitest must all pass. Fix formatting failures with `npm run format`.
 
 **If tests fail:**
 
@@ -195,7 +195,7 @@ In the normal autonomous flow the PR is still open when you finish, so both bran
 | NEVER skip TDD because "it's simple"                   | Use the strict skip rule — only skip when there is no new logic                                                                                                           |
 | NEVER skip self-review before committing               | Use `superpowers:requesting-code-review` on your diff                                                                                                                     |
 | NEVER claim tests pass without full verification       | Use `superpowers:verification-before-completion`                                                                                                                          |
-| NEVER skip `npm test`                                  | Full suite — type-check + lint + vitest                                                                                                                                   |
+| NEVER skip `npm test`                                  | Full suite — type-check + lint + format check + vitest                                                                                                                    |
 
 ---
 
