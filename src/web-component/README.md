@@ -101,9 +101,9 @@ shakuhachi-score {
 }
 ```
 
-It resolves through the shadow DOM normally, so it responds to media queries and theme-class changes with no JavaScript.
+It resolves through the shadow DOM normally, so it responds to media queries and theme-class changes with no JavaScript. That works because the value reaches the SVG as a literal `var(...)` string for the browser to resolve — nothing re-renders.
 
-> `:host` also declares `--shakuhachi-note-font-size`, `--shakuhachi-note-font-weight`, `--shakuhachi-note-font-family` and `--shakuhachi-note-vertical-spacing`. **Setting them has no effect** — the renderer reads those values from its own defaults. Tracked in [#353](https://github.com/chrisrauh/shakuhachi-ro/issues/353). Use `notation-font` to change the typeface.
+Colour is the only thing that can work this way. Font size and note spacing feed layout calculations in JavaScript, and a custom property cannot be observed, so setting one would change the glyphs without moving the positions. Use `notation-font` for the typeface; the rest is not configurable.
 
 Styles are isolated by shadow DOM, so page CSS cannot reach the notation except through the property above.
 

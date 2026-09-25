@@ -95,10 +95,6 @@ export class ScoreDetailClient {
         '--shakuhachi-note-color',
         'var(--color-text-primary)',
       );
-      container.style.setProperty(
-        '--shakuhachi-note-vertical-spacing',
-        isMobile ? '40px' : '44px',
-      );
 
       if (isMobile) {
         // Mobile: single-column mode with intrinsic sizing
