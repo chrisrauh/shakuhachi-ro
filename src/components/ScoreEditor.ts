@@ -6,7 +6,7 @@ import { parseScoreText } from '../utils/score-data';
 import { toast } from './Toast';
 import { confirmDialog } from '../utils/init-header';
 import { buildSpinnerSVG } from './LoadingSpinner';
-import type { ScoreDataFormat } from '../api/scores';
+import type { ScoreContent, ScoreDataFormat } from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 import { validateScoreInput } from '../utils/score-validation';
 import { EditorAutosave } from '../utils/editor-autosave';
@@ -86,7 +86,7 @@ export class ScoreEditor {
     if (this.dataFormat === 'json') {
       this.scoreData = JSON.stringify(score.data, null, 2);
     } else {
-      this.scoreData = score.data;
+      this.scoreData = score.data as string;
     }
 
     this.render();
@@ -346,7 +346,7 @@ export class ScoreEditor {
     }
 
     try {
-      let data: unknown;
+      let data: ScoreContent;
       let saveFormat: ScoreDataFormat;
       if (this.dataFormat === 'abc') {
         data = ABCParser.parse(this.scoreData);

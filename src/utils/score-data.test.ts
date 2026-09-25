@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { toScoreData, parseScoreText } from './score-data';
-import type { Score } from '../api/scores';
+import type { Score, ScoreContent } from '../api/scores';
 import type { ScoreData } from '../web-component/types/ScoreData';
 
 const sampleScoreData: ScoreData = {
@@ -49,7 +49,10 @@ K:D
 D2 F
 `;
 
-function makeScore(data: unknown, format: 'json' | 'musicxml' | 'abc'): Score {
+function makeScore(
+  data: ScoreContent,
+  format: 'json' | 'musicxml' | 'abc',
+): Score {
   return {
     id: 'test-id',
     user_id: 'test-user',
