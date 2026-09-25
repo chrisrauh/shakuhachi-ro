@@ -143,7 +143,6 @@ export class ScoreLibrary {
               type="text"
               id="search-input"
               placeholder="Search by title or composer..."
-              value="${this.searchQuery}"
             />
             <button
               class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
@@ -377,6 +376,14 @@ export class ScoreLibrary {
     const searchInput = this.container.querySelector(
       '#search-input',
     ) as HTMLInputElement;
+
+    // Restore the query as a property, not a value="" attribute: escapeHtml does
+    // not escape quotes, so interpolating it into the markup would let a typed `"`
+    // break out of the attribute.
+    if (searchInput) {
+      searchInput.value = this.searchQuery;
+    }
+
     searchInput?.addEventListener('input', (e) => {
       this.handleSearch((e.target as HTMLInputElement).value);
     });

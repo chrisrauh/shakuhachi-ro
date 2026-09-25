@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import PageHeader from '../../../components/PageHeader.astro';
 import { getScoreBySlug } from '../../../api/scores';
+import { embedJson } from '../../../utils/embed-json';
 import '../../../styles/score-editor.css';
 
 const { slug } = Astro.params;
@@ -32,8 +33,10 @@ if (!score) return new Response(null, { status: 404 });
     </div>
   </div>
 
-  <!-- Always embed score data — safe because 404 above ensures score is non-null -->
-  <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score })}></script>
+  <!-- Always embed score data — safe because 404 above ensures score is non-null.
+       embedJson, not JSON.stringify: score fields are user-supplied and
+       JSON.stringify does not escape `</script`. -->
+  <script id="score-data" type="application/json" is:inline set:html={embedJson({ score })}></script>
 
   <script is:inline src="/embed/shakuhachi-score.js"></script>
 

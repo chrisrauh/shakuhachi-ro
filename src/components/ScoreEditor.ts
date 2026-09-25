@@ -449,7 +449,7 @@ export class ScoreEditor {
                     ? 'ABC'
                     : 'MusicXML'
               } score data here..."
-            >${this.scoreData}</textarea>
+            >${this.escapeHtml(this.scoreData)}</textarea>
           </div>
 
           ${

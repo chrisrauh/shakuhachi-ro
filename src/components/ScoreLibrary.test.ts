@@ -277,6 +277,28 @@ describe('ScoreLibrary constructor', () => {
   });
 });
 
+// --- Search query restoration ---
+
+describe('ScoreLibrary search input value', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="score-library"></div>';
+  });
+
+  it('restores the query as a property rather than a markup attribute', () => {
+    const library = new ScoreLibrary('score-library');
+    // A quote in the query would break out of value="..." if it were
+    // interpolated into the markup — escapeHtml does not escape quotes.
+    const query = '" onfocus="alert(1)';
+
+    (library as unknown as { searchQuery: string }).searchQuery = query;
+    ScoreLibrary.prototype['render'].call(library);
+
+    const input = document.getElementById('search-input') as HTMLInputElement;
+    expect(input.value).toBe(query);
+    expect(input.getAttribute('onfocus')).toBeNull();
+  });
+});
+
 // --- Clear button visibility ---
 
 describe('ScoreLibrary clear button', () => {

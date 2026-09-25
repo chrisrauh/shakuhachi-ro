@@ -100,6 +100,64 @@ describe('ScoreEditor loading state', () => {
   });
 });
 
+// --- notation payload escaping ---
+
+describe('ScoreEditor notation payload escaping', () => {
+  const SCORE_ID = 'score-123';
+  const SLUG = 'test-slug';
+  const BREAKOUT = '</textarea><img src=x onerror="alert(1)">';
+
+  let containerId: string;
+  let container: HTMLDivElement;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    containerId = 'escaping-editor-container';
+    container = document.createElement('div');
+    container.id = containerId;
+    document.body.appendChild(container);
+
+    const { getScore } = await import('../api/scores');
+    vi.mocked(getScore).mockResolvedValue({
+      score: {
+        id: SCORE_ID,
+        slug: SLUG,
+        title: 'Test',
+        data_format: 'musicxml',
+        data: BREAKOUT,
+        updated_at: '2024-01-01T00:00:00Z',
+      } as any,
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    container.remove();
+    localStorage.clear();
+  });
+
+  it('does not let notation data break out of the textarea', async () => {
+    new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    // The payload is rendered via innerHTML; unescaped it would close the
+    // textarea and inject a real element into the document.
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('round-trips the notation data into the textarea value unchanged', async () => {
+    new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    const textarea = container.querySelector(
+      '#score-data-input',
+    ) as HTMLTextAreaElement;
+
+    expect(textarea.value).toBe(BREAKOUT);
+  });
+});
+
 // --- handleSave() ---
 
 describe('ScoreEditor.handleSave', () => {

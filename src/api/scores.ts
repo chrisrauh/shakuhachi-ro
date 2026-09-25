@@ -62,6 +62,21 @@ export interface ScoresResult {
 }
 
 /**
+ * fork_count is derived, not stored. PostgREST counts the `forked_from`
+ * self-relation, so the number can never drift from reality the way a
+ * denormalized column did (missed increments, deletes that never decremented).
+ *
+ * The embed is aliased `forks` rather than `fork_count` so `toScore` can map it
+ * onto the field callers already read.
+ */
+const SCORE_SELECT = '*, forks:scores!forked_from(count)';
+
+function toScore(row: Record<string, any>): Score {
+  const { forks, ...rest } = row;
+  return { ...rest, fork_count: forks?.[0]?.count ?? 0 } as Score;
+}
+
+/**
  * Create a new score
  */
 export async function createScore(
@@ -123,7 +138,7 @@ export async function createScore(
         rights: scoreData.rights || null,
         source_description: scoreData.source_description || null,
       })
-      .select()
+      .select(SCORE_SELECT)
       .single();
 
     if (error) {
@@ -133,7 +148,7 @@ export async function createScore(
       };
     }
 
-    return { score: data, error: null };
+    return { score: toScore(data), error: null };
   } catch (error) {
     return {
       score: null,
@@ -167,7 +182,7 @@ export async function updateScore(
       .update(updates)
       .eq('id', id)
       .eq('user_id', user.id)
-      .select()
+      .select(SCORE_SELECT)
       .single();
 
     if (error) {
@@ -185,7 +200,7 @@ export async function updateScore(
       };
     }
 
-    return { score: data, error: null };
+    return { score: toScore(data), error: null };
   } catch (error) {
     return {
       score: null,
@@ -242,7 +257,7 @@ export async function getScore(id: string): Promise<ScoreResult> {
   try {
     const { data, error } = await supabase
       .from('scores')
-      .select('*')
+      .select(SCORE_SELECT)
       .eq('id', id)
       .single();
 
@@ -259,7 +274,7 @@ export async function getScore(id: string): Promise<ScoreResult> {
       };
     }
 
-    return { score: data, error: null };
+    return { score: toScore(data), error: null };
   } catch (error) {
     return {
       score: null,
@@ -278,7 +293,7 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
   try {
     const { data, error } = await supabase
       .from('scores')
-      .select('*')
+      .select(SCORE_SELECT)
       .eq('slug', slug)
       .single();
 
@@ -295,7 +310,7 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
       };
     }
 
-    return { score: data, error: null };
+    return { score: toScore(data), error: null };
   } catch (error) {
     return {
       score: null,
@@ -314,7 +329,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
   try {
     const { data, error } = await supabase
       .from('scores')
-      .select('*')
+      .select(SCORE_SELECT)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -325,7 +340,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
       };
     }
 
-    return { scores: data || [], error: null };
+    return { scores: (data || []).map(toScore), error: null };
   } catch (error) {
     return {
       scores: [],
@@ -344,7 +359,7 @@ export async function getAllScores(): Promise<ScoresResult> {
   try {
     const { data, error } = await supabase
       .from('scores')
-      .select('*')
+      .select(SCORE_SELECT)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -354,7 +369,7 @@ export async function getAllScores(): Promise<ScoresResult> {
       };
     }
 
-    return { scores: data || [], error: null };
+    return { scores: (data || []).map(toScore), error: null };
   } catch (error) {
     return {
       scores: [],
@@ -379,7 +394,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
 
     const { data, error } = await supabase
       .from('scores')
-      .select('*')
+      .select(SCORE_SELECT)
       .or(`title.ilike.${searchTerm},composer.ilike.${searchTerm}`)
       .order('created_at', { ascending: false });
 
@@ -390,7 +405,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
       };
     }
 
-    return { scores: data || [], error: null };
+    return { scores: (data || []).map(toScore), error: null };
   } catch (error) {
     return {
       scores: [],
@@ -440,23 +455,8 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       forked_from: scoreId,
     });
 
-    if (forkResult.error) {
-      return forkResult;
-    }
-
-    // Increment fork count on parent score
-    const { error: forkCountError } = await supabase
-      .from('scores')
-      .update({ fork_count: originalScore.fork_count + 1 })
-      .eq('id', scoreId);
-
-    if (forkCountError) {
-      console.warn(
-        `Failed to increment fork_count for score ${scoreId}:`,
-        forkCountError.message,
-      );
-    }
-
+    // No counter to bump: the `forked_from` column set above IS the fork count.
+    // See SCORE_SELECT.
     return forkResult;
   } catch (error) {
     return {

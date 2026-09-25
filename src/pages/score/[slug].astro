@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug, getScore } from '../../api/scores';
+import { embedJson } from '../../utils/embed-json';
 import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
@@ -95,8 +96,9 @@ if (score?.forked_from) {
     )}
   </div>
 
-  <!-- Embed score data for client -->
-  <script id="score-data" type="application/json" is:inline set:html={JSON.stringify({ score, parentScore })}></script>
+  <!-- Embed score data for client. embedJson, not JSON.stringify: score fields are
+       user-supplied and JSON.stringify does not escape `</script`. -->
+  <script id="score-data" type="application/json" is:inline set:html={embedJson({ score, parentScore })}></script>
 
   <!-- Load web component for score rendering -->
   <script is:inline src="/embed/shakuhachi-score.js"></script>
