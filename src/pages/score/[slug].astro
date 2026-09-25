@@ -31,242 +31,284 @@ if (score?.forked_from) {
 ---
 
 {score ? (
-<Layout title={`${score.title} - Shakuhachi Score Library`} currentPage="score" fullHeight={true} mobileMenuType="score-edit">
-  <!-- Score metadata in header -->
-  <PageHeader slot="header-metadata" title={score.title}>
-    {parentScore ? (
-      <span>
-        forked from <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
-      </span>
-    ) : (
-      <span class="score-stat">
-        updated <relative-time datetime={score.created_at} format="relative"></relative-time>
-      </span>
-    )}
-  </PageHeader>
+  <Layout
+    title={`${score.title} - Shakuhachi Score Library`}
+    currentPage="score"
+    fullHeight={true}
+    mobileMenuType="score-edit"
+  >
+    <!-- Score metadata in header -->
+    <PageHeader slot="header-metadata" title={score.title}>
+      {parentScore ? (
+        <span>
+          forked from{' '}
+          <a href={`/score/${parentScore.slug}`}>{parentScore.title}</a>
+        </span>
+      ) : (
+        <span class="score-stat">
+          updated{' '}
+          <relative-time
+            datetime={score.created_at}
+            format="relative"
+          ></relative-time>
+        </span>
+      )}
+    </PageHeader>
 
-  <!-- Header actions (right side of navbar) -->
-  <div slot="header-actions" style="display: flex; gap: var(--spacing-small); align-items: center;">
-    <!-- Owner-only edit button -->
-    <a href={`/score/${score.slug}/edit`}
-       class="btn btn-icon owner-btn"
-       id="edit-btn"
-       aria-label="Edit score">
-      <SquarePen size={16} />
-    </a>
+    <!-- Header actions (right side of navbar) -->
+    <div
+      slot="header-actions"
+      style="display: flex; gap: var(--spacing-small); align-items: center;"
+    >
+      <!-- Owner-only edit button -->
+      <a
+        href={`/score/${score.slug}/edit`}
+        class="btn btn-icon owner-btn"
+        id="edit-btn"
+        aria-label="Edit score"
+      >
+        <SquarePen size={16} />
+      </a>
 
-    <!-- Owner-only delete button -->
-    <button id="delete-btn"
-            class="btn btn-icon owner-btn"
-            aria-label="Delete score">
-      <Trash size={16} />
-    </button>
+      <!-- Owner-only delete button -->
+      <button
+        id="delete-btn"
+        class="btn btn-icon owner-btn"
+        aria-label="Delete score"
+      >
+        <Trash size={16} />
+      </button>
 
-    <!-- Fork button -->
-    <button id="fork-btn"
-            class="btn btn-icon-with-count"
-            aria-label="Fork this score"
-            title="Create your own editable copy of this score">
-      <GitFork size={16} />
-      <span class="count">{score.fork_count}</span>
-    </button>
-  </div>
+      <!-- Fork button -->
+      <button
+        id="fork-btn"
+        class="btn btn-icon-with-count"
+        aria-label="Fork this score"
+        title="Create your own editable copy of this score"
+      >
+        <GitFork size={16} />
+        <span class="count">{score.fork_count}</span>
+      </button>
+    </div>
 
-  <!-- Score content -->
-  <div class="score-detail-container">
+    <!-- Score content -->
+    <div class="score-detail-container">
+      <!-- Score renderer using web component -->
+      <shakuhachi-score id="score-renderer"></shakuhachi-score>
 
-    <!-- Score renderer using web component -->
-    <shakuhachi-score id="score-renderer"></shakuhachi-score>
-
-    <!-- Attribution section (only for scores with attribution data) -->
-    {(score.source_url || score.rights || score.source_description) && (
-      <section class="score-attribution">
-        <h3>Attribution</h3>
-        {score.source_description && <p class="attribution-description">{score.source_description}</p>}
-        <div class="attribution-meta">
-          {score.rights && <span class="attribution-rights">{score.rights}</span>}
-          {score.source_url && (
-            <a href={score.source_url} target="_blank" rel="noopener noreferrer" class="attribution-link">
-              Source Reference
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
-            </a>
+      <!-- Attribution section (only for scores with attribution data) -->
+      {(score.source_url || score.rights || score.source_description) && (
+        <section class="score-attribution">
+          <h3>Attribution</h3>
+          {score.source_description && (
+            <p class="attribution-description">{score.source_description}</p>
           )}
-        </div>
-      </section>
-    )}
-  </div>
+          <div class="attribution-meta">
+            {score.rights && (
+              <span class="attribution-rights">{score.rights}</span>
+            )}
+            {score.source_url && (
+              <a
+                href={score.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="attribution-link"
+              >
+                Source Reference
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" x2="21" y1="14" y2="3" />
+                </svg>
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+    </div>
 
-  <!-- Embed score data for client. embedJson, not JSON.stringify: score fields are
+    <!-- Embed score data for client. embedJson, not JSON.stringify: score fields are
        user-supplied and JSON.stringify does not escape `</script`. -->
-  <script id="score-data" type="application/json" is:inline set:html={embedJson({ score, parentScore })}></script>
-
-  <!-- Load web component for score rendering -->
-  <script is:inline src="/embed/shakuhachi-score.js"></script>
-
-  <!-- Initialize relative-time web component -->
-  <script>
-    import '@github/relative-time-element';
-  </script>
-
-
-  <!-- Client-side logic -->
-  <script>
-    import { ScoreDetailClient } from '../../components/ScoreDetailClient';
-    const client = new ScoreDetailClient();
-    client.init();
-  </script>
-
-  <style>
-    :global(.metadata-separator) {
-      color: var(--color-separator);
-    }
-
-    :global(.score-stat) {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-3x-small);
-    }
-
-    :global(.score-header-metadata a) {
-      color: var(--color-link);
-      text-decoration: none;
-    }
-
-    :global(.score-header-metadata a:hover) {
-      text-decoration: underline;
-    }
-
-    /* Page content styling */
-    .score-detail-container {
-      width: 100%; /* Fill viewport width */
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--spacing-medium) var(--spacing-medium) 0;
-      position: relative;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box; /* Include padding in width calculation */
-    }
-
-    #score-renderer {
-      /* Flex child - fills available space in parent flex container */
-      flex: 1;
-      /* Needed for custom elements to participate in flex layout */
-      display: block;
-      min-height: 0; /* Allow flex shrinking */
-      /* Fill parent dimensions (parent is flex container) */
-      width: 100%;
-      align-self: stretch; /* Stretch to fill cross axis */
-    }
-
-    /* Attribution section */
-    .score-attribution {
-      margin-top: var(--spacing-large);
-      padding: var(--spacing-medium);
-      background: var(--color-surface-elevated);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--color-border);
-    }
-
-    .score-attribution h3 {
-      margin: 0 0 var(--spacing-small) 0;
-      font-size: var(--font-size-small);
-      font-weight: var(--font-weight-medium);
-      color: var(--color-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: var(--letter-spacing-densest);
-    }
-
-    .attribution-description {
-      margin: 0 0 var(--spacing-small) 0;
-      font-size: var(--font-size-small);
-      color: var(--color-text-primary);
-      line-height: 1.5;
-    }
-
-    .attribution-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--spacing-medium);
-      align-items: center;
-      font-size: var(--font-size-x-small);
-    }
-
-    .attribution-rights {
-      display: inline-flex;
-      align-items: center;
-      padding: var(--spacing-3x-small) var(--spacing-small);
-      background: var(--color-success-background);
-      color: var(--color-success);
-      border-radius: var(--border-radius-small);
-      font-weight: var(--font-weight-medium);
-    }
-
-    .attribution-link {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-3x-small);
-      color: var(--color-link);
-      text-decoration: none;
-    }
-
-    .attribution-link:hover {
-      text-decoration: underline;
-    }
-
-    .attribution-link svg {
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 768px) {
-      :global(.score-header-metadata) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-2x-small);
+    <script
+      id="score-data"
+      type="application/json"
+      is:inline
+      set:html={embedJson({ score, parentScore })}
+    ></script>
+    <!-- Load web component for score rendering -->
+    <script is:inline src="/embed/shakuhachi-score.js"></script>
+    <!-- Initialize relative-time web component -->
+    <script>
+      import '@github/relative-time-element';
+    </script>
+    <!-- Client-side logic -->
+    <script>
+      import { ScoreDetailClient } from '../../components/ScoreDetailClient';
+      const client = new ScoreDetailClient();
+      client.init();
+    </script>
+    <style>
+      :global(.metadata-separator) {
+        color: var(--color-separator);
       }
 
-      :global(.score-title) {
-        font-size: var(--font-size-medium);
+      :global(.score-stat) {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-3x-small);
       }
 
-      /* Hide owner buttons on mobile — shown in menu instead */
-      :global(.btn.owner-btn.owner-visible) { display: none; }
-
-      .floating-edit-btn {
-        top: 120px;
-        right: var(--spacing-medium);
+      :global(.score-header-metadata a) {
+        color: var(--color-link);
+        text-decoration: none;
       }
 
-      /* Mobile score rendering - allow natural height expansion */
+      :global(.score-header-metadata a:hover) {
+        text-decoration: underline;
+      }
+
+      /* Page content styling */
       .score-detail-container {
-        flex: none; /* Remove flex constraint */
-        overflow: visible; /* Allow content to overflow viewport */
-        max-width: 100%; /* Constrain to viewport width */
+        width: 100%; /* Fill viewport width */
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--spacing-medium) var(--spacing-medium) 0;
+        position: relative;
+        flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: center; /* Center intrinsic-width components (columns="1" uses 140px intrinsic width) */
+        box-sizing: border-box; /* Include padding in width calculation */
       }
 
       #score-renderer {
-        /* Remove width constraint to allow intrinsic sizing */
-        width: auto;
-        flex: none;
-        align-self: auto; /* Don't stretch - let intrinsic width work */
+        /* Flex child - fills available space in parent flex container */
+        flex: 1;
+        /* Needed for custom elements to participate in flex layout */
+        display: block;
+        min-height: 0; /* Allow flex shrinking */
+        /* Fill parent dimensions (parent is flex container) */
+        width: 100%;
+        align-self: stretch; /* Stretch to fill cross axis */
       }
 
-      #score-renderer-container {
-        flex: none; /* Remove flex constraint */
-        min-height: auto; /* Allow natural height */
-        width: 100%; /* Full width of container */
+      /* Attribution section */
+      .score-attribution {
+        margin-top: var(--spacing-large);
+        padding: var(--spacing-medium);
+        background: var(--color-surface-elevated);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border);
       }
 
-    }
-  </style>
-</Layout>
+      .score-attribution h3 {
+        margin: 0 0 var(--spacing-small) 0;
+        font-size: var(--font-size-small);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-densest);
+      }
+
+      .attribution-description {
+        margin: 0 0 var(--spacing-small) 0;
+        font-size: var(--font-size-small);
+        color: var(--color-text-primary);
+        line-height: 1.5;
+      }
+
+      .attribution-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-medium);
+        align-items: center;
+        font-size: var(--font-size-x-small);
+      }
+
+      .attribution-rights {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--spacing-3x-small) var(--spacing-small);
+        background: var(--color-success-background);
+        color: var(--color-success);
+        border-radius: var(--border-radius-small);
+        font-weight: var(--font-weight-medium);
+      }
+
+      .attribution-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-3x-small);
+        color: var(--color-link);
+        text-decoration: none;
+      }
+
+      .attribution-link:hover {
+        text-decoration: underline;
+      }
+
+      .attribution-link svg {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 768px) {
+        :global(.score-header-metadata) {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--spacing-2x-small);
+        }
+
+        :global(.score-title) {
+          font-size: var(--font-size-medium);
+        }
+
+        /* Hide owner buttons on mobile — shown in menu instead */
+        :global(.btn.owner-btn.owner-visible) {
+          display: none;
+        }
+
+        .floating-edit-btn {
+          top: 120px;
+          right: var(--spacing-medium);
+        }
+
+        /* Mobile score rendering - allow natural height expansion */
+        .score-detail-container {
+          flex: none; /* Remove flex constraint */
+          overflow: visible; /* Allow content to overflow viewport */
+          max-width: 100%; /* Constrain to viewport width */
+          display: flex;
+          flex-direction: column;
+          align-items: center; /* Center intrinsic-width components (columns="1" uses 140px intrinsic width) */
+        }
+
+        #score-renderer {
+          /* Remove width constraint to allow intrinsic sizing */
+          width: auto;
+          flex: none;
+          align-self: auto; /* Don't stretch - let intrinsic width work */
+        }
+
+        #score-renderer-container {
+          flex: none; /* Remove flex constraint */
+          min-height: auto; /* Allow natural height */
+          width: 100%; /* Full width of container */
+        }
+      }
+    </style>
+  </Layout>
 ) : (
-<Layout title="Page Not Found - Shakuhachi.ro" currentPage="score">
-  <PageHeader slot="header-metadata" title="Page Not Found" />
-  <Error404 />
-</Layout>
+  <Layout title="Page Not Found - Shakuhachi.ro" currentPage="score">
+    <PageHeader slot="header-metadata" title="Page Not Found" />
+    <Error404 />
+  </Layout>
 )}

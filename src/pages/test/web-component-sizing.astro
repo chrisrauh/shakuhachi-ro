@@ -56,8 +56,8 @@ const longScoreData = {
   <div class="sizing-test-page">
     <h1>Web Component Sizing Test</h1>
     <p class="description">
-      Testing ResizeObserver-based initial render timing fix for multi-column mode.
-      Open DevTools console to check for warnings.
+      Testing ResizeObserver-based initial render timing fix for multi-column
+      mode. Open DevTools console to check for warnings.
     </p>
 
     <!-- Multi-column mode in large container -->
@@ -77,9 +77,7 @@ const longScoreData = {
     <!-- Multi-column mode in small container -->
     <section class="test-section">
       <h2>Multi-Column Mode (auto) - 400×300 Container</h2>
-      <p class="test-description">
-        Should fill container on first render
-      </p>
+      <p class="test-description">Should fill container on first render</p>
       <div class="test-container small-container">
         <shakuhachi-score
           columns="auto"
@@ -106,7 +104,8 @@ const longScoreData = {
     <section class="test-section">
       <h2>Explicit Dimensions - 600×400</h2>
       <p class="test-description">
-        Should render immediately with explicit dimensions (bypasses ResizeObserver)
+        Should render immediately with explicit dimensions (bypasses
+        ResizeObserver)
       </p>
       <div class="test-container flex-container">
         <shakuhachi-score
@@ -122,7 +121,8 @@ const longScoreData = {
     <section class="test-section">
       <h2>Explicit Column Count (columns="3") - Intrinsic Sizing</h2>
       <p class="test-description">
-        Should distribute notes across 3 columns using intrinsic sizing (component calculates its own dimensions)
+        Should distribute notes across 3 columns using intrinsic sizing
+        (component calculates its own dimensions)
       </p>
       <div class="test-container flex-container">
         <shakuhachi-score
