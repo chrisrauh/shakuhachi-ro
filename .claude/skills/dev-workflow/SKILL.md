@@ -269,6 +269,8 @@ gh issue list --state open --search "-label:type:idea" --limit 100
 
 `type:idea` issues are speculative and never candidates to pick up — exclude them from any backlog view. See `/get-ready`.
 
+Prefer `type:ux` (user-facing) issues over internal work when choosing what to do next — list them with `--label type:ux`. See `/get-ready`.
+
 ---
 
 ## Stacked PR chains

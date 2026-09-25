@@ -17,14 +17,20 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
    ```bash
    gh issue list --label focus --label autonomy:high --state open
    ```
-2. If that is empty, widen to the actionable backlog:
+2. If that is empty, take user-facing work next — `type:ux` marks issues that change what users see or do:
+   ```bash
+   gh issue list --label autonomy:high --label type:ux --state open --search "-label:type:idea"
+   ```
+3. If that is also empty, widen to the rest of the actionable backlog:
    ```bash
    gh issue list --label autonomy:high --state open --search "-label:type:idea"
    ```
    `type:idea` issues are speculative and never agent work, whatever else they are labelled.
-3. Take the first result and read it in full: `gh issue view <n>`
-4. Announce: `"Working on: #<n> [issue title]"`
-5. If neither list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
+4. Take the first result and read it in full: `gh issue view <n>`
+5. Announce: `"Working on: #<n> [issue title]"`
+6. If no list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
+
+**Why `type:ux` comes first:** internal work (refactors, tests, type tightening) is easier to spec and finish autonomously, so without an explicit preference it crowds out user value.
 
 **`autonomy:high` means agent-ready:** the issue body must contain enough detail (file paths, exact approach, constraints) to implement without asking any questions. If the description is vague, it should not carry that label — see the failure protocol.
 
@@ -65,7 +71,7 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
   - If you notice a related refactor opportunity: open a new issue for it, do not do it now
   - Zero tolerance for scope creep — reviewability depends on it
 
-  New issues get the matching `area:*` and `autonomy:*` labels, and no `focus` label (that is a human prioritization call):
+  New issues get the matching `area:*` and `autonomy:*` labels, plus `type:ux` if the issue changes what users see or do, and no `focus` label (that is a human prioritization call):
   ```bash
   gh issue create --title "..." --body-file tmp/issue-body.md --label "area:renderer" --label "autonomy:medium"
   ```
