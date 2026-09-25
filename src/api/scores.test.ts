@@ -7,7 +7,9 @@ import {
   forkScore,
 } from './scores';
 
-vi.mock('./supabase', () => ({ supabase: { from: vi.fn() } }));
+vi.mock('./supabase', () => ({
+  supabase: { from: vi.fn() },
+}));
 vi.mock('./auth');
 vi.mock('../utils/slug');
 
@@ -35,7 +37,7 @@ function makeChain(result: ChainResult) {
   return chain;
 }
 
-const scoreFixture = {
+const scoreFields = {
   id: 'score-123',
   user_id: 'user-123',
   title: 'Test Score',
@@ -45,13 +47,18 @@ const scoreFixture = {
   data_format: 'json' as const,
   data: { notes: [] },
   forked_from: null,
-  fork_count: 2,
   source_url: null,
   rights: null,
   source_description: null,
   created_at: '2024-01-01',
   updated_at: '2024-01-01',
 };
+
+// What the database returns: no fork_count column, a counted `forks` embed instead.
+const scoreRow = { ...scoreFields, forks: [{ count: 2 }] };
+
+// What callers see: the embed collapsed into fork_count.
+const scoreFixture = { ...scoreFields, fork_count: 2 };
 
 const userFixture = { id: 'user-123' };
 
@@ -140,9 +147,7 @@ describe('createScore', () => {
     vi.mocked(ensureUniqueSlug).mockReturnValue('test-score');
     vi.mocked(supabase.from)
       .mockReturnValueOnce(makeChain({ data: [], error: null }) as any)
-      .mockReturnValueOnce(
-        makeChain({ data: scoreFixture, error: null }) as any,
-      );
+      .mockReturnValueOnce(makeChain({ data: scoreRow, error: null }) as any);
 
     const result = await createScore({
       title: 'Test Score',
@@ -153,6 +158,31 @@ describe('createScore', () => {
     expect(result.error).toBeNull();
     expect(result.score).toEqual(scoreFixture);
   });
+
+  it('reports fork_count 0 for a score nothing has forked yet', async () => {
+    const { getCurrentUser } = await import('./auth');
+    const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
+    const { supabase } = await import('./supabase');
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: userFixture as any,
+      error: null,
+    });
+    vi.mocked(generateSlug).mockReturnValue('test-score');
+    vi.mocked(ensureUniqueSlug).mockReturnValue('test-score');
+    vi.mocked(supabase.from)
+      .mockReturnValueOnce(makeChain({ data: [], error: null }) as any)
+      .mockReturnValueOnce(
+        makeChain({ data: { ...scoreRow, forks: [] }, error: null }) as any,
+      );
+
+    const result = await createScore({
+      title: 'Test Score',
+      data_format: 'json',
+      data: { notes: [] },
+    });
+
+    expect(result.score?.fork_count).toBe(0);
+  });
 });
 
 describe('getScoreBySlug', () => {
@@ -160,16 +190,17 @@ describe('getScoreBySlug', () => {
     vi.clearAllMocks();
   });
 
-  it('returns score when found', async () => {
+  it('returns score when found, with the fork embed collapsed into fork_count', async () => {
     const { supabase } = await import('./supabase');
     vi.mocked(supabase.from).mockReturnValueOnce(
-      makeChain({ data: scoreFixture, error: null }) as any,
+      makeChain({ data: scoreRow, error: null }) as any,
     );
 
     const result = await getScoreBySlug('test-score');
 
     expect(result.error).toBeNull();
     expect(result.score).toEqual(scoreFixture);
+    expect(result.score?.fork_count).toBe(2);
   });
 
   it('returns error when score not found (PGRST116)', async () => {
@@ -232,7 +263,7 @@ describe('updateScore', () => {
   it('returns updated score on success', async () => {
     const { getCurrentUser } = await import('./auth');
     const { supabase } = await import('./supabase');
-    const updated = { ...scoreFixture, title: 'New Title' };
+    const updated = { ...scoreRow, title: 'New Title' };
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -323,9 +354,7 @@ describe('forkScore', () => {
     vi.mocked(generateSlug).mockReturnValue('test-score');
     vi.mocked(ensureUniqueSlug).mockReturnValue('test-score');
     vi.mocked(supabase.from)
-      .mockReturnValueOnce(
-        makeChain({ data: scoreFixture, error: null }) as any,
-      ) // fetch original
+      .mockReturnValueOnce(makeChain({ data: scoreRow, error: null }) as any) // fetch original
       .mockReturnValueOnce(makeChain({ data: [], error: null }) as any) // slug query in createScore
       .mockReturnValueOnce(
         makeChain({ data: null, error: { message: 'Insert failed' } }) as any,
@@ -337,14 +366,15 @@ describe('forkScore', () => {
     expect(result.error?.message).toContain('Insert failed');
   });
 
-  it('returns forked score and increments fork_count on success', async () => {
+  it('returns the fork without writing any counter to the parent', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
     const { supabase } = await import('./supabase');
-    const forkedScore = {
-      ...scoreFixture,
+    const forkedRow = {
+      ...scoreRow,
       id: 'fork-456',
       forked_from: 'score-123',
+      forks: [],
     };
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
@@ -353,17 +383,17 @@ describe('forkScore', () => {
     vi.mocked(generateSlug).mockReturnValue('test-score');
     vi.mocked(ensureUniqueSlug).mockReturnValue('test-score');
     vi.mocked(supabase.from)
-      .mockReturnValueOnce(
-        makeChain({ data: scoreFixture, error: null }) as any,
-      ) // fetch original
+      .mockReturnValueOnce(makeChain({ data: scoreRow, error: null }) as any) // fetch original
       .mockReturnValueOnce(makeChain({ data: [], error: null }) as any) // slug query in createScore
-      .mockReturnValueOnce(makeChain({ data: forkedScore, error: null }) as any) // insert fork
-      .mockReturnValueOnce(makeChain({ data: null, error: null }) as any); // update fork_count
+      .mockReturnValueOnce(makeChain({ data: forkedRow, error: null }) as any); // insert fork
 
     const result = await forkScore('score-123');
 
     expect(result.error).toBeNull();
-    expect(result.score).toEqual(forkedScore);
-    expect(supabase.from).toHaveBeenCalledTimes(4);
+    expect(result.score?.id).toBe('fork-456');
+    expect(result.score?.forked_from).toBe('score-123');
+    // Three queries and no more: fetch original, slug probe, insert. The parent's
+    // count is derived from forked_from, so there is nothing left to update.
+    expect(supabase.from).toHaveBeenCalledTimes(3);
   });
 });
