@@ -47,7 +47,6 @@ export type {
 // Modifier exports
 export { Modifier } from './web-component/modifiers/Modifier';
 export type { ModifierPosition } from './web-component/modifiers/Modifier';
-export { TestModifier } from './web-component/modifiers/TestModifier';
 export { OctaveMarksModifier } from './web-component/modifiers/OctaveMarksModifier';
 export { MeriKariModifier } from './web-component/modifiers/MeriKariModifier';
 export type { MeriKariType } from './web-component/modifiers/MeriKariModifier';
