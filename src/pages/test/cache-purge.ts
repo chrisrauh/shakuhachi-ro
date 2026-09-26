@@ -16,21 +16,24 @@ export const prerender = false;
  * shipped anywhere. Purges are scoped to this deploy, so running it cannot touch
  * the production cache.
  *
- * Netlify sets REVIEW_ID on deploy previews; the alias is derived from it rather
- * than hardcoded. Without an alias the purge would target production.
+ * The alias comes from the request's own hostname, which on a preview looks like
+ * `deploy-preview-393--shakuhachi-ro.netlify.app`. Netlify's CONTEXT and
+ * REVIEW_ID are build-time variables and are empty at runtime, so they cannot
+ * serve as the guard. Without an alias the purge would target production.
  *
  * Throwaway — delete both routes once #388 records an answer.
  */
-export const GET: APIRoute = async () => {
-  const reviewId = process.env.REVIEW_ID;
-  const context = process.env.CONTEXT;
+const PREVIEW_HOST = /^(deploy-preview-\d+)--/;
 
-  if (context !== 'deploy-preview' || !reviewId) {
+export const GET: APIRoute = async ({ url }) => {
+  const alias = PREVIEW_HOST.exec(url.hostname)?.[1];
+
+  if (!alias) {
     return new Response(
       JSON.stringify(
         {
-          error: 'Refusing to purge: this is not a deploy preview.',
-          context: context ?? null,
+          error: 'Refusing to purge: this host is not a deploy preview.',
+          hostname: url.hostname,
         },
         null,
         2,
@@ -39,7 +42,7 @@ export const GET: APIRoute = async () => {
     );
   }
 
-  const deployAlias = `deploy-preview-${reviewId}`;
+  const deployAlias = alias;
 
   try {
     await purgeCache({ tags: ['cache-probe'], deployAlias });
