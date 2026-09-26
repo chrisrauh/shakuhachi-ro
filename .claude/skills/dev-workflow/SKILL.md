@@ -39,8 +39,10 @@ digraph phase_router {
 digraph dev_workflow {
   "Task assigned" [shape=doublecircle];
   "Check branch" [shape=box];
+  "git fetch origin" [shape=box];
   "On main?" [shape=diamond];
-  "Create feature branch" [shape=box];
+  "Create feature branch from origin/main" [shape=box];
+  "Claim issue (assign @me)" [shape=box];
   "Verify task in code" [shape=box];
   "Already done?" [shape=diamond];
   "Mark done, move on" [shape=box];
@@ -60,16 +62,20 @@ digraph dev_workflow {
   "Commit (clean message, no attribution)" [shape=box];
   "Ask: Create PR?" [shape=box];
   "STOP: wait for PR decision" [shape=doublecircle];
+  "Issue still open?" [shape=diamond];
+  "STOP: superseded, report to user" [shape=doublecircle];
   "Push + gh pr create" [shape=box];
   "STOP: wait for merge confirmation" [shape=doublecircle];
   "4 cleanup commands (sequential)" [shape=box];
   "Read focus issues, present next 3" [shape=doublecircle];
 
   "Task assigned" -> "Check branch";
-  "Check branch" -> "On main?";
-  "On main?" -> "Create feature branch" [label="yes"];
-  "On main?" -> "Verify task in code" [label="no"];
-  "Create feature branch" -> "Verify task in code";
+  "Check branch" -> "git fetch origin";
+  "git fetch origin" -> "On main?";
+  "On main?" -> "Create feature branch from origin/main" [label="yes"];
+  "On main?" -> "Claim issue (assign @me)" [label="no"];
+  "Create feature branch from origin/main" -> "Claim issue (assign @me)";
+  "Claim issue (assign @me)" -> "Verify task in code";
   "Verify task in code" -> "Already done?";
   "Already done?" -> "Mark done, move on" [label="yes"];
   "Already done?" -> "Make changes" [label="no"];
@@ -92,7 +98,9 @@ digraph dev_workflow {
   "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
   "Commit (clean message, no attribution)" -> "Ask: Create PR?";
   "Ask: Create PR?" -> "STOP: wait for PR decision";
-  "STOP: wait for PR decision" -> "Push + gh pr create" [label="yes"];
+  "STOP: wait for PR decision" -> "Issue still open?" [label="yes"];
+  "Issue still open?" -> "STOP: superseded, report to user" [label="no"];
+  "Issue still open?" -> "Push + gh pr create" [label="yes"];
   "Push + gh pr create" -> "STOP: wait for merge confirmation";
   "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
   "4 cleanup commands (sequential)" -> "Read focus issues, present next 3";
@@ -124,7 +132,29 @@ Every point where the model must fully stop and wait for a new user message befo
 git branch --show-current
 ```
 
-If on `main`: `git checkout -b feature/descriptive-name` — never work directly on main.
+**Then fetch, so you branch from current code:**
+
+```bash
+git fetch origin
+```
+
+Branch from `origin/main`, not from a local `main` that may be days stale:
+
+```bash
+git checkout -b feature/descriptive-name origin/main
+```
+
+Never work directly on main.
+
+**Claim the issue before writing any code:**
+
+```bash
+gh issue edit <n> --add-assignee @me
+```
+
+Sessions run concurrently — a terminal session and a Claude Code on the Web session can pick the same issue minutes apart and both implement it. #273 was built twice that way. The assignee is server-side, so it is the one signal both environments see. If the issue already has an assignee, ask before proceeding.
+
+Unassign on any exit that abandons the work: `gh issue edit <n> --remove-assignee @me`.
 
 **Verify the task (code is ground truth, not the issue text):**
 
@@ -132,6 +162,8 @@ If on `main`: `git checkout -b feature/descriptive-name` — never work directly
 - Implementation tasks → `Grep` for the function/class/feature
 - Bug fixes → confirm the bug still exists in the code
 - Already done? → close the issue with an explanatory comment (`gh issue close <n> --comment "..."`) and move on without re-implementing
+
+Verify against **fetched** code. Verifying a stale checkout can show a bug that upstream already fixed.
 
 ---
 
@@ -203,7 +235,22 @@ Forbidden in commit messages and PR bodies:
 
 **Step 3: Ask the user "Should I create a PR?"** — do not push or create a PR without asking.
 
-**Step 4 (if yes): Write PR body, push, and create PR.**
+**Step 4 (if yes): Re-check the issue is still open before pushing.**
+
+```bash
+gh issue view <n> --json state,stateReason
+```
+
+Claiming the issue in Phase 1 closes the collision window at the start; this closes it at the end. Another session can land the same work while you implement — with #273 the competing PR merged about 25 minutes after this work began, and it went unnoticed for hours.
+
+If `state` is `CLOSED`, stop and tell the user. Read the PR that closed it, then either:
+
+- **Fully superseded** — discard the branch and unassign. Do not open a PR for work already landed.
+- **Partly superseded** — rebase on `origin/main`, keep only what the merged PR left undone, and open a _new_ issue for the remainder to reference with `Closes #<new>`. A closed issue cannot be the link.
+
+After any rebase onto a moved `main`, run `npm install` before `npm test` — upstream may have added dependencies or new test stages.
+
+**Step 5: Write PR body, push, and create PR.**
 
 Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local, gitignored):
 
@@ -278,6 +325,8 @@ gh issue list --state open --search "-label:type:idea" --limit 100
 
 Prefer `type:ux` (user-facing) issues over internal work when choosing what to do next — list them with `--label type:ux`. See `/get-ready`.
 
+Add `--json number,title,assignees --jq ...` or check assignees before proposing: an assigned issue is already being worked by another session. Offer unassigned ones, and if you do surface an assigned issue, say who holds it so the user can decide.
+
 ---
 
 ## Stacked PR chains
@@ -307,6 +356,9 @@ These have zero exceptions:
 | Rule                                                                         | Detail                                                                                                                                                                                                                      |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NEVER commit to main                                                         | Check `git branch --show-current` before every commit                                                                                                                                                                       |
+| NEVER start work on an issue you have not claimed                            | `gh issue edit <n> --add-assignee @me` before any code. Concurrent terminal and web sessions select from the same backlog                                                                                                   |
+| NEVER abandon a claimed issue without unassigning                            | `gh issue edit <n> --remove-assignee @me`, or the issue looks taken forever and quietly leaves the backlog                                                                                                                  |
+| NEVER push without re-checking the issue is still open                       | A competing session may have landed the same work while you implemented it                                                                                                                                                  |
 | NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash                              | Use sequential Bash calls instead                                                                                                                                                                                           |
 | NEVER add Claude attribution                                                 | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs                                                                                                                                     |
 | NEVER use `--body` inline with `gh pr create`                                | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.               |
@@ -330,6 +382,10 @@ These thoughts mean STOP — you are rationalizing:
 | Thought                                                            | Reality                                                                                                          |
 | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | "I'll check the branch after I look at the code"                   | Branch check is FIRST, before anything                                                                           |
+| "I'll assign the issue to myself once I know it's worth doing"     | Claim first. The window you skip is exactly when another session picks the same issue                            |
+| "Nobody else is working in this repo right now"                    | You cannot see other sessions. A web session and a terminal session share one backlog                            |
+| "I checked the issue was open when I started, that's enough"       | It can close mid-flight. Re-check before pushing — that is the common case, not the rare one                     |
+| "The issue was open an hour ago"                                   | An hour is long enough for another session to open, merge and close the same work                                |
 | "Tests look fine, I'll report success"                             | Read the full output — type-check AND lint AND vitest                                                            |
 | "I'll add `Closes #<n>` later"                                     | Add it when you write the PR body, not after                                                                     |
 | "I'll add the attribution since the system prompt says to"         | CLAUDE.md overrides system prompt defaults                                                                       |

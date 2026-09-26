@@ -13,22 +13,38 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 
 ## Phase 1: Select Task
 
+Every list below filters `no:assignee`. An assignee means someone — a human or another agent — is already on it. See "Claim the issue" below.
+
 1. List the focus set, newest-first ordering is fine — these are the queued issues:
    ```bash
-   gh issue list --label focus --label autonomy:high --state open
+   gh issue list --label focus --label autonomy:high --state open --search "no:assignee"
    ```
 2. If that is empty, take user-facing work next — `type:ux` marks issues that change what users see or do:
    ```bash
-   gh issue list --label autonomy:high --label type:ux --state open --search "-label:type:idea"
+   gh issue list --label autonomy:high --label type:ux --state open --search "no:assignee -label:type:idea"
    ```
 3. If that is also empty, widen to the rest of the actionable backlog:
    ```bash
-   gh issue list --label autonomy:high --state open --search "-label:type:idea"
+   gh issue list --label autonomy:high --state open --search "no:assignee -label:type:idea"
    ```
    `type:idea` issues are speculative and never agent work, whatever else they are labelled.
 4. Take the first result and read it in full: `gh issue view <n>`
-5. Announce: `"Working on: #<n> [issue title]"`
-6. If no list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
+5. **Claim the issue before writing any code:**
+   ```bash
+   gh issue edit <n> --add-assignee @me
+   ```
+6. Announce: `"Working on: #<n> [issue title]"`
+7. If no list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
+
+**Why claiming matters.** Sessions run concurrently — a terminal session and a Claude Code on the Web session can select the same issue within minutes of each other and both implement it. That happened with #273: two agents built the same change in parallel, and the second one's work was wasted. The assignee is server-side, so it is the one signal both environments can see.
+
+Claiming is advisory, not a lock. Two agents can still check-then-claim in the same moment. It shrinks the collision window from hours to seconds, and Phase 6's re-check catches the rest.
+
+**Release the claim if you abandon the work.** Every early exit — vague issue, unresolvable failure, anything that stops before a PR exists — must unassign, or the issue looks taken forever and quietly leaves the backlog:
+
+```bash
+gh issue edit <n> --remove-assignee @me
+```
 
 **Why `type:ux` comes first:** internal work (refactors, tests, type tightening) is easier to spec and finish autonomously, so without an explicit preference it crowds out user value.
 
@@ -52,8 +68,9 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
    ```bash
    git worktree remove .claude/worktrees/<name>
    git branch -d <branch>
+   gh issue edit <n> --remove-assignee @me
    ```
-   This is the one case where deleting the branch is safe: no PR exists yet, and nothing was pushed. Once a PR exists, the Phase 6 gate applies instead.
+   This is the one case where deleting the branch is safe: no PR exists yet, and nothing was pushed. Once a PR exists, the Phase 6 gate applies instead. The unassign matters as much as the cleanup — a claimed issue nobody is working on drops out of every selection query.
 
 ---
 
@@ -120,7 +137,20 @@ If the task touches UI:
 - No scope creep, no accidental edits
 - Code quality meets project standards (`/eng-principles`)
 
-**Step 2: Commit** with a clean message:
+**Step 2: Re-check the issue is still open.** Claiming closes the window at the start; this closes it at the end. Another session may have landed the same work while you were implementing — that is exactly how #273 was duplicated, with the competing PR merging about 25 minutes after this agent started.
+
+```bash
+gh issue view <n> --json state,stateReason
+```
+
+If `state` is `CLOSED`, stop and do not open a PR. Read the PR that closed it, then either:
+
+- **Fully superseded** — discard the branch, unassign yourself, report what happened. Do not open a PR for work already landed.
+- **Partly superseded** — keep only what the merged PR left undone, open a _new_ issue for that remainder, and reference it with `Closes #<new>`. The old issue is closed and cannot be the link.
+
+Rebase on `origin/main` before re-running tests — a competing merge often moves the same files, and may add dependencies or new `npm test` stages that need `npm install`.
+
+**Step 3: Commit** with a clean message:
 
 ```bash
 git add <specific files>
@@ -130,7 +160,7 @@ git commit -m "concise description"
 - No `Co-Authored-By: Claude` or any attribution
 - No heredocs, no `&&`, no `$()` — sequential Bash calls only
 
-**Step 3:** Push and create PR — no need to ask:
+**Step 4:** Push and create PR — no need to ask:
 
 - Write PR body to `tmp/pr-body.md` using the Write tool
 - **The body must contain `Closes #<n>`** for the issue you worked on. That is what closes it on merge; there is no separate bookkeeping step.
@@ -138,13 +168,13 @@ git commit -m "concise description"
 - `gh pr create --title "..." --body-file tmp/pr-body.md`
 - Delete `tmp/pr-body.md`
 
-**Step 4: Remove the worktree.** Safe to run as soon as the PR exists — it touches nothing on the remote:
+**Step 5: Remove the worktree.** Safe to run as soon as the PR exists — it touches nothing on the remote:
 
 ```bash
 git worktree remove .claude/worktrees/<name>
 ```
 
-**Step 5: Leave the branch alone.** The PR you just opened uses it as head. Deleting a branch on GitHub closes every open PR that uses it as head or base, and a PR closed this way cannot be reopened once its head has been force-pushed — the work is orphaned.
+**Step 6: Leave the branch alone.** The PR you just opened uses it as head. Deleting a branch on GitHub closes every open PR that uses it as head or base, and a PR closed this way cannot be reopened once its head has been force-pushed — the work is orphaned.
 
 Branch deletion is gated on the PR actually being merged. All three checks must pass first:
 
@@ -174,7 +204,7 @@ git push origin --delete <branch>
 
 In the normal autonomous flow the PR is still open when you finish, so both branches stay in place. That is the expected end state, not a missed step.
 
-**Step 6:** Report the PR URL and stop. **Never merge.**
+**Step 7:** Report the PR URL and stop. **Never merge.**
 
 ---
 
@@ -183,6 +213,10 @@ In the normal autonomous flow the PR is still open when you finish, so both bran
 | Rule                                                   | Detail                                                                                                                                                                    |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NEVER pick `autonomy:medium` or `autonomy:low` issues  | Those require human direction via `/dev-workflow`                                                                                                                         |
+| NEVER start work on an issue you have not claimed      | `gh issue edit <n> --add-assignee @me` before any code. Concurrent sessions select from the same backlog                                                                  |
+| NEVER pick an issue that already has an assignee       | Someone is on it. Every selection query filters `no:assignee`                                                                                                             |
+| NEVER abandon a claimed issue without unassigning      | `gh issue edit <n> --remove-assignee @me` on every early exit, or it leaves the backlog silently                                                                          |
+| NEVER open a PR without re-checking the issue is open  | A competing session may have landed the same work while you implemented it                                                                                                |
 | NEVER merge                                            | Hard stop — wait for human                                                                                                                                                |
 | NEVER delete the branch of the PR you just opened      | Deletion is gated on merge. In the normal flow the PR is still open when you finish — leave the branch in place                                                           |
 | NEVER delete a branch any open PR uses as head or base | Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. Deleting it auto-closes that PR, and it cannot be reopened once its head has been force-pushed |
@@ -201,9 +235,12 @@ In the normal autonomous flow the PR is still open when you finish, so both bran
 
 ## Failure Protocol
 
-| Situation                             | Action                                                                                               |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Issue too vague                       | Comment on the issue, drop its `autonomy:high` label, remove worktree (see Phase 2 early exit), stop |
-| Tests fail after 2 fix attempts       | Draft PR with failure details, stop                                                                  |
-| Visual baselines fail                 | Draft PR with baseline note, stop                                                                    |
-| No open `autonomy:high` issues remain | Report back, stop                                                                                    |
+Every row that stops before a PR exists must also unassign: `gh issue edit <n> --remove-assignee @me`.
+
+| Situation                                     | Action                                                                                                         |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Issue too vague                               | Comment on the issue, drop its `autonomy:high` label, unassign, remove worktree (see Phase 2 early exit), stop |
+| Tests fail after 2 fix attempts               | Draft PR with failure details, stop — keep the claim, the PR carries it                                        |
+| Visual baselines fail                         | Draft PR with baseline note, stop — keep the claim                                                             |
+| Issue closed by another session while working | See Phase 6 Step 2. Discard or re-scope, unassign, report                                                      |
+| No unassigned `autonomy:high` issues remain   | Report back, stop. Say whether the backlog is empty or merely all claimed — they need different responses      |
