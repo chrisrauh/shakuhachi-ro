@@ -26,4 +26,4 @@ The branch always starts with `claude/` but the suffix changes every session. Us
 - **Step 8 (push + PR)**: Push (`git push -u origin <branch-from-task>`), then create the PR with `mcp__github__create_pull_request`.
 - **Step 10 (cleanup)**: `git push origin --delete <branch>` works for `claude/`-prefixed branches.
 - **Recovery from main**: Use the injected task branch name, not `feature/descriptive-name`.
-- **Images in PRs**: the MCP tools cannot upload attachments. Commit the images, link them by commit SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>?raw=true`), then delete them in the next commit so they stay out of `main`.
+- **Images in PRs**: visual PRs need before/after images — see Phase 3 in `/dev-workflow` for the commit-and-link method. Capture them with the Playwright approach above.
