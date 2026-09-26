@@ -25,13 +25,15 @@ Read the architecture documents to understand the system:
 
 ### 3. Review Current Tasks (GitHub Issues)
 
-Tasks live in GitHub Issues, not in a file. Start with the focus set:
+Tasks live in GitHub Issues, not in a file. Start with queued work and open bugs — they rank together, because a bug is a promise already broken:
 
 ```bash
-gh issue list --label focus --state open
+gh issue list --state open --search "label:focus,bug -label:type:idea"
 ```
 
-If that returns nothing, the focus set is empty — fall back to the actionable backlog and say so rather than guessing. List user-facing work first, then the rest:
+The comma is OR; `--label focus --label bug` would be AND. Report the two counts separately, so "nothing is queued" stays visible.
+
+If that returns nothing, fall back to the actionable backlog rather than guessing. List user-facing work first, then the rest:
 
 ```bash
 gh issue list --state open --label type:ux --search "-label:type:idea"
@@ -55,6 +57,6 @@ Once you've reviewed these documents:
 
 1. Summarize the most important points from the guidelines
 2. Ask the user which issue they'd like to work on, quoting issue numbers
-3. If unclear, suggest the top `focus` issue — or, if the focus set is empty, the top open `type:ux` issue, then the top open `autonomy:high` issue
+3. If unclear, suggest the top issue from the first non-empty tier above
 
 **Remember**: This review ensures you have full context before starting work. Take time to understand the project's patterns and principles.
