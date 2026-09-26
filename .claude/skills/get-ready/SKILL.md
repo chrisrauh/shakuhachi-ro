@@ -45,7 +45,9 @@ gh issue list --state open --search "-label:type:idea" --limit 100
 
 **Always exclude `type:idea` from backlog views.** Those issues are speculative — future features that may never be built — and they are a large fraction of the open set, so including them buries the work that is actually queued. They are never candidates to pick up, and none of them carry `autonomy:high`.
 
-Useful filters: `--label type:ux` (user-facing), `--label autonomy:high` (agent-ready), `--label area:renderer` (or any other `area:*`). To look at the ideas deliberately — not to pick work from — use `--label type:idea` on its own.
+Useful filters: `--label type:ux` (user-facing), `--label autonomy:high` (agent-ready), `--label area:renderer` (or any other `area:*`), `--search "no:assignee"` (not already claimed). To look at the ideas deliberately — not to pick work from — use `--label type:idea` on its own.
+
+**Check assignees before suggesting an issue.** An assignee means another session — possibly Claude Code on the Web, running concurrently with this one — has already claimed it. Suggest unassigned work; if you surface an assigned issue anyway, say who holds it. Claiming is how the collision is avoided in the first place: see `/dev-workflow` Phase 1.
 
 ## After Review
 
