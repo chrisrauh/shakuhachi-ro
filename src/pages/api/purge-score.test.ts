@@ -133,14 +133,21 @@ describe('POST /api/purge-score', () => {
     expect(purgeCache).toHaveBeenCalledWith({ tags: ['score-deleted-score'] });
   });
 
-  it('reports a failed purge rather than claiming success', async () => {
+  // The log is the only lasting record: the page just goes quietly stale, and
+  // the browser is told a status code and nothing about the cause.
+  it('reports a failed purge rather than claiming success, and logs why', async () => {
     await signedInAs(OWNER);
     await scoreExists(true);
     const { purgeCache } = await import('@netlify/functions');
     vi.mocked(purgeCache).mockRejectedValue(new Error('Netlify says no'));
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const response = await call(request({ slug: 'test-score' }));
 
     expect(response.status).toBe(502);
+    expect(logged).toHaveBeenCalledWith(
+      expect.stringContaining('score-test-score'),
+      expect.any(Error),
+    );
   });
 });

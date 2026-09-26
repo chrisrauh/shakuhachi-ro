@@ -6,7 +6,7 @@ vi.mock('./auth');
 describe('purgeScoreCache', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal('fetch', vi.fn());
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
     vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -51,5 +51,15 @@ describe('purgeScoreCache', () => {
 
     await expect(purgeScoreCache('test-score')).resolves.toBeUndefined();
     expect(console.warn).toHaveBeenCalled();
+  });
+
+  // A rejected promise is only half the failures. The server answering "I could
+  // not purge that" resolves normally, and used to vanish without a trace.
+  it('warns when the server reports a failure', async () => {
+    await signedIn('jwt-123');
+    vi.mocked(fetch).mockResolvedValue({ ok: false, status: 502 } as Response);
+
+    await expect(purgeScoreCache('test-score')).resolves.toBeUndefined();
+    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('502'));
   });
 });
