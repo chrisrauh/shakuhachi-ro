@@ -9,7 +9,9 @@ Run these SQL files in order in your **Supabase Dashboard → SQL Editor**:
 1. `migrations/add_attribution_to_scores.sql` - Adds attribution fields to scores table
 2. `migrations/rls_policies_scores.sql` - **Required.** Row Level Security policies
 3. `migrations/derive_fork_count.sql` - **Required.** Drops the stored `fork_count` column; the count is derived from `forked_from`
-4. `migrations/seed_scores.sql` - Seeds 7 shakuhachi songs into the library
+4. `migrations/add_licensing_to_scores.sql` - **Required.** Composition copyright status, score licence, and the fork licence trigger
+5. `migrations/drop_rights_from_scores.sql` - Drops the superseded free-text `rights` column
+6. `migrations/seed_scores.sql` - Seeds 6 shakuhachi songs into the library
 
 ## Row Level Security
 
@@ -54,8 +56,15 @@ CREATE TABLE scores (
   data JSONB NOT NULL,
   forked_from UUID REFERENCES scores(id),  -- fork count is derived from this
   source_url TEXT,           -- Reference URL for source material
-  rights TEXT,               -- License or rights (e.g., Public Domain)
   source_description TEXT,   -- Human-readable attribution text
+  -- Composition layer: a fact about the piece
+  composition_copyright_status copyright_status NOT NULL DEFAULT 'not_evaluated',
+  composition_copyright_basis copyright_basis,  -- only when public domain / no known copyright
+  composition_copyright_source TEXT,            -- NULL = determined by shakuhachi.ro
+  composition_year_author_died INT,
+  composition_year_published INT,
+  -- Score layer: the terms on this notation (SPDX identifier)
+  license score_license NOT NULL DEFAULT 'CC-BY-SA-4.0',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -72,19 +81,20 @@ CREATE TABLE scores (
 | `remove_view_count_from_scores.sql` | Removes unused view_count field                                    |
 | `rls_policies_scores.sql`           | Row Level Security policies (public read, owner-only write)        |
 | `derive_fork_count.sql`             | Drops stored `fork_count`; the count is derived from `forked_from` |
-| `seed_scores.sql`                   | Seeds 7 shakuhachi songs with full attribution                     |
+| `add_licensing_to_scores.sql`       | Two rights layers, backfill, and the fork licence trigger (#306)   |
+| `drop_rights_from_scores.sql`       | Drops `rights`, superseded by the two layers                       |
+| `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                     |
 
 ## Seeded Songs
 
 The seed script adds these songs to your library:
 
 1. **Akatombo** - Traditional folk song (beginner)
-2. **Love Story** - Unknown composer
-3. **Sakura Sakura** - Traditional Edo period folk song
-4. **Kojo no Tsuki** - Rentaro Taki (1901)
-5. **Kuroda Bushi** - Traditional Chikuzen folk song
-6. **Shika no Tone** - Traditional Kinko-ryu honkyoku
-7. **Tsuru no Sugomori** - Traditional Dokyoku honkyoku (Voyager Golden Record)
+2. **Sakura Sakura** - Traditional Edo period folk song
+3. **Kojo no Tsuki** - Rentaro Taki (1901)
+4. **Kuroda Bushi** - Traditional Chikuzen folk song
+5. **Shika no Tone** - Traditional Kinko-ryu honkyoku
+6. **Tsuru no Sugomori** - Traditional Dokyoku honkyoku (Voyager Golden Record)
 
 ## Troubleshooting
 

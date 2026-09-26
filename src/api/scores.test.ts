@@ -48,8 +48,13 @@ const scoreFields = {
   data: { notes: [] },
   forked_from: null,
   source_url: null,
-  rights: null,
   source_description: null,
+  composition_copyright_status: 'not_evaluated' as const,
+  composition_copyright_basis: null,
+  composition_copyright_source: null,
+  composition_year_author_died: null,
+  composition_year_published: null,
+  license: 'CC-BY-SA-4.0' as const,
   created_at: '2024-01-01',
   updated_at: '2024-01-01',
 };
@@ -417,5 +422,44 @@ describe('forkScore', () => {
     // Three queries and no more: fetch original, slug probe, insert. The parent's
     // count is derived from forked_from, so there is nothing left to update.
     expect(supabase.from).toHaveBeenCalledTimes(3);
+  });
+
+  it('carries attribution and both rights layers over to the fork', async () => {
+    const { getCurrentUser } = await import('./auth');
+    const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
+    const { supabase } = await import('./supabase');
+    const parentRow = {
+      ...scoreRow,
+      source_url: 'https://example.com/source',
+      source_description: 'Transcribed by ear',
+      composition_copyright_status: 'public_domain',
+      composition_copyright_basis: 'author_died',
+      composition_year_author_died: 1903,
+      license: 'NOASSERTION',
+    };
+    const insertChain = makeChain({ data: scoreRow, error: null });
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: userFixture as any,
+      error: null,
+    });
+    vi.mocked(generateSlug).mockReturnValue('test-score');
+    vi.mocked(ensureUniqueSlug).mockReturnValue('test-score');
+    vi.mocked(supabase.from)
+      .mockReturnValueOnce(makeChain({ data: parentRow, error: null }) as any)
+      .mockReturnValueOnce(makeChain({ data: [], error: null }) as any)
+      .mockReturnValueOnce(insertChain as any);
+
+    await forkScore('score-123');
+
+    expect(insertChain.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source_url: 'https://example.com/source',
+        source_description: 'Transcribed by ear',
+        composition_copyright_status: 'public_domain',
+        composition_copyright_basis: 'author_died',
+        composition_year_author_died: 1903,
+        license: 'NOASSERTION',
+      }),
+    );
   });
 });

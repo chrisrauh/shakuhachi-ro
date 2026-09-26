@@ -68,8 +68,13 @@ function makeScore(
     forked_from: null,
     parent: null,
     source_url: null,
-    rights: null,
     source_description: null,
+    composition_copyright_status: 'not_evaluated',
+    composition_copyright_basis: null,
+    composition_copyright_source: null,
+    composition_year_author_died: null,
+    composition_year_published: null,
+    license: 'CC-BY-SA-4.0',
   };
 }
 

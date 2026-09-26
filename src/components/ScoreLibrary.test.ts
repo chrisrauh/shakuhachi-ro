@@ -37,8 +37,13 @@ function makeScore(overrides: Partial<Score> = {}): Score {
     parent: null,
     fork_count: 0,
     source_url: null,
-    rights: null,
     source_description: null,
+    composition_copyright_status: 'not_evaluated',
+    composition_copyright_basis: null,
+    composition_copyright_source: null,
+    composition_year_author_died: null,
+    composition_year_published: null,
+    license: 'CC-BY-SA-4.0',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
     ...overrides,
@@ -124,6 +129,16 @@ describe('ScoreLibrary.renderScoreCard', () => {
     expect(call(makeScore({ forked_from: null }))).not.toContain(
       'forked-indicator',
     );
+  });
+
+  it('badges only a public-domain composition', () => {
+    const badged = call(
+      makeScore({ composition_copyright_status: 'public_domain' }),
+    );
+    expect(badged).toContain('Public domain');
+    expect(
+      call(makeScore({ composition_copyright_status: 'not_evaluated' })),
+    ).not.toContain('badge-public-domain');
   });
 
   it('escapes HTML in title to prevent XSS', () => {

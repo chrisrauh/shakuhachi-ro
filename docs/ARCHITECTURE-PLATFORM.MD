@@ -146,7 +146,7 @@ session to the shared Supabase client; see AUTH-SESSION-STORAGE.md.
 
 **Supabase tables:**
 
-- `scores` — id, user_id, title, slug, composer, description, data_format, data, forked_from, source_url, rights, source_description, created_at, updated_at
+- `scores` — id, user_id, title, slug, composer, description, data_format, data, forked_from, source_url, source_description, composition_copyright_status, composition_copyright_basis, composition_copyright_source, composition_year_author_died, composition_year_published, license, created_at, updated_at
 - `users` — user profiles
 
 **Row Level Security is the authorization boundary.** The anon key is public, and the
@@ -160,6 +160,14 @@ read, owner-only write.
 would have to be written on the _parent_ score, which the forking user does not own —
 and the owner-only update policy silently dropped exactly that write, so the old column
 had drifted. Deriving it also makes deletes correct without any extra work.
+
+**Rights are two layers, not one.** `composition_copyright_status` is a fact about the
+piece; `license` (an SPDX identifier) is the terms on which this score's notation may be
+reused. A public-domain composition can carry a restrictive notation licence, and the
+reverse. Forks copy both. The fork licence rules — ND and All Rights Reserved sources
+cannot be forked by others, ShareAlike stays locked — are enforced by a trigger in
+`database/migrations/add_licensing_to_scores.sql`, for the same reason as RLS: a check
+in the browser is not a rule. The decisions behind the model are on issue #306.
 
 ## Client Components
 

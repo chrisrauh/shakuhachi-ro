@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { buildSpinnerSVG } from './LoadingSpinner';
+import { COPYRIGHT_STATUS_LABELS } from '../utils/license';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -345,8 +346,8 @@ export class ScoreLibrary {
                 : 'Unknown composer'
             }
             ${
-              score.rights
-                ? `<span class="badge-public-domain">${this.escapeHtml(score.rights)}</span>`
+              score.composition_copyright_status === 'public_domain'
+                ? `<span class="badge-public-domain">${COPYRIGHT_STATUS_LABELS.public_domain}</span>`
                 : ''
             }
           </p>
