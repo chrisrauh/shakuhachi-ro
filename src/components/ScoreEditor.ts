@@ -1,4 +1,5 @@
 import { updateScore, getScore } from '../api/scores';
+import { purgeScoreCache } from '../api/purge';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
 import { ABCParser } from '../web-component/parser/ABCParser';
@@ -23,6 +24,7 @@ export class ScoreEditor {
   };
   private validationError: string | null = null;
   private scoreId: string;
+  private slug: string;
   private loadedAt: string = '';
   private hasUnsavedChanges: boolean = false;
   private autosave: EditorAutosave;
@@ -34,6 +36,7 @@ export class ScoreEditor {
     }
     this.container = container;
     this.scoreId = scoreId;
+    this.slug = slug;
     this.autosave = new EditorAutosave(slug);
 
     this.showLoadingPlaceholder();
@@ -373,6 +376,9 @@ export class ScoreEditor {
         this.hasUnsavedChanges = false;
         this.updateUnsavedIndicator();
         toast.success(STRINGS.SUCCESS.ScoreEditor.scoreSaved(true));
+        // Before navigating away, so the score page is already invalidated by
+        // the time anyone opens it.
+        await purgeScoreCache(this.slug);
         window.location.href = '/';
       }
     } catch (error) {
