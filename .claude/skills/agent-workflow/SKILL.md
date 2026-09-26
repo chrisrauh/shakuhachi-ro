@@ -15,9 +15,9 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 
 Sessions run concurrently — a terminal session and a Claude Code on the Web session select from this same backlog. Assigning is how they avoid building the same thing twice, so every list filters `no:assignee` and step 5 claims before any code is written.
 
-1. List the focus set, newest-first ordering is fine — these are the queued issues:
+1. List queued work and open bugs — they rank together, because a bug is a promise already broken (the comma is OR; two `--label` flags would be AND):
    ```bash
-   gh issue list --label focus --label autonomy:high --state open --search "no:assignee"
+   gh issue list --label autonomy:high --state open --search "no:assignee label:focus,bug -label:type:idea"
    ```
 2. If that is empty, take user-facing work next — `type:ux` marks issues that change what users see or do:
    ```bash
@@ -36,7 +36,7 @@ Sessions run concurrently — a terminal session and a Claude Code on the Web se
 6. Announce: `"Working on: #<n> [issue title]"`
 7. If no list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
 
-**Why `type:ux` comes first:** internal work (refactors, tests, type tightening) is easier to spec and finish autonomously, so without an explicit preference it crowds out user value.
+**Why bugs and `type:ux` come first:** internal work (refactors, tests, type tightening) is easier to spec and finish autonomously, so without an explicit preference it crowds out user value.
 
 **`autonomy:high` means agent-ready:** the issue body must contain enough detail (file paths, exact approach, constraints) to implement without asking any questions. If the description is vague, it should not carry that label — see the failure protocol.
 
