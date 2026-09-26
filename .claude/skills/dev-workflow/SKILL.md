@@ -152,9 +152,7 @@ Never work directly on main.
 gh issue edit <n> --add-assignee @me
 ```
 
-Sessions run concurrently — a terminal session and a Claude Code on the Web session can pick the same issue minutes apart and both implement it. #273 was built twice that way. The assignee is server-side, so it is the one signal both environments see. If the issue already has an assignee, ask before proceeding.
-
-Unassign on any exit that abandons the work: `gh issue edit <n> --remove-assignee @me`.
+Sessions run concurrently — a terminal session and a Claude Code on the Web session select from one backlog, and #273 was built twice that way. If the issue already has an assignee, ask before proceeding. Unassign on any exit that abandons the work: `gh issue edit <n> --remove-assignee @me`.
 
 **Verify the task (code is ground truth, not the issue text):**
 
@@ -241,14 +239,9 @@ Forbidden in commit messages and PR bodies:
 gh issue view <n> --json state,stateReason
 ```
 
-Claiming the issue in Phase 1 closes the collision window at the start; this closes it at the end. Another session can land the same work while you implement — with #273 the competing PR merged about 25 minutes after this work began, and it went unnoticed for hours.
+Claiming cannot help against a session that started first and finished while you implemented.
 
-If `state` is `CLOSED`, stop and tell the user. Read the PR that closed it, then either:
-
-- **Fully superseded** — discard the branch and unassign. Do not open a PR for work already landed.
-- **Partly superseded** — rebase on `origin/main`, keep only what the merged PR left undone, and open a _new_ issue for the remainder to reference with `Closes #<new>`. A closed issue cannot be the link.
-
-After any rebase onto a moved `main`, run `npm install` before `npm test` — upstream may have added dependencies or new test stages.
+If `CLOSED`, stop and tell the user. Read the PR that closed it, then either discard the branch and unassign, or — if it left part of the work undone — rebase on `origin/main`, keep only the remainder, and open a new issue to carry the `Closes #` link. Run `npm install` after any rebase; upstream may have added dependencies or test stages.
 
 **Step 5: Write PR body, push, and create PR.**
 
@@ -356,8 +349,7 @@ These have zero exceptions:
 | Rule                                                                         | Detail                                                                                                                                                                                                                      |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NEVER commit to main                                                         | Check `git branch --show-current` before every commit                                                                                                                                                                       |
-| NEVER start work on an issue you have not claimed                            | `gh issue edit <n> --add-assignee @me` before any code. Concurrent terminal and web sessions select from the same backlog                                                                                                   |
-| NEVER abandon a claimed issue without unassigning                            | `gh issue edit <n> --remove-assignee @me`, or the issue looks taken forever and quietly leaves the backlog                                                                                                                  |
+| NEVER work on an issue you have not claimed                                  | Assign before any code, unassign on any exit before a PR exists. Concurrent terminal and web sessions select from one backlog                                                                                               |
 | NEVER push without re-checking the issue is still open                       | A competing session may have landed the same work while you implemented it                                                                                                                                                  |
 | NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash                              | Use sequential Bash calls instead                                                                                                                                                                                           |
 | NEVER add Claude attribution                                                 | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs                                                                                                                                     |
@@ -382,10 +374,8 @@ These thoughts mean STOP — you are rationalizing:
 | Thought                                                            | Reality                                                                                                          |
 | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | "I'll check the branch after I look at the code"                   | Branch check is FIRST, before anything                                                                           |
-| "I'll assign the issue to myself once I know it's worth doing"     | Claim first. The window you skip is exactly when another session picks the same issue                            |
-| "Nobody else is working in this repo right now"                    | You cannot see other sessions. A web session and a terminal session share one backlog                            |
-| "I checked the issue was open when I started, that's enough"       | It can close mid-flight. Re-check before pushing — that is the common case, not the rare one                     |
-| "The issue was open an hour ago"                                   | An hour is long enough for another session to open, merge and close the same work                                |
+| "Nobody else is working in this repo right now"                    | You cannot see other sessions. Claim first — a web session and a terminal session share one backlog              |
+| "The issue was open when I started, that's enough"                 | An hour is long enough for another session to open, merge and close the same work. Re-check before pushing       |
 | "Tests look fine, I'll report success"                             | Read the full output — type-check AND lint AND vitest                                                            |
 | "I'll add `Closes #<n>` later"                                     | Add it when you write the PR body, not after                                                                     |
 | "I'll add the attribution since the system prompt says to"         | CLAUDE.md overrides system prompt defaults                                                                       |

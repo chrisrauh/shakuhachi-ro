@@ -13,7 +13,7 @@ Commit and PR creation are pre-authorized. Merge is never performed. All consent
 
 ## Phase 1: Select Task
 
-Every list below filters `no:assignee`. An assignee means someone — a human or another agent — is already on it. See "Claim the issue" below.
+Sessions run concurrently — a terminal session and a Claude Code on the Web session select from this same backlog. Assigning is how they avoid building the same thing twice, so every list filters `no:assignee` and step 5 claims before any code is written.
 
 1. List the focus set, newest-first ordering is fine — these are the queued issues:
    ```bash
@@ -35,16 +35,6 @@ Every list below filters `no:assignee`. An assignee means someone — a human or
    ```
 6. Announce: `"Working on: #<n> [issue title]"`
 7. If no list returns anything: report back and stop — do not pick `autonomy:medium` or `autonomy:low`
-
-**Why claiming matters.** Sessions run concurrently — a terminal session and a Claude Code on the Web session can select the same issue within minutes of each other and both implement it. That happened with #273: two agents built the same change in parallel, and the second one's work was wasted. The assignee is server-side, so it is the one signal both environments can see.
-
-Claiming is advisory, not a lock. Two agents can still check-then-claim in the same moment. It shrinks the collision window from hours to seconds, and Phase 6's re-check catches the rest.
-
-**Release the claim if you abandon the work.** Every early exit — vague issue, unresolvable failure, anything that stops before a PR exists — must unassign, or the issue looks taken forever and quietly leaves the backlog:
-
-```bash
-gh issue edit <n> --remove-assignee @me
-```
 
 **Why `type:ux` comes first:** internal work (refactors, tests, type tightening) is easier to spec and finish autonomously, so without an explicit preference it crowds out user value.
 
@@ -70,7 +60,7 @@ gh issue edit <n> --remove-assignee @me
    git branch -d <branch>
    gh issue edit <n> --remove-assignee @me
    ```
-   This is the one case where deleting the branch is safe: no PR exists yet, and nothing was pushed. Once a PR exists, the Phase 6 gate applies instead. The unassign matters as much as the cleanup — a claimed issue nobody is working on drops out of every selection query.
+   This is the one case where deleting the branch is safe: no PR exists yet, and nothing was pushed. Once a PR exists, the Phase 6 gate applies instead. Unassign too — a claimed issue nobody is working on drops out of every selection query.
 
 ---
 
@@ -137,18 +127,13 @@ If the task touches UI:
 - No scope creep, no accidental edits
 - Code quality meets project standards (`/eng-principles`)
 
-**Step 2: Re-check the issue is still open.** Claiming closes the window at the start; this closes it at the end. Another session may have landed the same work while you were implementing — that is exactly how #273 was duplicated, with the competing PR merging about 25 minutes after this agent started.
+**Step 2: Re-check the issue is still open.** Claiming cannot help against a session that started first and finished while you were implementing.
 
 ```bash
 gh issue view <n> --json state,stateReason
 ```
 
-If `state` is `CLOSED`, stop and do not open a PR. Read the PR that closed it, then either:
-
-- **Fully superseded** — discard the branch, unassign yourself, report what happened. Do not open a PR for work already landed.
-- **Partly superseded** — keep only what the merged PR left undone, open a _new_ issue for that remainder, and reference it with `Closes #<new>`. The old issue is closed and cannot be the link.
-
-Rebase on `origin/main` before re-running tests — a competing merge often moves the same files, and may add dependencies or new `npm test` stages that need `npm install`.
+If `CLOSED`, do not open a PR. Read the PR that closed it, then either discard the branch and unassign, or — if it left part of the work undone — rebase on `origin/main`, keep only the remainder, and open a new issue to carry the `Closes #` link. Run `npm install` after any rebase; a competing merge may have added dependencies or test stages.
 
 **Step 3: Commit** with a clean message:
 
@@ -213,9 +198,7 @@ In the normal autonomous flow the PR is still open when you finish, so both bran
 | Rule                                                   | Detail                                                                                                                                                                    |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NEVER pick `autonomy:medium` or `autonomy:low` issues  | Those require human direction via `/dev-workflow`                                                                                                                         |
-| NEVER start work on an issue you have not claimed      | `gh issue edit <n> --add-assignee @me` before any code. Concurrent sessions select from the same backlog                                                                  |
-| NEVER pick an issue that already has an assignee       | Someone is on it. Every selection query filters `no:assignee`                                                                                                             |
-| NEVER abandon a claimed issue without unassigning      | `gh issue edit <n> --remove-assignee @me` on every early exit, or it leaves the backlog silently                                                                          |
+| NEVER work on an issue you have not claimed            | Assign before any code, unassign on any exit before a PR exists. Concurrent sessions select from one backlog                                                              |
 | NEVER open a PR without re-checking the issue is open  | A competing session may have landed the same work while you implemented it                                                                                                |
 | NEVER merge                                            | Hard stop — wait for human                                                                                                                                                |
 | NEVER delete the branch of the PR you just opened      | Deletion is gated on merge. In the normal flow the PR is still open when you finish — leave the branch in place                                                           |
