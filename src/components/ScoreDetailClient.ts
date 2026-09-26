@@ -1,4 +1,5 @@
 import { forkScore, deleteScore } from '../api/scores';
+import { purgeScoreCache } from '../api/purge';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { confirmDialog } from '../utils/init-header';
 import { toScoreData } from '../utils/score-data';
@@ -163,6 +164,10 @@ export class ScoreDetailClient {
       return;
     }
 
+    // The cached page outlives the row, so drop it before anyone can be served
+    // a score that no longer exists.
+    await purgeScoreCache(this.score.slug);
+
     sessionStorage.setItem('score-deleted', this.score.title);
     window.location.href = '/';
   }
@@ -205,6 +210,10 @@ export class ScoreDetailClient {
       }
 
       if (result.score) {
+        // Forking writes no row on the parent, but the parent's page renders the
+        // fork count, so its cached copy is now wrong.
+        await purgeScoreCache(this.score.slug);
+
         // Redirect to editor with the forked score
         window.location.href = `/score/${result.score.slug}/edit`;
       }

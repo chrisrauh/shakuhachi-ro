@@ -3,7 +3,7 @@
 - Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now, and `bug` ranks alongside it — a bug is a promise already broken. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:ux` (user-facing — changes what users see or do; **preferred over internal work when choosing what to do next**), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
 - **Claim before you build:** assign an issue to yourself (`gh issue edit <n> --add-assignee @me`) before writing code, pick only unassigned issues (`--search "no:assignee"`), unassign if you abandon it, and re-check it is still open before pushing. Terminal and web sessions run concurrently against one backlog and will otherwise build the same thing twice. See `/dev-workflow` Phase 1.
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
-- Environment: [Cloud (claude.ai/code, mobile app)](./docs/ENVIRONMENT-WEB.md)
+- Environment: [Cloud (claude.ai/code, mobile app)](./docs/ENVIRONMENT-CLOUD.md)
 
 ## ⚠️ MANDATORY SKILL RULES — HIGHEST PRIORITY
 
@@ -63,7 +63,7 @@ Use project skills for structured workflows:
 
 This project is used in two environments: a local macOS terminal and the **Claude Code cloud** environment (claude.ai/code on the web, and sessions started from the Claude mobile or desktop app — they run in the same container). The guidelines in this file are written for the terminal environment. `/get-ready` explains how to tell which one you are in.
 
-**If you are running in the cloud environment**, read [docs/ENVIRONMENT-WEB.md](./docs/ENVIRONMENT-WEB.md) for constraints and workflow differences that apply there.
+**If you are running in the cloud environment**, read [docs/ENVIRONMENT-CLOUD.md](./docs/ENVIRONMENT-CLOUD.md) for constraints and workflow differences that apply there.
 
 ## Dev Workflow
 
@@ -355,6 +355,7 @@ When testing authenticated features (score editor, creating scores, forking):
 - No auth-related console errors
 - Session token is in localStorage (`sb-*-auth-token`) — this is expected; see [docs/AUTH-SESSION-STORAGE.md](./docs/AUTH-SESSION-STORAGE.md)
 - Authorization is enforced by RLS, not by the client-side checks in `src/api/scores.ts`
+- Score pages are edge-cached and therefore shared between viewers — the SSR HTML must stay identical for everyone. Anything that makes it depend on who is asking (private scores, reading cookies or an `Authorization` header during SSR) needs the caching in `src/pages/score/[slug].astro` revisited first. See [docs/ARCHITECTURE-PLATFORM.MD](./docs/ARCHITECTURE-PLATFORM.MD)
 - Any user-supplied data embedded in HTML uses `embedJson()` or `escapeHtml()` (never a bare attribute — `escapeHtml()` does not escape quotes)
 - `npm test` passes
 

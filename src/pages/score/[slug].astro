@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug } from '../../api/scores';
+import { cacheTagForScore } from '../../utils/cache-tags';
 import { embedJson } from '../../utils/embed-json';
 import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
@@ -20,6 +21,26 @@ const { score } = scoreResult;
 
 if (!score) {
   Astro.response.status = 404;
+} else {
+  // Serve repeat views from Netlify's edge instead of re-rendering here. The
+  // functions run in N. Virginia and the database is in Paris, so every render
+  // crosses the Atlantic three times — a cache hit crosses none (#385).
+  //
+  // Netlify-CDN-Cache-Control, not Cache-Control: this applies to Netlify's CDN
+  // alone, so browsers keep revalidating and a purge reaches every viewer at once.
+  //
+  // max-age is only the backstop for a missed purge — the tag below is what keeps
+  // edits immediately visible, which is why these pages are SSR in the first place
+  // (docs/ARCHITECTURE-PLATFORM.MD). stale-while-revalidate is what makes a short
+  // max-age cheap: past it the edge serves the stale copy at once and refreshes
+  // behind the request, so nobody waits for the round trip.
+  Astro.response.headers.set(
+    'Netlify-CDN-Cache-Control',
+    'public, max-age=300, stale-while-revalidate=86400, durable',
+  );
+  // Netlify-Cache-Tag rather than Cache-Tag: Netlify prefers it when both are
+  // present, and keeps it internal instead of passing it on to the client.
+  Astro.response.headers.set('Netlify-Cache-Tag', cacheTagForScore(score.slug));
 }
 
 // The parent of a fork arrives embedded in the query above — no second round trip.

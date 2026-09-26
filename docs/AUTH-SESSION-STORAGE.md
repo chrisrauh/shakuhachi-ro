@@ -10,7 +10,8 @@ calls `createClient()` with no storage options. There are no auth cookies.
 
 **Authorization is enforced by Row Level Security**, not by application code. Every
 ownership check in `src/api/scores.ts` runs in the client's own browser and is
-trivially bypassable; the `.eq('user_id', user.id)` filters on update and delete are
+trivially bypassable (the lone exception is `/api/purge-score`, which guards a cache
+operation rather than data — see below); the `.eq('user_id', user.id)` filters on update and delete are
 query filters, not constraints. The policies in
 `database/migrations/rls_policies_scores.sql` are the actual boundary. Client-side
 checks exist for UX — hiding buttons, redirecting — and nothing more.
@@ -47,15 +48,38 @@ declarative, fail-closed boundary (RLS) with hand-written checks in every endpoi
 That is a plausible net security _regression_, and disproportionate for a public
 library of shakuhachi scores.
 
-## Constraint for any future migration
+## Constraint on server-side auth
 
 `src/api/supabase.ts` exports a **module-level singleton**. On Netlify Functions,
 module scope persists across invocations in a warm container.
 
-This is only safe because the server never authenticates that client — Astro frontmatter
-calls read-only functions (`getScoreBySlug`, `getScore`, `getAllScores`, `searchScores`)
-and nothing else. **Any future server-side auth must construct a per-request client.**
-Authenticating the singleton would let user A's session serve user B's request.
+This is safe only because the server never _authenticates_ that client. Astro
+frontmatter calls read-only functions (`getScoreBySlug`, `getScore`, `getAllScores`,
+`searchScores`) and nothing else. **Server-side auth must never attach a session to the
+singleton** — doing so would let user A's session serve user B's request. Anything that
+needs to act _as_ a user must construct a per-request client.
+
+### The one server-side check, and why it does not break this
+
+`src/pages/api/purge-score.ts` verifies a bearer token so it can decide who may
+invalidate a cached score page (#390). It calls `supabase.auth.getUser(token)` on the
+singleton, which is safe because **verifying a token is not the same as adopting it**:
+
+- `getUser(jwt)` with an explicit argument returns early into a one-off `GET /user` with
+  a per-call `Authorization` header. It never calls `_saveSession`, never writes to
+  storage, and never emits an auth state change — so `getSession()` still returns
+  whatever it did before, which on the server is nothing.
+- PostgREST requests pick their bearer token from `getSession()`, falling back to the
+  anon key. Since the verification leaves no session behind, a later `supabase.from(...)`
+  on that client still runs as anon.
+
+So the endpoint learns _who is asking_ without the client ever acting as them. The
+ownership check compares `user_id` explicitly rather than relying on RLS to scope the
+query — RLS cannot help here, because the read it performs is public to everyone.
+
+This endpoint guards a cache operation, not data. Purging only forces a page to be
+re-rendered from the database; nothing is disclosed or written. It is **not** a
+precedent for moving authorization out of RLS.
 
 ## What actually protects the session
 

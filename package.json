@@ -28,6 +28,7 @@
     "@astrojs/netlify": "^8.2.6",
     "@github/relative-time-element": "^5.0.0",
     "@lucide/astro": "^1.47.0",
+    "@netlify/functions": "6.0.0",
     "@supabase/supabase-js": "^2.39.0",
     "dayjs": "^1.11.19",
     "lucide": "^1.47.0",
