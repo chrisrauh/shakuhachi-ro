@@ -11,6 +11,17 @@ This skill prepares you to work on the shakuhachi-ro project by reviewing key do
 
 Follow this sequence to get context:
 
+### 0. Identify Your Environment
+
+This project is worked on in two environments. Work out which one you are in before anything else — the tooling differs.
+
+| Environment                                                                                                                    | How to tell                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                                    |
+| **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt injects a `Develop on branch \`claude/...\``block;`gh` is not installed. |
+
+In the cloud environment, read [docs/ENVIRONMENT-WEB.md](../../../docs/ENVIRONMENT-WEB.md) now. It lists what is unavailable there (`gh`, the visual regression suite, chrome-devtools-mcp) and what to use instead. Everywhere this skill and `/dev-workflow` say `gh`, use the GitHub MCP tools (`mcp__github__*`).
+
 ### 1. Review Guidelines (CLAUDE.md)
 
 Read `./CLAUDE.md` to understand each section.
@@ -51,7 +62,7 @@ Useful filters: `--label type:ux` (user-facing), `--label autonomy:high` (agent-
 
 Once you've reviewed these documents:
 
-1. Summarize the most important points from the guidelines
+1. State which environment you are in, and summarize the most important points from the guidelines
 2. Ask the user which issue they'd like to work on, quoting issue numbers
 3. If unclear, suggest the top `focus` issue — or, if the focus set is empty, the top open `type:ux` issue, then the top open `autonomy:high` issue
 
