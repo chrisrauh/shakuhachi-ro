@@ -305,18 +305,22 @@ The issue closes itself on merge via the `Closes #<n>` line in the PR body — n
 Then: list the next candidates and present the top 3. Ask the user which to work on next, or if they'd like to stop.
 
 ```bash
-gh issue list --label focus --state open
+gh issue list --state open --search "label:focus,bug -label:type:idea"
 ```
 
-If the focus set is empty, say so and fall back to the actionable backlog:
+Queued work and open bugs rank together (the comma is OR — `--label focus --label bug` would be AND). Say how many of each, so "nothing is queued" stays visible.
+
+If that is empty, fall back to user-facing work, then the rest:
+
+```bash
+gh issue list --state open --label type:ux --search "-label:type:idea"
+```
 
 ```bash
 gh issue list --state open --search "-label:type:idea" --limit 100
 ```
 
 `type:idea` issues are speculative and never candidates to pick up — exclude them from any backlog view. See `/get-ready`.
-
-Prefer `type:ux` (user-facing) issues over internal work when choosing what to do next — list them with `--label type:ux`. See `/get-ready`.
 
 Add `--json number,title,assignees --jq ...` or check assignees before proposing: an assigned issue is already being worked by another session. Offer unassigned ones, and if you do surface an assigned issue, say who holds it so the user can decide.
 
