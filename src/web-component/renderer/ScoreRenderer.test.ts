@@ -508,4 +508,66 @@ describe('ScoreRenderer', () => {
       expect(container.querySelector('svg')).toBeTruthy();
     });
   });
+
+  describe('duration lines', () => {
+    /** Three quarter notes, each with one duration line */
+    function quarterNotes(firstDotted = false): ScoreData {
+      return {
+        title: 'Duration lines',
+        style: 'kinko',
+        notes: [
+          {
+            pitch: { step: 'ro', octave: 0 },
+            duration: 1,
+            dotted: firstDotted,
+          },
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
+          { pitch: { step: 're', octave: 0 }, duration: 1 },
+        ],
+      };
+    }
+
+    /** Gaps between consecutive line segments (next y1 minus this y2) */
+    function segmentGaps(): number[] {
+      const lines = Array.from(container.querySelectorAll('line'));
+      expect(lines).toHaveLength(3);
+      return lines
+        .slice(1)
+        .map(
+          (line, i) =>
+            Number(line.getAttribute('y1')) -
+            Number(lines[i].getAttribute('y2')),
+        );
+    }
+
+    it('should join consecutive segments with default options', async () => {
+      await new ScoreRenderer(container).renderFromScoreData(quarterNotes());
+      expect(segmentGaps()).toEqual([0, 0]);
+    });
+
+    it('should join consecutive segments with custom note spacing', async () => {
+      const renderer = new ScoreRenderer(container, {
+        noteVerticalSpacing: 60,
+      });
+      await renderer.renderFromScoreData(quarterNotes());
+      expect(segmentGaps()).toEqual([0, 0]);
+    });
+
+    it('should continue the line past a dotted note', async () => {
+      await new ScoreRenderer(container).renderFromScoreData(
+        quarterNotes(true),
+      );
+      expect(segmentGaps()).toEqual([0, 0]);
+    });
+
+    it('should end the last segment at the middle of its note', async () => {
+      const renderer = new ScoreRenderer(container, { noteFontSize: 40 });
+      await renderer.renderFromScoreData(quarterNotes());
+      const last = Array.from(container.querySelectorAll('line')).at(-1)!;
+      const lastNoteY = Number(
+        container.querySelectorAll('text')[2].getAttribute('y'),
+      );
+      expect(Number(last.getAttribute('y2'))).toBe(lastNoteY - 40 * 0.25);
+    });
+  });
 });

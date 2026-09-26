@@ -260,6 +260,8 @@ Use the Write tool to create the PR body file at `tmp/pr-body.md` (project-local
 Closes #<n>
 ```
 
+**Visual changes need before/after images in the PR body.** Any change to what users see (rendering, layout, styling) gets a `## Before / after` table with light and dark rows. Capture "before" from the base branch (e.g. build it in a temporary `git worktree`) and "after" from the branch. `gh` and the GitHub MCP tools cannot upload attachments, so commit the images (e.g. `docs/pr-assets/<issue>/`), link them by commit SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>?raw=true`), then delete them in the next commit so they stay out of `main`. The PR's refs keep the SHA links working.
+
 **`Closes #<n>` is required whenever the work corresponds to an issue.** That link is what closes the issue on merge — there is no separate bookkeeping step.
 
 Then run as two **separate** Bash tool calls (not on separate lines in one call):
