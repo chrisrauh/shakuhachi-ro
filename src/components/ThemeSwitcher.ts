@@ -7,15 +7,23 @@
 export class ThemeSwitcher {
   private currentTheme: 'light' | 'dark' = 'light';
 
+  // Assigned before any other method can run — the constructor returns early
+  // when the button is absent, and every other method is reachable only
+  // through a listener registered after this point.
+  private button!: HTMLButtonElement;
+
   constructor() {
     const button = document.getElementById('theme-toggle') as HTMLButtonElement;
     if (!button) {
       return;
     }
+    this.button = button;
 
     // Read theme from DOM (already set by inline script in head)
     const currentAttr = document.documentElement.getAttribute('data-theme');
     this.currentTheme = currentAttr === 'dark' ? 'dark' : 'light';
+    // Sets the initial title; re-applying the current theme is idempotent
+    this.applyTheme(this.currentTheme);
 
     button.addEventListener('click', () => {
       this.toggleTheme();
@@ -39,5 +47,9 @@ export class ThemeSwitcher {
   private applyTheme(theme: 'light' | 'dark'): void {
     const html = document.documentElement;
     html.setAttribute('data-theme', theme);
+    // Names the state the click moves to; aria-label stays constant so screen
+    // reader users are not re-announced on every toggle.
+    this.button.title =
+      theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
   }
 }

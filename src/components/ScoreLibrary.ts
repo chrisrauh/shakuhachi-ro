@@ -148,6 +148,7 @@ export class ScoreLibrary {
               class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
               id="search-clear-btn"
               aria-label="Clear search"
+              title="Clear the search field"
               type="button"
             >${getIconHTML(CircleX)}</button>
           </div>
