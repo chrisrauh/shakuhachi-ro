@@ -124,6 +124,7 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 
 - Button text needs `<span class="btn-text">` wrapper — required for `text-box-trim` to work inside flex containers
 - All toolbar-height elements use `--size-toolbar-item`
+- Icon-only buttons need BOTH `aria-label` (names the action, for screen readers) and `title` (explains it, on hover). Use different text for each — with both present the accessible name comes from `aria-label`, and identical strings get announced twice. Toggles set `title` from state; see `ThemeSwitcher.applyTheme`.
 
 ## Testing
 

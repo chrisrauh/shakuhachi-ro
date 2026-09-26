@@ -21,17 +21,28 @@ const { mobileMenuType = 'standard' } = Astro.props;
     <div class="header-nav-separator" aria-hidden="true"></div>
     <!-- Desktop navigation (hidden on mobile) -->
     <div class="header-desktop-nav">
-      <a href="/" class="btn btn-icon" aria-label="View scores">
+      <a
+        href="/"
+        class="btn btn-icon"
+        aria-label="View scores"
+        title="Browse all scores"
+      >
         <Book size={16} stroke-width={2} />
       </a>
       <button
         id="desktop-create-btn"
         class="btn btn-icon"
         aria-label="Create new score"
+        title="Start a new score"
       >
         <Plus size={16} stroke-width={2} />
       </button>
-      <a href="/about" class="btn btn-icon" aria-label="About">
+      <a
+        href="/about"
+        class="btn btn-icon"
+        aria-label="About"
+        title="About shakuhachi.ro"
+      >
         <Info size={16} stroke-width={2} />
       </a>
       <button
@@ -57,6 +68,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
           class="btn btn-icon auth-avatar-btn"
           hidden
           aria-label="Account menu"
+          title="Your account and settings"
           aria-expanded="false"
           aria-haspopup="menu"
         >
@@ -74,6 +86,7 @@ const { mobileMenuType = 'standard' } = Astro.props;
         id="mobile-menu-toggle"
         class="btn btn-icon"
         aria-label="Menu"
+        title="More options"
         aria-expanded="false"
       >
         <svg
