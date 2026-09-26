@@ -34,6 +34,7 @@ function makeScore(overrides: Partial<Score> = {}): Score {
     data_format: 'json',
     data: { notes: [] },
     forked_from: null,
+    parent: null,
     fork_count: 0,
     source_url: null,
     rights: null,
