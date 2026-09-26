@@ -15,10 +15,10 @@ Follow this sequence to get context:
 
 This project is worked on in two environments. Work out which one you are in before anything else — the tooling differs.
 
-| Environment                                                                                                                    | How to tell                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                                    |
-| **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt injects a `Develop on branch \`claude/...\``block;`gh` is not installed. |
+| Environment                                                                                                                    | How to tell                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                             |
+| **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt names a `claude/...` branch to develop on; `gh` is not installed. |
 
 In the cloud environment, read [docs/ENVIRONMENT-WEB.md](../../../docs/ENVIRONMENT-WEB.md) now. It lists what is unavailable there (`gh`, the visual regression suite, chrome-devtools-mcp) and what to use instead. Everywhere this skill and `/dev-workflow` say `gh`, use the GitHub MCP tools (`mcp__github__*`).
 
