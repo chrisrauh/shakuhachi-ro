@@ -34,7 +34,7 @@ class ToastManager {
     el.setAttribute('role', type === 'error' ? 'alert' : 'status');
     el.innerHTML = `
       <span class="toast-message">${this.escapeHtml(message)}</span>
-      <button class="toast-close" aria-label="Dismiss">&times;</button>
+      <button class="toast-close" aria-label="Dismiss" title="Dismiss this message">&times;</button>
     `;
 
     this.container!.appendChild(el);
