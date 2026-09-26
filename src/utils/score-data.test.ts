@@ -66,6 +66,7 @@ function makeScore(
     composer: null,
     description: null,
     forked_from: null,
+    parent: null,
     source_url: null,
     rights: null,
     source_description: null,

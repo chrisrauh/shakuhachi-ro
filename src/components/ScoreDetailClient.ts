@@ -10,7 +10,6 @@ import { STRINGS } from '../constants/strings';
 
 interface ScoreData {
   score: Score;
-  parentScore: Score | null;
 }
 
 export class ScoreDetailClient {
@@ -24,7 +23,7 @@ export class ScoreDetailClient {
       try {
         const data = JSON.parse(dataEl.textContent || '{}') as ScoreData;
         this.score = data.score;
-        // parentScore is rendered server-side, no need to store client-side
+        // The "forked from" link is rendered server-side from score.parent.
       } catch {
         // this.score remains null; renderScore() will display the error UI
       }

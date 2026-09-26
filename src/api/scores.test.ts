@@ -203,6 +203,28 @@ describe('getScoreBySlug', () => {
     expect(result.score?.fork_count).toBe(2);
   });
 
+  // The score page renders the "forked from" link from this, rather than
+  // issuing a second query for the parent — which would cost another
+  // transatlantic round trip in production. See #386.
+  it('surfaces the embedded parent for a forked score', async () => {
+    const { supabase } = await import('./supabase');
+    const forkRow = {
+      ...scoreRow,
+      forked_from: 'parent-123',
+      parent: { slug: 'original-score', title: 'Original Score' },
+    };
+    vi.mocked(supabase.from).mockReturnValueOnce(
+      makeChain({ data: forkRow, error: null }) as any,
+    );
+
+    const result = await getScoreBySlug('test-score');
+
+    expect(result.score?.parent).toEqual({
+      slug: 'original-score',
+      title: 'Original Score',
+    });
+  });
+
   it('returns error when score not found (PGRST116)', async () => {
     const { supabase } = await import('./supabase');
     vi.mocked(supabase.from).mockReturnValueOnce(

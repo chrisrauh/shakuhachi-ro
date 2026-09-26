@@ -15,6 +15,15 @@ export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
  */
 export type ScoreContent = ScoreData | string;
 
+/**
+ * The parent of a fork, embedded in the same query as the score itself.
+ * Only the fields the "forked from" link needs — not a full Score.
+ */
+export interface ScoreParent {
+  slug: string;
+  title: string;
+}
+
 export interface Score {
   id: string;
   user_id: string;
@@ -25,6 +34,7 @@ export interface Score {
   data_format: ScoreDataFormat;
   data: ScoreContent;
   forked_from: string | null;
+  parent: ScoreParent | null;
   fork_count: number;
   source_url: string | null;
   rights: string | null;
@@ -75,8 +85,18 @@ export interface ScoresResult {
  *
  * The embed is aliased `forks` rather than `fork_count` so `toScore` can map it
  * onto the field callers already read.
+ *
+ * `parent` embeds the fork's source in the same round trip. The score page used
+ * to fetch it with a second, sequential query, which costs a full transatlantic
+ * round trip in production (functions run in us-east, the database is in Paris).
+ *
+ * The two embeds point in opposite directions across the same self-relation:
+ * `scores!forked_from` resolves to the children (hence the count), and bare
+ * `forked_from(...)` to the parent. PostgREST rejects the constraint-name hint
+ * form here, so the column-name form is the one that works.
  */
-const SCORE_SELECT = '*, forks:scores!forked_from(count)';
+const SCORE_SELECT =
+  '*, forks:scores!forked_from(count), parent:forked_from(slug,title)';
 
 function toScore(row: Record<string, any>): Score {
   const { forks, ...rest } = row;
