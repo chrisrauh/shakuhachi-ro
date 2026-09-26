@@ -20,7 +20,7 @@ This project is worked on in two environments. Work out which one you are in bef
 | **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                             |
 | **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt names a `claude/...` branch to develop on; `gh` is not installed. |
 
-In the cloud environment, read [docs/ENVIRONMENT-WEB.md](../../../docs/ENVIRONMENT-WEB.md) now. It lists what is unavailable there (`gh`, the visual regression suite, chrome-devtools-mcp) and what to use instead. Everywhere this skill and `/dev-workflow` say `gh`, use the GitHub MCP tools (`mcp__github__*`).
+In the cloud environment, read [docs/ENVIRONMENT-CLOUD.md](../../../docs/ENVIRONMENT-CLOUD.md) now. It lists what is unavailable there (`gh`, the visual regression suite, chrome-devtools-mcp) and what to use instead. Everywhere this skill and `/dev-workflow` say `gh`, use the GitHub MCP tools (`mcp__github__*`).
 
 ### 1. Review Guidelines (CLAUDE.md)
 

@@ -38,4 +38,25 @@ test.describe('Score Detail Page Visual Regression', () => {
       });
     }
   }
+
+  // The tag is what lets a save invalidate this page; without it, an edit would
+  // sit behind the cache until max-age expired. The header names must match
+  // exactly, so assert them rather than trusting they were spelled right.
+  test('is cached at the edge and tagged for purging', async ({ page }) => {
+    const response = await page.goto('/score/akatombo');
+    const headers = response!.headers();
+
+    expect(headers['netlify-cdn-cache-control']).toContain('max-age=300');
+    expect(headers['netlify-cdn-cache-control']).toContain(
+      'stale-while-revalidate',
+    );
+    expect(headers['netlify-cache-tag']).toBe('score-akatombo');
+  });
+
+  test('a missing score is not cached', async ({ page }) => {
+    const response = await page.goto('/score/no-such-score-exists');
+
+    expect(response!.status()).toBe(404);
+    expect(response!.headers()['netlify-cdn-cache-control']).toBeUndefined();
+  });
 });
