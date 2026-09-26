@@ -235,19 +235,6 @@
   gap: var(--spacing-small);
 }
 
-.badge-public-domain {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-3x-small) var(--spacing-x-small);
-  background: var(--color-success-background);
-  color: var(--color-success);
-  border-radius: var(--border-radius-small);
-  font-size: var(--font-size-x-small);
-  font-weight: var(--font-weight-medium);
-  font-style: normal;
-  white-space: nowrap;
-}
-
 .score-description {
   color: var(--color-text-primary);
   font-size: var(--font-size-small);

@@ -131,14 +131,16 @@ describe('ScoreLibrary.renderScoreCard', () => {
     );
   });
 
-  it('badges only a public-domain composition', () => {
-    const badged = call(
-      makeScore({ composition_copyright_status: 'public_domain' }),
+  it('dates the card by its last update, not its creation', () => {
+    const html = call(
+      makeScore({
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-06-01T00:00:00Z',
+      }),
     );
-    expect(badged).toContain('Public domain');
-    expect(
-      call(makeScore({ composition_copyright_status: 'not_evaluated' })),
-    ).not.toContain('badge-public-domain');
+    expect(html).toContain('Updated <relative-time');
+    expect(html).toContain('datetime="2024-06-01T00:00:00Z"');
+    expect(html).not.toContain('datetime="2024-01-01T00:00:00Z"');
   });
 
   it('escapes HTML in title to prevent XSS', () => {

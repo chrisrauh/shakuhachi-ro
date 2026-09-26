@@ -31,14 +31,52 @@ export type ScoreLicense =
   | 'LicenseRef-AllRightsReserved'
   | 'NOASSERTION';
 
-export const COPYRIGHT_STATUS_LABELS: Record<CopyrightStatus, string> = {
-  public_domain: 'Public domain',
-  no_known_copyright: 'No known copyright',
-  in_copyright: 'In copyright',
-  undetermined: 'Copyright undetermined',
-  not_evaluated: 'Copyright not evaluated',
-  original: 'Original composition',
+/**
+ * Copyright status as it reads after "Music by <composer>, …", and on its own
+ * when the composer is unknown. The score page names the music and the score in
+ * one line, so each half must say which of the two it is about.
+ */
+const MUSIC_STATUS: Partial<
+  Record<CopyrightStatus, { afterComposer: string; alone: string }>
+> = {
+  public_domain: {
+    afterComposer: 'in the public domain',
+    alone: 'Music in the public domain',
+  },
+  in_copyright: { afterComposer: 'in copyright', alone: 'Music in copyright' },
+  no_known_copyright: {
+    afterComposer: 'no known copyright',
+    alone: 'No known copyright on the music',
+  },
+  undetermined: {
+    afterComposer: 'copyright undetermined',
+    alone: 'Music copyright undetermined',
+  },
 };
+
+/** The music half of the score page's credit line; null when nothing is known. */
+export function musicCredit(
+  status: CopyrightStatus,
+  composer: string | null,
+): string | null {
+  const name = composer?.trim() || null;
+  // "Traditional" fills the composer field for pieces with no known author;
+  // "Music by Traditional" would read as if it were a name.
+  if (name?.toLowerCase() === 'traditional') {
+    const phrase = MUSIC_STATUS[status];
+    return phrase
+      ? `Traditional music, ${phrase.afterComposer}`
+      : 'Traditional music';
+  }
+  if (status === 'original') {
+    return name ? `Original composition by ${name}` : 'Original composition';
+  }
+  const phrase = MUSIC_STATUS[status];
+  if (phrase) {
+    return name ? `Music by ${name}, ${phrase.afterComposer}` : phrase.alone;
+  }
+  return name ? `Music by ${name}` : null;
+}
 
 interface LicenseInfo {
   name: string;

@@ -7,7 +7,6 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { buildSpinnerSVG } from './LoadingSpinner';
-import { COPYRIGHT_STATUS_LABELS } from '../utils/license';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -345,11 +344,6 @@ export class ScoreLibrary {
                 ? this.escapeHtml(score.composer)
                 : 'Unknown composer'
             }
-            ${
-              score.composition_copyright_status === 'public_domain'
-                ? `<span class="badge-public-domain">${COPYRIGHT_STATUS_LABELS.public_domain}</span>`
-                : ''
-            }
           </p>
 
           ${
@@ -367,7 +361,7 @@ export class ScoreLibrary {
           <span class="score-stat" title="Fork count">${renderIcon(
             'git-fork',
           )} ${score.fork_count}</span>
-          <span class="score-stat" title="Created date"><relative-time datetime="${score.created_at}" format="relative"></relative-time></span>
+          <span class="score-stat" title="Last updated">Updated <relative-time datetime="${score.updated_at}" format="relative"></relative-time></span>
         </div>
       </div>
     `;
