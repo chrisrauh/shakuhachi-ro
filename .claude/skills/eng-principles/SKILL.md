@@ -2,8 +2,10 @@
 name: eng-principles
 description: >
   Apply project engineering principles when designing, building, or reviewing
-  code — KISS, YAGNI, SRP, DRY, and related hard rules. Use when making
-  design decisions, adding features, or reviewing code quality.
+  code — KISS, YAGNI, SRP, DRY, and related hard rules. Invoke before any
+  implementation work (writing or changing code, tests, styles or config) and
+  before any superpowers:* skill; also when making design decisions or
+  reviewing code quality.
 ---
 
 # Engineering Principles
@@ -12,8 +14,10 @@ Apply these principles actively — not as a reading list, but as constraints th
 
 ## When to Apply
 
-Invoke this skill when:
+Invoke this skill:
 
+- **Before any implementation work** — writing or changing code, tests, styles or config, however small
+- **Before any `superpowers:*` skill**
 - Designing an approach before writing code
 - Choosing between implementation alternatives
 - Adding new abstractions, utilities, or helpers

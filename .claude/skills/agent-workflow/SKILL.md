@@ -66,6 +66,7 @@ Sessions run concurrently — a terminal session and a Claude Code on the Web se
 
 ## Phase 3: Implement
 
+- **Invoke `/eng-principles` first**, before writing any code or tests.
 - **Use TDD:** `superpowers:test-driven-development` — write the failing test first, then implement.
 - **TDD skip rule (strict):** Skip TDD ONLY when there is no new logic to implement:
   - Adding assertions to existing tests
@@ -209,6 +210,7 @@ In the normal autonomous flow the PR is still open when you finish, so both bran
 | NEVER use `&&`, heredocs, or `$()` in Bash             | Sequential calls only                                                                                                                                                     |
 | NEVER add Claude attribution to commits or PRs         | Clean messages only                                                                                                                                                       |
 | NEVER push a non-draft PR with failing tests           | Use draft + failure notes instead                                                                                                                                         |
+| NEVER start implementing without `/eng-principles`     | Invoke it before writing any code or tests                                                                                                                                |
 | NEVER skip TDD because "it's simple"                   | Use the strict skip rule — only skip when there is no new logic                                                                                                           |
 | NEVER skip self-review before committing               | Use `superpowers:requesting-code-review` on your diff                                                                                                                     |
 | NEVER claim tests pass without full verification       | Use `superpowers:verification-before-completion`                                                                                                                          |

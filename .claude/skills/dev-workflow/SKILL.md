@@ -46,6 +46,7 @@ digraph dev_workflow {
   "Verify task in code" [shape=box];
   "Already done?" [shape=diamond];
   "Mark done, move on" [shape=box];
+  "Invoke /eng-principles" [shape=box];
   "Make changes" [shape=box];
   "Run npm test" [shape=box];
   "Tests pass?" [shape=diamond];
@@ -78,7 +79,8 @@ digraph dev_workflow {
   "Claim issue (assign @me)" -> "Verify task in code";
   "Verify task in code" -> "Already done?";
   "Already done?" -> "Mark done, move on" [label="yes"];
-  "Already done?" -> "Make changes" [label="no"];
+  "Already done?" -> "Invoke /eng-principles" [label="no"];
+  "Invoke /eng-principles" -> "Make changes";
   "Mark done, move on" -> "Read focus issues, present next 3";
   "Make changes" -> "Run npm test";
   "Run npm test" -> "Tests pass?";
@@ -167,7 +169,7 @@ Verify against **fetched** code. Verifying a stale checkout can show a bug that 
 
 ## Phase 2: Implement & Test
 
-Make the changes. Then:
+Invoke `/eng-principles` before writing any code, then make the changes. Then:
 
 ```bash
 npm test
@@ -364,6 +366,7 @@ These have zero exceptions:
 | NEVER delete a branch any open PR uses as head or base                       | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
 | NEVER run post-merge branch cleanup while a stack is in flight               | Skip both delete steps entirely; clean up every branch once the whole chain has landed                                                                                                                                      |
 | NEVER skip git hooks                                                         | No `--no-verify`                                                                                                                                                                                                            |
+| NEVER start implementation without `/eng-principles`                         | Invoke it before writing or changing code, tests, styles or config — however small the change                                                                                                                               |
 | NEVER push before `npm test` passes                                          | Read the FULL output — type-check + lint + format check + vitest                                                                                                                                                            |
 | NEVER omit `Closes #<n>` from a PR body                                      | When the work maps to an issue, that link is the only thing that closes it                                                                                                                                                  |
 | NEVER run `test:visual:update` without user approval                         | Show the playwright report URL first, wait for explicit "yes, update baselines"                                                                                                                                             |
