@@ -86,6 +86,10 @@ export const POST: APIRoute = async ({ request }) => {
     // docs/ARCHITECTURE-PLATFORM.MD before changing that.
     await purgeCache({ tags: [cacheTagForScore(slug)] });
   } catch (cause) {
+    // The only durable record of a purge failing. Nobody is watching the page
+    // go stale, and the browser only learns a status code, so without this the
+    // cause is lost. console.error lands in the Netlify function log.
+    console.error(`Could not purge ${cacheTagForScore(slug)}:`, cause);
     return json(
       { error: cause instanceof Error ? cause.message : 'Purge failed' },
       502,

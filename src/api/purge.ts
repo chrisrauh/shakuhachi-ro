@@ -15,7 +15,7 @@ export async function purgeScoreCache(slug: string): Promise<void> {
     const { session } = await getCurrentSession();
     if (!session) return;
 
-    await fetch('/api/purge-score', {
+    const response = await fetch('/api/purge-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -24,6 +24,16 @@ export async function purgeScoreCache(slug: string): Promise<void> {
       body: JSON.stringify({ slug }),
       signal: AbortSignal.timeout(PURGE_TIMEOUT_MS),
     });
+
+    // fetch rejects only when the request never completed, so a failure the
+    // server reported arrives here as a resolved response and would otherwise
+    // pass unnoticed. The cause is in the function log; the status says where
+    // to look — 502 means purging broke, anything else means we called it wrong.
+    if (!response.ok) {
+      console.warn(
+        `Could not purge the cache for ${slug}: HTTP ${response.status}`,
+      );
+    }
   } catch (error) {
     // Deliberately swallowed — see above. Logged so a systematic failure is
     // visible to whoever is looking for stale pages.
