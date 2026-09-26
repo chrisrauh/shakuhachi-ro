@@ -177,7 +177,11 @@ export function initHeader(): void {
   new ThemeSwitcher();
   new NotationFontSwitcher();
 
-  if (import.meta.env.DEV) {
+  // Opt-in with ?tweak, so the panel does not cover pages during normal dev work
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).has('tweak')
+  ) {
     import('../components/LetterSpacingControl').then(
       ({ LetterSpacingControl }) => {
         new LetterSpacingControl('letter-spacing-control');
