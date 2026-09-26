@@ -78,7 +78,9 @@ export interface RenderOptions extends ViewportOptions {
 
   /**
    * Top margin in pixels to prevent octave mark clipping
-   * @default 34 (|octaveMarkOffsetY| + octaveMarkFontSize with the default values)
+   * Must clear the octave mark, which OctaveMarksModifier positions at
+   * offsetY -22 and draws at octaveMarkFontSize
+   * @default 34
    */
   topMargin?: number;
 
@@ -133,18 +135,6 @@ export interface RenderOptions extends ViewportOptions {
    * @default 500
    */
   octaveMarkFontWeight?: number;
-
-  /**
-   * Horizontal offset from note center for octave marks
-   * @default 18
-   */
-  octaveMarkOffsetX?: number;
-
-  /**
-   * Vertical offset from note baseline for octave marks (negative = above)
-   * @default -22
-   */
-  octaveMarkOffsetY?: number;
 
   // =========================================================================
   // Meri/Kari Mark Configuration
@@ -241,7 +231,9 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   notesPerColumn: 10,
   columnSpacing: 35,
   columnWidth: 100,
-  topMargin: 34, // Math.abs(-22) + 12
+  // Math.abs(-22) + 12 — the octave mark's offsetY, set in
+  // OctaveMarksModifier.setDefaultOffsets(), plus octaveMarkFontSize below.
+  topMargin: 34,
 
   // Note typography
   noteFontSize: 32,
@@ -253,8 +245,6 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   // Octave mark configuration
   octaveMarkFontSize: 12,
   octaveMarkFontWeight: 500,
-  octaveMarkOffsetX: 18,
-  octaveMarkOffsetY: -22,
 
   // Meri/Kari mark configuration
   meriKariFontSize: 14,
