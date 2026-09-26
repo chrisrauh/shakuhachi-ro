@@ -155,6 +155,14 @@ export class ScoreDetailClient {
     const loadingState = deleteBtn ? new ButtonLoadingState(deleteBtn) : null;
     loadingState?.show();
 
+    // The parent's page renders its fork count. Purge it now, while this fork
+    // still exists: the endpoint only lets a non-owner purge the parent of a
+    // fork they own, so the same call after the delete would be refused. The
+    // page re-renders on its next request, after the row is gone.
+    if (this.score.parent) {
+      await purgeScoreCache(this.score.parent.slug);
+    }
+
     const result = await deleteScore(this.score.id);
     if (result.error) {
       toast.error(
