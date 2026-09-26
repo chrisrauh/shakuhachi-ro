@@ -6,6 +6,11 @@ import {
   generateUniqueRandomSlug,
 } from '../utils/slug';
 import type { ScoreData } from '../web-component/types/ScoreData';
+import type {
+  CopyrightBasis,
+  CopyrightStatus,
+  ScoreLicense,
+} from '../utils/license';
 
 export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
@@ -37,8 +42,14 @@ export interface Score {
   parent: ScoreParent | null;
   fork_count: number;
   source_url: string | null;
-  rights: string | null;
   source_description: string | null;
+  composition_copyright_status: CopyrightStatus;
+  composition_copyright_basis: CopyrightBasis | null;
+  /** NULL means shakuhachi.ro determined the status itself. */
+  composition_copyright_source: string | null;
+  composition_year_author_died: number | null;
+  composition_year_published: number | null;
+  license: ScoreLicense;
   created_at: string;
   updated_at: string;
 }
@@ -51,8 +62,14 @@ export interface CreateScoreData {
   data: ScoreContent;
   forked_from?: string;
   source_url?: string;
-  rights?: string;
   source_description?: string;
+  composition_copyright_status?: CopyrightStatus;
+  composition_copyright_basis?: CopyrightBasis | null;
+  composition_copyright_source?: string | null;
+  composition_year_author_died?: number | null;
+  composition_year_published?: number | null;
+  /** Omit for the database default, CC BY-SA 4.0. */
+  license?: ScoreLicense;
 }
 
 export interface UpdateScoreData {
@@ -62,7 +79,6 @@ export interface UpdateScoreData {
   data_format?: ScoreDataFormat;
   data?: ScoreContent;
   source_url?: string;
-  rights?: string;
   source_description?: string;
   // slug is intentionally omitted — slugs are immutable after creation to preserve
   // stable URLs (bookmarks, shared links). See TODO for future slug editing feature.
@@ -162,8 +178,15 @@ export async function createScore(
         data: scoreData.data,
         forked_from: scoreData.forked_from || null,
         source_url: scoreData.source_url || null,
-        rights: scoreData.rights || null,
         source_description: scoreData.source_description || null,
+        // Undefined fields are left out of the request, so the database
+        // defaults apply: not_evaluated, and CC BY-SA 4.0.
+        composition_copyright_status: scoreData.composition_copyright_status,
+        composition_copyright_basis: scoreData.composition_copyright_basis,
+        composition_copyright_source: scoreData.composition_copyright_source,
+        composition_year_author_died: scoreData.composition_year_author_died,
+        composition_year_published: scoreData.composition_year_published,
+        license: scoreData.license,
       })
       .select(SCORE_SELECT)
       .single();
@@ -472,7 +495,11 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       };
     }
 
-    // Create the forked score (keep original title, no "(Fork)" suffix)
+    // Create the forked score (keep original title, no "(Fork)" suffix).
+    // Attribution and both rights layers travel with the notation: the
+    // composition's status is a fact that forking does not change, and the fork
+    // starts under its source's licence. The database enforces the licence rules
+    // and rejects a fork the source's licence does not allow, with the reason.
     const forkResult = await createScore({
       title: originalScore.title,
       composer: originalScore.composer || undefined,
@@ -480,6 +507,14 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       data_format: originalScore.data_format,
       data: originalScore.data,
       forked_from: scoreId,
+      source_url: originalScore.source_url || undefined,
+      source_description: originalScore.source_description || undefined,
+      composition_copyright_status: originalScore.composition_copyright_status,
+      composition_copyright_basis: originalScore.composition_copyright_basis,
+      composition_copyright_source: originalScore.composition_copyright_source,
+      composition_year_author_died: originalScore.composition_year_author_died,
+      composition_year_published: originalScore.composition_year_published,
+      license: originalScore.license,
     });
 
     // No counter to bump: the `forked_from` column set above IS the fork count.
