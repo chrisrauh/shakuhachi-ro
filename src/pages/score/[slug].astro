@@ -5,7 +5,7 @@ import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug } from '../../api/scores';
 import { cacheTagForScore } from '../../utils/cache-tags';
 import { embedJson } from '../../utils/embed-json';
-import { COPYRIGHT_STATUS_LABELS, LICENSES } from '../../utils/license';
+import { LICENSES, musicCredit } from '../../utils/license';
 import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
@@ -47,16 +47,14 @@ if (!score) {
 // The parent of a fork arrives embedded in the query above — no second round trip.
 const parentScore = score?.parent ?? null;
 
-// The two rights layers (#306): the composition's copyright status and the
-// licence on this score's notation. Unevaluated status and NOASSERTION mean
-// nothing is established yet, so neither is worth a line on its own.
-const license = score ? LICENSES[score.license] : null;
-const hasAttribution =
-  !!score &&
-  (!!score.source_url ||
-    !!score.source_description ||
-    score.composition_copyright_status !== 'not_evaluated' ||
-    score.license !== 'NOASSERTION');
+// The two rights layers (#306), as one credit line under the score: the music's
+// copyright status and the licence on this score's notation. NOASSERTION means
+// no licence is established yet, so that half is left off.
+const credit = score
+  ? musicCredit(score.composition_copyright_status, score.composer)
+  : null;
+const license =
+  score && score.license !== 'NOASSERTION' ? LICENSES[score.license] : null;
 ---
 
 {score ? (
@@ -77,7 +75,7 @@ const hasAttribution =
         <span class="score-stat">
           updated{' '}
           <relative-time
-            datetime={score.created_at}
+            datetime={score.updated_at}
             format="relative"
           ></relative-time>
         </span>
@@ -127,69 +125,29 @@ const hasAttribution =
       <!-- Score renderer using web component -->
       <shakuhachi-score id="score-renderer"></shakuhachi-score>
 
-      <!-- Attribution section (only when there is something established to say) -->
-      {hasAttribution && (
-        <section class="score-attribution">
-          <h3>Attribution</h3>
-          {score.source_description && (
-            <p class="attribution-description">{score.source_description}</p>
-          )}
-          <div class="attribution-meta">
-            {score.composition_copyright_status === 'public_domain' ? (
-              <span class="attribution-rights">
-                {COPYRIGHT_STATUS_LABELS.public_domain}
-              </span>
-            ) : (
-              score.composition_copyright_status !== 'not_evaluated' && (
-                <span>
-                  {COPYRIGHT_STATUS_LABELS[score.composition_copyright_status]}
-                </span>
-              )
-            )}
-            {license && score.license !== 'NOASSERTION' && (
-              <span>
-                Score licensed under{' '}
-                {license.url ? (
+      {(credit || license) && (
+        <p class="score-credit">
+          {credit && <span class="score-credit-part">{credit}</span>}
+          {credit && license && <span class="score-credit-separator">·</span>}
+          {license && (
+            <span class="score-credit-part">
+              {license.url ? (
+                <>
+                  Score licensed under{' '}
                   <a
                     href={license.url}
                     rel="license noopener noreferrer"
                     target="_blank"
-                    class="attribution-link"
                   >
                     {license.name}
                   </a>
-                ) : (
-                  license.name
-                )}
-              </span>
-            )}
-            {score.source_url && (
-              <a
-                href={score.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="attribution-link"
-              >
-                Source Reference
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" x2="21" y1="14" y2="3" />
-                </svg>
-              </a>
-            )}
-          </div>
-        </section>
+                </>
+              ) : (
+                `Score: ${license.name.toLowerCase()}`
+              )}
+            </span>
+          )}
+        </p>
       )}
     </div>
 
@@ -213,154 +171,6 @@ const hasAttribution =
       const client = new ScoreDetailClient();
       client.init();
     </script>
-    <style>
-      :global(.metadata-separator) {
-        color: var(--color-separator);
-      }
-
-      :global(.score-stat) {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--spacing-3x-small);
-      }
-
-      :global(.score-header-metadata a) {
-        color: var(--color-link);
-        text-decoration: none;
-      }
-
-      :global(.score-header-metadata a:hover) {
-        text-decoration: underline;
-      }
-
-      /* Page content styling */
-      .score-detail-container {
-        width: 100%; /* Fill viewport width */
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: var(--spacing-medium) var(--spacing-medium) 0;
-        position: relative;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box; /* Include padding in width calculation */
-      }
-
-      #score-renderer {
-        /* Flex child - fills available space in parent flex container */
-        flex: 1;
-        /* Needed for custom elements to participate in flex layout */
-        display: block;
-        min-height: 0; /* Allow flex shrinking */
-        /* Fill parent dimensions (parent is flex container) */
-        width: 100%;
-        align-self: stretch; /* Stretch to fill cross axis */
-      }
-
-      /* Attribution section */
-      .score-attribution {
-        margin-top: var(--spacing-large);
-        padding: var(--spacing-medium);
-        background: var(--color-surface-elevated);
-        border-radius: var(--border-radius);
-        border: 1px solid var(--color-border);
-      }
-
-      .score-attribution h3 {
-        margin: 0 0 var(--spacing-small) 0;
-        font-size: var(--font-size-small);
-        font-weight: var(--font-weight-medium);
-        color: var(--color-text-secondary);
-        text-transform: uppercase;
-        letter-spacing: var(--letter-spacing-densest);
-      }
-
-      .attribution-description {
-        margin: 0 0 var(--spacing-small) 0;
-        font-size: var(--font-size-small);
-        color: var(--color-text-primary);
-        line-height: 1.5;
-      }
-
-      .attribution-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-medium);
-        align-items: center;
-        font-size: var(--font-size-x-small);
-      }
-
-      .attribution-rights {
-        display: inline-flex;
-        align-items: center;
-        padding: var(--spacing-3x-small) var(--spacing-small);
-        background: var(--color-success-background);
-        color: var(--color-success);
-        border-radius: var(--border-radius-small);
-        font-weight: var(--font-weight-medium);
-      }
-
-      .attribution-link {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--spacing-3x-small);
-        color: var(--color-link);
-        text-decoration: none;
-      }
-
-      .attribution-link:hover {
-        text-decoration: underline;
-      }
-
-      .attribution-link svg {
-        flex-shrink: 0;
-      }
-
-      @media (max-width: 768px) {
-        :global(.score-header-metadata) {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: var(--spacing-2x-small);
-        }
-
-        :global(.score-title) {
-          font-size: var(--font-size-medium);
-        }
-
-        /* Hide owner buttons on mobile — shown in menu instead */
-        :global(.btn.owner-btn.owner-visible) {
-          display: none;
-        }
-
-        .floating-edit-btn {
-          top: 120px;
-          right: var(--spacing-medium);
-        }
-
-        /* Mobile score rendering - allow natural height expansion */
-        .score-detail-container {
-          flex: none; /* Remove flex constraint */
-          overflow: visible; /* Allow content to overflow viewport */
-          max-width: 100%; /* Constrain to viewport width */
-          display: flex;
-          flex-direction: column;
-          align-items: center; /* Center intrinsic-width components (columns="1" uses 140px intrinsic width) */
-        }
-
-        #score-renderer {
-          /* Remove width constraint to allow intrinsic sizing */
-          width: auto;
-          flex: none;
-          align-self: auto; /* Don't stretch - let intrinsic width work */
-        }
-
-        #score-renderer-container {
-          flex: none; /* Remove flex constraint */
-          min-height: auto; /* Allow natural height */
-          width: 100%; /* Full width of container */
-        }
-      }
-    </style>
   </Layout>
 ) : (
   <Layout title="Page Not Found - Shakuhachi.ro" currentPage="score">
@@ -368,3 +178,125 @@ const hasAttribution =
     <Error404 />
   </Layout>
 )}
+
+<style>
+  :global(.metadata-separator) {
+    color: var(--color-separator);
+  }
+
+  :global(.score-stat) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3x-small);
+  }
+
+  /* Links in metadata are copy, not calls to action: one step more contrast
+     than the text around them, and the underline says they are links. */
+  :global(.score-header-metadata a),
+  .score-credit a {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-underline-offset: var(--spacing-3x-small);
+  }
+
+  /* Page content styling */
+  .score-detail-container {
+    width: 100%; /* Fill viewport width */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-medium) var(--spacing-medium) 0;
+    position: relative;
+    flex: 1;
+    min-height: 0; /* Shrink to main's height, so nothing is clipped below */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+
+  #score-renderer {
+    /* Flex child - fills available space in parent flex container */
+    flex: 1;
+    /* Needed for custom elements to participate in flex layout */
+    display: block;
+    min-height: 0; /* Allow flex shrinking */
+    /* Fill parent dimensions (parent is flex container) */
+    width: 100%;
+    align-self: stretch; /* Stretch to fill cross axis */
+  }
+
+  /* Footnote to the score, not a competitor for attention: one quiet line,
+     no louder than the header's metadata. */
+  .score-credit {
+    flex-shrink: 0; /* The score gives up the space, not the credit */
+    margin-top: var(--spacing-small);
+    padding-bottom: var(--spacing-medium);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-small); /* Matches the header's metadata */
+    line-height: var(--line-height-dense);
+    text-align: center;
+  }
+
+  .score-credit-separator {
+    margin: 0 var(--spacing-x-small);
+    color: var(--color-separator);
+  }
+
+  @media (max-width: 768px) {
+    :global(.score-header-metadata) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-2x-small);
+    }
+
+    :global(.score-title) {
+      font-size: var(--font-size-medium);
+    }
+
+    /* Follows the header's metadata down a size and into a column
+       (PageHeader.astro): one half per line, so no separator is needed */
+    .score-credit {
+      font-size: var(--font-size-x-small);
+    }
+
+    .score-credit-part {
+      display: block;
+    }
+
+    .score-credit-separator {
+      display: none;
+    }
+
+    /* Hide owner buttons on mobile — shown in menu instead */
+    :global(.btn.owner-btn.owner-visible) {
+      display: none;
+    }
+
+    .floating-edit-btn {
+      top: 120px;
+      right: var(--spacing-medium);
+    }
+
+    /* Mobile score rendering - allow natural height expansion */
+    .score-detail-container {
+      flex: none; /* Remove flex constraint */
+      overflow: visible; /* Allow content to overflow viewport */
+      max-width: 100%; /* Constrain to viewport width */
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center intrinsic-width components (columns="1" uses 140px intrinsic width) */
+    }
+
+    #score-renderer {
+      /* Remove width constraint to allow intrinsic sizing */
+      width: auto;
+      flex: none;
+      align-self: auto; /* Don't stretch - let intrinsic width work */
+    }
+
+    #score-renderer-container {
+      flex: none; /* Remove flex constraint */
+      min-height: auto; /* Allow natural height */
+      width: 100%; /* Full width of container */
+    }
+  }
+</style>
