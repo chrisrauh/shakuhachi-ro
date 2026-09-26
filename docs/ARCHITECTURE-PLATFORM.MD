@@ -207,9 +207,32 @@ The platform uses the `<shakuhachi-score>` web component directly. Score JSON is
 selection needs a paid plan, which is why score pages are edge-cached instead (#385).
 
 **Caching:** `@netlify/functions` provides `purgeCache()`, which authenticates through
-the function context — no token or env var is needed. Note that calling it without an
-explicit scope purges the **production** cache from any deploy context, so
-`/api/purge-score` always passes a tag.
+the function context — no token or env var is needed.
+
+`/api/purge-score` calls it with a tag and no deploy scope, which clears that tag in
+**every** deploy context at once, production included. Measured, not assumed: a purge
+issued against a deploy preview marked production's entry stale while 163 s of its TTL
+remained.
+
+That is deliberate. Every context — production and each preview — reads one Supabase
+project, so a save made on a preview is a real change to real data and production's
+cached page really is stale. Scoping the purge to the calling deploy would be the bug:
+production would keep serving the old page until `max-age` expired.
+
+**The invariant: purge scope must match database scope.** If previews are ever pointed
+at a separate database, this must change in the same commit. Two things break otherwise,
+and only one of them is merely wasteful:
+
+- Purges fire across contexts for writes the other context never saw — harmless but
+  pointless re-renders.
+- Worse, authorization decouples from the cache it guards. The endpoint would check
+  ownership in the preview's database and then purge the production tag, so anyone able
+  to create a score named `x` in the dev database could purge production's `score-x`.
+  Slugs are also only unique within a database, so the same tag could name two different
+  scores.
+
+Scope the purge by deploy (derive the alias from the request hostname; `CONTEXT` is
+build-time only) at the moment the databases diverge, not before.
 
 **Environment variables:**
 

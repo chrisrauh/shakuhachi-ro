@@ -80,8 +80,10 @@ export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.DEV) return json({ purged: false, reason: 'dev' }, 200);
 
   try {
-    // Always tag-scoped. An unscoped purgeCache() clears the entire production
-    // cache, from any deploy context.
+    // Always pass tags: purgeCache() with no tags clears the whole site, from any
+    // deploy context. No deploy scope, though — this tag is meant to clear in every
+    // context, because they all read one database. See "Caching" in
+    // docs/ARCHITECTURE-PLATFORM.MD before changing that.
     await purgeCache({ tags: [cacheTagForScore(slug)] });
   } catch (cause) {
     return json(
