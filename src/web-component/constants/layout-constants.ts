@@ -7,16 +7,6 @@
  */
 
 /**
- * Note configuration
- */
-export const NOTE = {
-  /** Font size for note characters */
-  fontSize: 32,
-  /** Vertical spacing between notes (baseline to baseline) */
-  verticalSpacing: 44,
-} as const;
-
-/**
  * Separator lines drawn between columns
  */
 export const COLUMN_SEPARATOR = {

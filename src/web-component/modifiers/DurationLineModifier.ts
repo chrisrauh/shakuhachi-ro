@@ -15,7 +15,7 @@
 
 import { Modifier } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
-import { NOTE } from '../constants/layout-constants';
+import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 /**
  * Where a duration line meets a note, as a fraction of the font size above the
@@ -24,14 +24,21 @@ import { NOTE } from '../constants/layout-constants';
  */
 const NOTE_VERTICAL_MIDDLE_RATIO = 0.25;
 
+/** Where the line starts relative to the note baseline: just above the note */
+const LINE_START_OFFSET_Y = -22;
+
 export class DurationLineModifier extends Modifier {
   /** Number of lines to render */
   private lineCount: number;
 
+  /** Whether this is the last note in a continuous duration line sequence */
+  private lastInSequence: boolean;
+
   /**
    * Length of line extending downward.
    * - For last note in sequence: ends at middle of current note
-   * - For non-last notes: extends to middle of next note to create continuous line
+   * - For non-last notes: extends to the start of the next note's segment
+   *   to create a continuous line
    */
   private lineLength: number;
 
@@ -59,24 +66,48 @@ export class DurationLineModifier extends Modifier {
     super(position);
     this.lineCount = lineCount;
 
-    // Calculate line length based on position in sequence
-    const verticalMiddleOfCurrentNote =
-      -NOTE.fontSize * NOTE_VERTICAL_MIDDLE_RATIO; // ≈ -8px
-    const startOffsetY = -22;
-
-    if (isLastInSequence) {
-      // Last note: line ends at middle of current note
-      this.lineLength = verticalMiddleOfCurrentNote - startOffsetY; // ≈ 14px
-    } else {
-      // Non-last note: line extends to start of next note's segment
-      // Next note's segment starts at (noteY + verticalSpacing) + startOffsetY,
-      // so the length is exactly verticalSpacing to meet without overlap.
-      // Overlapping segments cause anti-aliasing artifacts (visible as two
-      // colors on the duration line in dark mode screenshots).
-      this.lineLength = NOTE.verticalSpacing; // 44px
-    }
-
+    this.lastInSequence = isLastInSequence;
     this.setDefaultOffsets();
+
+    // Default length assumes the default layout; fitToLayout() replaces it
+    // with the actual distance once note positions are known.
+    this.lineLength = this.computeLineLength(
+      0,
+      DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+      DEFAULT_RENDER_OPTIONS.noteFontSize,
+    );
+  }
+
+  /**
+   * Sizes the line from the note's actual layout position.
+   *
+   * A non-last segment runs exactly to the next note's y, where the next
+   * segment starts (both share the same offsetY), so consecutive segments
+   * meet without a gap. They must not overlap either: overlapping segments
+   * cause anti-aliasing artifacts (visible as two colors on the line in dark
+   * mode).
+   *
+   * @param noteY - Y coordinate of this note's baseline
+   * @param nextNoteY - Y coordinate of the following note's baseline
+   * @param noteFontSize - Font size of the note glyph
+   */
+  fitToLayout(noteY: number, nextNoteY: number, noteFontSize: number): this {
+    this.lineLength = this.computeLineLength(noteY, nextNoteY, noteFontSize);
+    return this;
+  }
+
+  private computeLineLength(
+    noteY: number,
+    nextNoteY: number,
+    noteFontSize: number,
+  ): number {
+    if (this.lastInSequence) {
+      // Last note: line ends at the vertical middle of the current note
+      const verticalMiddleOfCurrentNote =
+        -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+      return verticalMiddleOfCurrentNote - LINE_START_OFFSET_Y;
+    }
+    return nextNoteY - noteY;
   }
 
   /**
@@ -87,7 +118,7 @@ export class DurationLineModifier extends Modifier {
       // Position to the right of the note, with small margin past modifiers
       // (modifiers at offsetX=22, so duration line at 26 for 4px margin)
       this.offsetX = 26;
-      this.offsetY = -22; // Start just above the note
+      this.offsetY = LINE_START_OFFSET_Y;
     } else {
       // Position below the note (horizontal layout - not typically used for duration lines)
       this.offsetX = 0;
