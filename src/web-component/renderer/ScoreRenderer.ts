@@ -128,7 +128,7 @@ export class ScoreRenderer {
         note.setFontWeight(this.options.noteFontWeight);
         note.setFontFamily(this.options.noteFontFamily);
         note.setPosition(x, y);
-        this.fitDurationLines(note, y, notePosition.nextY);
+        this.fitDurationLines(note, notePosition.nextY - y);
         note.render(renderer);
 
         // Render debug label if enabled
@@ -143,10 +143,10 @@ export class ScoreRenderer {
    * Sizes a note's duration lines from its layout position so consecutive
    * segments meet, whatever the spacing (dotted notes, custom options)
    */
-  private fitDurationLines(note: ShakuNote, y: number, nextY: number): void {
+  private fitDurationLines(note: ShakuNote, distanceToNext: number): void {
     note.getModifiers().forEach((mod) => {
       if (mod instanceof DurationLineModifier) {
-        mod.fitToLayout(y, nextY, this.options.noteFontSize);
+        mod.fitToLayout(distanceToNext, this.options.noteFontSize);
       }
     });
   }

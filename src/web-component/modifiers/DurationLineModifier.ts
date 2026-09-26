@@ -69,36 +69,34 @@ export class DurationLineModifier extends Modifier {
     this.lastInSequence = isLastInSequence;
     this.setDefaultOffsets();
 
-    // Default length assumes the default layout; fitToLayout() replaces it
-    // with the actual distance once note positions are known.
+    // Default length assumes the default note spacing; fitToLayout() replaces
+    // it with the actual distance once note positions are known.
     this.lineLength = this.computeLineLength(
-      0,
       DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       DEFAULT_RENDER_OPTIONS.noteFontSize,
     );
   }
 
   /**
-   * Sizes the line from the note's actual layout position.
+   * Sizes the line from the actual layout.
    *
-   * A non-last segment runs exactly to the next note's y, where the next
-   * segment starts (both share the same offsetY), so consecutive segments
-   * meet without a gap. They must not overlap either: overlapping segments
-   * cause anti-aliasing artifacts (visible as two colors on the line in dark
-   * mode).
+   * A non-last segment runs exactly the distance to the next note, where the
+   * next segment starts (both share the same offsetY), so consecutive
+   * segments meet without a gap. They must not overlap either: overlapping
+   * segments cause anti-aliasing artifacts (visible as two colors on the line
+   * in dark mode).
    *
-   * @param noteY - Y coordinate of this note's baseline
-   * @param nextNoteY - Y coordinate of the following note's baseline
+   * @param distanceToNext - Distance from this note's baseline to the next
+   *   note's baseline, including any extra spacing after a dotted note
    * @param noteFontSize - Font size of the note glyph
    */
-  fitToLayout(noteY: number, nextNoteY: number, noteFontSize: number): this {
-    this.lineLength = this.computeLineLength(noteY, nextNoteY, noteFontSize);
+  fitToLayout(distanceToNext: number, noteFontSize: number): this {
+    this.lineLength = this.computeLineLength(distanceToNext, noteFontSize);
     return this;
   }
 
   private computeLineLength(
-    noteY: number,
-    nextNoteY: number,
+    distanceToNext: number,
     noteFontSize: number,
   ): number {
     if (this.lastInSequence) {
@@ -107,7 +105,7 @@ export class DurationLineModifier extends Modifier {
         -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
       return verticalMiddleOfCurrentNote - LINE_START_OFFSET_Y;
     }
-    return nextNoteY - noteY;
+    return distanceToNext;
   }
 
   /**
