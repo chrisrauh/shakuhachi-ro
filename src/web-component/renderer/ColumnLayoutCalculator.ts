@@ -17,6 +17,11 @@ export interface NotePosition {
   noteIndex: number;
   /** Y coordinate for this note */
   y: number;
+  /**
+   * Y coordinate where the following note sits, or would sit if the column
+   * continued. Includes the extra spacing after a dotted note.
+   */
+  nextY: number;
 }
 
 /**
@@ -292,17 +297,19 @@ export class ColumnLayoutCalculator {
     for (let i = startIndex; i < endIndex; i++) {
       const note = notes[i];
 
-      // Record this note's position
-      positions.push({
-        noteIndex: i,
-        y: currentY,
-      });
-
       // Calculate spacing to next note
       const extraSpacing = note.needsExtraSpacing()
         ? options.durationDotExtraSpacing
         : 0;
-      currentY += verticalSpacing + extraSpacing;
+      const nextY = currentY + verticalSpacing + extraSpacing;
+
+      positions.push({
+        noteIndex: i,
+        y: currentY,
+        nextY,
+      });
+
+      currentY = nextY;
     }
 
     return positions;
