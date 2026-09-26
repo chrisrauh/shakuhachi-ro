@@ -59,7 +59,9 @@ export class OctaveMarksModifier extends Modifier {
    * Set default offsets for top-right position
    */
   private setDefaultOffsets(): void {
-    // Top-right position
+    // Offsets belong to the modifier, not to render options — MeriKariModifier
+    // works the same way. DEFAULT_RENDER_OPTIONS.topMargin is derived from
+    // these two values, so changing them means changing that as well.
     this.offsetX = 18; // To the right of note
     this.offsetY = -22; // Above the note
   }

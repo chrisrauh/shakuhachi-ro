@@ -72,15 +72,11 @@ describe('RenderOptions', () => {
       const options: RenderOptions = {
         octaveMarkFontSize: 14,
         octaveMarkFontWeight: 600,
-        octaveMarkOffsetX: 20,
-        octaveMarkOffsetY: -25,
       };
       const result = mergeWithDefaults(options);
 
       expect(result.octaveMarkFontSize).toBe(14);
       expect(result.octaveMarkFontWeight).toBe(600);
-      expect(result.octaveMarkOffsetX).toBe(20);
-      expect(result.octaveMarkOffsetY).toBe(-25);
     });
 
     it('should merge meri/kari mark options correctly', () => {
@@ -161,8 +157,6 @@ describe('RenderOptions', () => {
         noteColor: '#333',
         octaveMarkFontSize: 14,
         octaveMarkFontWeight: 600,
-        octaveMarkOffsetX: 20,
-        octaveMarkOffsetY: -25,
         meriKariFontSize: 16,
         meriKariFontWeight: 600,
         durationDotExtraSpacing: 15,
