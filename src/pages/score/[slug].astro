@@ -5,6 +5,7 @@ import Error404 from '../../components/Error404.astro';
 import { getScoreBySlug } from '../../api/scores';
 import { cacheTagForScore } from '../../utils/cache-tags';
 import { embedJson } from '../../utils/embed-json';
+import { COPYRIGHT_STATUS_LABELS, LICENSES } from '../../utils/license';
 import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
@@ -45,6 +46,17 @@ if (!score) {
 
 // The parent of a fork arrives embedded in the query above — no second round trip.
 const parentScore = score?.parent ?? null;
+
+// The two rights layers (#306): the composition's copyright status and the
+// licence on this score's notation. Unevaluated status and NOASSERTION mean
+// nothing is established yet, so neither is worth a line on its own.
+const license = score ? LICENSES[score.license] : null;
+const hasAttribution =
+  !!score &&
+  (!!score.source_url ||
+    !!score.source_description ||
+    score.composition_copyright_status !== 'not_evaluated' ||
+    score.license !== 'NOASSERTION');
 ---
 
 {score ? (
@@ -115,16 +127,41 @@ const parentScore = score?.parent ?? null;
       <!-- Score renderer using web component -->
       <shakuhachi-score id="score-renderer"></shakuhachi-score>
 
-      <!-- Attribution section (only for scores with attribution data) -->
-      {(score.source_url || score.rights || score.source_description) && (
+      <!-- Attribution section (only when there is something established to say) -->
+      {hasAttribution && (
         <section class="score-attribution">
           <h3>Attribution</h3>
           {score.source_description && (
             <p class="attribution-description">{score.source_description}</p>
           )}
           <div class="attribution-meta">
-            {score.rights && (
-              <span class="attribution-rights">{score.rights}</span>
+            {score.composition_copyright_status === 'public_domain' ? (
+              <span class="attribution-rights">
+                {COPYRIGHT_STATUS_LABELS.public_domain}
+              </span>
+            ) : (
+              score.composition_copyright_status !== 'not_evaluated' && (
+                <span>
+                  {COPYRIGHT_STATUS_LABELS[score.composition_copyright_status]}
+                </span>
+              )
+            )}
+            {license && score.license !== 'NOASSERTION' && (
+              <span>
+                Score licensed under{' '}
+                {license.url ? (
+                  <a
+                    href={license.url}
+                    rel="license noopener noreferrer"
+                    target="_blank"
+                    class="attribution-link"
+                  >
+                    {license.name}
+                  </a>
+                ) : (
+                  license.name
+                )}
+              </span>
             )}
             {score.source_url && (
               <a
