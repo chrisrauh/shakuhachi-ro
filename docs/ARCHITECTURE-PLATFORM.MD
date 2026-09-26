@@ -76,7 +76,8 @@ Fork existing score → forkScore() API call → copy data to new score
 **Delete:**
 
 ```
-deleteScore() → POST /api/purge-score → the cached page cannot outlive the row → /
+If a fork: POST /api/purge-score for the PARENT first (only a fork's owner may purge it)
+  → deleteScore() → POST /api/purge-score → the cached page cannot outlive the row → /
 ```
 
 **Viewing:**
