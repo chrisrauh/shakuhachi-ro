@@ -183,6 +183,22 @@
   border-color: transparent;
 }
 
+/* Link button - a tertiary action: advanced or rarely needed, so it reads as
+   an underlined word in the copy rather than as a control competing for
+   attention. Same treatment as links in score metadata. */
+.btn-link {
+  background: transparent;
+  border-color: transparent;
+  padding: 0;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-3x-small);
+}
+
+.btn-link:hover:not(:disabled) {
+  color: var(--color-text-secondary);
+}
+
 /* Special styling for floating buttons */
 .btn-floating {
   position: fixed;

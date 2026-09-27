@@ -216,7 +216,12 @@ describe('getScoreBySlug', () => {
     const forkRow = {
       ...scoreRow,
       forked_from: 'parent-123',
-      parent: { slug: 'original-score', title: 'Original Score' },
+      parent: {
+        slug: 'original-score',
+        title: 'Original Score',
+        license: 'CC-BY-SA-4.0',
+        user_id: 'user-parent',
+      },
     };
     vi.mocked(supabase.from).mockReturnValueOnce(
       makeChain({ data: forkRow, error: null }) as any,
@@ -227,6 +232,8 @@ describe('getScoreBySlug', () => {
     expect(result.score?.parent).toEqual({
       slug: 'original-score',
       title: 'Original Score',
+      license: 'CC-BY-SA-4.0',
+      user_id: 'user-parent',
     });
   });
 

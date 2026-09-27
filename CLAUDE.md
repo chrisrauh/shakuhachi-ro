@@ -123,6 +123,8 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 
 ### Component Patterns
 
+- **Use the design system's components first.** If what you need does not exist, extend the design system (`src/styles/components.css`, shown on `/test/buttons`) rather than styling it locally. Build locally only what is specific to one place and used once.
+- Match the control's weight to how often it should be used: a rare or advanced action is a `btn-link`, not a secondary button.
 - Button text needs `<span class="btn-text">` wrapper — required for `text-box-trim` to work inside flex containers
 - All toolbar-height elements use `--size-toolbar-item`
 - Icon-only buttons need BOTH `aria-label` (names the action, for screen readers) and `title` (explains it, on hover). Use different text for each — with both present the accessible name comes from `aria-label`, and identical strings get announced twice. Toggles set `title` from state; see `ThemeSwitcher.applyTheme`.
