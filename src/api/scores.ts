@@ -123,6 +123,13 @@ function toScore(row: Record<string, any>): Score {
   return { ...rest, fork_count: forks?.[0]?.count ?? 0 } as Score;
 }
 
+// Anything can be thrown; callers of this module always get an Error back.
+function toError(thrown: unknown, action: string): Error {
+  return thrown instanceof Error
+    ? thrown
+    : new Error(`Unknown error ${action}`);
+}
+
 /**
  * Create a new score
  */
@@ -206,10 +213,7 @@ export async function createScore(
   } catch (error) {
     return {
       score: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error creating score'),
+      error: toError(error, 'creating score'),
     };
   }
 }
@@ -258,10 +262,7 @@ export async function updateScore(
   } catch (error) {
     return {
       score: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error updating score'),
+      error: toError(error, 'updating score'),
     };
   }
 }
@@ -296,10 +297,7 @@ export async function deleteScore(
     return { error: null };
   } catch (error) {
     return {
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error deleting score'),
+      error: toError(error, 'deleting score'),
     };
   }
 }
@@ -332,10 +330,7 @@ export async function getScore(id: string): Promise<ScoreResult> {
   } catch (error) {
     return {
       score: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error fetching score'),
+      error: toError(error, 'fetching score'),
     };
   }
 }
@@ -368,10 +363,7 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
   } catch (error) {
     return {
       score: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error fetching score'),
+      error: toError(error, 'fetching score'),
     };
   }
 }
@@ -398,10 +390,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
   } catch (error) {
     return {
       scores: [],
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error fetching user scores'),
+      error: toError(error, 'fetching user scores'),
     };
   }
 }
@@ -427,10 +416,7 @@ export async function getAllScores(): Promise<ScoresResult> {
   } catch (error) {
     return {
       scores: [],
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error fetching scores'),
+      error: toError(error, 'fetching scores'),
     };
   }
 }
@@ -463,10 +449,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
   } catch (error) {
     return {
       scores: [],
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error searching scores'),
+      error: toError(error, 'searching scores'),
     };
   }
 }
@@ -527,10 +510,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
   } catch (error) {
     return {
       score: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error('Unknown error forking score'),
+      error: toError(error, 'forking score'),
     };
   }
 }
