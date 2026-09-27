@@ -215,6 +215,20 @@ The platform uses the `<shakuhachi-score>` web component directly. Score JSON is
 
 **Adapter:** `@astrojs/netlify`
 
+**Browser support:** the two builds have different floors, and only one is chosen on
+purpose (#320).
+
+- The embed bundle (`vite.embed.config.ts`) targets Vite's default,
+  `baseline-widely-available`: Chrome/Edge 111, Firefox 114, Safari/iOS 16.4.
+- The site's client JavaScript is built at `esnext`. Astro sets that inside its client
+  build config and does not read a user override, so Vite does no syntax lowering. The
+  floor is whatever the source and dependencies happen to emit.
+
+Measured on 27 Sep 2026: all 16 files in `dist/_astro/` pass
+`npx es-check es2022 './dist/_astro/*.js' --module`, and everything ES2022 adds is
+within the embed floor above. So the gap is theoretical today. Re-run that check after
+dependency or Astro upgrades. It checks syntax only, not browser APIs.
+
 **Region:** functions run in IAD (N. Virginia); the database is in Paris. Region
 selection needs a paid plan, which is why score pages are edge-cached instead (#385).
 

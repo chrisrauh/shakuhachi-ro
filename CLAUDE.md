@@ -379,3 +379,4 @@ When testing authenticated features (score editor, creating scores, forking):
 
 - Co-locate related files (test HTML + JS together)
 - Unit tests next to source (`*.test.ts` next to `*.ts`)
+- Under `src/pages/`, prefix test files with `_` (`_purge-score.test.ts`). Astro builds every other `.ts` file there as a route, tests included; `src/pages/_test-files-stay-out-of-routes.test.ts` enforces this

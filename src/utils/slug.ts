@@ -1,3 +1,5 @@
+import { supabase } from '../api/supabase';
+
 /**
  * Generates a URL-friendly slug from a string
  * @param text - The text to convert to a slug
@@ -191,9 +193,6 @@ export async function generateUniqueRandomSlug(): Promise<{
 
   for (let i = 0; i < maxAttempts; i++) {
     const slug = generateRandomSlug();
-
-    // Dynamic import to avoid circular dependency issues
-    const { supabase } = await import('../api/supabase');
 
     // Check if slug exists in database
     const { data } = await supabase
