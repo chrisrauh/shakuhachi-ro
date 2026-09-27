@@ -9,7 +9,7 @@
  * - Notes: A-G (uppercase = octave 4), a-g (lowercase = octave 5), ' (upper octave), , (lower octave)
  * - Accidentals: ^ (sharp), ^^ (double sharp), _ (flat), __ (double flat), = (natural)
  * - Duration: 2 (double), /2 (half), 3/2 (dotted), default is L: value
- * - Dotted: > (dotted note), < (less common dotted syntax)
+ * - Broken rhythm: A>B dots A and halves B; A<B halves A and dots B
  * - Rests: z (with duration modifiers)
  * - Bar lines: | (measure separator, ignored in output)
  */
@@ -100,6 +100,8 @@ export class ABCParser {
    */
   private static parseNotes(noteString: string): ScoreNote[] {
     const notes: ScoreNote[] = [];
+    // The broken-rhythm marker (> or <) after each note, by note index
+    const brokenRhythm: string[] = [];
 
     // Remove bar lines and extra whitespace
     const cleaned = noteString.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
@@ -149,6 +151,8 @@ export class ABCParser {
         throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(pitch));
       }
 
+      brokenRhythm[notes.length] = dottedMarker;
+
       // Handle rest
       if (pitch === 'z') {
         const duration = this.calculateDuration(durationSuffix);
@@ -168,11 +172,8 @@ export class ABCParser {
         throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(abcPitch));
       }
 
-      // Calculate duration
+      // Sounding length for now; toBaseAndDot() splits out the dot below
       const duration = this.calculateDuration(durationSuffix);
-
-      // Check for dotted note (> or < syntax)
-      const isDotted = dottedMarker === '>' || dottedMarker === '<';
 
       // Create note
       const note: ScoreNote = {
@@ -194,12 +195,12 @@ export class ABCParser {
         note.dai_meri = true;
       }
 
-      // Add dotted flag
-      if (isDotted) {
-        note.dotted = true;
-      }
-
       notes.push(note);
+    }
+
+    this.applyBrokenRhythm(notes, brokenRhythm);
+    for (const note of notes) {
+      if (!note.rest) this.toBaseAndDot(note);
     }
 
     if (notes.length === 0) {
@@ -207,6 +208,43 @@ export class ABCParser {
     }
 
     return notes;
+  }
+
+  /**
+   * Applies ABC broken rhythm to sounding lengths: A>B makes A one and a half
+   * times as long and B half as long, so the pair keeps its total; A<B is the
+   * reverse. A marker on the last note has no partner, so it only lengthens
+   * that note, which keeps older ABC written with a trailing > readable.
+   */
+  private static applyBrokenRhythm(
+    notes: ScoreNote[],
+    markers: string[],
+  ): void {
+    notes.forEach((note, i) => {
+      const marker = markers[i];
+      if (!marker) return;
+      const next = notes[i + 1];
+      if (!next) {
+        note.duration *= 1.5;
+        return;
+      }
+      const [first, second] = marker === '>' ? [note, next] : [next, note];
+      first.duration *= 1.5;
+      second.duration *= 0.5;
+    });
+  }
+
+  /**
+   * Splits a sounding length into a base length plus a dot, the way ScoreNote
+   * stores it (as MusicXMLParser does): 3/2 becomes a dotted 1, 3 a dotted 2.
+   * Lengths that aren't one and a half times a power of two stay as they are.
+   */
+  private static toBaseAndDot(note: ScoreNote): void {
+    const base = note.duration / 1.5;
+    if (Number.isInteger(Math.log2(base))) {
+      note.duration = base;
+      note.dotted = true;
+    }
   }
 
   /**

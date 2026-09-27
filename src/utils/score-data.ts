@@ -5,9 +5,9 @@ import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 
 export function toScoreData(score: Score): ScoreData {
   if (score.data_format === 'json') {
-    return score.data as ScoreData;
+    return score.data;
   }
-  return parseScoreText(score.data as string, score.data_format);
+  return parseScoreText(score.data, score.data_format);
 }
 
 export function parseScoreText(

@@ -16,9 +16,12 @@ export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
 /**
  * Stored score content: a ScoreData object when data_format is 'json',
- * the raw text when it is 'musicxml' or 'abc'.
+ * the text as typed when it is 'musicxml' or 'abc'. Keyed on data_format so
+ * checking the format narrows the data, and a mismatched pair doesn't compile.
  */
-export type ScoreContent = ScoreData | string;
+export type ScoreContent =
+  | { data_format: 'json'; data: ScoreData }
+  | { data_format: 'musicxml' | 'abc'; data: string };
 
 /**
  * The parent of a fork, embedded in the same query as the score itself.
@@ -32,15 +35,13 @@ export interface ScoreParent {
   user_id: string;
 }
 
-export interface Score {
+export type Score = ScoreContent & {
   id: string;
   user_id: string;
   title: string;
   slug: string;
   composer: string | null;
   description: string | null;
-  data_format: ScoreDataFormat;
-  data: ScoreContent;
   forked_from: string | null;
   parent: ScoreParent | null;
   fork_count: number;
@@ -55,14 +56,12 @@ export interface Score {
   license: ScoreLicense;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface CreateScoreData {
+export type CreateScoreData = ScoreContent & {
   title: string;
   composer?: string;
   description?: string;
-  data_format: ScoreDataFormat;
-  data: ScoreContent;
   forked_from?: string;
   source_url?: string;
   source_description?: string;
@@ -73,20 +72,22 @@ export interface CreateScoreData {
   composition_year_published?: number | null;
   /** Omit for the database default, CC BY-NC-SA 4.0. */
   license?: ScoreLicense;
-}
+};
 
-export interface UpdateScoreData {
+/** The content is updated as a pair or not at all. */
+export type UpdateScoreData = (
+  | ScoreContent
+  | { data_format?: never; data?: never }
+) & {
   title?: string;
   composer?: string;
   description?: string;
-  data_format?: ScoreDataFormat;
-  data?: ScoreContent;
   source_url?: string;
   source_description?: string;
   license?: ScoreLicense;
   // slug is intentionally omitted — slugs are immutable after creation to preserve
   // stable URLs (bookmarks, shared links). See TODO for future slug editing feature.
-}
+};
 
 export interface ScoreResult {
   score: Score | null;
@@ -491,8 +492,9 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       title: originalScore.title,
       composer: originalScore.composer || undefined,
       description: originalScore.description || undefined,
-      data_format: originalScore.data_format,
-      data: originalScore.data,
+      ...(originalScore.data_format === 'json'
+        ? { data_format: 'json', data: originalScore.data }
+        : { data_format: originalScore.data_format, data: originalScore.data }),
       forked_from: scoreId,
       source_url: originalScore.source_url || undefined,
       source_description: originalScore.source_description || undefined,

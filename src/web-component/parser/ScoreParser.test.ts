@@ -223,14 +223,8 @@ describe('ScoreParser', () => {
       );
     });
 
-    it('should throw error if notes array is empty', () => {
-      const scoreData = {
-        notes: [],
-      } as any;
-
-      expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Score must contain at least one note',
-      );
+    it('parses an empty score, which is how new scores start, to no notes', () => {
+      expect(ScoreParser.parse({ notes: [] } as any)).toEqual([]);
     });
 
     it('should throw error if note is missing pitch', () => {

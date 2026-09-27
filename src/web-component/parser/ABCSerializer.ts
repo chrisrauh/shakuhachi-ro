@@ -102,14 +102,10 @@ export class ABCSerializer {
           }
         }
 
-        // Format duration
-        const durationStr = this.formatDuration(note.duration);
-
-        // Add dotted marker if needed
-        const dottedMarker = note.dotted ? '>' : '';
-
-        // Combine: pitch + duration + dotted
-        abcNotes.push(`${abcPitch}${durationStr}${dottedMarker}`);
+        // A dot is written as the sounding length (a dotted 1 is 3/2), not as
+        // >, which in ABC is broken rhythm and would also halve the next note
+        const sounding = note.dotted ? note.duration * 1.5 : note.duration;
+        abcNotes.push(`${abcPitch}${this.formatDuration(sounding)}`);
       }
     }
 
