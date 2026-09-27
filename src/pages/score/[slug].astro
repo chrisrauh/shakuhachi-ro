@@ -42,6 +42,10 @@ if (!score) {
   // Netlify-Cache-Tag rather than Cache-Tag: Netlify prefers it when both are
   // present, and keeps it internal instead of passing it on to the client.
   Astro.response.headers.set('Netlify-Cache-Tag', cacheTagForScore(score.slug));
+  // Left alone, Netlify applies `Netlify-Vary: query` and keys on the full query
+  // string, so `?x=1`, `?x=2`, … each miss and pay for a full render (#397). This
+  // page reads no query parameters, so vary on none: an empty allow-list.
+  Astro.response.headers.set('Netlify-Vary', 'query=');
 }
 
 // The parent of a fork arrives embedded in the query above — no second round trip.
