@@ -49,17 +49,13 @@ K:D
 D2 F
 `;
 
-function makeScore(
-  data: ScoreContent,
-  format: 'json' | 'musicxml' | 'abc',
-): Score {
+function makeScore(content: ScoreContent): Score {
   return {
+    ...content,
     id: 'test-id',
     user_id: 'test-user',
     title: 'Test',
     slug: 'test',
-    data_format: format,
-    data,
     created_at: '',
     updated_at: '',
     fork_count: 0,
@@ -81,7 +77,7 @@ function makeScore(
 describe('score-data', () => {
   describe('toScoreData()', () => {
     it('should pass JSON data through as-is (no parsing)', () => {
-      const score = makeScore(sampleScoreData, 'json');
+      const score = makeScore({ data_format: 'json', data: sampleScoreData });
       const result = toScoreData(score);
 
       // Should be the same object reference — no parsing
@@ -89,7 +85,10 @@ describe('score-data', () => {
     });
 
     it('should parse MusicXML string data', () => {
-      const score = makeScore(sampleMusicXML, 'musicxml');
+      const score = makeScore({
+        data_format: 'musicxml',
+        data: sampleMusicXML,
+      });
       const result = toScoreData(score);
 
       expect(result.title).toBe('Test');
@@ -97,7 +96,7 @@ describe('score-data', () => {
     });
 
     it('should parse ABC string data', () => {
-      const score = makeScore(sampleABC, 'abc');
+      const score = makeScore({ data_format: 'abc', data: sampleABC });
       const result = toScoreData(score);
 
       expect(result.title).toBe('Test Score');
@@ -106,7 +105,7 @@ describe('score-data', () => {
     });
 
     it('should throw for unsupported format', () => {
-      const score = makeScore('data', 'unknown' as any);
+      const score = makeScore({ data_format: 'unknown', data: 'data' } as any);
       expect(() => toScoreData(score)).toThrow('Unsupported score format');
     });
   });

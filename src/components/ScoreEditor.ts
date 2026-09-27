@@ -105,10 +105,10 @@ export class ScoreEditor {
     this.ownerId = score.user_id;
     this.parent = score.parent;
 
-    if (this.dataFormat === 'json') {
+    if (score.data_format === 'json') {
       this.scoreData = JSON.stringify(score.data, null, 2);
     } else {
-      this.scoreData = score.data as string;
+      this.scoreData = score.data;
     }
 
     this.render();
@@ -369,17 +369,16 @@ export class ScoreEditor {
     try {
       // Text formats are stored as typed, so reopening the editor gives the
       // author back their own source, not a conversion of it.
-      const data: ScoreContent =
+      const content: ScoreContent =
         this.dataFormat === 'json'
-          ? JSON.parse(this.scoreData)
-          : this.scoreData;
+          ? { data_format: 'json', data: JSON.parse(this.scoreData) }
+          : { data_format: this.dataFormat, data: this.scoreData };
 
       const scoreData: UpdateScoreData = {
+        ...content,
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         description: this.metadata.description || undefined,
-        data_format: this.dataFormat,
-        data: data,
       };
       // Only when changed. Naming the column at all fires the fork-licence
       // trigger, which would reject an unrelated save if the parent's licence

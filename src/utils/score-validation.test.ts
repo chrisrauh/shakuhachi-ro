@@ -11,8 +11,27 @@ describe('validateScoreInput', () => {
   });
 
   // JSON
-  it('returns valid for valid JSON', () => {
+  it('accepts an empty score, which is how new scores start', () => {
     expect(validateScoreInput('{"notes":[]}', 'json')).toEqual({ valid: true });
+  });
+  it.each([
+    ['an empty object', '{}'],
+    ['an array', '[]'],
+    ['a number', '42'],
+    ['notes that are not an array', '{"notes":"x"}'],
+    ['a note without a pitch', '{"notes":[{"duration":1}]}'],
+  ])('rejects JSON that is not a score: %s', (_, json) => {
+    const result = validateScoreInput(json, 'json');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBeTruthy();
+  });
+  it('accepts a score with notes', () => {
+    expect(
+      validateScoreInput(
+        '{"notes":[{"pitch":{"step":"ro","octave":0},"duration":1}]}',
+        'json',
+      ),
+    ).toEqual({ valid: true });
   });
   it('returns invalid with error for invalid JSON', () => {
     const result = validateScoreInput('{bad', 'json');

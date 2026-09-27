@@ -1,4 +1,5 @@
 import { ABCParser } from '../web-component/parser/ABCParser';
+import { ScoreParser } from '../web-component/parser/ScoreParser';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS } from '../constants/strings';
 
@@ -10,7 +11,8 @@ export function validateScoreInput(
 
   try {
     if (format === 'json') {
-      JSON.parse(data);
+      // The same shape check the renderer applies, so what saves also renders
+      ScoreParser.validate(JSON.parse(data));
       return { valid: true };
     } else if (format === 'abc') {
       ABCParser.parse(data);

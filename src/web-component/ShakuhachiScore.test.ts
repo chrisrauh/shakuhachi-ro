@@ -209,6 +209,18 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     expect(noteElements?.length).toBeGreaterThan(0);
   });
 
+  it('renders an empty score without an error', async () => {
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute('data-score', JSON.stringify({ notes: [] }));
+    component.setAttribute('columns', '1');
+    container.appendChild(component);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(component.shadowRoot?.querySelector('svg')).toBeTruthy();
+    expect(component.shadowRoot?.textContent).not.toContain('Error');
+  });
+
   it('shows an error message when drawing the score fails', async () => {
     // Parse errors are caught before the renderer runs, so only a failure
     // while drawing reaches this path.

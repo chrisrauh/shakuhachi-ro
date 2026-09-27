@@ -24,6 +24,7 @@ vi.mock('../constants/strings', () => ({
 // Helpers
 
 function makeScore(overrides: Partial<Score> = {}): Score {
+  // Cast: spreading a Partial<Score> loses the data_format/data pairing
   return {
     id: '1',
     user_id: 'u1',
@@ -47,7 +48,7 @@ function makeScore(overrides: Partial<Score> = {}): Score {
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
     ...overrides,
-  };
+  } as Score;
 }
 
 // Bind the real private helper methods for use in test contexts.

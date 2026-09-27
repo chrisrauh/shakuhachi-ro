@@ -107,11 +107,12 @@ D2 D/2 D3/2 D
       expect(scoreData.notes).toHaveLength(4);
       expect(scoreData.notes[0].duration).toBe(2); // D2 = double unit
       expect(scoreData.notes[1].duration).toBe(0.5); // D/2 = half unit
-      expect(scoreData.notes[2].duration).toBe(1.5); // D3/2 = 1.5 unit
+      // D3/2 = 1.5 units, stored as a dotted 1 like MusicXML dotted notes
+      expect(scoreData.notes[2]).toMatchObject({ duration: 1, dotted: true });
       expect(scoreData.notes[3].duration).toBe(1); // D = default unit
     });
 
-    it('should parse dotted notes with > syntax', () => {
+    it('should read > as broken rhythm: dot the first note, halve the second', () => {
       const abc = `
 X:1
 T:Dotted Test
@@ -123,11 +124,14 @@ D> D
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].dotted).toBe(true); // D> = dotted
-      expect(scoreData.notes[1].dotted).toBe(undefined); // D = not dotted
+      expect(scoreData.notes[0]).toMatchObject({ duration: 1, dotted: true });
+      expect(scoreData.notes[1]).toEqual(
+        expect.objectContaining({ duration: 0.5 }),
+      );
+      expect(scoreData.notes[1].dotted).toBeUndefined();
     });
 
-    it('should parse dotted notes with < syntax', () => {
+    it('should read < as broken rhythm: halve the first note, dot the second', () => {
       const abc = `
 X:1
 T:Dotted Test
@@ -139,7 +143,15 @@ D< D
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].dotted).toBe(true); // D< = dotted
+      expect(scoreData.notes[0].duration).toBe(0.5);
+      expect(scoreData.notes[0].dotted).toBeUndefined();
+      expect(scoreData.notes[1]).toMatchObject({ duration: 1, dotted: true });
+    });
+
+    it('should dot a last note that carries >, since it has no partner', () => {
+      const scoreData = ABCParser.parse('X:1\nK:D\nD D>');
+
+      expect(scoreData.notes[1]).toMatchObject({ duration: 1, dotted: true });
     });
 
     it('should parse accidentals (sharp → meri)', () => {
@@ -510,7 +522,25 @@ Q
 
         const abc = ABCSerializer.serialize(scoreData);
 
-        expect(abc).toContain('D>');
+        // Written as its sounding length: > would also halve the next note
+        expect(abc).toContain('D3/2');
+        expect(abc).not.toContain('>');
+      });
+
+      it('keeps each note length and dot through ABC and back', () => {
+        const notes: ScoreData['notes'] = [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1, dotted: true },
+          { pitch: { step: 'tsu', octave: 0 }, duration: 0.5 },
+          { pitch: { step: 're', octave: 0 }, duration: 2, dotted: true },
+          { pitch: { step: 'chi', octave: 0 }, duration: 0.5, dotted: true },
+          { pitch: { step: 'ri', octave: 0 }, duration: 1 },
+        ];
+
+        const back = ABCParser.parse(
+          ABCSerializer.serialize({ title: 'T', style: 'kinko', notes }),
+        );
+
+        expect(back.notes).toEqual(notes);
       });
 
       it('should serialize rests', () => {

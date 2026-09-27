@@ -23,7 +23,6 @@ export const PARSER_STRINGS = {
     ScoreParser: {
       scoreDataRequired: 'Score data is required',
       notesArrayRequired: 'Score notes must be an array',
-      notesEmptyArray: 'Score must contain at least one note',
       noteIndexPitchRequired: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch'),
       noteIndexPitchWhenNotRest: (index: number) =>
