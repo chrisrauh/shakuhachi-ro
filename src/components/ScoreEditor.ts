@@ -580,7 +580,7 @@ export class ScoreEditor {
           ${
             choices.locked
               ? ''
-              : `<button type="button" id="license-change" class="btn btn-small btn-secondary">
+              : `<button type="button" id="license-change" class="btn btn-link">
                   <span class="btn-text">Change</span>
                 </button>`
           }
