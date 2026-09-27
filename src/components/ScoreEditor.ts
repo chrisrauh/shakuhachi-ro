@@ -611,7 +611,7 @@ export class ScoreEditor {
     const validationDiv = this.container.querySelector('#validation-error');
     if (validationDiv) {
       if (this.validationError) {
-        validationDiv.innerHTML = `${renderIcon('alert-circle')} ${this.validationError}`;
+        validationDiv.innerHTML = `${renderIcon('circle-alert')} ${this.validationError}`;
         validationDiv.classList.add('show');
         initIcons();
       } else {
