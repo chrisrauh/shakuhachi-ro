@@ -165,7 +165,8 @@ had drifted. Deriving it also makes deletes correct without any extra work.
 **Rights are two layers, not one.** `composition_copyright_status` is a fact about the
 piece; `license` (an SPDX identifier) is the terms on which this score's notation may be
 reused. A public-domain composition can carry a restrictive notation licence, and the
-reverse. Forks copy both. The fork licence rules — ND and All Rights Reserved sources
+reverse. New scores default to CC BY-NC-SA 4.0; an author who wants to allow
+commercial reuse picks another licence in the editor. Forks copy both. The fork licence rules — ND and All Rights Reserved sources
 cannot be forked by others, ShareAlike stays locked — are enforced by a trigger in
 `database/migrations/add_licensing_to_scores.sql`, for the same reason as RLS: a check
 in the browser is not a rule. The decisions behind the model are on issue #306.

@@ -86,7 +86,7 @@ describe('licenseChoices', () => {
       licenseChoices('CC-BY-NC-4.0', OWNER, parentBy('CC-BY-NC-4.0')),
     ).toEqual({
       locked: false,
-      options: ['CC-BY-NC-4.0', 'CC-BY-NC-SA-4.0'],
+      options: ['CC-BY-NC-SA-4.0', 'CC-BY-NC-4.0'],
       reason: 'non_commercial',
     });
   });

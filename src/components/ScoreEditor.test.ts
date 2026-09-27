@@ -719,6 +719,17 @@ describe('ScoreEditor licence field', () => {
     );
   });
 
+  it('puts the NonCommercial restriction in bold', async () => {
+    await loadEditor();
+
+    select().value = 'CC-BY-NC-SA-4.0';
+    select().dispatchEvent(new Event('change'));
+
+    expect(
+      container.querySelector('#license-description strong')?.textContent,
+    ).toBe('not commercially');
+  });
+
   // Naming the column fires the fork-licence trigger, which can reject an
   // otherwise unrelated save.
   it('leaves the licence out of a save that did not change it', async () => {

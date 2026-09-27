@@ -78,6 +78,12 @@ export function musicCredit(
   return name ? `Music by ${name}` : null;
 }
 
+/**
+ * The clause NonCommercial licences add, shared by their descriptions so the
+ * editor can emphasise it: it is the restriction authors most need to notice.
+ */
+export const NON_COMMERCIAL_CLAUSE = 'not commercially';
+
 interface LicenseInfo {
   name: string;
   /** The licence deed. CC licences require a link to it wherever the work is shown. */
@@ -108,14 +114,12 @@ export const LICENSES: Record<ScoreLicense, LicenseInfo> = {
   'CC-BY-NC-4.0': {
     name: 'CC BY-NC 4.0',
     url: 'https://creativecommons.org/licenses/by-nc/4.0/',
-    description:
-      'Anyone may copy, adapt and share your notation, but not commercially, if they credit you.',
+    description: `Anyone may copy, adapt and share your notation, but ${NON_COMMERCIAL_CLAUSE}, if they credit you.`,
   },
   'CC-BY-NC-SA-4.0': {
     name: 'CC BY-NC-SA 4.0',
     url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-    description:
-      'Anyone may copy, adapt and share your notation, but not commercially, if they credit you and share adaptations under the same licence.',
+    description: `Anyone may copy, adapt and share your notation, but ${NON_COMMERCIAL_CLAUSE}, if they credit you and share adaptations under the same licence.`,
   },
   'CC-BY-ND-4.0': {
     name: 'CC BY-ND 4.0',
@@ -126,8 +130,7 @@ export const LICENSES: Record<ScoreLicense, LicenseInfo> = {
   'CC-BY-NC-ND-4.0': {
     name: 'CC BY-NC-ND 4.0',
     url: 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
-    description:
-      'Anyone may share your notation unchanged, but not commercially, if they credit you. Nobody else can fork it.',
+    description: `Anyone may share your notation unchanged, but ${NON_COMMERCIAL_CLAUSE}, if they credit you. Nobody else can fork it.`,
   },
   'LicenseRef-AllRightsReserved': {
     name: 'All rights reserved',
@@ -143,15 +146,15 @@ export const LICENSES: Record<ScoreLicense, LicenseInfo> = {
 };
 
 /**
- * The licences the editor offers, in menu order (#263). CC BY-SA 4.0, the
+ * The licences the editor offers, in menu order (#263). CC BY-NC-SA 4.0, the
  * default for new scores, comes first. The ND licences are left out: this
  * platform exists to fork, and they forbid it.
  */
 export const EDITOR_LICENSES: readonly ScoreLicense[] = [
+  'CC-BY-NC-SA-4.0',
   'CC-BY-SA-4.0',
   'CC-BY-4.0',
   'CC-BY-NC-4.0',
-  'CC-BY-NC-SA-4.0',
   'CC0-1.0',
   'LicenseRef-AllRightsReserved',
 ];

@@ -17,7 +17,11 @@ import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 import { validateScoreInput } from '../utils/score-validation';
 import { EditorAutosave } from '../utils/editor-autosave';
 import type { ScoreMetadata } from '../utils/editor-autosave';
-import { LICENSES, licenseChoices } from '../utils/license';
+import {
+  LICENSES,
+  NON_COMMERCIAL_CLAUSE,
+  licenseChoices,
+} from '../utils/license';
 import type { LicenseChoices, ScoreLicense } from '../utils/license';
 
 export class ScoreEditor {
@@ -28,10 +32,10 @@ export class ScoreEditor {
     title: '',
     composer: '',
     description: '',
-    license: 'CC-BY-SA-4.0',
+    license: 'CC-BY-NC-SA-4.0',
   };
   /** The licence as saved, so a save only writes it when the owner changed it. */
-  private savedLicense: ScoreLicense = 'CC-BY-SA-4.0';
+  private savedLicense: ScoreLicense = 'CC-BY-NC-SA-4.0';
   private ownerId: string = '';
   private parent: ScoreParent | null = null;
   private validationError: string | null = null;
@@ -586,10 +590,21 @@ export class ScoreEditor {
           }
         </div>
         ${select}
-        <p class="field-hint" id="license-description">${current.description}</p>
+        <p class="field-hint" id="license-description">${this.licenseDescriptionHTML(this.metadata.license)}</p>
         ${note ? `<p class="field-hint">${note}</p>` : ''}
       </div>
     `;
+  }
+
+  /**
+   * What the licence lets others do, with the NonCommercial restriction in bold
+   * so an author cannot miss it. The descriptions are constants, not user input.
+   */
+  private licenseDescriptionHTML(license: ScoreLicense): string {
+    return LICENSES[license].description.replace(
+      NON_COMMERCIAL_CLAUSE,
+      `<strong>${NON_COMMERCIAL_CLAUSE}</strong>`,
+    );
   }
 
   private renderValidation(): void {
@@ -670,7 +685,7 @@ export class ScoreEditor {
           '#license-description',
         );
         if (description)
-          description.textContent = LICENSES[license].description;
+          description.innerHTML = this.licenseDescriptionHTML(license);
       });
 
     this.container

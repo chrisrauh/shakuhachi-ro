@@ -71,7 +71,7 @@ export interface CreateScoreData {
   composition_copyright_source?: string | null;
   composition_year_author_died?: number | null;
   composition_year_published?: number | null;
-  /** Omit for the database default, CC BY-SA 4.0. */
+  /** Omit for the database default, CC BY-NC-SA 4.0. */
   license?: ScoreLicense;
 }
 
@@ -184,7 +184,7 @@ export async function createScore(
         source_url: scoreData.source_url || null,
         source_description: scoreData.source_description || null,
         // Undefined fields are left out of the request, so the database
-        // defaults apply: not_evaluated, and CC BY-SA 4.0.
+        // defaults apply: not_evaluated, and CC BY-NC-SA 4.0.
         composition_copyright_status: scoreData.composition_copyright_status,
         composition_copyright_basis: scoreData.composition_copyright_basis,
         composition_copyright_source: scoreData.composition_copyright_source,
