@@ -68,9 +68,13 @@ export class ScoreRenderer {
   /**
    * Renders a score from ScoreData object
    *
+   * Synchronous: all the work happens here, so a caller's try/catch sees any
+   * error. As an async method its errors became rejected promises, which the
+   * web component's try/catch never saw.
+   *
    * @param scoreData - Parsed score data
    */
-  async renderFromScoreData(scoreData: ScoreData): Promise<void> {
+  renderFromScoreData(scoreData: ScoreData): void {
     this.currentScoreData = scoreData;
     const notes = ScoreParser.parse(scoreData, this.options.noteColor);
     this.renderNotes(notes);

@@ -341,62 +341,7 @@ unsubscribe();
 
 ## 7. Async API Consistency
 
-### Issue: Mixed Async/Sync Methods
-
-```typescript
-async renderScoreFromURL(container, url, options?)  // Async (convenience)
-async renderFromScoreData(data: ScoreData): Promise<void>  // Async (why?)
-renderNotes(notes: ShakuNote[]): void                // Sync
-```
-
-**Problem:** `renderFromScoreData()` is async but doesn't do any async work
-
-### Recommendation: Make Async Where Needed
-
-```typescript
-// Async: actually needs to fetch (convenience.ts — ScoreRenderer does not fetch)
-async function renderScoreFromURL(
-  container,
-  url,
-  options?,
-): Promise<ScoreRenderer> {
-  const scoreData = await MusicXMLParser.parseFromURL(url);
-  const renderer = new ScoreRenderer(container, options);
-  renderer.renderFromScoreData(scoreData); // Sync call
-  return renderer;
-}
-
-class ScoreRenderer {
-  // Sync: no async operations
-  renderFromScoreData(scoreData: ScoreData): void {
-    this.currentScoreData = scoreData;
-    const notes = ScoreParser.parse(scoreData, this.options.noteColor);
-    this.renderNotes(notes);
-  }
-
-  // Sync: no async operations
-  renderNotes(notes: ShakuNote[]): void {
-    // ... rendering logic ...
-  }
-}
-```
-
-**Benefits:**
-
-- More predictable API
-- Better performance (avoid microtasks)
-- Clearer about what's async
-
-**Migration:**
-Keep async version for backward compatibility with deprecation warning:
-
-```typescript
-/** @deprecated Use synchronous renderFromScoreData instead */
-async renderFromScoreDataAsync(data: ScoreData): Promise<void> {
-  console.warn('renderFromScoreDataAsync is deprecated, use renderFromScoreData');
-  this.renderFromScoreData(data);
-}
-```
+**Done (#295).** `renderFromScoreData()` and `renderScore()` are synchronous; only `renderScoreFromURL()`, which fetches, is async. No deprecated async variant was kept: the package has never been published, so there are no callers to migrate.
 
 ---
 
@@ -706,7 +651,7 @@ import { getSymbolByRomaji } from 'shakuhachi-ro/utils';
 ### High Priority (Do First)
 
 1. **API Surface Clarity** - Remove internal exports, reduce public API
-2. **Async API Consistency** - Make `renderFromScoreData` synchronous
+2. ~~**Async API Consistency**~~ - done (#295)
 3. **Options Validation** - Add basic validation to prevent broken states
 4. **destroy() Documentation** - Already critical, properly document lifecycle
 
