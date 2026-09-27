@@ -158,7 +158,7 @@ describe('Convenience Functions', () => {
   describe('renderScore', () => {
     it('should render score from ScoreData', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       expect(renderer).toBeInstanceOf(ScoreRenderer);
       expect(container.querySelector('svg')).toBeTruthy();
@@ -166,7 +166,7 @@ describe('Convenience Functions', () => {
 
     it('should render with default options', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       const options = renderer.getOptions();
       expect(options.showOctaveMarks).toBe(true);
@@ -175,7 +175,7 @@ describe('Convenience Functions', () => {
 
     it('should render with custom options', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData, {
+      const renderer = renderScore(container, scoreData, {
         showOctaveMarks: false,
         notesPerColumn: 8,
         noteColor: '#333',
@@ -189,7 +189,7 @@ describe('Convenience Functions', () => {
 
     it('should return ScoreRenderer instance', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       // Should be able to call renderer methods
       expect(typeof renderer.refresh).toBe('function');
@@ -199,7 +199,7 @@ describe('Convenience Functions', () => {
 
     it('should allow further manipulation of renderer', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       // Should be able to resize
       renderer.resize(1000, 800);
@@ -209,7 +209,7 @@ describe('Convenience Functions', () => {
 
     it('should render correct number of notes', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       const notes = renderer.getNotes();
       expect(notes.length).toBe(3);
@@ -217,7 +217,7 @@ describe('Convenience Functions', () => {
 
     it('should store score data', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
 
       const storedData = renderer.getScoreData();
       expect(storedData).toBe(scoreData);
@@ -230,7 +230,7 @@ describe('Convenience Functions', () => {
         notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
       };
 
-      const renderer = await renderScore(container, scoreData);
+      const renderer = renderScore(container, scoreData);
       expect(renderer.getNotes().length).toBe(1);
     });
   });
@@ -248,7 +248,7 @@ describe('Convenience Functions', () => {
       // Clear and render from ScoreData
       renderer1.clear();
       const scoreData = createTestScoreData();
-      await renderScore(container, scoreData);
+      renderScore(container, scoreData);
       const svg2 = container.querySelector('svg');
       expect(svg2).toBeTruthy();
     });
@@ -265,7 +265,7 @@ describe('Convenience Functions', () => {
         );
 
         const scoreData = createTestScoreData();
-        const renderer2 = await renderScore(container2, scoreData, {
+        const renderer2 = renderScore(container2, scoreData, {
           notesPerColumn: 10,
         });
 
@@ -285,7 +285,7 @@ describe('Convenience Functions', () => {
 
     it('should allow chaining operations after creation', async () => {
       const scoreData = createTestScoreData();
-      const renderer = await renderScore(container, scoreData, {
+      const renderer = renderScore(container, scoreData, {
         showOctaveMarks: true,
       });
 

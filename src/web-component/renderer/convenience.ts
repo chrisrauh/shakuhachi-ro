@@ -44,7 +44,7 @@ export async function renderScoreFromURL(
 ): Promise<ScoreRenderer> {
   const scoreData = await MusicXMLParser.parseFromURL(url);
   const renderer = new ScoreRenderer(container, options);
-  await renderer.renderFromScoreData(scoreData);
+  renderer.renderFromScoreData(scoreData);
   return renderer;
 }
 
@@ -70,15 +70,15 @@ export async function renderScoreFromURL(
  *   ]
  * };
  *
- * const renderer = await renderScore(container, scoreData);
+ * const renderer = renderScore(container, scoreData);
  * ```
  */
-export async function renderScore(
+export function renderScore(
   container: HTMLElement,
   scoreData: ScoreData,
   options?: RenderOptions,
-): Promise<ScoreRenderer> {
+): ScoreRenderer {
   const renderer = new ScoreRenderer(container, options);
-  await renderer.renderFromScoreData(scoreData);
+  renderer.renderFromScoreData(scoreData);
   return renderer;
 }

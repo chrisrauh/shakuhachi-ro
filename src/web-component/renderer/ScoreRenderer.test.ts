@@ -257,7 +257,7 @@ describe('ScoreRenderer', () => {
       const scoreData = createTestScoreData();
       const renderer = new ScoreRenderer(container);
 
-      await renderer.renderFromScoreData(scoreData);
+      renderer.renderFromScoreData(scoreData);
 
       // Should render notes
       const svg = container.querySelector('svg');
@@ -416,7 +416,7 @@ describe('ScoreRenderer', () => {
     it('should return score data when rendered from ScoreData', async () => {
       const scoreData = createTestScoreData();
       const renderer = new ScoreRenderer(container);
-      await renderer.renderFromScoreData(scoreData);
+      renderer.renderFromScoreData(scoreData);
 
       expect(renderer.getScoreData()).toBe(scoreData);
     });
@@ -454,7 +454,7 @@ describe('ScoreRenderer', () => {
         showDebugLabels: true,
       });
 
-      await renderer.renderFromScoreData(scoreData);
+      renderer.renderFromScoreData(scoreData);
 
       // Should have rendered
       expect(container.querySelector('svg')).toBeTruthy();
@@ -541,7 +541,7 @@ describe('ScoreRenderer', () => {
     }
 
     it('should join consecutive segments with default options', async () => {
-      await new ScoreRenderer(container).renderFromScoreData(quarterNotes());
+      new ScoreRenderer(container).renderFromScoreData(quarterNotes());
       expect(segmentGaps()).toEqual([0, 0]);
     });
 
@@ -549,20 +549,18 @@ describe('ScoreRenderer', () => {
       const renderer = new ScoreRenderer(container, {
         noteVerticalSpacing: 60,
       });
-      await renderer.renderFromScoreData(quarterNotes());
+      renderer.renderFromScoreData(quarterNotes());
       expect(segmentGaps()).toEqual([0, 0]);
     });
 
     it('should continue the line past a dotted note', async () => {
-      await new ScoreRenderer(container).renderFromScoreData(
-        quarterNotes(true),
-      );
+      new ScoreRenderer(container).renderFromScoreData(quarterNotes(true));
       expect(segmentGaps()).toEqual([0, 0]);
     });
 
     it('should end the last segment at the middle of its note', async () => {
       const renderer = new ScoreRenderer(container, { noteFontSize: 40 });
-      await renderer.renderFromScoreData(quarterNotes());
+      renderer.renderFromScoreData(quarterNotes());
       const last = Array.from(container.querySelectorAll('line')).at(-1)!;
       const lastNoteY = Number(
         container.querySelectorAll('text')[2].getAttribute('y'),

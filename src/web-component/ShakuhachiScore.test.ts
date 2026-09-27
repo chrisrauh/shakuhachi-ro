@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import './ShakuhachiScore';
+import { ScoreRenderer } from './renderer/ScoreRenderer';
 
 describe('ShakuhachiScore Web Component - Columns Attribute', () => {
   let container: HTMLElement;
@@ -206,6 +207,33 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     // Verify notes were rendered
     const noteElements = component.shadowRoot?.querySelectorAll('text');
     expect(noteElements?.length).toBeGreaterThan(0);
+  });
+
+  it('shows an error message when drawing the score fails', async () => {
+    // Parse errors are caught before the renderer runs, so only a failure
+    // while drawing reaches this path.
+    const renderNotes = vi
+      .spyOn(ScoreRenderer.prototype, 'renderNotes')
+      .mockImplementation(() => {
+        throw new Error('drawing failed');
+      });
+
+    const component = document.createElement('shakuhachi-score');
+    component.setAttribute(
+      'data-score',
+      JSON.stringify({
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
+      }),
+    );
+    component.setAttribute('columns', '1');
+    container.appendChild(component);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    renderNotes.mockRestore();
+
+    expect(component.shadowRoot?.textContent).toContain(
+      'Error: drawing failed',
+    );
   });
 
   it('still works with full metadata (backward compatibility)', async () => {

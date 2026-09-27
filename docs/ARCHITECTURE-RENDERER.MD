@@ -117,7 +117,7 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 ```typescript
 import { ScoreRenderer } from 'shakuhachi-ro';
 const renderer = new ScoreRenderer(container, options);
-await renderer.renderFromScoreData(scoreData);
+renderer.renderFromScoreData(scoreData);
 ```
 
 ### Standalone Script
