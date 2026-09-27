@@ -180,19 +180,34 @@ const {
         max-width: 280px;
       }
 
-      /* Dev panel - individual panel within the stack */
+      /* Tweakpane theme integration: its defaults are a dark theme, so every
+         colour it uses is mapped, or light mode mixes light and dark parts */
       .dev-panel {
+        --tp-base-background-color: var(--color-bg-subtle);
+        --tp-container-background-color: var(--color-bg-hover);
+        --tp-container-background-color-hover: var(--color-bg-active);
+        --tp-container-background-color-focus: var(--color-bg-active);
+        --tp-container-background-color-active: var(--color-bg-active);
+        --tp-container-foreground-color: var(--color-text-primary);
+        --tp-input-background-color: var(--color-bg-hover);
+        --tp-input-background-color-hover: var(--color-bg-active);
+        --tp-input-background-color-focus: var(--color-bg-active);
+        --tp-input-background-color-active: var(--color-bg-active);
+        --tp-input-foreground-color: var(--color-text-primary);
+        --tp-button-background-color: var(--color-button-secondary);
+        --tp-button-background-color-hover: var(--color-button-secondary-hover);
+        --tp-button-background-color-focus: var(--color-button-secondary-hover);
+        --tp-button-background-color-active: var(
+          --color-button-secondary-hover
+        );
+        --tp-button-foreground-color: var(--color-text-primary);
+        --tp-label-foreground-color: var(--color-text-secondary);
+        --tp-groove-foreground-color: var(--color-border);
       }
 
-      /* Tweakpane theme integration */
       .dev-panel .tp-rotv_c {
-        background-color: var(--color-bg-subtle);
         border: 1px solid var(--color-border);
         border-radius: var(--border-radius-medium);
-      }
-
-      .dev-panel .tp-lblv_l {
-        color: var(--color-text-primary);
       }
     </style>
 
