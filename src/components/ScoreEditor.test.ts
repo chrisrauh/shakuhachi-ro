@@ -63,6 +63,8 @@ describe('ScoreEditor loading state', () => {
         title: 'Test',
         data_format: 'json',
         data: { notes: [] },
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -133,6 +135,8 @@ describe('ScoreEditor notation payload escaping', () => {
         title: 'Test',
         data_format: 'musicxml',
         data: BREAKOUT,
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -197,6 +201,8 @@ describe('ScoreEditor.handleSave', () => {
         description: null,
         data_format: 'json',
         data: { title: '', style: 'kinko', notes: [] },
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -224,7 +230,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '{"notes":[]}';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'Test',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
 
     await editor['handleSave']();
 
@@ -245,7 +256,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'Test',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
 
     await editor['handleSave']();
 
@@ -271,7 +287,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '{"title":"t","style":"kinko","notes":[]}';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'My Score', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'My Score',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
 
     await editor['handleSave']();
 
@@ -302,7 +323,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '{"title":"t","style":"kinko","notes":[]}';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'Test',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
 
     await editor['handleSave']();
 
@@ -325,7 +351,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '{"title":"t","style":"kinko","notes":[]}';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'Test',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
 
     await editor['handleSave']();
 
@@ -346,7 +377,12 @@ describe('ScoreEditor.handleSave', () => {
     const editor = await makeEditorLoaded();
     editor['scoreData'] = '{"title":"t","style":"kinko","notes":[]}';
     editor['dataFormat'] = 'json';
-    editor['metadata'] = { title: 'Test', composer: '', description: '' };
+    editor['metadata'] = {
+      title: 'Test',
+      composer: '',
+      description: '',
+      license: 'CC-BY-SA-4.0',
+    };
     const saveBtn = container.querySelector('#save-btn') as HTMLButtonElement;
 
     // Two saves in a row: the label must survive more than one round trip
@@ -413,6 +449,8 @@ describe('ScoreEditor preview error', () => {
         title: 'Test',
         data_format: 'json',
         data: { notes: [] },
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -483,6 +521,8 @@ describe('ScoreEditor unsaved changes indicator', () => {
         title: 'Test',
         data_format: 'json',
         data: {},
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -530,6 +570,8 @@ describe('ScoreEditor autosave integration', () => {
         title: 'Test',
         data_format: 'json',
         data: {},
+        license: 'CC-BY-SA-4.0',
+        parent: null,
         updated_at: '2024-01-01T00:00:00Z',
       } as any,
       error: null,
@@ -582,5 +624,135 @@ describe('ScoreEditor autosave integration', () => {
         metadata: expect.objectContaining({ title: 'New Title' }),
       }),
     );
+  });
+});
+
+// --- licence field ---
+
+describe('ScoreEditor licence field', () => {
+  const SCORE_ID = 'score-123';
+  const SLUG = 'test-slug';
+  const OWNER = 'user-1';
+
+  let container: HTMLDivElement;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    Object.defineProperty(window, 'location', {
+      value: { href: '/' },
+      writable: true,
+    });
+    container = document.createElement('div');
+    container.id = 'licence-editor-container';
+    document.body.appendChild(container);
+
+    const { getCurrentUser } = await import('../api/auth');
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: OWNER } as any,
+      error: null,
+    });
+    const { updateScore } = await import('../api/scores');
+    vi.mocked(updateScore).mockResolvedValue({
+      score: { id: SCORE_ID } as any,
+      error: null,
+    });
+  });
+
+  afterEach(() => {
+    container.remove();
+    localStorage.clear();
+  });
+
+  async function loadEditor(parent: unknown = null): Promise<ScoreEditor> {
+    const { getScore } = await import('../api/scores');
+    vi.mocked(getScore).mockResolvedValue({
+      score: {
+        id: SCORE_ID,
+        slug: SLUG,
+        user_id: OWNER,
+        title: 'Test Score',
+        data_format: 'json',
+        data: { title: '', style: 'kinko', notes: [] },
+        license: 'CC-BY-SA-4.0',
+        parent,
+        updated_at: '2024-01-01T00:00:00Z',
+      } as any,
+      error: null,
+    });
+    const editor = new ScoreEditor(container.id, SCORE_ID, SLUG);
+    await flushLoadScore();
+    return editor;
+  }
+
+  function select(): HTMLSelectElement {
+    return container.querySelector<HTMLSelectElement>('#license-select')!;
+  }
+
+  it('shows the licence on one line and reveals the select on Change', async () => {
+    await loadEditor();
+
+    expect(container.querySelector('#license-summary')?.textContent).toContain(
+      'CC BY-SA 4.0',
+    );
+    expect(select().hidden).toBe(true);
+
+    container.querySelector<HTMLButtonElement>('#license-change')!.click();
+
+    expect(select().hidden).toBe(false);
+    expect(container.querySelector('#license-summary')).toBeNull();
+  });
+
+  it('saves the licence picked, and explains it', async () => {
+    const { updateScore } = await import('../api/scores');
+    const editor = await loadEditor();
+
+    select().value = 'CC0-1.0';
+    select().dispatchEvent(new Event('change'));
+    await editor['handleSave']();
+
+    expect(
+      container.querySelector('#license-description')?.textContent,
+    ).toContain('without credit');
+    expect(updateScore).toHaveBeenCalledWith(
+      SCORE_ID,
+      expect.objectContaining({ license: 'CC0-1.0' }),
+    );
+  });
+
+  it('puts the NonCommercial restriction in bold', async () => {
+    await loadEditor();
+
+    select().value = 'CC-BY-NC-SA-4.0';
+    select().dispatchEvent(new Event('change'));
+
+    expect(
+      container.querySelector('#license-description strong')?.textContent,
+    ).toBe('not commercially');
+  });
+
+  // Naming the column fires the fork-licence trigger, which can reject an
+  // otherwise unrelated save.
+  it('leaves the licence out of a save that did not change it', async () => {
+    const { updateScore } = await import('../api/scores');
+    const editor = await loadEditor();
+
+    await editor['handleSave']();
+
+    expect(vi.mocked(updateScore).mock.calls[0][1]).not.toHaveProperty(
+      'license',
+    );
+  });
+
+  it('offers no choice on a fork of someone else’s ShareAlike score', async () => {
+    await loadEditor({
+      slug: 'shika-no-tone',
+      title: 'Shika no Tone',
+      license: 'CC-BY-SA-4.0',
+      user_id: 'someone-else',
+    });
+
+    expect(container.querySelector('#license-change')).toBeNull();
+    expect(container.querySelector('#license-select')).toBeNull();
+    expect(container.textContent).toContain('requires adaptations to keep it');
   });
 });

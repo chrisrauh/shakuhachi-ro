@@ -271,3 +271,22 @@
     grid-template-columns: 1fr;
   }
 }
+
+.license-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-small);
+  color: var(--color-text-primary);
+}
+
+.field-hint {
+  margin-top: var(--spacing-x-small);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-dense);
+  color: var(--color-text-secondary);
+}
+
+.field-hint a {
+  color: inherit;
+}

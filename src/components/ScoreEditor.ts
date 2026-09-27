@@ -7,11 +7,22 @@ import { parseScoreText } from '../utils/score-data';
 import { toast } from './Toast';
 import { confirmDialog } from '../utils/init-header';
 import { buildSpinnerSVG, ButtonLoadingState } from './LoadingSpinner';
-import type { ScoreContent, ScoreDataFormat } from '../api/scores';
+import type {
+  ScoreContent,
+  ScoreDataFormat,
+  ScoreParent,
+  UpdateScoreData,
+} from '../api/scores';
 import { STRINGS, STRING_FACTORIES } from '../constants/strings';
 import { validateScoreInput } from '../utils/score-validation';
 import { EditorAutosave } from '../utils/editor-autosave';
 import type { ScoreMetadata } from '../utils/editor-autosave';
+import {
+  LICENSES,
+  NON_COMMERCIAL_CLAUSE,
+  licenseChoices,
+} from '../utils/license';
+import type { LicenseChoices, ScoreLicense } from '../utils/license';
 
 export class ScoreEditor {
   private container: HTMLElement;
@@ -21,7 +32,12 @@ export class ScoreEditor {
     title: '',
     composer: '',
     description: '',
+    license: 'CC-BY-NC-SA-4.0',
   };
+  /** The licence as saved, so a save only writes it when the owner changed it. */
+  private savedLicense: ScoreLicense = 'CC-BY-NC-SA-4.0';
+  private ownerId: string = '';
+  private parent: ScoreParent | null = null;
   private validationError: string | null = null;
   private scoreId: string;
   private slug: string;
@@ -84,7 +100,11 @@ export class ScoreEditor {
       title: score.title,
       composer: score.composer || '',
       description: score.description || '',
+      license: score.license,
     };
+    this.savedLicense = score.license;
+    this.ownerId = score.user_id;
+    this.parent = score.parent;
 
     if (this.dataFormat === 'json') {
       this.scoreData = JSON.stringify(score.data, null, 2);
@@ -97,7 +117,9 @@ export class ScoreEditor {
     this.autosave.checkAndOfferRestore(this.loadedAt, (draft) => {
       this.scoreData = draft.scoreData || '';
       this.dataFormat = draft.dataFormat || 'json';
-      this.metadata = draft.metadata || this.metadata;
+      // Spread over the loaded values: drafts saved before a field existed
+      // (the licence, #263) lack it.
+      this.metadata = { ...this.metadata, ...draft.metadata };
       this.hasUnsavedChanges = true;
       this.render();
       this.updatePreview();
@@ -172,9 +194,9 @@ export class ScoreEditor {
     });
   }
 
-  private handleMetadataChange(
-    field: keyof ScoreMetadata,
-    value: string,
+  private handleMetadataChange<K extends keyof ScoreMetadata>(
+    field: K,
+    value: ScoreMetadata[K],
   ): void {
     this.hasUnsavedChanges = true;
     this.metadata[field] = value;
@@ -359,13 +381,19 @@ export class ScoreEditor {
         saveFormat = this.dataFormat;
       }
 
-      const scoreData = {
+      const scoreData: UpdateScoreData = {
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         description: this.metadata.description || undefined,
         data_format: saveFormat,
         data: data,
       };
+      // Only when changed. Naming the column at all fires the fork-licence
+      // trigger, which would reject an unrelated save if the parent's licence
+      // has moved since this fork was made.
+      if (this.metadata.license !== this.savedLicense) {
+        scoreData.license = this.metadata.license;
+      }
 
       const result = await updateScore(this.scoreId, scoreData);
 
@@ -498,6 +526,8 @@ export class ScoreEditor {
           >${this.escapeHtml(this.metadata.description)}</textarea>
         </div>
 
+        ${this.renderLicenseFieldHTML()}
+
         <div class="metadata-field metadata-field-full">
           <div class="save-bar">
             <div id="save-status-indicator"></div>
@@ -508,6 +538,73 @@ export class ScoreEditor {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * One line naming the licence, with a Change button that swaps it for the
+   * select. Most owners keep the default, so the choice stays out of the way
+   * until asked for.
+   */
+  private renderLicenseFieldHTML(): string {
+    const choices = licenseChoices(
+      this.metadata.license,
+      this.ownerId,
+      this.parent,
+    );
+    const current = LICENSES[this.metadata.license];
+    const parentLink = this.parent
+      ? `<a href="/score/${encodeURIComponent(this.parent.slug)}">${this.escapeHtml(this.parent.title)}</a>`
+      : '';
+    const constraintNote: Record<
+      NonNullable<LicenseChoices['reason']>,
+      string
+    > = {
+      share_alike: `Fixed: this is a fork of ${parentLink}, whose licence requires adaptations to keep it.`,
+      unestablished: `Fixed until the licence of ${parentLink}, which this was forked from, is established.`,
+      non_commercial: `Only NonCommercial licences, because ${parentLink} is NonCommercial.`,
+    };
+    const note = choices.reason ? constraintNote[choices.reason] : '';
+
+    const select = choices.locked
+      ? ''
+      : `<select id="license-select" hidden>
+          ${choices.options
+            .map(
+              (id) =>
+                `<option value="${id}" ${id === this.metadata.license ? 'selected' : ''}>${LICENSES[id].name}</option>`,
+            )
+            .join('')}
+        </select>`;
+
+    return `
+      <div class="metadata-field metadata-field-full">
+        <label ${choices.locked ? '' : 'for="license-select"'}>Score licence</label>
+        <div class="license-summary" id="license-summary">
+          <span>${current.name}</span>
+          ${
+            choices.locked
+              ? ''
+              : `<button type="button" id="license-change" class="btn btn-link">
+                  <span class="btn-text">Change</span>
+                </button>`
+          }
+        </div>
+        ${select}
+        <p class="field-hint" id="license-description">${this.licenseDescriptionHTML(this.metadata.license)}</p>
+        ${note ? `<p class="field-hint">${note}</p>` : ''}
+      </div>
+    `;
+  }
+
+  /**
+   * What the licence lets others do, with the NonCommercial restriction in bold
+   * so an author cannot miss it. The descriptions are constants, not user input.
+   */
+  private licenseDescriptionHTML(license: ScoreLicense): string {
+    return LICENSES[license].description.replace(
+      NON_COMMERCIAL_CLAUSE,
+      `<strong>${NON_COMMERCIAL_CLAUSE}</strong>`,
+    );
   }
 
   private renderValidation(): void {
@@ -566,6 +663,29 @@ export class ScoreEditor {
           'composer',
           (e.target as HTMLInputElement).value,
         );
+      });
+
+    this.container
+      .querySelector('#license-change')
+      ?.addEventListener('click', () => {
+        // The select is rendered, hidden, whenever the button is.
+        const select =
+          this.container.querySelector<HTMLSelectElement>('#license-select')!;
+        this.container.querySelector('#license-summary')?.remove();
+        select.hidden = false;
+        select.focus();
+      });
+
+    this.container
+      .querySelector('#license-select')
+      ?.addEventListener('change', (e) => {
+        const license = (e.target as HTMLSelectElement).value as ScoreLicense;
+        this.handleMetadataChange('license', license);
+        const description = this.container.querySelector(
+          '#license-description',
+        );
+        if (description)
+          description.innerHTML = this.licenseDescriptionHTML(license);
       });
 
     this.container

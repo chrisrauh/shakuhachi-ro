@@ -35,7 +35,12 @@ describe('EditorAutosave', () => {
     autosave.save({
       scoreData: 'data',
       dataFormat: 'json',
-      metadata: { title: 'T', composer: '', description: '' },
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
     });
     expect(localStorage.getItem(KEY)).toBeNull();
 
@@ -48,12 +53,22 @@ describe('EditorAutosave', () => {
     autosave.save({
       scoreData: 'first',
       dataFormat: 'json',
-      metadata: { title: 'T', composer: '', description: '' },
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
     });
     autosave.save({
       scoreData: 'second',
       dataFormat: 'json',
-      metadata: { title: 'T', composer: '', description: '' },
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
     });
 
     vi.advanceTimersByTime(2000);
@@ -66,7 +81,12 @@ describe('EditorAutosave', () => {
     autosave.save({
       scoreData: 'data',
       dataFormat: 'json',
-      metadata: { title: 'T', composer: '', description: '' },
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
     });
 
     vi.advanceTimersByTime(2000);
@@ -91,7 +111,12 @@ describe('EditorAutosave', () => {
         savedAt: '2023-12-31T00:00:00Z',
         scoreData: '',
         dataFormat: 'json',
-        metadata: { title: '', composer: '', description: '' },
+        metadata: {
+          title: '',
+          composer: '',
+          description: '',
+          license: 'CC-BY-SA-4.0',
+        },
       }),
     );
 
@@ -107,7 +132,12 @@ describe('EditorAutosave', () => {
         savedAt: '2024-01-01T00:00:00Z',
         scoreData: '',
         dataFormat: 'json',
-        metadata: { title: '', composer: '', description: '' },
+        metadata: {
+          title: '',
+          composer: '',
+          description: '',
+          license: 'CC-BY-SA-4.0',
+        },
       }),
     );
 
@@ -122,7 +152,12 @@ describe('EditorAutosave', () => {
       JSON.stringify({
         scoreData: 'data',
         dataFormat: 'json',
-        metadata: { title: '', composer: '', description: '' },
+        metadata: {
+          title: '',
+          composer: '',
+          description: '',
+          license: 'CC-BY-SA-4.0',
+        },
       }),
     );
 
@@ -139,7 +174,12 @@ describe('EditorAutosave', () => {
         savedAt: '2024-01-02T00:00:00Z',
         scoreData: '',
         dataFormat: 'json',
-        metadata: { title: '', composer: '', description: '' },
+        metadata: {
+          title: '',
+          composer: '',
+          description: '',
+          license: 'CC-BY-SA-4.0',
+        },
       }),
     );
 
@@ -155,7 +195,12 @@ describe('EditorAutosave', () => {
       savedAt: '2024-01-02T00:00:00Z',
       scoreData: 'abc',
       dataFormat: 'json' as const,
-      metadata: { title: 'T', composer: '', description: '' },
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
     };
     localStorage.setItem(KEY, JSON.stringify(draft));
     const onRestore = vi.fn();
@@ -178,7 +223,12 @@ describe('EditorAutosave', () => {
         savedAt: '2024-01-02T00:00:00Z',
         scoreData: '',
         dataFormat: 'json',
-        metadata: { title: '', composer: '', description: '' },
+        metadata: {
+          title: '',
+          composer: '',
+          description: '',
+          license: 'CC-BY-SA-4.0',
+        },
       }),
     );
 

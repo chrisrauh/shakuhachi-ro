@@ -64,7 +64,7 @@ CREATE TABLE scores (
   composition_year_author_died INT,
   composition_year_published INT,
   -- Score layer: the terms on this notation (SPDX identifier)
-  license score_license NOT NULL DEFAULT 'CC-BY-SA-4.0',
+  license score_license NOT NULL DEFAULT 'CC-BY-NC-SA-4.0',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -83,6 +83,7 @@ CREATE TABLE scores (
 | `derive_fork_count.sql`             | Drops stored `fork_count`; the count is derived from `forked_from` |
 | `add_licensing_to_scores.sql`       | Two rights layers, backfill, and the fork licence trigger (#306)   |
 | `drop_rights_from_scores.sql`       | Drops `rights`, superseded by the two layers                       |
+| `default_license_nc_sa.sql`         | New scores default to CC BY-NC-SA 4.0                              |
 | `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                     |
 
 ## Seeded Songs

@@ -51,7 +51,12 @@ describe('ScoreDetailClient delete', () => {
       id: '2',
       title: 'My fork',
       slug: 'my-fork',
-      parent: { slug: 'akatombo', title: 'Akatombo' },
+      parent: {
+        slug: 'akatombo',
+        title: 'Akatombo',
+        license: 'CC-BY-SA-4.0',
+        user_id: 'someone-else',
+      },
     });
 
     await deleteViaButton();

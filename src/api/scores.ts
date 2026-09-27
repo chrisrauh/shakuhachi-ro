@@ -22,11 +22,14 @@ export type ScoreContent = ScoreData | string;
 
 /**
  * The parent of a fork, embedded in the same query as the score itself.
- * Only the fields the "forked from" link needs — not a full Score.
+ * Only the fields the "forked from" link and the editor's licence rules need —
+ * not a full Score.
  */
 export interface ScoreParent {
   slug: string;
   title: string;
+  license: ScoreLicense;
+  user_id: string;
 }
 
 export interface Score {
@@ -68,7 +71,7 @@ export interface CreateScoreData {
   composition_copyright_source?: string | null;
   composition_year_author_died?: number | null;
   composition_year_published?: number | null;
-  /** Omit for the database default, CC BY-SA 4.0. */
+  /** Omit for the database default, CC BY-NC-SA 4.0. */
   license?: ScoreLicense;
 }
 
@@ -80,6 +83,7 @@ export interface UpdateScoreData {
   data?: ScoreContent;
   source_url?: string;
   source_description?: string;
+  license?: ScoreLicense;
   // slug is intentionally omitted — slugs are immutable after creation to preserve
   // stable URLs (bookmarks, shared links). See TODO for future slug editing feature.
 }
@@ -112,7 +116,7 @@ export interface ScoresResult {
  * form here, so the column-name form is the one that works.
  */
 const SCORE_SELECT =
-  '*, forks:scores!forked_from(count), parent:forked_from(slug,title)';
+  '*, forks:scores!forked_from(count), parent:forked_from(slug,title,license,user_id)';
 
 function toScore(row: Record<string, any>): Score {
   const { forks, ...rest } = row;
@@ -180,7 +184,7 @@ export async function createScore(
         source_url: scoreData.source_url || null,
         source_description: scoreData.source_description || null,
         // Undefined fields are left out of the request, so the database
-        // defaults apply: not_evaluated, and CC BY-SA 4.0.
+        // defaults apply: not_evaluated, and CC BY-NC-SA 4.0.
         composition_copyright_status: scoreData.composition_copyright_status,
         composition_copyright_basis: scoreData.composition_copyright_basis,
         composition_copyright_source: scoreData.composition_copyright_source,
