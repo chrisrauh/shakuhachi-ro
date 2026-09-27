@@ -72,10 +72,6 @@ export class ScoreParser {
    */
   static parse(scoreData: ScoreData, noteColor: string = '#000'): ShakuNote[] {
     this.validate(scoreData);
-    // Valid data (a new score starts empty), but there is nothing to draw
-    if (scoreData.notes.length === 0) {
-      throw new Error(PARSER_STRINGS.ERRORS.ScoreParser.notesEmptyArray);
-    }
 
     const shakuNotes: ShakuNote[] = [];
     let previousNoteMidi: number | null = null; // Track previous pitch for closest-note calculation
@@ -248,7 +244,7 @@ export class ScoreParser {
 
   /**
    * Validates score data structure. An empty notes array is valid: new
-   * scores start that way.
+   * scores start that way, and it renders as an empty score.
    *
    * Takes `unknown` because it also checks JSON the user typed in the editor.
    *
