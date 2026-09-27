@@ -7,7 +7,11 @@ import '../styles/score-library.css';
 export const prerender = true;
 ---
 
-<Layout title="Shakuhachi Score Library" currentPage="browse">
+<Layout
+  title="Shakuhachi Score Library"
+  currentPage="browse"
+  preconnectSupabase
+>
   <PageHeader slot="header-metadata" title="Shakuhachi.ro" />
 
   <div id="delete-banner" style="display: none;" class="delete-banner">

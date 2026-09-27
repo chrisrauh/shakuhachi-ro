@@ -2,7 +2,6 @@ import { updateScore, getScore } from '../api/scores';
 import { purgeScoreCache } from '../api/purge';
 import { getCurrentUser } from '../api/auth';
 import { renderIcon, initIcons } from '../utils/icons';
-import { ABCParser } from '../web-component/parser/ABCParser';
 import { parseScoreText } from '../utils/score-data';
 import { toast } from './Toast';
 import { confirmDialog } from '../utils/init-header';
@@ -368,24 +367,18 @@ export class ScoreEditor {
     saveLoading?.show();
 
     try {
-      let data: ScoreContent;
-      let saveFormat: ScoreDataFormat;
-      if (this.dataFormat === 'abc') {
-        data = ABCParser.parse(this.scoreData);
-        saveFormat = 'json';
-      } else if (this.dataFormat === 'json') {
-        data = JSON.parse(this.scoreData);
-        saveFormat = 'json';
-      } else {
-        data = this.scoreData;
-        saveFormat = this.dataFormat;
-      }
+      // Text formats are stored as typed, so reopening the editor gives the
+      // author back their own source, not a conversion of it.
+      const data: ScoreContent =
+        this.dataFormat === 'json'
+          ? JSON.parse(this.scoreData)
+          : this.scoreData;
 
       const scoreData: UpdateScoreData = {
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         description: this.metadata.description || undefined,
-        data_format: saveFormat,
+        data_format: this.dataFormat,
         data: data,
       };
       // Only when changed. Naming the column at all fires the fork-licence

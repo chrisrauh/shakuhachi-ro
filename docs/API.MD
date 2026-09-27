@@ -19,10 +19,6 @@ Complete API reference for the Shakuhachi Score Renderer.
 - `RenderOptions` interface
 - All modifier classes (OctaveMarksModifier, MeriKariModifier, etc.)
 
-**Experimental APIs:**
-
-- `Formatter`, `VerticalSystem` (alternative layout system, not used by ScoreRenderer)
-
 **Internal APIs (Not Recommended):**
 
 - `ScoreParser` (used internally by ScoreRenderer)
@@ -154,16 +150,6 @@ try {
   console.error('Failed to load score:', error);
   showErrorToUser(error.message);
 }
-```
-
-**Don't use experimental APIs in production:**
-
-```typescript
-// Bad - experimental, may change
-import { Formatter, VerticalSystem } from 'shakuhachi-ro';
-
-// Good - use stable API
-import { ScoreRenderer } from 'shakuhachi-ro';
 ```
 
 ## Common Patterns
@@ -993,29 +979,6 @@ const parsed = parseNote('ro');
 
 **Note:** These are low-level utilities. Most users should use the high-level `ScoreRenderer` API instead.
 
-### Alternative Layout System (VexFlow-inspired)
-
-The library includes an alternative VexFlow-inspired layout system with `Formatter` and `VerticalSystem`. These are not used by `ScoreRenderer` but are available for advanced use cases.
-
-**Status:** Experimental - not recommended for production use. Use `ScoreRenderer` instead.
-
-```typescript
-import { Formatter, VerticalSystem } from 'shakuhachi-ro';
-
-// Horizontal spacing
-const formatter = new Formatter({ startX: 0, minNoteSpacing: 40 });
-formatter.format(notes, 500); // Format within 500px width
-
-// Vertical layout
-const system = new VerticalSystem(svgRenderer, {
-  x: 100,
-  y: 50,
-  columnHeight: 500,
-});
-system.addNotes(notes);
-system.render();
-```
-
 ## Error Handling
 
 All async methods can throw errors. Always use try/catch:
@@ -1284,7 +1247,6 @@ If rendering is slower, check:
 
 **How to prepare:**
 
-- Avoid using experimental APIs (Formatter, VerticalSystem)
 - Avoid using internal APIs (ScoreParser, kinko-symbols utilities)
 - Always call `destroy()` for cleanup
 - Handle errors with try/catch
