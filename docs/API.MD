@@ -67,7 +67,7 @@ const renderer = new ScoreRenderer(container, {
   showOctaveMarks: false,
 });
 
-await renderer.renderFromScoreData(
+renderer.renderFromScoreData(
   await MusicXMLParser.parseFromURL('/score.musicxml'),
 );
 ```
@@ -137,13 +137,13 @@ new ScoreRenderer(container, {
 
 ```typescript
 // Bad - silently fails
-await renderer.renderFromScoreData(
+renderer.renderFromScoreData(
   await MusicXMLParser.parseFromURL('/score.musicxml'),
 );
 
 // Good - handle errors
 try {
-  await renderer.renderFromScoreData(
+  renderer.renderFromScoreData(
     await MusicXMLParser.parseFromURL('/score.musicxml'),
   );
 } catch (error) {
@@ -206,7 +206,7 @@ export default {
       });
 
       try {
-        await renderer.renderFromScoreData(
+        renderer.renderFromScoreData(
           await MusicXMLParser.parseFromURL(props.scoreUrl),
         );
       } catch (error) {
@@ -244,9 +244,7 @@ class ScoreWidget {
 
   async loadScore(url: string): Promise<void> {
     try {
-      await this.renderer.renderFromScoreData(
-        await MusicXMLParser.parseFromURL(url),
-      );
+      this.renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
     } catch (error) {
       this.handleError(error);
     }
@@ -312,7 +310,7 @@ updateLayout();
 ```typescript
 async function loadScore(url: string) {
   try {
-    await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
+    renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
   } catch (error) {
     if (error instanceof Error && error.message.includes('404')) {
       showMessage('Score not found');
@@ -332,9 +330,7 @@ async function loadScore(url: string) {
 async function loadScoreWithRetry(url: string, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      await renderer.renderFromScoreData(
-        await MusicXMLParser.parseFromURL(url),
-      );
+      renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
       return;
     } catch (error) {
       if (i === maxRetries - 1) throw error;
@@ -416,10 +412,10 @@ const renderer = new ScoreRenderer(document.getElementById('score'), {
 #### renderFromScoreData()
 
 ```typescript
-async renderFromScoreData(scoreData: ScoreData): Promise<void>
+renderFromScoreData(scoreData: ScoreData): void
 ```
 
-Renders a score from a ScoreData object.
+Renders a score from a ScoreData object. Synchronous: errors are thrown to the caller.
 
 **Parameters:**
 
@@ -433,7 +429,7 @@ const scoreData = {
   style: 'kinko',
   notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
 };
-await renderer.renderFromScoreData(scoreData);
+renderer.renderFromScoreData(scoreData);
 ```
 
 #### renderNotes()
@@ -641,11 +637,11 @@ renderer.setOptions({ showDebugLabels: true });
 ### renderScore()
 
 ```typescript
-async function renderScore(
+function renderScore(
   container: HTMLElement,
   scoreData: ScoreData,
   options?: RenderOptions,
-): Promise<ScoreRenderer>;
+): ScoreRenderer;
 ```
 
 Creates a ScoreRenderer and renders from ScoreData.
@@ -655,7 +651,7 @@ Creates a ScoreRenderer and renders from ScoreData.
 **Example:**
 
 ```typescript
-const renderer = await renderScore(container, scoreData, { notesPerColumn: 8 });
+const renderer = renderScore(container, scoreData, { notesPerColumn: 8 });
 ```
 
 ## RenderOptions
@@ -935,7 +931,7 @@ Fetches and parses MusicXML into ScoreData. `ScoreRenderer` only renders ScoreDa
 import { MusicXMLParser } from 'shakuhachi-ro';
 
 const scoreData = await MusicXMLParser.parseFromURL('/data/Akatombo.musicxml');
-await renderer.renderFromScoreData(scoreData);
+renderer.renderFromScoreData(scoreData);
 
 // Or from a string you already have
 const fromString = MusicXMLParser.parse(xmlString);
@@ -985,7 +981,7 @@ All async methods can throw errors. Always use try/catch:
 
 ```typescript
 try {
-  await renderer.renderFromScoreData(
+  renderer.renderFromScoreData(
     await MusicXMLParser.parseFromURL('/score.musicxml'),
   );
 } catch (error) {
@@ -1175,13 +1171,13 @@ oldRenderer.destroy(); // Free memory
 // Bad - creates new renderer each time
 function displayScore(url) {
   const renderer = new ScoreRenderer(container);
-  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
+  renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url));
 }
 
 // Good - reuse renderer
 const renderer = new ScoreRenderer(container);
 function displayScore(url) {
-  await renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url)); // Clears and re-renders
+  renderer.renderFromScoreData(await MusicXMLParser.parseFromURL(url)); // Clears and re-renders
 }
 ```
 
@@ -1191,7 +1187,7 @@ function displayScore(url) {
 
 ```typescript
 const start = performance.now();
-await renderer.renderFromScoreData(
+renderer.renderFromScoreData(
   await MusicXMLParser.parseFromURL('/score.musicxml'),
 );
 const duration = performance.now() - start;
@@ -1202,7 +1198,7 @@ console.log(`Rendered in ${duration.toFixed(2)}ms`);
 
 ```typescript
 performance.mark('render-start');
-await renderer.renderFromScoreData(
+renderer.renderFromScoreData(
   await MusicXMLParser.parseFromURL('/score.musicxml'),
 );
 performance.mark('render-end');
@@ -1228,7 +1224,6 @@ If rendering is slower, check:
 **Planned Breaking Changes:**
 
 - Cleaner public API (fewer exports, clearer boundaries)
-- Synchronous `renderFromScoreData()` (currently async but does no async work)
 - Fluent API with method chaining (`renderer.setOptions().resize().refresh()`)
 - Property getters instead of getter methods (`renderer.options` vs `renderer.getOptions()`)
 
