@@ -306,6 +306,32 @@ describe('ScoreEditor.handleSave', () => {
     expect(mockInstance.clear).toHaveBeenCalledOnce();
   });
 
+  it('saves ABC as the text the author typed, so it reopens as ABC', async () => {
+    const { getCurrentUser } = await import('../api/auth');
+    const { updateScore } = await import('../api/scores');
+
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      user: { id: 'user-1' } as any,
+      error: null,
+    });
+    vi.mocked(updateScore).mockResolvedValue({
+      score: { id: SCORE_ID } as any,
+      error: null,
+    });
+
+    const abc = 'X:1\nT:Akatombo\n% a comment the parser drops\nK:D\nD F G|';
+    const editor = await makeEditorLoaded();
+    editor['scoreData'] = abc;
+    editor['dataFormat'] = 'abc';
+
+    await editor['handleSave']();
+
+    expect(updateScore).toHaveBeenCalledWith(
+      SCORE_ID,
+      expect.objectContaining({ data_format: 'abc', data: abc }),
+    );
+  });
+
   it('calls toast.error when API returns an error', async () => {
     const { getCurrentUser } = await import('../api/auth');
     const { updateScore } = await import('../api/scores');
