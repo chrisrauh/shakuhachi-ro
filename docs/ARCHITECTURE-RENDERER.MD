@@ -13,10 +13,8 @@ src/web-component/
 │   ├── ScoreRenderer.ts    # Main orchestrator
 │   ├── RenderOptions.ts    # Configuration
 │   ├── ColumnLayoutCalculator.ts
-│   ├── Formatter.ts        # Text/symbol formatting
 │   ├── ModifierConfigurator.ts
 │   ├── SVGRenderer.ts      # Low-level SVG drawing
-│   ├── VerticalSystem.ts   # Vertical layout system
 │   └── convenience.ts      # Factory functions
 ├── parser/                 # Data parsing
 │   ├── ScoreParser.ts      # ScoreData → ShakuNote[]
@@ -52,7 +50,6 @@ src/web-component/
 ├─────────────────────────────────────────┤
 │   Layout (ColumnLayoutCalculator)       │
 │   Modifiers (ModifierConfigurator)      │
-│   Formatting (Formatter, VerticalSystem)│
 ├─────────────────────────────────────────┤
 │   Parsing (MusicXMLParser, ScoreParser) │
 ├─────────────────────────────────────────┤

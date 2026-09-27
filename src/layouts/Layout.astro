@@ -10,6 +10,10 @@ interface Props {
   fullHeight?: boolean;
   noPadding?: boolean;
   mobileMenuType?: 'standard' | 'score-edit';
+  // For pages whose scripts call Supabase as soon as they load: opens the
+  // connection while the scripts download. Pages that call it only on user
+  // action leave it off, so no connection is opened unused.
+  preconnectSupabase?: boolean;
 }
 
 const {
@@ -18,6 +22,7 @@ const {
   fullHeight = false,
   noPadding = false,
   mobileMenuType,
+  preconnectSupabase = false,
 } = Astro.props;
 ---
 
@@ -27,6 +32,13 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    {preconnectSupabase && (
+      <link
+        rel="preconnect"
+        href={import.meta.env.VITE_SUPABASE_URL}
+        crossorigin
+      />
+    )}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -168,19 +180,34 @@ const {
         max-width: 280px;
       }
 
-      /* Dev panel - individual panel within the stack */
+      /* Tweakpane theme integration: its defaults are a dark theme, so every
+         colour it uses is mapped, or light mode mixes light and dark parts */
       .dev-panel {
+        --tp-base-background-color: var(--color-bg-subtle);
+        --tp-container-background-color: var(--color-bg-hover);
+        --tp-container-background-color-hover: var(--color-bg-active);
+        --tp-container-background-color-focus: var(--color-bg-active);
+        --tp-container-background-color-active: var(--color-bg-active);
+        --tp-container-foreground-color: var(--color-text-primary);
+        --tp-input-background-color: var(--color-bg-hover);
+        --tp-input-background-color-hover: var(--color-bg-active);
+        --tp-input-background-color-focus: var(--color-bg-active);
+        --tp-input-background-color-active: var(--color-bg-active);
+        --tp-input-foreground-color: var(--color-text-primary);
+        --tp-button-background-color: var(--color-button-secondary);
+        --tp-button-background-color-hover: var(--color-button-secondary-hover);
+        --tp-button-background-color-focus: var(--color-button-secondary-hover);
+        --tp-button-background-color-active: var(
+          --color-button-secondary-hover
+        );
+        --tp-button-foreground-color: var(--color-text-primary);
+        --tp-label-foreground-color: var(--color-text-secondary);
+        --tp-groove-foreground-color: var(--color-border);
       }
 
-      /* Tweakpane theme integration */
       .dev-panel .tp-rotv_c {
-        background-color: var(--color-bg-subtle);
         border: 1px solid var(--color-border);
         border-radius: var(--border-radius-medium);
-      }
-
-      .dev-panel .tp-lblv_l {
-        color: var(--color-text-primary);
       }
     </style>
 

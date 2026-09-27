@@ -52,8 +52,8 @@ CREATE TABLE scores (
   slug TEXT NOT NULL UNIQUE,
   composer TEXT,
   description TEXT,
-  data_format TEXT NOT NULL,
-  data JSONB NOT NULL,
+  data_format TEXT NOT NULL CHECK (data_format IN ('json', 'musicxml', 'abc')),
+  data JSONB NOT NULL,        -- a ScoreData object for json; the text as a JSON string otherwise
   forked_from UUID REFERENCES scores(id),  -- fork count is derived from this
   source_url TEXT,           -- Reference URL for source material
   source_description TEXT,   -- Human-readable attribution text
@@ -84,6 +84,7 @@ CREATE TABLE scores (
 | `add_licensing_to_scores.sql`       | Two rights layers, backfill, and the fork licence trigger (#306)   |
 | `drop_rights_from_scores.sql`       | Drops `rights`, superseded by the two layers                       |
 | `default_license_nc_sa.sql`         | New scores default to CC BY-NC-SA 4.0                              |
+| `allow_abc_data_format.sql`         | Allows `data_format` `abc`, so ABC is stored as typed (#262)       |
 | `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                     |
 
 ## Seeded Songs

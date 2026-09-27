@@ -32,10 +32,6 @@ export type {
 
 // Low-level Renderer exports
 export { SVGRenderer } from './web-component/renderer/SVGRenderer';
-export { Formatter } from './web-component/renderer/Formatter';
-export type { FormatterOptions } from './web-component/renderer/Formatter';
-export { VerticalSystem } from './web-component/renderer/VerticalSystem';
-export type { VerticalSystemOptions } from './web-component/renderer/VerticalSystem';
 
 // Parser exports
 export { ScoreParser } from './web-component/parser/ScoreParser';

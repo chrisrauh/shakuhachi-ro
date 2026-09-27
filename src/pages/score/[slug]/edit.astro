@@ -15,7 +15,12 @@ const { score } = scoreResult;
 if (!score) return new Response(null, { status: 404 });
 ---
 
-<Layout title={`Edit ${score.title}`} currentPage="score" fullHeight={true}>
+<Layout
+  title={`Edit ${score.title}`}
+  currentPage="score"
+  fullHeight={true}
+  preconnectSupabase
+>
   <PageHeader slot="header-metadata" title={`Edit ${score.title}`} />
 
   <div class="edit-layout">
