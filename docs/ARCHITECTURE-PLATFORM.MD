@@ -169,6 +169,8 @@ reverse. Forks copy both. The fork licence rules — ND and All Rights Reserved 
 cannot be forked by others, ShareAlike stays locked — are enforced by a trigger in
 `database/migrations/add_licensing_to_scores.sql`, for the same reason as RLS: a check
 in the browser is not a rule. The decisions behind the model are on issue #306.
+The editor's licence field (#263) mirrors those rules in `licenseChoices()` in
+`src/utils/license.ts`, only so it never offers a choice the trigger would reject.
 
 ## Client Components
 

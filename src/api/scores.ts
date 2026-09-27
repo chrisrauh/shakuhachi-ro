@@ -22,11 +22,14 @@ export type ScoreContent = ScoreData | string;
 
 /**
  * The parent of a fork, embedded in the same query as the score itself.
- * Only the fields the "forked from" link needs — not a full Score.
+ * Only the fields the "forked from" link and the editor's licence rules need —
+ * not a full Score.
  */
 export interface ScoreParent {
   slug: string;
   title: string;
+  license: ScoreLicense;
+  user_id: string;
 }
 
 export interface Score {
@@ -80,6 +83,7 @@ export interface UpdateScoreData {
   data?: ScoreContent;
   source_url?: string;
   source_description?: string;
+  license?: ScoreLicense;
   // slug is intentionally omitted — slugs are immutable after creation to preserve
   // stable URLs (bookmarks, shared links). See TODO for future slug editing feature.
 }
@@ -112,7 +116,7 @@ export interface ScoresResult {
  * form here, so the column-name form is the one that works.
  */
 const SCORE_SELECT =
-  '*, forks:scores!forked_from(count), parent:forked_from(slug,title)';
+  '*, forks:scores!forked_from(count), parent:forked_from(slug,title,license,user_id)';
 
 function toScore(row: Record<string, any>): Score {
   const { forks, ...rest } = row;
