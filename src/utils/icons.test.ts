@@ -13,7 +13,7 @@ describe('initIcons', () => {
   });
 
   it('replaces every icon name the app renders via renderIcon', () => {
-    const namesInUse = ['git-fork', 'circle-help', 'alert-circle'];
+    const namesInUse = ['git-fork', 'circle-help', 'circle-alert'];
     document.body.innerHTML = namesInUse.map((n) => renderIcon(n)).join('');
 
     initIcons();
