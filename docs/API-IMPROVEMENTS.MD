@@ -10,7 +10,6 @@ Currently exports **55+ items** from `index.ts`, mixing:
 
 - High-level user APIs (ScoreRenderer, renderScoreFromURL)
 - Internal utilities (ScoreParser, TestModifier)
-- Experimental features (Formatter, VerticalSystem)
 - Low-level primitives (kinko-symbols utilities)
 
 ### Recommendation: Tiered API Strategy
@@ -47,7 +46,6 @@ export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 ```typescript
 // Should NOT be exported
 - TestModifier (testing only)
-- Formatter, VerticalSystem (experimental, not used by main API)
 - kinko-symbols utilities (internal implementation details)
 ```
 
@@ -67,7 +65,7 @@ export { SVGRenderer } from './web-component/renderer/SVGRenderer';
 **Class names:**
 
 - ✅ Good: `ScoreRenderer`, `ColumnLayoutCalculator` (noun phrases)
-- ❌ Mixed: `Formatter` (too generic), `ModifierConfigurator` (verbose)
+- ❌ Verbose: `ModifierConfigurator`
 
 **Function names:**
 
