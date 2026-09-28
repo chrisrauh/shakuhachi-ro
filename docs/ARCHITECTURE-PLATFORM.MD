@@ -173,6 +173,12 @@ in the browser is not a rule. The decisions behind the model are on issue #306.
 The editor's licence field (#263) mirrors those rules in `licenseChoices()` in
 `src/utils/license.ts`, only so it never offers a choice the trigger would reject.
 
+**NonCommercial notation is accepted** (decided 28 Sep 2026, #308): scores may carry
+an NC licence, including notation from sources that allow only non-commercial use. This
+rests on shakuhachi.ro itself being non-commercial. Revisit it before adding anything
+commercial, such as ads or paid features, because hosting NC material would then need
+each rights holder's permission.
+
 ## Client Components
 
 Vanilla TypeScript classes with a simple `constructor(containerId) → render() → attachEventListeners()` pattern.
