@@ -47,6 +47,13 @@ export const PARSER_STRINGS = {
           duration,
           'Must be > 0.',
         ),
+      noteIndexMeriKariInvalid: (index: number, meriKari: unknown) =>
+        PARSER_STRING_FACTORIES.noteIndexInvalid(
+          index,
+          'meriKari',
+          meriKari,
+          'Must be dai-meri, meri or chu-meri.',
+        ),
       restIndexDuration: (index: number) =>
         `Rest at index ${index} is missing duration`,
       invalidJSON: (message: string) => `Invalid JSON: ${message}`,

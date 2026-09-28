@@ -167,12 +167,12 @@ K:D
 
       expect(scoreData.notes).toHaveLength(2);
       expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
-      expect(scoreData.notes[0].meri).toBe(true); // Sharp maps to meri
+      expect(scoreData.notes[0].meriKari).toBe('meri'); // Sharp maps to meri
       expect(scoreData.notes[1].pitch?.step).toBe('re'); // ^F → re
-      expect(scoreData.notes[1].meri).toBe(true);
+      expect(scoreData.notes[1].meriKari).toBe('meri');
     });
 
-    it('should parse accidentals (flat → chu_meri)', () => {
+    it('should parse accidentals (flat → meri)', () => {
       const abc = `
 X:1
 T:Accidental Test
@@ -185,7 +185,7 @@ _E
 
       expect(scoreData.notes).toHaveLength(1);
       expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // _E → tsu
-      expect(scoreData.notes[0].meri).toBe(true); // Flat maps to meri
+      expect(scoreData.notes[0].meriKari).toBe('meri'); // Flat maps to meri
     });
 
     it('should parse accidentals (natural = no meri)', () => {
@@ -201,9 +201,9 @@ K:D
 
       expect(scoreData.notes).toHaveLength(2);
       expect(scoreData.notes[0].pitch?.step).toBe('ro'); // =D → ro
-      expect(scoreData.notes[0].meri).toBe(undefined); // Natural = no meri
+      expect(scoreData.notes[0].meriKari).toBeUndefined(); // Natural = no meri
       expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // =F → tsu
-      expect(scoreData.notes[1].meri).toBe(undefined);
+      expect(scoreData.notes[1].meriKari).toBeUndefined();
     });
 
     it('should parse rests with duration', () => {
@@ -302,10 +302,10 @@ K:D
 
       expect(scoreData.notes).toHaveLength(2);
       expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
-      expect(scoreData.notes[0].meri).toBe(true);
+      expect(scoreData.notes[0].meriKari).toBe('meri');
       expect(scoreData.notes[0].duration).toBe(2);
       expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // _E → tsu
-      expect(scoreData.notes[1].meri).toBe(true);
+      expect(scoreData.notes[1].meriKari).toBe('meri');
       expect(scoreData.notes[1].duration).toBe(0.5);
     });
 
@@ -322,7 +322,7 @@ K:D
 
       expect(scoreData.notes).toHaveLength(1);
       expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
-      expect(scoreData.notes[0].meri).toBe(true);
+      expect(scoreData.notes[0].meriKari).toBe('meri');
       expect(scoreData.notes[0].duration).toBe(2);
       expect(scoreData.notes[0].dotted).toBe(true);
     });
@@ -485,7 +485,11 @@ Q
           title: 'Test',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true }, // ^D
+            {
+              pitch: { step: 'tsu', octave: 0 },
+              duration: 1,
+              meriKari: 'meri',
+            }, // ^D
           ],
         };
 
@@ -627,8 +631,8 @@ K:D
         const reparsed = ABCParser.parse(serializedAbc);
 
         // Both should have meri flag
-        expect(reparsed.notes[0].meri).toBe(true);
-        expect(reparsed.notes[1].meri).toBe(true);
+        expect(reparsed.notes[0].meriKari).toBe('meri');
+        expect(reparsed.notes[1].meriKari).toBe('meri');
       });
 
       it('should round-trip with rests', () => {

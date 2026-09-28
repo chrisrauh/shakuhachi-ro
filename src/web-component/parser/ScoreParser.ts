@@ -12,7 +12,7 @@ import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
-import type { ScoreData } from '../types/ScoreData';
+import { MERI_KARI, type ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
@@ -138,22 +138,8 @@ export class ScoreParser {
         shakuNote.addModifier(octaveModifier);
       }
 
-      // Add meri modifier if needed
-      if (note.meri) {
-        const meriModifier = new MeriKariModifier('meri');
-        shakuNote.addModifier(meriModifier);
-      }
-
-      // Add chu-meri modifier if needed
-      if (note.chu_meri) {
-        const chuMeriModifier = new MeriKariModifier('chu-meri');
-        shakuNote.addModifier(chuMeriModifier);
-      }
-
-      // Add dai-meri modifier if needed
-      if (note.dai_meri) {
-        const daiMeriModifier = new MeriKariModifier('dai-meri');
-        shakuNote.addModifier(daiMeriModifier);
+      if (note.meriKari) {
+        shakuNote.addModifier(new MeriKariModifier(note.meriKari));
       }
 
       // Add duration dot if needed
@@ -298,6 +284,13 @@ export class ScoreParser {
       // Validate duration is positive
       if (note.duration <= 0) {
         throw new Error(S.noteIndexDurationInvalid(index, note.duration));
+      }
+
+      if (
+        note.meriKari !== undefined &&
+        !(MERI_KARI as readonly string[]).includes(note.meriKari)
+      ) {
+        throw new Error(S.noteIndexMeriKariInvalid(index, note.meriKari));
       }
     });
   }

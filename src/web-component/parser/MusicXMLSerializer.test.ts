@@ -68,7 +68,7 @@ describe('MusicXMLSerializer', () => {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true }, // F4 meri → E4 (alter -1)
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meriKari: 'meri' }, // F4 meri → E4 (alter -1)
         ],
       };
 

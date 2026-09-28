@@ -50,7 +50,6 @@ export { Modifier } from './web-component/modifiers/Modifier';
 export type { ModifierPosition } from './web-component/modifiers/Modifier';
 export { OctaveMarksModifier } from './web-component/modifiers/OctaveMarksModifier';
 export { MeriKariModifier } from './web-component/modifiers/MeriKariModifier';
-export type { MeriKariType } from './web-component/modifiers/MeriKariModifier';
 export { AtariModifier } from './web-component/modifiers/AtariModifier';
 export type { AtariStyle } from './web-component/modifiers/AtariModifier';
 export { DurationDotModifier } from './web-component/modifiers/DurationDotModifier';
@@ -65,15 +64,12 @@ export {
   getSymbolByPitch,
   parseNote,
   octaveModifiers,
-  alterationSemitones,
-  meriKariSymbols,
   techniqueSymbols,
   octaveDots,
 } from './web-component/constants/kinko-symbols';
 export type {
   KinkoSymbol,
   Octave,
-  PitchAlteration,
   Technique,
   Fingering,
 } from './web-component/constants/kinko-symbols';
@@ -84,6 +80,7 @@ export type {
   ScoreNote,
   Pitch,
   PitchStep,
+  MeriKari,
   NotationStyle,
 } from './web-component/types/ScoreData';
 
