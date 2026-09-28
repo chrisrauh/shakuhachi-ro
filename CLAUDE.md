@@ -46,6 +46,7 @@ Use project skills for structured workflows:
    - Primary use case: Mobile viewing of shared scores
    - Secondary use case: Practice/perform from the platform
    - Built with Astro + Supabase
+   - **The library grows with use, not by scraping.** Never propose bulk-importing or scraping other sites. The only curated content is a small starter collection of classical pieces of varied complexity, for development, testing, validating notation features and early user feedback, built by transcribing public-domain sources and with explicit permission. See #308.
 
 2. **Renderer Library** (standalone package)
    - Framework-agnostic TypeScript/SVG renderer
