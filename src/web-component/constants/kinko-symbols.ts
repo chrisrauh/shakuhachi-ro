@@ -19,13 +19,6 @@
 export type Octave = 'otsu' | 'kan' | 'daikan';
 
 /**
- * Pitch alteration techniques
- * - meri: Lowering pitch (half or whole step)
- * - kari: Raising pitch (half step)
- */
-export type PitchAlteration = 'meri' | 'kari' | 'dai-meri' | null;
-
-/**
  * Common shakuhachi techniques
  */
 export type Technique =
@@ -206,29 +199,6 @@ export const octaveModifiers: Record<Octave, number> = {
   otsu: 0, // Base octave
   kan: 12, // +1 octave (12 semitones)
   daikan: 24, // +2 octaves (24 semitones)
-};
-
-/**
- * Pitch alterations in semitones
- */
-export const alterationSemitones: Record<string, number> = {
-  meri: -1, // Half step down
-  'dai-meri': -2, // Whole step down
-  kari: 1, // Half step up
-};
-
-/**
- * Visual symbols for meri/kari pitch alterations
- *
- * Traditional Kinko notation uses katakana/kanji characters:
- * - Meri: メ (katakana "me")
- * - Dai-meri: 大 (kanji "dai" meaning big/great)
- * - Kari: カ (katakana "ka")
- */
-export const meriKariSymbols: Record<string, string> = {
-  meri: 'メ', // Katakana "me"
-  'dai-meri': '大', // Kanji "dai" (big/great)
-  kari: 'カ', // Katakana "ka"
 };
 
 /**

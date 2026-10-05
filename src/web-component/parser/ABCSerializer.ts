@@ -85,14 +85,14 @@ export class ABCSerializer {
         abcNotes.push(`z${durationStr}`);
       } else if (note.pitch) {
         // Build key for reverse map lookup
-        const key = `${note.pitch.step}-${note.pitch.octave}-${note.meri || false}-${note.chu_meri || false}-${note.dai_meri || false}`;
+        const key = `${note.pitch.step}-${note.pitch.octave}-${note.meriKari ?? ''}`;
 
         // Find ABC pitch notation
         let abcPitch = reverseMap.get(key);
 
         if (!abcPitch) {
           // Fallback: construct basic ABC pitch without meri
-          const baseKey = `${note.pitch.step}-${note.pitch.octave}-false-false-false`;
+          const baseKey = `${note.pitch.step}-${note.pitch.octave}-`;
           abcPitch = reverseMap.get(baseKey);
 
           if (!abcPitch) {

@@ -57,7 +57,7 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: 4, meri: true }, // Use whole note
+          { pitch: { step: 'ro', octave: 0 }, duration: 4, meriKari: 'meri' }, // Use whole note
         ],
       };
 
@@ -72,7 +72,7 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'chi', octave: 1 }, duration: 4, meri: true }, // Use whole note
+          { pitch: { step: 'chi', octave: 1 }, duration: 4, meriKari: 'meri' }, // Use whole note
         ],
       };
 
@@ -182,7 +182,7 @@ describe('ScoreParser', () => {
           {
             pitch: { step: 'chi', octave: 1 },
             duration: 4,
-            meri: true,
+            meriKari: 'meri',
             dotted: true,
           }, // Use whole note
         ],
@@ -288,6 +288,18 @@ describe('ScoreParser', () => {
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
         'Note at index 0 has invalid octave: 3',
+      );
+    });
+
+    it('should throw error if meriKari is not a known value', () => {
+      const scoreData = {
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1, meriKari: 'merri' },
+        ],
+      } as unknown as ScoreData;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow(
+        'Note at index 0 has invalid meriKari: merri',
       );
     });
 

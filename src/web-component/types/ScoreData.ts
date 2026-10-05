@@ -30,6 +30,18 @@ export interface Pitch {
 }
 
 /**
+ * Meri or kari: a fixed lowering (meri) or raising (kari) of a note, played by
+ * changing the angle of the lips to the blowing edge.
+ *
+ * The exact pitch change varies with school, piece and player, so this names
+ * the technique rather than an interval. Pitch that moves within a note (yuri,
+ * ori, suri) is a separate technique, not a meri or kari. 'kari' will be added
+ * when the renderer can draw it.
+ */
+export const MERI_KARI = ['dai-meri', 'meri', 'chu-meri'] as const;
+export type MeriKari = (typeof MERI_KARI)[number];
+
+/**
  * Individual note within a score
  */
 export interface ScoreNote {
@@ -42,14 +54,8 @@ export interface ScoreNote {
   /** Rest indicator (mutually exclusive with pitch) */
   rest?: boolean;
 
-  /** Optional meri pitch alteration (lowers pitch ~half step) - full meri */
-  meri?: boolean;
-
-  /** Optional chu-meri pitch alteration (middle/half meri - between normal and full) */
-  chu_meri?: boolean;
-
-  /** Optional dai-meri pitch alteration (lowers pitch ~whole step) - great meri */
-  dai_meri?: boolean;
+  /** Meri or kari, if the note is played with one */
+  meriKari?: MeriKari;
 
   /** Dotted duration indicator (extends duration by half) */
   dotted?: boolean;

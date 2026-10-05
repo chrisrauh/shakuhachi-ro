@@ -111,19 +111,8 @@ export class MusicXMLParser {
         duration,
       };
 
-      // Add meri modifier if needed
-      if (shakuPitch.meri) {
-        note.meri = true;
-      }
-
-      // Add chu-meri modifier if needed
-      if (shakuPitch.chu_meri) {
-        note.chu_meri = true;
-      }
-
-      // Add dai-meri modifier if needed
-      if (shakuPitch.dai_meri) {
-        note.dai_meri = true;
+      if (shakuPitch.meriKari) {
+        note.meriKari = shakuPitch.meriKari;
       }
 
       // Add dotted flag if needed

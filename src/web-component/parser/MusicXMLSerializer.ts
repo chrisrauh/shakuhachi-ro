@@ -185,14 +185,10 @@ export class MusicXMLSerializer {
     // Determine alteration based on meri
     let alter: number | undefined;
 
-    if (note.dai_meri) {
-      // Dai-meri lowers pitch by ~whole step
+    // A fixed rule that disagrees with the pitch table in places; #417
+    if (note.meriKari === 'dai-meri') {
       alter = -2;
-    } else if (note.chu_meri) {
-      // Chu-meri lowers pitch by ~half step (between normal and meri)
-      alter = -1;
-    } else if (note.meri) {
-      // Meri lowers pitch by ~half step
+    } else if (note.meriKari === 'chu-meri' || note.meriKari === 'meri') {
       alter = -1;
     }
 

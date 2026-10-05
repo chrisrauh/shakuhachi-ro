@@ -17,19 +17,19 @@
       "_comment": "Jump to kan with meri: ri kan (甲) + meri (メ)",
       "pitch": { "step": "ri", "octave": 1 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "Back to otsu with chu meri: ro (乙) + chu meri (中)",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "Jump to kan with dai meri: chi kan (甲) + dai meri (大)",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1,
-      "dai_meri": true
+      "meriKari": "dai-meri"
     },
     {
       "_comment": "=== MERI + DURATION DOTS ===",
@@ -46,21 +46,21 @@
       "_comment": "ro meri (メ) with dotted duration",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
-      "meri": true,
+      "meriKari": "meri",
       "dotted": true
     },
     {
       "_comment": "tsu chu meri (中) with dotted duration",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
-      "chu_meri": true,
+      "meriKari": "chu-meri",
       "dotted": true
     },
     {
       "_comment": "chi dai meri (大) with dotted duration",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
-      "dai_meri": true,
+      "meriKari": "dai-meri",
       "dotted": true
     },
     {
@@ -77,21 +77,21 @@
       "_comment": "ri kan (甲) with meri (メ) and dotted",
       "pitch": { "step": "ri", "octave": 1 },
       "duration": 1,
-      "meri": true,
+      "meriKari": "meri",
       "dotted": true
     },
     {
       "_comment": "Back to otsu: tsu (乙) with chu meri (中) and dotted",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
-      "chu_meri": true,
+      "meriKari": "chu-meri",
       "dotted": true
     },
     {
       "_comment": "Jump to kan: chi kan (甲) with dai meri (大) and dotted",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1,
-      "dai_meri": true,
+      "meriKari": "dai-meri",
       "dotted": true
     },
     {
@@ -108,7 +108,7 @@
       "_comment": "First note in kan with meri - octave mark + meri",
       "pitch": { "step": "ri", "octave": 1 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "Rest to reset context",
@@ -124,7 +124,7 @@
       "_comment": "Same note with chu meri",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     }
   ]
 }

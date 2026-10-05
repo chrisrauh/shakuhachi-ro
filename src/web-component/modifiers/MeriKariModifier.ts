@@ -21,12 +21,11 @@
 import { Modifier, type ModifierPosition } from './Modifier';
 import type { SVGRenderer } from '../renderer/SVGRenderer';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-
-export type MeriKariType = 'meri' | 'chu-meri' | 'dai-meri';
+import type { MeriKari } from '../types/ScoreData';
 
 export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
-  private type: MeriKariType;
+  private type: MeriKari;
 
   /** Font size — overridden by ModifierConfigurator from render options */
   private fontSize: number = DEFAULT_RENDER_OPTIONS.meriKariFontSize;
@@ -41,7 +40,7 @@ export class MeriKariModifier extends Modifier {
   private color: string = '#000'; // Black, like traditional notation
 
   /** Katakana/Kanji characters for each alteration type */
-  private static readonly symbols: Record<MeriKariType, string> = {
+  private static readonly symbols: Record<MeriKari, string> = {
     meri: 'メ', // Katakana "me" - full meri
     'chu-meri': '中', // Kanji "chu" (middle) - half meri
     'dai-meri': '大', // Kanji "dai" (big/great) - great meri
@@ -53,10 +52,7 @@ export class MeriKariModifier extends Modifier {
    * @param type - Type of alteration: 'meri', 'chu-meri', or 'dai-meri'
    * @param position - Where to position relative to note (default: 'left')
    */
-  constructor(
-    type: MeriKariType = 'meri',
-    position: ModifierPosition = 'left',
-  ) {
+  constructor(type: MeriKari = 'meri', position: ModifierPosition = 'left') {
     super(position);
     this.type = type;
     this.setDefaultOffsets();
@@ -138,7 +134,7 @@ export class MeriKariModifier extends Modifier {
   /**
    * Gets the type of alteration
    */
-  getType(): MeriKariType {
+  getType(): MeriKari {
     return this.type;
   }
 
