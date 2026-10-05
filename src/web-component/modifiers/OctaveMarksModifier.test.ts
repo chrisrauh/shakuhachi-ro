@@ -5,13 +5,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { OctaveMarksModifier } from './OctaveMarksModifier';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 describe('OctaveMarksModifier', () => {
   it('should render with the default render options when not configured', () => {
     const drawText = vi.fn();
     new OctaveMarksModifier('kan').render(
-      { drawText } as unknown as SVGRenderer,
+      { drawText } as unknown as RenderingBackend,
       0,
       0,
     );
@@ -30,7 +30,7 @@ describe('OctaveMarksModifier', () => {
 
   it('should stack 大甲 vertically, 大 where a single mark goes and 甲 below it', () => {
     const drawText = vi.fn();
-    const renderer = { drawText } as unknown as SVGRenderer;
+    const renderer = { drawText } as unknown as RenderingBackend;
     new OctaveMarksModifier('kan').render(renderer, 0, 0);
     new OctaveMarksModifier('daikan').render(renderer, 0, 0);
 

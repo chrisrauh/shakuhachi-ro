@@ -4,11 +4,11 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { AtariModifier } from './AtariModifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 function renderAt(modifier: AtariModifier, x: number, y: number) {
   const renderer = { drawLine: vi.fn(), drawCircle: vi.fn() };
-  modifier.render(renderer as unknown as SVGRenderer, x, y);
+  modifier.render(renderer as unknown as RenderingBackend, x, y);
   return renderer;
 }
 

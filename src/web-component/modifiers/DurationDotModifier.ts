@@ -9,7 +9,7 @@
  */
 
 import { Modifier } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 export class DurationDotModifier extends Modifier {
   /** Radius of the duration dot */
@@ -46,11 +46,11 @@ export class DurationDotModifier extends Modifier {
   /**
    * Renders the duration dot
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
     renderer.drawCircle(x, y, this.dotRadius, this.color);

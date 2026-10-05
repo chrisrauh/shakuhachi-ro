@@ -8,7 +8,7 @@
  * that attach to notes and position themselves relative to the note.
  */
 
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 /**
  * Position of modifier relative to note
@@ -44,11 +44,15 @@ export abstract class Modifier {
   /**
    * Renders the modifier at the specified note position
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note
    * @param noteY - Y coordinate of the note (baseline)
    */
-  abstract render(renderer: SVGRenderer, noteX: number, noteY: number): void;
+  abstract render(
+    renderer: RenderingBackend,
+    noteX: number,
+    noteY: number,
+  ): void;
 
   /**
    * Sets the offset for this modifier

@@ -19,7 +19,7 @@
  */
 
 import { Modifier, type ModifierPosition } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 import type { MeriKari } from '../types/ScoreData';
 
@@ -78,11 +78,11 @@ export class MeriKariModifier extends Modifier {
   /**
    * Renders the meri/kari mark as katakana/kanji character
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
     const symbol = MeriKariModifier.symbols[this.type];

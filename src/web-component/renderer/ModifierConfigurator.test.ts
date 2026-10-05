@@ -9,7 +9,7 @@ import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
-import type { SVGRenderer } from './SVGRenderer';
+import type { RenderingBackend } from './RenderingBackend';
 
 describe('ModifierConfigurator', () => {
   describe('configureModifiers', () => {
@@ -259,7 +259,7 @@ describe('ModifierConfigurator', () => {
       ModifierConfigurator.configureModifiers([note], options);
 
       const drawText = vi.fn();
-      meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+      meriMod.render({ drawText } as unknown as RenderingBackend, 0, 0);
 
       expect(drawText).toHaveBeenCalledWith(
         expect.any(String),
@@ -293,7 +293,7 @@ describe('ModifierConfigurator', () => {
       expect(note.getModifiers()).toHaveLength(2);
 
       const drawText = vi.fn();
-      meriMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+      meriMod.render({ drawText } as unknown as RenderingBackend, 0, 0);
       expect(drawText).toHaveBeenCalledWith(
         expect.any(String),
         expect.any(Number),
@@ -306,7 +306,7 @@ describe('ModifierConfigurator', () => {
       );
 
       const drawCircle = vi.fn();
-      dotMod.render({ drawCircle } as unknown as SVGRenderer, 0, 0);
+      dotMod.render({ drawCircle } as unknown as RenderingBackend, 0, 0);
       expect(drawCircle).toHaveBeenCalledWith(
         expect.any(Number),
         expect.any(Number),
@@ -326,7 +326,7 @@ describe('ModifierConfigurator', () => {
       ModifierConfigurator.configureModifiers([note], options);
 
       const drawText = vi.fn();
-      octaveMod.render({ drawText } as unknown as SVGRenderer, 0, 0);
+      octaveMod.render({ drawText } as unknown as RenderingBackend, 0, 0);
 
       expect(drawText).toHaveBeenCalledWith(
         expect.any(String),

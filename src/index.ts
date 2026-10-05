@@ -32,6 +32,7 @@ export type {
 
 // Low-level Renderer exports
 export { SVGRenderer } from './web-component/renderer/SVGRenderer';
+export type { RenderingBackend } from './web-component/renderer/RenderingBackend';
 
 // Parser exports
 export { ScoreParser } from './web-component/parser/ScoreParser';

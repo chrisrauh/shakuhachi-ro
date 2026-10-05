@@ -4,11 +4,11 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { DurationDotModifier } from './DurationDotModifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 function renderAt(modifier: DurationDotModifier, x: number, y: number) {
   const drawCircle = vi.fn();
-  modifier.render({ drawCircle } as unknown as SVGRenderer, x, y);
+  modifier.render({ drawCircle } as unknown as RenderingBackend, x, y);
   return drawCircle;
 }
 

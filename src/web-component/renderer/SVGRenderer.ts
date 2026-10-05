@@ -5,9 +5,11 @@
  * for drawing primitives, managing groups, and applying transformations.
  */
 
+import type { RenderingBackend } from './RenderingBackend';
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-export class SVGRenderer {
+export class SVGRenderer implements RenderingBackend {
   private svg: SVGSVGElement;
   private width: number;
   private height: number;
