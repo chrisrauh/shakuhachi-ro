@@ -15,7 +15,8 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { ABC_TO_KINKO_MAP } from '../constants/abc-pitch-map';
+import { parseABCPitch } from '../constants/abc-pitch-map';
+import { fingeringForPitch } from '../constants/kinko-pitch-map';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class ABCParser {
@@ -167,7 +168,8 @@ export class ABCParser {
       const abcPitch = `${accidental || ''}${pitch}${octaveMarks}`;
 
       // Map to shakuhachi
-      const shakuPitch = ABC_TO_KINKO_MAP[abcPitch];
+      const written = parseABCPitch(accidental || '', pitch, octaveMarks);
+      const shakuPitch = written && fingeringForPitch(written);
       if (!shakuPitch) {
         throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(abcPitch));
       }

@@ -1,14 +1,15 @@
 /**
- * ABC Notation Pitch Mapping Constants
+ * ABC Notation Pitch Spelling
  *
- * Maps ABC pitch notation to shakuhachi fingerings for Kinko style notation.
- * This mapping is specific to D shakuhachi (1.8 shaku).
+ * Converts between ABC pitch notation and written Western notes. Which
+ * fingering a note gets is decided by the shared pitch table in
+ * kinko-pitch-map.ts, the same one MusicXML uses.
  *
  * ABC Notation Octave System:
  * - Uppercase letters (C-B) = octave 4 (middle C to B4)
  * - Lowercase letters (c-b) = octave 5 (C5 to B5)
  * - Apostrophe after lowercase (c', d') = octave 6+
- * - Comma before uppercase (,C, ,D) = octave 3 and below
+ * - Comma after uppercase (C, D,) = octave 3 and below
  *
  * ABC Accidentals:
  * - ^ (sharp) raises pitch by half step
@@ -17,163 +18,48 @@
  * - __ (double flat) lowers pitch by whole step
  * - = (natural) cancels previous accidentals
  *
- * D Shakuhachi Base Mapping (K:D):
- * - D → ro (ロ)
- * - E → (tsu chu-meri)
- * - F → tsu (ツ)
- * - G → re (レ)
- * - A → chi (チ)
- * - B → ri (リ) chu-meri
- * - C → ri (リ)
+ * Key signatures are not applied: "F" is always F natural.
  */
 
-import type { MeriKari, PitchStep } from '../types/ScoreData';
+import type { NoteLetter, WrittenPitch } from './kinko-pitch-map';
 
-export interface ABCPitchMapping {
-  step: PitchStep;
-  octave: number;
-  meriKari?: MeriKari;
-}
-
-/**
- * Comprehensive ABC to Kinko pitch mapping for D shakuhachi
- * Maps ABC notation (e.g., "D", "^d", "d'") to shakuhachi fingerings
- */
-export const ABC_TO_KINKO_MAP: Record<string, ABCPitchMapping> = {
-  // ============================================================
-  // OTSU REGISTER (Lower Octave) - Uppercase letters (D4-C5)
-  // ============================================================
-
-  // Ro (ロ) - D4 base note
-  C: { step: 'ro', octave: 0, meriKari: 'dai-meri' }, // ro dai-meri (大メ)
-  '^C': { step: 'ro', octave: 0, meriKari: 'meri' }, // ro meri (メ)
-  _D: { step: 'ro', octave: 0, meriKari: 'meri' }, // ro meri (メ)
-  '=D': { step: 'ro', octave: 0 }, // ro (ロ) - natural
-  D: { step: 'ro', octave: 0 }, // ro (ロ) - fundamental note
-
-  // Tsu (ツ) - F4 base note
-  '^D': { step: 'tsu', octave: 0, meriKari: 'meri' }, // tsu meri (ツメ)
-  _E: { step: 'tsu', octave: 0, meriKari: 'meri' }, // tsu meri (ツメ)
-  E: { step: 'tsu', octave: 0, meriKari: 'chu-meri' }, // tsu chu-meri (ツ中メ)
-  '=F': { step: 'tsu', octave: 0 }, // tsu (ツ) - natural
-  F: { step: 'tsu', octave: 0 }, // tsu (ツ)
-
-  // Re (レ) - G4 base note
-  '^F': { step: 're', octave: 0, meriKari: 'meri' }, // re meri (レメ)
-  _G: { step: 're', octave: 0, meriKari: 'meri' }, // re meri (レメ)
-  '=G': { step: 're', octave: 0 }, // re (レ) - natural
-  G: { step: 're', octave: 0 }, // re (レ)
-
-  // U/Chi (ウ/チ) - G#4/A4 base notes
-  '^G': { step: 'u', octave: 0 }, // u (ウ) - also called "chi meri"
-  _A: { step: 'u', octave: 0 }, // u (ウ)
-  '=A': { step: 'chi', octave: 0 }, // chi (チ) - natural
-  A: { step: 'chi', octave: 0 }, // chi (チ)
-  '^A': { step: 'chi', octave: 0, meriKari: 'meri' }, // chi meri (チメ)
-  _B: { step: 'chi', octave: 0, meriKari: 'meri' }, // chi meri (チメ)
-
-  // Ri (リ) - C5 base note
-  '=B': { step: 'ri', octave: 0, meriKari: 'chu-meri' }, // ri chu-meri (リ中メ) - natural
-  B: { step: 'ri', octave: 0, meriKari: 'chu-meri' }, // ri chu-meri (リ中メ)
-
-  // ============================================================
-  // KAN REGISTER (Middle Octave) - Lowercase letters (D5-C6)
-  // ============================================================
-
-  // c5 is at the end of otsu register
-  '=c': { step: 'ri', octave: 0 }, // ri (リ) - natural
-  c: { step: 'ri', octave: 0 }, // ri (リ)
-
-  // Ro kan (ロ甲) - D5 base note
-  '^c': { step: 'ro', octave: 1, meriKari: 'meri' }, // ro meri kan
-  _d: { step: 'ro', octave: 1, meriKari: 'meri' }, // ro meri kan
-  '=d': { step: 'ro', octave: 1 }, // ro kan (ロ甲) - natural
-  d: { step: 'ro', octave: 1 }, // ro kan (ロ甲)
-
-  // Tsu kan (ツ甲) - F5 base note
-  '^d': { step: 'tsu', octave: 1, meriKari: 'meri' }, // tsu meri kan
-  _e: { step: 'tsu', octave: 1, meriKari: 'meri' }, // tsu meri kan
-  e: { step: 'tsu', octave: 1, meriKari: 'chu-meri' }, // tsu chu-meri kan
-  '=f': { step: 'tsu', octave: 1 }, // tsu kan (ツ甲) - natural
-  f: { step: 'tsu', octave: 1 }, // tsu kan (ツ甲)
-
-  // Re kan (レ甲) - G5 base note
-  '^f': { step: 're', octave: 1, meriKari: 'meri' }, // re meri kan
-  _g: { step: 're', octave: 1, meriKari: 'meri' }, // re meri kan
-  '=g': { step: 're', octave: 1 }, // re kan (レ甲) - natural
-  g: { step: 're', octave: 1 }, // re kan (レ甲)
-
-  // Chi kan (チ甲) - A5 base note
-  '^g': { step: 'chi', octave: 1, meriKari: 'meri' }, // chi meri kan
-  _a: { step: 'chi', octave: 1, meriKari: 'meri' }, // chi meri kan
-  '=a': { step: 'chi', octave: 1 }, // chi kan (チ甲) - natural
-  a: { step: 'chi', octave: 1 }, // chi kan (チ甲)
-  '^a': { step: 'chi', octave: 1, meriKari: 'chu-meri' }, // chi chu-meri kan
-  _b: { step: 'chi', octave: 1, meriKari: 'chu-meri' }, // chi chu-meri kan
-
-  // Ri/Hi kan (リ/ヒ甲) - B5/C6
-  '=b': { step: 'ri', octave: 1 }, // ri kan (リ甲) - natural
-  b: { step: 'ri', octave: 1 }, // ri kan (リ甲)
-
-  // ============================================================
-  // DAI-KAN REGISTER (Upper Octave) - Apostrophe notation (D6+)
-  // ============================================================
-
-  // Hi kan (ヒ甲) - C6
-  "=c'": { step: 'hi', octave: 1 }, // hi kan (ヒ甲) - natural
-  "c'": { step: 'hi', octave: 1 }, // hi kan (ヒ甲)
-
-  // Ro dai-kan (ロ大甲) - D6
-  "^c'": { step: 'ro', octave: 2, meriKari: 'meri' }, // ro meri dai-kan
-  "_d'": { step: 'ro', octave: 2, meriKari: 'meri' }, // ro meri dai-kan
-  "=d'": { step: 'ro', octave: 2 }, // ro dai-kan (ロ大甲) - natural
-  "d'": { step: 'ro', octave: 2 }, // ro dai-kan (ロ大甲)
-
-  // Tsu dai-kan (ツ大甲) - F6
-  "^d'": { step: 'tsu', octave: 2, meriKari: 'meri' }, // tsu meri dai-kan
-  "_e'": { step: 'tsu', octave: 2, meriKari: 'meri' }, // tsu meri dai-kan
-  "e'": { step: 'tsu', octave: 2, meriKari: 'chu-meri' }, // tsu chu-meri dai-kan
-  "=f'": { step: 'tsu', octave: 2 }, // tsu dai-kan (ツ大甲) - natural
-  "f'": { step: 'tsu', octave: 2 }, // tsu dai-kan (ツ大甲)
-
-  // Re dai-kan (レ大甲) - G6
-  "^f'": { step: 're', octave: 2, meriKari: 'meri' }, // re meri dai-kan
-  "_g'": { step: 're', octave: 2, meriKari: 'meri' }, // re meri dai-kan
-  "=g'": { step: 're', octave: 2 }, // re dai-kan (レ大甲) - natural
-  "g'": { step: 're', octave: 2 }, // re dai-kan (レ大甲)
-
-  // Chi dai-kan (チ大甲) - A6
-  "^g'": { step: 'chi', octave: 2, meriKari: 'meri' }, // chi meri dai-kan
-  "_a'": { step: 'chi', octave: 2, meriKari: 'meri' }, // chi meri dai-kan
-  "=a'": { step: 'chi', octave: 2 }, // chi dai-kan (チ大甲) - natural
-  "a'": { step: 'chi', octave: 2 }, // chi dai-kan (チ大甲)
-
-  // Hi dai-kan (ヒ大甲) - B6 (upper limit)
-  "^a'": { step: 'hi', octave: 2, meriKari: 'meri' }, // hi meri dai-kan
-  "_b'": { step: 'hi', octave: 2, meriKari: 'meri' }, // hi meri dai-kan
-  "=b'": { step: 'hi', octave: 2 }, // hi dai-kan (ヒ大甲) - natural
-  "b'": { step: 'hi', octave: 2 }, // hi dai-kan (ヒ大甲)
+const ACCIDENTAL_ALTER: Record<string, number> = {
+  '': 0,
+  '=': 0,
+  '^': 1,
+  '^^': 2,
+  _: -1,
+  __: -2,
 };
 
 /**
- * Create reverse mapping for serialization (shakuhachi → ABC)
- * Returns a map from "step-octave-meriKari" to ABC notation
+ * Reads an ABC pitch from its parts, e.g. ("^", "c", "'") → C#6.
+ * Undefined when the accidental is not one ABC defines.
  */
-export function createReverseABCMap(): Map<string, string> {
-  const reverseMap = new Map<string, string>();
-
-  for (const [abcPitch, mapping] of Object.entries(ABC_TO_KINKO_MAP)) {
-    // Create key from mapping properties
-    const key = `${mapping.step}-${mapping.octave}-${mapping.meriKari ?? ''}`;
-
-    // Prefer shorter notation (without accidentals/naturals) when multiple options exist
-    if (
-      !reverseMap.has(key) ||
-      abcPitch.length < (reverseMap.get(key)?.length || Infinity)
-    ) {
-      reverseMap.set(key, abcPitch);
-    }
+export function parseABCPitch(
+  accidental: string,
+  letter: string,
+  octaveMarks: string,
+): WrittenPitch | undefined {
+  const alter = ACCIDENTAL_ALTER[accidental];
+  if (alter === undefined) {
+    return undefined;
   }
+  const isLower = letter === letter.toLowerCase();
+  const ups = octaveMarks.split("'").length - 1;
+  const downs = octaveMarks.split(',').length - 1;
+  return {
+    letter: letter.toUpperCase() as NoteLetter,
+    alter,
+    octave: (isLower ? 5 : 4) + ups - downs,
+  };
+}
 
-  return reverseMap;
+/** Writes a note as ABC, e.g. C#6 → "^c'" */
+export function toABCPitch({ letter, alter, octave }: WrittenPitch): string {
+  const accidental = alter > 0 ? '^'.repeat(alter) : '_'.repeat(-alter);
+  if (octave >= 5) {
+    return `${accidental}${letter.toLowerCase()}${"'".repeat(octave - 5)}`;
+  }
+  return `${accidental}${letter}${','.repeat(4 - octave)}`;
 }

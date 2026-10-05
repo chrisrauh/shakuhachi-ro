@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest';
 import { MusicXMLSerializer } from './MusicXMLSerializer';
 import { MusicXMLParser } from './MusicXMLParser';
-import type { ScoreData } from '../types/ScoreData';
+import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
 
 describe('MusicXMLSerializer', () => {
   describe('serialize()', () => {
@@ -63,18 +64,62 @@ describe('MusicXMLSerializer', () => {
       expect(xml).toContain('<octave>6</octave>');
     });
 
-    it('should serialize notes with meri as altered pitches', () => {
+    it('should write each fingering as its note in the pitch table', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meriKari: 'meri' }, // F4 meri → E4 (alter -1)
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meriKari: 'meri' }, // D#4
+          {
+            pitch: { step: 'tsu', octave: 0 },
+            duration: 1,
+            meriKari: 'chu-meri',
+          }, // E4
         ],
       };
 
-      const xml = MusicXMLSerializer.serialize(scoreData);
+      const pitches = [
+        ...MusicXMLSerializer.serialize(scoreData).matchAll(
+          /<pitch>([\s\S]*?)<\/pitch>/g,
+        ),
+      ].map((m) => m[1].replace(/\s+/g, ''));
 
-      expect(xml).toContain('<alter>-1</alter>');
+      expect(pitches).toEqual([
+        '<step>D</step><alter>1</alter><octave>4</octave>',
+        '<step>E</step><octave>4</octave>',
+      ]);
+    });
+
+    it('should fail on a fingering the pitch table has no note for', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ri', octave: 0 }, duration: 1, meriKari: 'meri' },
+        ],
+      };
+
+      expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
+        'ri meri in octave 0',
+      );
+    });
+
+    it('should round-trip every fingering in the pitch table exactly', () => {
+      const notes: ScoreNote[] = Object.values(KINKO_PITCH_MAP).map(
+        ({ step, octave, meriKari }) => ({
+          pitch: { step, octave },
+          duration: 1,
+          ...(meriKari && { meriKari }),
+        }),
+      );
+
+      const xml = MusicXMLSerializer.serialize({
+        title: 'Every fingering',
+        style: 'kinko',
+        notes,
+      });
+
+      expect(MusicXMLParser.parse(xml).notes).toEqual(notes);
     });
 
     it('should serialize rests', () => {

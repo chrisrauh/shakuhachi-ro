@@ -6,7 +6,8 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { createReverseABCMap } from '../constants/abc-pitch-map';
+import { toABCPitch } from '../constants/abc-pitch-map';
+import { pitchForFingering } from '../constants/kinko-pitch-map';
 
 export class ABCSerializer {
   /**
@@ -75,7 +76,6 @@ export class ABCSerializer {
    * Serialize notes array to ABC notation string
    */
   private static serializeNotes(notes: ScoreNote[]): string {
-    const reverseMap = createReverseABCMap();
     const abcNotes: string[] = [];
 
     for (const note of notes) {
@@ -84,23 +84,17 @@ export class ABCSerializer {
         const durationStr = this.formatDuration(note.duration);
         abcNotes.push(`z${durationStr}`);
       } else if (note.pitch) {
-        // Build key for reverse map lookup
-        const key = `${note.pitch.step}-${note.pitch.octave}-${note.meriKari ?? ''}`;
-
-        // Find ABC pitch notation
-        let abcPitch = reverseMap.get(key);
-
-        if (!abcPitch) {
-          // Fallback: construct basic ABC pitch without meri
-          const baseKey = `${note.pitch.step}-${note.pitch.octave}-`;
-          abcPitch = reverseMap.get(baseKey);
-
-          if (!abcPitch) {
-            throw new Error(
-              `Cannot serialize pitch: ${note.pitch.step} octave ${note.pitch.octave}`,
-            );
-          }
+        // A fingering the table has no note for falls back to its plain
+        // fingering, dropping the meri
+        const written =
+          pitchForFingering({ ...note.pitch, meriKari: note.meriKari }) ??
+          pitchForFingering(note.pitch);
+        if (!written) {
+          throw new Error(
+            `Cannot serialize pitch: ${note.pitch.step} octave ${note.pitch.octave}`,
+          );
         }
+        const abcPitch = toABCPitch(written);
 
         // A dot is written as the sounding length (a dotted 1 is 3/2), not as
         // >, which in ABC is broken rhythm and would also halve the next note

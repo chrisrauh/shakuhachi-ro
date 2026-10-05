@@ -6,7 +6,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
+import { fingeringForPitch, isNoteLetter } from '../constants/kinko-pitch-map';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /**
@@ -24,6 +24,12 @@ function toBaseDuration(
 ): number {
   const sounding = raw / divisions;
   return dotted ? sounding / 1.5 : sounding;
+}
+
+/** Writes an alter as accidentals for messages: 1 → "#", -2 → "bb" */
+function alterSign(alter: number): string {
+  if (!Number.isInteger(alter)) return ` (alter ${alter})`;
+  return alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
 }
 
 export class MusicXMLParser {
@@ -88,18 +94,26 @@ export class MusicXMLParser {
         return;
       }
 
-      const step = pitchElement.querySelector('step')?.textContent || '';
-      const octave = pitchElement.querySelector('octave')?.textContent || '4';
-      // const alter = pitchElement.querySelector('alter')?.textContent || '0'; // TODO: Use for accidentals
+      const step = pitchElement.querySelector('step')?.textContent?.trim();
+      const octave = Number(
+        pitchElement.querySelector('octave')?.textContent ?? '4',
+      );
+      const alter = Number(
+        pitchElement.querySelector('alter')?.textContent ?? '0',
+      );
 
-      // Build pitch name (e.g., "D4", "G5")
-      const pitchName = `${step}${octave}`;
-
-      // Map to shakuhachi notation
-      const shakuPitch = KINKO_PITCH_MAP[pitchName];
+      // A note the table has no fingering for fails the import rather than
+      // being dropped, which would change the piece without telling anyone
+      const shakuPitch = isNoteLetter(step)
+        ? fingeringForPitch({ letter: step, alter, octave })
+        : undefined;
       if (!shakuPitch) {
-        console.warn(`Unknown pitch: ${pitchName}, skipping`);
-        return;
+        throw new Error(
+          PARSER_STRINGS.ERRORS.MusicXMLParser.unknownPitch(
+            i,
+            `${step ?? ''}${alterSign(alter)}${octave}`,
+          ),
+        );
       }
 
       // Create note

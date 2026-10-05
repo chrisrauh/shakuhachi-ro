@@ -76,8 +76,15 @@ export const PARSER_STRINGS = {
     },
 
     MusicXMLParser: {
+      unknownPitch: (index: number, pitch: string) =>
+        `Note ${index + 1} (${pitch}) has no shakuhachi fingering in the pitch table`,
       loadFailed: (statusText: string) =>
         `Failed to load MusicXML file: ${statusText}`,
+    },
+
+    MusicXMLSerializer: {
+      unknownFingering: (step: string, octave: number, meriKari?: string) =>
+        `${[step, meriKari].filter(Boolean).join(' ')} in octave ${octave} has no Western note in the pitch table`,
     },
   },
 } as const;

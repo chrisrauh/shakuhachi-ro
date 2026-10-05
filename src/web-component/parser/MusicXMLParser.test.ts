@@ -27,6 +27,13 @@ function makeXML(
 </score-partwise>`;
 }
 
+function makeAlteredNote(step: string, alter: number, octave: number): string {
+  return `<note>
+    <pitch><step>${step}</step><alter>${alter}</alter><octave>${octave}</octave></pitch>
+    <duration>2</duration>
+  </note>`;
+}
+
 function makeNote(
   step: string,
   octave: number,
@@ -142,48 +149,44 @@ describe('MusicXMLParser', () => {
       warnSpy.mockRestore();
     });
 
-    it('should skip note with unknown pitch and call console.warn', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      // "Z9" is not in KINKO_PITCH_MAP
-      const xml = makeXML(makeNote('Z', 9));
+    it('should fail on a pitch the table has no fingering for, naming the note', () => {
+      const xml = makeXML(makeNote('D', 4) + makeNote('A', 3));
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(0);
-      expect(warnSpy).toHaveBeenCalledOnce();
-      expect(warnSpy.mock.calls[0][0]).toContain('Unknown pitch');
-
-      warnSpy.mockRestore();
+      expect(() => MusicXMLParser.parse(xml)).toThrow('Note 2 (A3)');
     });
 
-    it('should set dai-meri for a pitch that maps to dai-meri', () => {
-      // D#4 → tsu meri
-      // MusicXML encodes D# as step=D with an <alter>1</alter>
-      // But the parser builds pitchName from step+octave only → "D4" → ro
-      // So use a pitch that maps directly without alter: C#4 = ro meri
-      // The parser uses step+octave, no alter handling yet → use Db4
-      // But "Db4" would require step=D+alter=-1 which parser doesn't combine.
-      // Instead, use step=C, octave=4 → "C4" → ro dai-meri
-      const xml = makeXML(makeNote('C', 4));
+    it('should fail on a quarter-tone alter rather than round it', () => {
+      const xml = makeXML(makeAlteredNote('D', -0.5, 4));
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(1);
-      expect(score.notes[0].pitch?.step).toBe('ro');
-      expect(score.notes[0].meriKari).toBe('dai-meri');
+      expect(() => MusicXMLParser.parse(xml)).toThrow('alter -0.5');
     });
 
-    it('should set chu-meri for a pitch with a chu-meri mapping', () => {
-      // F#4 → re meri. Parser builds "F4" → tsu, "G4" → re.
-      // There's no direct single-step meri without alter in standard note names.
-      // Use E4 → tsu chu-meri (step=E, octave=4 → "E4" in KINKO_PITCH_MAP)
-      const xml = makeXML(makeNote('E', 4));
+    it('should read sharps and flats through the pitch table', () => {
+      const xml = makeXML(
+        makeAlteredNote('F', 1, 4) + // F#4 → re meri
+          makeAlteredNote('B', -1, 4) + // Bb4 → chi meri
+          makeAlteredNote('D', 1, 4) + // D#4 → tsu meri
+          makeNote('C', 4), // C4 → ro dai-meri
+      );
 
-      const score = MusicXMLParser.parse(xml);
+      const fingerings = MusicXMLParser.parse(xml).notes.map((n) => [
+        n.pitch?.step,
+        n.meriKari,
+      ]);
 
-      expect(score.notes).toHaveLength(1);
-      expect(score.notes[0].pitch?.step).toBe('tsu');
-      expect(score.notes[0].meriKari).toBe('chu-meri');
+      expect(fingerings).toEqual([
+        ['re', 'meri'],
+        ['chi', 'meri'],
+        ['tsu', 'meri'],
+        ['ro', 'dai-meri'],
+      ]);
+    });
+
+    it('should give enharmonic spellings the same fingering', () => {
+      const sharp = MusicXMLParser.parse(makeXML(makeAlteredNote('F', 1, 4)));
+      const flat = MusicXMLParser.parse(makeXML(makeAlteredNote('G', -1, 4)));
+
+      expect(flat.notes).toEqual(sharp.notes);
     });
 
     it('should default title to "Untitled" when <work-title> is missing', () => {
