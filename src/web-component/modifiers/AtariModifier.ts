@@ -12,7 +12,7 @@
  */
 
 import { Modifier, type ModifierPosition } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 export type AtariStyle = 'arrow' | 'chevron' | 'dot';
 
@@ -66,11 +66,11 @@ export class AtariModifier extends Modifier {
   /**
    * Renders the atari mark
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
 
@@ -91,7 +91,7 @@ export class AtariModifier extends Modifier {
    * Renders an arrow pointing at the note
    * Visual: →
    */
-  private renderArrow(renderer: SVGRenderer, x: number, y: number): void {
+  private renderArrow(renderer: RenderingBackend, x: number, y: number): void {
     const halfSize = this.size / 2;
 
     // Arrow pointing right (toward note if on left side)
@@ -121,7 +121,11 @@ export class AtariModifier extends Modifier {
    * Renders a simple chevron/angle bracket
    * Visual: >
    */
-  private renderChevron(renderer: SVGRenderer, x: number, y: number): void {
+  private renderChevron(
+    renderer: RenderingBackend,
+    x: number,
+    y: number,
+  ): void {
     const halfSize = this.size / 2;
 
     // Two lines forming > shape
@@ -147,7 +151,7 @@ export class AtariModifier extends Modifier {
    * Renders a solid dot (alternative style)
    * Visual: ●
    */
-  private renderDot(renderer: SVGRenderer, x: number, y: number): void {
+  private renderDot(renderer: RenderingBackend, x: number, y: number): void {
     renderer.drawCircle(x, y, this.size / 2, this.color);
   }
 

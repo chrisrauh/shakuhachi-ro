@@ -5,13 +5,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { MeriKariModifier } from './MeriKariModifier';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 describe('MeriKariModifier', () => {
   it('should render with the default render options when not configured', () => {
     const drawText = vi.fn();
     new MeriKariModifier('meri').render(
-      { drawText } as unknown as SVGRenderer,
+      { drawText } as unknown as RenderingBackend,
       0,
       0,
     );

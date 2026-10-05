@@ -14,7 +14,7 @@
  */
 
 import { Modifier } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 /**
@@ -130,11 +130,11 @@ export class DurationLineModifier extends Modifier {
    * Lines extend downward from each note and connect when consecutive
    * notes both have duration lines.
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const startX = noteX + this.offsetX;
     const startY = noteY + this.offsetY;
 

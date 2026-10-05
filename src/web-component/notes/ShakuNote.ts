@@ -8,7 +8,7 @@
  * themselves and manage their modifiers.
  */
 
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Modifier } from '../modifiers/Modifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import {
@@ -142,9 +142,9 @@ export class ShakuNote {
   /**
    * Renders the note and all its modifiers
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    */
-  render(renderer: SVGRenderer): void {
+  render(renderer: RenderingBackend): void {
     if (this.isRest) {
       // Draw rest as a small hollow circle
       // Radius is about 1/8 of fontSize (for fontSize 32, radius ~4px)

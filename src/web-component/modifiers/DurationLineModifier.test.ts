@@ -5,12 +5,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { DurationLineModifier } from './DurationLineModifier';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 /** Renders the modifier at (100, 200) and returns each drawLine call */
 function drawnLines(modifier: DurationLineModifier) {
   const drawLine = vi.fn();
-  modifier.render({ drawLine } as unknown as SVGRenderer, 100, 200);
+  modifier.render({ drawLine } as unknown as RenderingBackend, 100, 200);
   return drawLine.mock.calls.map(([x1, y1, x2, y2, , width]) => ({
     x1,
     y1,
