@@ -121,6 +121,18 @@
           <div class="score-container" id="score-dark-2"></div>
         </div>
       </div>
+
+      <!-- Example 4: Octave marks -->
+      <div class="example-row">
+        <div class="example-column light">
+          <h3>4. Octave marks (乙 甲 大甲, with and without duration lines)</h3>
+          <div class="score-container" id="score-light-3"></div>
+        </div>
+        <div class="example-column dark">
+          <h3>4. Octave marks (乙 甲 大甲, with and without duration lines)</h3>
+          <div class="score-container" id="score-dark-3"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Load the built web component bundle -->
@@ -202,6 +214,25 @@
             { pitch: { step: 'ro', octave: 0 }, duration: 2 },
           ],
         },
+
+        // 4. Octave marks: every register (大甲 stacked vertically), on notes
+        // with no duration line, one line and two lines
+        {
+          title: 'Octave Marks',
+          style: 'kinko',
+          notes: [
+            { pitch: { step: 're', octave: 2 }, duration: 1 }, // 大甲, line, first note
+            { pitch: { step: 'ro', octave: 0 }, duration: 1 }, // 乙, line
+            { pitch: { step: 'tsu', octave: 0 }, duration: 2 }, // no mark
+            { pitch: { step: 'ri', octave: 1 }, duration: 2 }, // 甲, no line
+            { pitch: { step: 'ro', octave: 0 }, duration: 2 }, // 乙, no line
+            { pitch: { step: 'chi', octave: 2 }, duration: 2 }, // 大甲, no line
+            { pitch: { step: 'tsu', octave: 1 }, duration: 0.5 }, // 甲, two lines
+            { pitch: { step: 're', octave: 1 }, duration: 0.5 },
+            { pitch: { step: 'ro', octave: 0 }, dotted: true, duration: 1 }, // 乙, line
+            { pitch: { step: 'ro', octave: 0 }, duration: 4 },
+          ],
+        },
       ];
 
       // Render web components after DOM loads
@@ -212,8 +243,8 @@
           const component = document.createElement('shakuhachi-score');
           component.setAttribute('data-score', JSON.stringify(scoreData));
 
-          // Examples 1 and 2: single column with intrinsic height
-          if (i === 0 || i === 1) {
+          // Examples 1, 2 and 4: single column with intrinsic height
+          if (i !== 2) {
             component.setAttribute('columns', '1');
           }
 
@@ -234,8 +265,8 @@
           component.setAttribute('data-score', JSON.stringify(scoreData));
           component.style.setProperty('--shakuhachi-note-color', '#fff');
 
-          // Examples 1 and 2: single column with intrinsic height
-          if (i === 0 || i === 1) {
+          // Examples 1, 2 and 4: single column with intrinsic height
+          if (i !== 2) {
             component.setAttribute('columns', '1');
           }
 

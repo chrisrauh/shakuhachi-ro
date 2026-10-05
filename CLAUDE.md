@@ -350,6 +350,12 @@ When testing authenticated features (score editor, creating scores, forking):
 - Title is **"A Very Long Score Title That Will Definitely Wrap Across Multiple Lines on Mobile"**. This is deliberate: it exercises title wrapping in the header. Seeing it in a page snapshot means you are on the right score, not the wrong one.
 - Format is **MusicXML**, not JSON. Three notes — D4, F4, G4, rendering as ro, tsu, re. Switch the format radio to convert if you need JSON or ABC.
 
+**Test Score for Octave Marks:**
+
+- Slug `evening-morning-bell` (a leftover auto-generated name), titled **"Test: Octave Marks"**, owned by the test account, JSON
+- A scale from ro to kan ro, then 乙, 甲 and 大甲 on notes with no duration line, one line and two lines, plus a dotted note. The same notes as example 4 on `/test/shakuhachi-score.html`
+- No visual test screenshots it yet; see #422
+
 **Auth Verification Checklist (after auth-related changes):**
 
 - Login and logout work end-to-end

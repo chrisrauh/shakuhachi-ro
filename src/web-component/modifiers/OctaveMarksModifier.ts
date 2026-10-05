@@ -8,8 +8,10 @@
  * Visual representation:
  * - 乙 (otsu) - indicates note is in base register (when unexpected)
  * - 甲 (kan) - indicates note is in upper register (when unexpected)
+ * - 大甲 (daikan) - indicates note is in the top register (when unexpected)
  *
- * Position: Top-right of note character (initially; 8-position system planned)
+ * Position: Top-right of note character. A two-character mark (大甲) is
+ * stacked vertically, like the notation itself.
  *
  * Following VexFlow's Modifier pattern - positions itself relative to note.
  */
@@ -40,7 +42,7 @@ export class OctaveMarksModifier extends Modifier {
   private static readonly registerSymbols: Record<OctaveRegister, string> = {
     otsu: '乙',
     kan: '甲',
-    daikan: '大甲', // Future: daikan support
+    daikan: '大甲',
   };
 
   /**
@@ -76,18 +78,23 @@ export class OctaveMarksModifier extends Modifier {
   render(renderer: SVGRenderer, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
-    const symbol = OctaveMarksModifier.registerSymbols[this.register];
+    const chars = [...OctaveMarksModifier.registerSymbols[this.register]];
 
-    renderer.drawText(
-      symbol,
-      x,
-      y,
-      this.fontSize,
-      this.fontFamily,
-      this.color,
-      'middle',
-      this.fontWeight,
-    );
+    // The first character takes the single-character position and the rest
+    // stack below it, so 大甲 reads top to bottom and reaches no higher than
+    // 乙 or 甲 (DEFAULT_RENDER_OPTIONS.topMargin only clears one character)
+    chars.forEach((char, i) => {
+      renderer.drawText(
+        char,
+        x,
+        y + i * this.fontSize,
+        this.fontSize,
+        this.fontFamily,
+        this.color,
+        'middle',
+        this.fontWeight,
+      );
+    });
   }
 
   /**

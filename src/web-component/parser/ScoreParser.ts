@@ -8,13 +8,19 @@
  */
 
 import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
-import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
+import {
+  OctaveMarksModifier,
+  type OctaveRegister,
+} from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import { MERI_KARI, type ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
+
+/** Register for each `pitch.octave` value validate() accepts: 0, 1, 2 */
+const OCTAVE_REGISTERS: readonly OctaveRegister[] = ['otsu', 'kan', 'daikan'];
 
 /**
  * Maps numeric duration to NoteDuration
@@ -133,8 +139,9 @@ export class ScoreParser {
 
       // Add octave mark only if needed (violates closest-note rule)
       if (needsOctaveMark) {
-        const octaveType = note.pitch.octave === 0 ? 'otsu' : 'kan';
-        const octaveModifier = new OctaveMarksModifier(octaveType);
+        const octaveModifier = new OctaveMarksModifier(
+          OCTAVE_REGISTERS[note.pitch.octave],
+        );
         shakuNote.addModifier(octaveModifier);
       }
 
