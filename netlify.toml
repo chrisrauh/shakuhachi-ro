@@ -11,3 +11,10 @@
 
 [build]
   command = "npm run build"
+  # Skip the build when only files that never ship changed since the last
+  # deploy: docs, tests, agent instructions and database migrations. This saves
+  # build minutes on docs-only and test-only merges and PR pushes. Netlify skips
+  # when this exits 0. Anything outside the list, or a missing previous commit
+  # (git diff then errors), builds as normal. Pages live in src/content, so .md
+  # and .mdx are deliberately not excluded by extension.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude)tests' ':(exclude).claude' ':(exclude)database' ':(exclude)CLAUDE.md' ':(exclude)README.md' ':(exclude,glob)**/*.test.ts'"
