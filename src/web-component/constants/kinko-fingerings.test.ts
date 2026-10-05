@@ -42,7 +42,8 @@ const named = FINGERINGS.flatMap((f) => (f.written ? [f.written] : []));
 
 describe('fingering table', () => {
   it("lists Koga's 84 fingerings, in order, with five holes each", () => {
-    expect(FINGERINGS.map((f) => f.koga)).toEqual(
+    const koga = FINGERINGS.filter((f) => f.koga !== undefined);
+    expect(koga.map((f) => f.koga)).toEqual(
       Array.from({ length: 84 }, (_, i) => i + 1),
     );
     for (const { holes } of FINGERINGS) {
@@ -59,6 +60,12 @@ describe('fingering table', () => {
       (pitch) => !defaultFingering(parseTablePitch(pitch)),
     );
     expect(missing).toEqual(['C#7']);
+  });
+
+  it('says where every row that is not from Koga comes from', () => {
+    for (const f of FINGERINGS) {
+      if (f.koga === undefined) expect(f.source).toBeTruthy();
+    }
   });
 
   it('marks only named fingerings as defaults', () => {

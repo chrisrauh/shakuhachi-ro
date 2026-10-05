@@ -121,6 +121,15 @@ All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), chec
 | 83 | D7 | ●○○●● | ハ ha (大甲) | neutral (name) | The note has no accidental |
 | 84 | D7 | ○○○○○ | — | ? | |
 
+## Added from other charts
+
+The fingering table (`src/web-component/constants/kinko-fingerings.ts`) adds these where Koga gives no name:
+
+| Pitch | Holes 5·4·3·2·1 | Name | Chin | Source |
+|---|---|---|---|---|
+| G♭6 | ●●●●○ | レメ re meri (大甲) | meri | Nyokai-An; the holes of Koga's #76 |
+| C♯4 | ●●●●● | ロ中 ro chu-meri | chu-meri | Nyokai-An. Not the import default: Koga calls this pitch ro meri (#2) |
+
 ## Names on page 109 not yet placed
 
 - **ヨン五ハ yon go no ha.** Nyokai-An gives it ○○●●● at D, which is #36's holes, but #36 is under E♭5. Unplaced.
