@@ -3,7 +3,7 @@
  *
  * Converts between ABC pitch notation and written Western notes. Which
  * fingering a note gets is decided by the shared pitch table in
- * kinko-pitch-map.ts, the same one MusicXML uses.
+ * kinko-fingerings.ts, the same one MusicXML uses.
  *
  * ABC Notation Octave System:
  * - Uppercase letters (C-B) = octave 4 (middle C to B4)
@@ -21,7 +21,7 @@
  * Key signatures are not applied: "F" is always F natural.
  */
 
-import type { NoteLetter, WrittenPitch } from './kinko-pitch-map';
+import type { NoteLetter, WrittenPitch } from './kinko-fingerings';
 
 const ACCIDENTAL_ALTER: Record<string, number> = {
   '': 0,

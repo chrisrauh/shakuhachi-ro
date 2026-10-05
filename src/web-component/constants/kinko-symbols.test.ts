@@ -8,17 +8,11 @@ import {
   pitchToMidi,
   getNoteMidi,
 } from './kinko-symbols';
+import { PITCH_STEPS } from '../types/ScoreData';
 
 describe('kinkoMap', () => {
-  it('contains all 7 base shakuhachi notes', () => {
-    const notes = Object.keys(kinkoMap);
-    expect(notes).toContain('ro');
-    expect(notes).toContain('tsu');
-    expect(notes).toContain('re');
-    expect(notes).toContain('chi');
-    expect(notes).toContain('ri');
-    expect(notes).toContain('u');
-    expect(notes).toContain('hi');
+  it('has a symbol for every pitch step', () => {
+    expect(Object.keys(kinkoMap)).toEqual([...PITCH_STEPS]);
   });
 });
 

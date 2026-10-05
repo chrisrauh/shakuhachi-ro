@@ -8,9 +8,12 @@
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
+  fingeringName,
+  isDefaultFingering,
   pitchForFingering,
+  type WrittenFingering,
   type WrittenPitch,
-} from '../constants/kinko-pitch-map';
+} from '../constants/kinko-fingerings';
 
 /**
  * Divisions per quarter note.
@@ -87,9 +90,9 @@ export class MusicXMLSerializer {
     parts.push('      </attributes>');
 
     // Serialize notes
-    for (const note of scoreData.notes) {
-      parts.push(this.serializeNote(note));
-    }
+    scoreData.notes.forEach((note, index) => {
+      parts.push(this.serializeNote(note, index));
+    });
 
     parts.push('    </measure>');
     parts.push('  </part>');
@@ -101,17 +104,20 @@ export class MusicXMLSerializer {
   /**
    * Serialize a single note to MusicXML
    */
-  private static serializeNote(note: ScoreNote): string {
+  private static serializeNote(note: ScoreNote, index: number): string {
     const parts: string[] = [];
+    const fingering: WrittenFingering | undefined = note.pitch && {
+      ...note.pitch,
+      meriKari: note.meriKari,
+    };
 
     parts.push('      <note>');
 
     if (note.rest) {
       // Rest
       parts.push('        <rest/>');
-    } else if (note.pitch) {
-      // Convert shakuhachi pitch to Western pitch
-      const westernPitch = this.convertToWesternPitch(note);
+    } else if (fingering) {
+      const westernPitch = this.convertToWesternPitch(fingering, index);
 
       parts.push('        <pitch>');
       parts.push(`          <step>${westernPitch.letter}</step>`);
@@ -142,6 +148,19 @@ export class MusicXMLSerializer {
       parts.push('        <dot/>');
     }
 
+    // Several fingerings can share a pitch. One that import wouldn't choose
+    // for its pitch is named, so it reads back as itself. Other software
+    // shows <fingering> as text by the note.
+    if (fingering && !isDefaultFingering(fingering)) {
+      parts.push('        <notations>');
+      parts.push('          <technical>');
+      parts.push(
+        `            <fingering>${fingeringName(fingering)}</fingering>`,
+      );
+      parts.push('          </technical>');
+      parts.push('        </notations>');
+    }
+
     parts.push('      </note>');
 
     return parts.join('\n');
@@ -152,22 +171,18 @@ export class MusicXMLSerializer {
    * fingering the table has no note for fails rather than being written as a
    * nearby note, which would read back as a different fingering.
    */
-  private static convertToWesternPitch(note: ScoreNote): WrittenPitch {
-    if (!note.pitch) {
-      throw new Error('Cannot convert rest to Western pitch');
-    }
-
-    const written = pitchForFingering({
-      step: note.pitch.step,
-      octave: note.pitch.octave,
-      meriKari: note.meriKari,
-    });
+  private static convertToWesternPitch(
+    fingering: WrittenFingering,
+    index: number,
+  ): WrittenPitch {
+    const written = pitchForFingering(fingering);
     if (!written) {
       throw new Error(
-        PARSER_STRINGS.ERRORS.MusicXMLSerializer.unknownFingering(
-          note.pitch.step,
-          note.pitch.octave,
-          note.meriKari,
+        PARSER_STRINGS.ERRORS.Serializer.noWesternNote(
+          index,
+          fingeringName(fingering),
+          fingering.octave,
+          'MusicXML',
         ),
       );
     }

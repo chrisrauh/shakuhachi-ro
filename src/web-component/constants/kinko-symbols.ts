@@ -10,6 +10,8 @@
  * - Japanese Kana References: https://en.wikipedia.org/wiki/Ro_(kana), https://en.wikipedia.org/wiki/Tsu_(kana), etc.
  */
 
+import type { PitchStep } from '../types/ScoreData';
+
 /**
  * Octave range for shakuhachi
  * - otsu: Lower octave (fundamental)
@@ -31,113 +33,57 @@ export type Technique =
   | 'ori'; // Slide down
 
 /**
- * Fingering pattern (simplified - true = hole closed, false = hole open)
- * Holes from top to bottom: [1, 2, 3, 4, 5] (thumb is hole 5)
- */
-export type Fingering = [boolean, boolean, boolean, boolean, boolean];
-
-/**
- * Complete symbol definition for a shakuhachi note
+ * How a pitch step is written
  */
 export interface KinkoSymbol {
   /** Japanese kana character */
   kana: string;
 
+  /**
+   * Small numerals written beside the kana, naming the holes that make the
+   * fingering, e.g. 五 for go no hi (ヒ). Several are stacked, as for ハ in ni
+   * shi go no ha.
+   */
+  numerals?: string;
+
   /** Romanized name */
-  romaji: string;
+  romaji: PitchStep;
 
-  /** Western pitch equivalent (for reference) */
+  /**
+   * Western pitch in otsu (octave 0), for finding which octave a note is
+   * nearest to. Fingerings Koga lists only in kan are placed an octave below
+   * it. The fingering table has the pitch of each fingering.
+   */
   pitch: string;
-
-  /** Default octave */
-  defaultOctave: Octave;
-
-  /** Basic fingering pattern (otsu octave) */
-  fingering: Fingering;
-
-  /** Whether meri/kari alterations are commonly used */
-  canAlter: boolean;
-
-  /** Unicode code point (for reference) */
-  unicode: string;
 }
 
 /**
- * Basic Kinko-ryū note symbols
- *
- * The fundamental five notes (五音 go-on) of Kinko notation,
- * representing the D pentatonic scale on a standard 1.8 shakuhachi.
+ * Kinko-ryū pitch steps, keyed by romaji. See PITCH_STEPS.
  */
-export const kinkoMap: Record<string, KinkoSymbol> = {
-  ro: {
-    kana: 'ロ',
-    romaji: 'ro',
-    pitch: 'D4', // On 1.8 shakuhachi
-    defaultOctave: 'otsu',
-    fingering: [true, true, true, true, true], // All holes closed
-    canAlter: true,
-    unicode: 'U+30ED',
+export const kinkoMap: Record<PitchStep, KinkoSymbol> = {
+  ro: { kana: 'ロ', romaji: 'ro', pitch: 'D4' },
+  tsu: { kana: 'ツ', romaji: 'tsu', pitch: 'F4' },
+  re: { kana: 'レ', romaji: 're', pitch: 'G4' },
+  u: { kana: 'ウ', romaji: 'u', pitch: 'Ab4' },
+  chi: { kana: 'チ', romaji: 'chi', pitch: 'A4' },
+  ri: { kana: 'リ', romaji: 'ri', pitch: 'C5' },
+  hi: { kana: 'ヒ', romaji: 'hi', pitch: 'C5' },
+  ha: { kana: 'ハ', romaji: 'ha', pitch: 'D5' },
+  'go-no-hi': { kana: 'ヒ', numerals: '五', romaji: 'go-no-hi', pitch: 'D5' },
+  'go-no-ha': { kana: 'ハ', numerals: '五', romaji: 'go-no-ha', pitch: 'D5' },
+  'san-no-u': { kana: 'ウ', numerals: '三', romaji: 'san-no-u', pitch: 'Bb4' },
+  'san-no-ha': {
+    kana: 'ハ',
+    numerals: '三',
+    romaji: 'san-no-ha',
+    pitch: 'Eb5',
   },
-
-  tsu: {
-    kana: 'ツ',
-    romaji: 'tsu',
-    pitch: 'F4',
-    defaultOctave: 'otsu',
-    fingering: [true, true, true, true, false], // Bottom hole (thumb) open
-    canAlter: true,
-    unicode: 'U+30C4',
-  },
-
-  re: {
-    kana: 'レ',
-    romaji: 're',
-    pitch: 'G4',
-    defaultOctave: 'otsu',
-    fingering: [true, true, true, false, false], // Bottom two holes open
-    canAlter: true,
-    unicode: 'U+30EC',
-  },
-
-  chi: {
-    kana: 'チ',
-    romaji: 'chi',
-    pitch: 'A4',
-    defaultOctave: 'otsu',
-    fingering: [true, true, false, false, false], // Top two holes closed
-    canAlter: true,
-    unicode: 'U+30C1',
-  },
-
-  ri: {
-    kana: 'リ',
-    romaji: 'ri',
-    pitch: 'C5', // Note: sometimes B4 depending on fingering
-    defaultOctave: 'otsu',
-    fingering: [true, false, false, false, false], // Only top hole closed
-    canAlter: true,
-    unicode: 'U+30EA',
-  },
-
-  // Additional common notes
-  u: {
-    kana: 'ウ',
-    romaji: 'u',
-    pitch: 'C4', // Lower than ro
-    defaultOctave: 'otsu',
-    fingering: [true, true, true, true, true], // All closed + special embouchure
-    canAlter: false,
-    unicode: 'U+30A6',
-  },
-
-  hi: {
-    kana: 'ヒ',
-    romaji: 'hi',
-    pitch: 'E4',
-    defaultOctave: 'otsu',
-    fingering: [true, true, true, false, true],
-    canAlter: true,
-    unicode: 'U+30D2',
+  'shi-no-ha': { kana: 'ハ', numerals: '四', romaji: 'shi-no-ha', pitch: 'E5' },
+  'ni-shi-go-no-ha': {
+    kana: 'ハ',
+    numerals: '二四五',
+    romaji: 'ni-shi-go-no-ha',
+    pitch: 'Eb5',
   },
 };
 
@@ -159,7 +105,8 @@ export function getSymbolByKana(kana: string): KinkoSymbol | undefined {
  * Helper function to get symbol by romaji name
  */
 export function getSymbolByRomaji(romaji: string): KinkoSymbol | undefined {
-  return kinkoMap[romaji.toLowerCase()];
+  const key = romaji.toLowerCase();
+  return Object.hasOwn(kinkoMap, key) ? kinkoMap[key as PitchStep] : undefined;
 }
 
 /**

@@ -5,8 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { MusicXMLSerializer } from './MusicXMLSerializer';
 import { MusicXMLParser } from './MusicXMLParser';
-import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
+import type { ScoreData } from '../types/ScoreData';
 
 describe('MusicXMLSerializer', () => {
   describe('serialize()', () => {
@@ -52,7 +51,7 @@ describe('MusicXMLSerializer', () => {
         notes: [
           { pitch: { step: 'ro', octave: 0 }, duration: 1 }, // D4 (otsu)
           { pitch: { step: 'ro', octave: 1 }, duration: 1 }, // D5 (kan)
-          { pitch: { step: 'ro', octave: 2 }, duration: 1 }, // D6 (daikan)
+          { pitch: { step: 'tsu', octave: 2 }, duration: 1 }, // F6 (daikan)
         ],
       };
 
@@ -90,36 +89,34 @@ describe('MusicXMLSerializer', () => {
       ]);
     });
 
-    it('should fail on a fingering the pitch table has no note for', () => {
+    it('should fail on a fingering the table has no note for', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ri', octave: 0 }, duration: 1, meriKari: 'meri' },
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+          { pitch: { step: 'ri', octave: 1 }, duration: 1 },
         ],
       };
 
       expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
-        'ri meri in octave 0',
+        "Note 2: ri in kan has no Western note in the fingering table, so the score can't be converted to MusicXML",
       );
     });
 
-    it('should round-trip every fingering in the pitch table exactly', () => {
-      const notes: ScoreNote[] = Object.values(KINKO_PITCH_MAP).map(
-        ({ step, octave, meriKari }) => ({
-          pitch: { step, octave },
-          duration: 1,
-          ...(meriKari && { meriKari }),
-        }),
-      );
-
+    it('names a fingering that is not its pitch default', () => {
       const xml = MusicXMLSerializer.serialize({
-        title: 'Every fingering',
-        style: 'kinko',
-        notes,
+        title: 'Test',
+        notes: [
+          { pitch: { step: 'san-no-u', octave: 1 }, duration: 1 },
+          { pitch: { step: 'hi', octave: 1 }, duration: 1, meriKari: 'meri' },
+        ],
       });
 
-      expect(MusicXMLParser.parse(xml).notes).toEqual(notes);
+      // Both are B♭5; hi meri is the default, so only san no u is named
+      expect(xml.match(/<fingering>.*<\/fingering>/g)).toEqual([
+        '<fingering>san-no-u</fingering>',
+      ]);
     });
 
     it('should serialize rests', () => {

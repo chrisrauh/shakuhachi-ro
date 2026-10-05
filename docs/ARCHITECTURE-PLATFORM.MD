@@ -115,7 +115,7 @@ MusicXML ✓      ✓        -
 - `src/web-component/parser/ABCParser.ts` / `ABCSerializer.ts`
 - `src/web-component/parser/MusicXMLParser.ts` / `MusicXMLSerializer.ts`
 - `src/utils/format-converter.ts` — orchestrates all conversions
-- `src/web-component/constants/kinko-pitch-map.ts` — the one pitch table both MusicXML and ABC import and export read: Western note ↔ default fingering (D shakuhachi, Kinko). Notes are matched by sounding pitch, so any spelling of a note imports the same way. Importing a note outside the table, or exporting a fingering outside it to MusicXML, fails rather than changing the note (ABC export still falls back to the plain fingering). The defaults are under review in #423; change them here only.
+- `src/web-component/constants/kinko-fingerings.ts` — the fingering table both MusicXML and ABC import and export read (D shakuhachi, Kinko). It lists every fingering in Koga's chart, transcribed in `reference/fingering-charts/koga-inventory.md`, with its Western note, holes and chin position, and one default fingering per pitch for import. Notes are matched by sounding pitch, so any spelling of a note imports the same way. Export names a fingering that isn't its pitch's default (`<technical><fingering>` in MusicXML, a `!ri-meri!` decoration in ABC), and import prefers that name, so every listed fingering reads back exactly. Importing a note outside the table, or exporting a fingering outside it, fails rather than changing the note. The table is under review in #423; change it here only.
 - `src/web-component/constants/abc-pitch-map.ts` — ABC pitch spelling ↔ Western note
 
 **Editor UX:** Switching formats triggers automatic conversion. On failure, user is prompted to clear content or cancel.

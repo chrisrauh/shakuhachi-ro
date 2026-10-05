@@ -9,9 +9,29 @@
  */
 
 /**
- * Valid shakuhachi pitch steps (Kinko-ryū fingerings)
+ * Shakuhachi pitch steps (Kinko-ryū). Each names a written character: the five
+ * basic notes, u, hi and ha, and the fingerings Kinko writes with a small
+ * numeral beside the character, such as go no hi (ヒ with 五). Which pitch each
+ * gives, and how it is fingered, is in the fingering table
+ * (constants/kinko-fingerings.ts).
  */
-export type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';
+export const PITCH_STEPS = [
+  'ro',
+  'tsu',
+  're',
+  'u',
+  'chi',
+  'ri',
+  'hi',
+  'ha',
+  'go-no-hi',
+  'go-no-ha',
+  'san-no-u',
+  'san-no-ha',
+  'shi-no-ha',
+  'ni-shi-go-no-ha',
+] as const;
+export type PitchStep = (typeof PITCH_STEPS)[number];
 
 /**
  * Notation style
@@ -35,10 +55,19 @@ export interface Pitch {
  *
  * The exact pitch change varies with school, piece and player, so this names
  * the technique rather than an interval. Pitch that moves within a note (yuri,
- * ori, suri) is a separate technique, not a meri or kari. 'kari' will be added
- * when the renderer can draw it.
+ * ori, suri) is a separate technique, not a meri or kari.
+ *
+ * On a note, this is the mark the score writes. Some fingerings are played
+ * meri or kari without a mark (u, san no u); the fingering table records that.
  */
-export const MERI_KARI = ['dai-meri', 'meri', 'chu-meri'] as const;
+export const MERI_KARI = [
+  'dai-meri',
+  'meri',
+  'chu-meri',
+  'chu-kari',
+  'kari',
+  'dai-kari',
+] as const;
 export type MeriKari = (typeof MERI_KARI)[number];
 
 /**

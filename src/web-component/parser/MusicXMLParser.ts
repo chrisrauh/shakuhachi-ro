@@ -7,12 +7,13 @@
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import {
-  fingeringForPitch,
+  defaultFingering,
   isNoteLetter,
+  namedFingering,
   PITCH_RANGE,
   rangePosition,
   type WrittenPitch,
-} from '../constants/kinko-pitch-map';
+} from '../constants/kinko-fingerings';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /**
@@ -105,7 +106,7 @@ export class MusicXMLParser {
     // are counted so a score written in the wrong octave reads as such.
     const unplayable: string[] = [];
 
-    noteElements.forEach((noteElement, i) => {
+    noteElements.forEach((noteElement) => {
       const rawDuration = parseInt(
         noteElement.querySelector('duration')?.textContent || '1',
         10,
@@ -127,7 +128,7 @@ export class MusicXMLParser {
       // Extract pitch
       const pitchElement = noteElement.querySelector('pitch');
       if (!pitchElement) {
-        console.warn(`Skipping note at index ${i}: no <pitch> element`);
+        unplayable.push(MESSAGES.noPitch(locate(noteElement)));
         return;
       }
 
@@ -142,7 +143,16 @@ export class MusicXMLParser {
       const written = isNoteLetter(step)
         ? { letter: step, alter, octave }
         : undefined;
-      const shakuPitch = written && fingeringForPitch(written);
+      // A fingering our export named wins over the pitch's default. Other
+      // software's fingerings (finger numbers) don't match a name, and fall
+      // back to the default.
+      const named = noteElement
+        .querySelector('technical > fingering')
+        ?.textContent?.trim();
+      const shakuPitch =
+        written &&
+        ((named && namedFingering(written, named)) ||
+          defaultFingering(written));
       if (!shakuPitch) {
         unplayable.push(describeUnplayable(noteElement, written, alter));
         return;

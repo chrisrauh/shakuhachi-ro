@@ -5,6 +5,10 @@
  * Part of the standalone renderer library.
  */
 
+import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
+
+const REGISTERS = ['otsu', 'kan', 'daikan'];
+
 // Shared string factory functions for parser validation
 export const PARSER_STRING_FACTORIES = {
   invalidDuration: (duration: string) => `Invalid duration: ${duration}`,
@@ -29,6 +33,13 @@ export const PARSER_STRINGS = {
         `Note at index ${index} must have pitch when rest is not set`,
       noteIndexPitchStep: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.step'),
+      noteIndexStepInvalid: (index: number, step: unknown) =>
+        PARSER_STRING_FACTORIES.noteIndexInvalid(
+          index,
+          'pitch.step',
+          step,
+          `Must be one of: ${PITCH_STEPS.join(', ')}.`,
+        ),
       noteIndexPitchOctave: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.octave'),
       noteIndexDuration: (index: number) =>
@@ -52,7 +63,7 @@ export const PARSER_STRINGS = {
           index,
           'meriKari',
           meriKari,
-          'Must be dai-meri, meri or chu-meri.',
+          `Must be one of: ${MERI_KARI.join(', ')}.`,
         ),
       restIndexDuration: (index: number) =>
         `Rest at index ${index} is missing duration`,
@@ -90,6 +101,8 @@ export const PARSER_STRINGS = {
       microtone: (where: string, letter: string, alter: number) =>
         `${where}: ${letter} is altered by ${alter} semitones, and microtones can't be imported`,
       invalidStep: (where: string) => `${where}: the pitch has no valid step`,
+      noPitch: (where: string) =>
+        `${where}: the note has no pitch (an unpitched note, such as percussion)`,
       unplayableNotes: (first: string, others: number) =>
         others === 0
           ? `${first}. Change or transpose it in the source and import again.`
@@ -98,9 +111,14 @@ export const PARSER_STRINGS = {
         `Failed to load MusicXML file: ${statusText}`,
     },
 
-    MusicXMLSerializer: {
-      unknownFingering: (step: string, octave: number, meriKari?: string) =>
-        `${[step, meriKari].filter(Boolean).join(' ')} in octave ${octave} has no Western note in the pitch table`,
+    Serializer: {
+      noWesternNote: (
+        index: number,
+        name: string,
+        octave: number,
+        format: string,
+      ) =>
+        `Note ${index + 1}: ${name.replaceAll('-', ' ')} in ${REGISTERS[octave] ?? `octave ${octave}`} has no Western note in the fingering table, so the score can't be converted to ${format}. Change that note, or keep the score in its current format.`,
     },
   },
 } as const;

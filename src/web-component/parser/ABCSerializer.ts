@@ -7,7 +7,12 @@
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import { toABCPitch } from '../constants/abc-pitch-map';
-import { pitchForFingering } from '../constants/kinko-pitch-map';
+import {
+  fingeringName,
+  isDefaultFingering,
+  pitchForFingering,
+} from '../constants/kinko-fingerings';
+import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class ABCSerializer {
   /**
@@ -78,30 +83,38 @@ export class ABCSerializer {
   private static serializeNotes(notes: ScoreNote[]): string {
     const abcNotes: string[] = [];
 
-    for (const note of notes) {
+    notes.forEach((note, index) => {
       if (note.rest) {
         // Rest: "z" + duration
         const durationStr = this.formatDuration(note.duration);
         abcNotes.push(`z${durationStr}`);
       } else if (note.pitch) {
-        // A fingering the table has no note for falls back to its plain
-        // fingering, dropping the meri
-        const written =
-          pitchForFingering({ ...note.pitch, meriKari: note.meriKari }) ??
-          pitchForFingering(note.pitch);
+        const fingering = { ...note.pitch, meriKari: note.meriKari };
+        const written = pitchForFingering(fingering);
         if (!written) {
           throw new Error(
-            `Cannot serialize pitch: ${note.pitch.step} octave ${note.pitch.octave}`,
+            PARSER_STRINGS.ERRORS.Serializer.noWesternNote(
+              index,
+              fingeringName(fingering),
+              fingering.octave,
+              'ABC',
+            ),
           );
         }
-        const abcPitch = toABCPitch(written);
+        // A fingering import wouldn't choose for its pitch is named in a
+        // decoration, so it reads back as itself. ABC software that doesn't
+        // know the decoration ignores it.
+        const decoration = isDefaultFingering(fingering)
+          ? ''
+          : `!${fingeringName(fingering)}!`;
+        const abcPitch = decoration + toABCPitch(written);
 
         // A dot is written as the sounding length (a dotted 1 is 3/2), not as
         // >, which in ABC is broken rhythm and would also halve the next note
         const sounding = note.dotted ? note.duration * 1.5 : note.duration;
         abcNotes.push(`${abcPitch}${this.formatDuration(sounding)}`);
       }
-    }
+    });
 
     // Join notes with spaces (could add bar lines based on meter)
     return abcNotes.join(' ');

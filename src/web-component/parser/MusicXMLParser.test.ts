@@ -135,25 +135,21 @@ describe('MusicXMLParser', () => {
       expect(score.notes[0].dotted).toBe(true);
     });
 
-    it('should skip note with no <pitch> and call console.warn with index', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      // A note element with no <pitch> or <rest>
-      const xml = makeXML('<note><duration>2</duration></note>');
+    it('should fail on a note with no <pitch>, such as percussion', () => {
+      const xml = makeXML(
+        makeNote('D', 4) + '<note><unpitched/><duration>2</duration></note>',
+      );
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(0);
-      expect(warnSpy).toHaveBeenCalledOnce();
-      expect(warnSpy.mock.calls[0][0]).toContain('0'); // index 0
-
-      warnSpy.mockRestore();
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 2: the note has no pitch',
+      );
     });
 
     it('should fail on a note outside the range, saying where, why and what to do', () => {
       const xml = makeXML(makeNote('D', 4) + makeNote('A', 3));
 
       expect(() => MusicXMLParser.parse(xml)).toThrow(
-        "Measure 1, note 2: A3 is below the shakuhachi's range (C4–B6). Change or transpose it in the source and import again.",
+        "Measure 1, note 2: A3 is below the shakuhachi's range (C4–D7). Change or transpose it in the source and import again.",
       );
     });
 
@@ -162,20 +158,42 @@ describe('MusicXMLParser', () => {
         makeNote('D', 3) +
           makeNote('E', 3) +
           makeNote('F', 3) +
-          makeAlteredNote('C', 1, 7),
+          makeNote('E', 7),
       );
 
       expect(() => MusicXMLParser.parse(xml)).toThrow(
-        "Measure 1, note 1: D3 is below the shakuhachi's range (C4–B6), and 3 other notes can't be imported either.",
+        "Measure 1, note 1: D3 is below the shakuhachi's range (C4–D7), and 3 other notes can't be imported either.",
       );
     });
 
     it('should say when a note is above the range', () => {
+      const xml = makeXML(makeNote('E', 7));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "E7 is above the shakuhachi's range",
+      );
+    });
+
+    it('should say when no chart has a fingering for a note in range', () => {
       const xml = makeXML(makeAlteredNote('C', 1, 7));
 
       expect(() => MusicXMLParser.parse(xml)).toThrow(
-        "C#7 is above the shakuhachi's range",
+        'C#7 has no shakuhachi fingering',
       );
+    });
+
+    it('should keep a fingering named in <technical>, and ignore finger numbers', () => {
+      const withFingering = (name: string) =>
+        makeAlteredNote('B', -1, 5).replace(
+          '</note>',
+          `<notations><technical><fingering>${name}</fingering></technical></notations></note>`,
+        );
+      const xml = makeXML(withFingering('san-no-u') + withFingering('2'));
+
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
+        { step: 'san-no-u', octave: 1 },
+        { step: 'hi', octave: 1 },
+      ]);
     });
 
     it('should not quote an unrecognised step in the error', () => {
@@ -197,7 +215,7 @@ describe('MusicXMLParser', () => {
     it('should read sharps and flats through the pitch table', () => {
       const xml = makeXML(
         makeAlteredNote('F', 1, 4) + // F#4 → re meri
-          makeAlteredNote('B', -1, 4) + // Bb4 → chi meri
+          makeAlteredNote('B', -1, 4) + // Bb4 → ri meri
           makeAlteredNote('D', 1, 4) + // D#4 → tsu meri
           makeNote('C', 4), // C4 → ro dai-meri
       );
@@ -209,7 +227,7 @@ describe('MusicXMLParser', () => {
 
       expect(fingerings).toEqual([
         ['re', 'meri'],
-        ['chi', 'meri'],
+        ['ri', 'meri'],
         ['tsu', 'meri'],
         ['ro', 'dai-meri'],
       ]);

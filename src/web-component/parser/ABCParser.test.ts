@@ -86,8 +86,8 @@ d' f' g'
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(3);
-      expect(scoreData.notes[0].pitch?.step).toBe('ro'); // d' → ro dai-kan
-      expect(scoreData.notes[0].pitch?.octave).toBe(2); // Apostrophe = dai-kan
+      expect(scoreData.notes[0].pitch?.step).toBe('go-no-hi'); // d' → kan go no hi
+      expect(scoreData.notes[0].pitch?.octave).toBe(1);
       expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // f' → tsu dai-kan
       expect(scoreData.notes[1].pitch?.octave).toBe(2);
     });
@@ -347,6 +347,15 @@ G
   });
 
   describe('parse() - error handling', () => {
+    it('should keep a fingering named in a decoration, and ignore other decorations', () => {
+      const abc = 'X:1\nK:D\n!san-no-u!_b !trill!_b\n';
+
+      expect(ABCParser.parse(abc).notes.map((n) => n.pitch)).toEqual([
+        { step: 'san-no-u', octave: 1 },
+        { step: 'hi', octave: 1 },
+      ]);
+    });
+
     it('should throw error for empty input', () => {
       expect(() => ABCParser.parse('')).toThrow(
         'ABC notation content is required',
@@ -505,14 +514,27 @@ Q
           notes: [
             { pitch: { step: 'ro', octave: 0 }, duration: 1 }, // D (uppercase)
             { pitch: { step: 'ro', octave: 1 }, duration: 1 }, // d (lowercase)
-            { pitch: { step: 'ro', octave: 2 }, duration: 1 }, // d' (apostrophe)
+            { pitch: { step: 'tsu', octave: 2 }, duration: 1 }, // f' (apostrophe)
           ],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
 
-        expect(abc).toContain('D d');
-        expect(abc).toContain("d'");
+        expect(abc).toContain("D d f'");
+      });
+
+      it('should fail on a fingering the table has no note for, rather than drop its meri', () => {
+        const scoreData: ScoreData = {
+          title: 'Test',
+          notes: [
+            { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+            { pitch: { step: 'ro', octave: 0 }, duration: 1, meriKari: 'kari' },
+          ],
+        };
+
+        expect(() => ABCSerializer.serialize(scoreData)).toThrow(
+          "Note 2: ro kari in otsu has no Western note in the fingering table, so the score can't be converted to ABC",
+        );
       });
 
       it('should serialize notes with dotted flag', () => {

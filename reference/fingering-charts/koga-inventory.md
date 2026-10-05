@@ -111,7 +111,7 @@ All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), chec
 | 73 | E6 | ○●○○○ | — | ? | |
 | 74 | E6 | ◐●○○● | — | ? | |
 | 75 | F6 | ●●○○● | ツ tsu (大甲) | neutral (name) | |
-| 76 | G♭6 | ●●●●○ | — | ? | |
+| 76 | G♭6 | ●●●●○ | — (レメ re meri, from Nyokai-An) | meri (name) | Koga gives no name. The fingering table names it re meri in daikan, as Nyokai-An does |
 | 77 | G6 | ●●●○○ | レ re (大甲) | neutral (name) | |
 | 78 | A♭6 | ●○●○○ | チメ chi meri (大甲) | meri (name) | |
 | 79 | A6 | ●○●●● | チ chi (大甲) | neutral (name) | |
