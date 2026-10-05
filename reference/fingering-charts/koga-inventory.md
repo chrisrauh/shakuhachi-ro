@@ -1,6 +1,6 @@
 # Koga fingering inventory (draft for review)
 
-All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), checked against *Koga I*, pages 37 and 39, and *Koga II*, page 109. Source photos are in this folder. ⚠ marks a reading that is still uncertain.
+All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), checked against *Koga I*, pages 37 and 39, and *Koga II*, page 109. Source photos are in this folder. ⚠ marks a reading that is still uncertain. Community review of these readings is tracked in #423.
 
 ## How to read it
 
