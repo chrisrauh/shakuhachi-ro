@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { ScoreParser } from './ScoreParser';
+import type { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import type { ScoreData } from '../types/ScoreData';
 
 describe('ScoreParser', () => {
@@ -45,11 +46,17 @@ describe('ScoreParser', () => {
       // Otsu - no modifiers (whole notes don't get duration lines)
       expect(notes[0].getModifiers()).toHaveLength(0);
 
-      // Kan - 1 octave dot
+      // Kan - 甲
       expect(notes[1].getModifiers()).toHaveLength(1);
+      expect(
+        (notes[1].getModifiers()[0] as OctaveMarksModifier).getRegister(),
+      ).toBe('kan');
 
-      // Daikan - 2 octave dots
+      // Daikan - 大甲
       expect(notes[2].getModifiers()).toHaveLength(1);
+      expect(
+        (notes[2].getModifiers()[0] as OctaveMarksModifier).getRegister(),
+      ).toBe('daikan');
     });
 
     it('should parse notes with meri modifier', () => {
