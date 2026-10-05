@@ -27,14 +27,12 @@
  * - C → ri (リ)
  */
 
-import type { PitchStep } from '../types/ScoreData';
+import type { MeriKari, PitchStep } from '../types/ScoreData';
 
 export interface ABCPitchMapping {
   step: PitchStep;
   octave: number;
-  meri?: boolean;
-  chu_meri?: boolean;
-  dai_meri?: boolean;
+  meriKari?: MeriKari;
 }
 
 /**
@@ -47,22 +45,22 @@ export const ABC_TO_KINKO_MAP: Record<string, ABCPitchMapping> = {
   // ============================================================
 
   // Ro (ロ) - D4 base note
-  C: { step: 'ro', octave: 0, dai_meri: true }, // ro dai-meri (大メ)
-  '^C': { step: 'ro', octave: 0, meri: true }, // ro meri (メ)
-  _D: { step: 'ro', octave: 0, meri: true }, // ro meri (メ)
+  C: { step: 'ro', octave: 0, meriKari: 'dai-meri' }, // ro dai-meri (大メ)
+  '^C': { step: 'ro', octave: 0, meriKari: 'meri' }, // ro meri (メ)
+  _D: { step: 'ro', octave: 0, meriKari: 'meri' }, // ro meri (メ)
   '=D': { step: 'ro', octave: 0 }, // ro (ロ) - natural
   D: { step: 'ro', octave: 0 }, // ro (ロ) - fundamental note
 
   // Tsu (ツ) - F4 base note
-  '^D': { step: 'tsu', octave: 0, meri: true }, // tsu meri (ツメ)
-  _E: { step: 'tsu', octave: 0, meri: true }, // tsu meri (ツメ)
-  E: { step: 'tsu', octave: 0, chu_meri: true }, // tsu chu-meri (ツ中メ)
+  '^D': { step: 'tsu', octave: 0, meriKari: 'meri' }, // tsu meri (ツメ)
+  _E: { step: 'tsu', octave: 0, meriKari: 'meri' }, // tsu meri (ツメ)
+  E: { step: 'tsu', octave: 0, meriKari: 'chu-meri' }, // tsu chu-meri (ツ中メ)
   '=F': { step: 'tsu', octave: 0 }, // tsu (ツ) - natural
   F: { step: 'tsu', octave: 0 }, // tsu (ツ)
 
   // Re (レ) - G4 base note
-  '^F': { step: 're', octave: 0, meri: true }, // re meri (レメ)
-  _G: { step: 're', octave: 0, meri: true }, // re meri (レメ)
+  '^F': { step: 're', octave: 0, meriKari: 'meri' }, // re meri (レメ)
+  _G: { step: 're', octave: 0, meriKari: 'meri' }, // re meri (レメ)
   '=G': { step: 're', octave: 0 }, // re (レ) - natural
   G: { step: 're', octave: 0 }, // re (レ)
 
@@ -71,12 +69,12 @@ export const ABC_TO_KINKO_MAP: Record<string, ABCPitchMapping> = {
   _A: { step: 'u', octave: 0 }, // u (ウ)
   '=A': { step: 'chi', octave: 0 }, // chi (チ) - natural
   A: { step: 'chi', octave: 0 }, // chi (チ)
-  '^A': { step: 'chi', octave: 0, meri: true }, // chi meri (チメ)
-  _B: { step: 'chi', octave: 0, meri: true }, // chi meri (チメ)
+  '^A': { step: 'chi', octave: 0, meriKari: 'meri' }, // chi meri (チメ)
+  _B: { step: 'chi', octave: 0, meriKari: 'meri' }, // chi meri (チメ)
 
   // Ri (リ) - C5 base note
-  '=B': { step: 'ri', octave: 0, chu_meri: true }, // ri chu-meri (リ中メ) - natural
-  B: { step: 'ri', octave: 0, chu_meri: true }, // ri chu-meri (リ中メ)
+  '=B': { step: 'ri', octave: 0, meriKari: 'chu-meri' }, // ri chu-meri (リ中メ) - natural
+  B: { step: 'ri', octave: 0, meriKari: 'chu-meri' }, // ri chu-meri (リ中メ)
 
   // ============================================================
   // KAN REGISTER (Middle Octave) - Lowercase letters (D5-C6)
@@ -87,31 +85,31 @@ export const ABC_TO_KINKO_MAP: Record<string, ABCPitchMapping> = {
   c: { step: 'ri', octave: 0 }, // ri (リ)
 
   // Ro kan (ロ甲) - D5 base note
-  '^c': { step: 'ro', octave: 1, meri: true }, // ro meri kan
-  _d: { step: 'ro', octave: 1, meri: true }, // ro meri kan
+  '^c': { step: 'ro', octave: 1, meriKari: 'meri' }, // ro meri kan
+  _d: { step: 'ro', octave: 1, meriKari: 'meri' }, // ro meri kan
   '=d': { step: 'ro', octave: 1 }, // ro kan (ロ甲) - natural
   d: { step: 'ro', octave: 1 }, // ro kan (ロ甲)
 
   // Tsu kan (ツ甲) - F5 base note
-  '^d': { step: 'tsu', octave: 1, meri: true }, // tsu meri kan
-  _e: { step: 'tsu', octave: 1, meri: true }, // tsu meri kan
-  e: { step: 'tsu', octave: 1, chu_meri: true }, // tsu chu-meri kan
+  '^d': { step: 'tsu', octave: 1, meriKari: 'meri' }, // tsu meri kan
+  _e: { step: 'tsu', octave: 1, meriKari: 'meri' }, // tsu meri kan
+  e: { step: 'tsu', octave: 1, meriKari: 'chu-meri' }, // tsu chu-meri kan
   '=f': { step: 'tsu', octave: 1 }, // tsu kan (ツ甲) - natural
   f: { step: 'tsu', octave: 1 }, // tsu kan (ツ甲)
 
   // Re kan (レ甲) - G5 base note
-  '^f': { step: 're', octave: 1, meri: true }, // re meri kan
-  _g: { step: 're', octave: 1, meri: true }, // re meri kan
+  '^f': { step: 're', octave: 1, meriKari: 'meri' }, // re meri kan
+  _g: { step: 're', octave: 1, meriKari: 'meri' }, // re meri kan
   '=g': { step: 're', octave: 1 }, // re kan (レ甲) - natural
   g: { step: 're', octave: 1 }, // re kan (レ甲)
 
   // Chi kan (チ甲) - A5 base note
-  '^g': { step: 'chi', octave: 1, meri: true }, // chi meri kan
-  _a: { step: 'chi', octave: 1, meri: true }, // chi meri kan
+  '^g': { step: 'chi', octave: 1, meriKari: 'meri' }, // chi meri kan
+  _a: { step: 'chi', octave: 1, meriKari: 'meri' }, // chi meri kan
   '=a': { step: 'chi', octave: 1 }, // chi kan (チ甲) - natural
   a: { step: 'chi', octave: 1 }, // chi kan (チ甲)
-  '^a': { step: 'chi', octave: 1, chu_meri: true }, // chi chu-meri kan
-  _b: { step: 'chi', octave: 1, chu_meri: true }, // chi chu-meri kan
+  '^a': { step: 'chi', octave: 1, meriKari: 'chu-meri' }, // chi chu-meri kan
+  _b: { step: 'chi', octave: 1, meriKari: 'chu-meri' }, // chi chu-meri kan
 
   // Ri/Hi kan (リ/ヒ甲) - B5/C6
   '=b': { step: 'ri', octave: 1 }, // ri kan (リ甲) - natural
@@ -126,47 +124,47 @@ export const ABC_TO_KINKO_MAP: Record<string, ABCPitchMapping> = {
   "c'": { step: 'hi', octave: 1 }, // hi kan (ヒ甲)
 
   // Ro dai-kan (ロ大甲) - D6
-  "^c'": { step: 'ro', octave: 2, meri: true }, // ro meri dai-kan
-  "_d'": { step: 'ro', octave: 2, meri: true }, // ro meri dai-kan
+  "^c'": { step: 'ro', octave: 2, meriKari: 'meri' }, // ro meri dai-kan
+  "_d'": { step: 'ro', octave: 2, meriKari: 'meri' }, // ro meri dai-kan
   "=d'": { step: 'ro', octave: 2 }, // ro dai-kan (ロ大甲) - natural
   "d'": { step: 'ro', octave: 2 }, // ro dai-kan (ロ大甲)
 
   // Tsu dai-kan (ツ大甲) - F6
-  "^d'": { step: 'tsu', octave: 2, meri: true }, // tsu meri dai-kan
-  "_e'": { step: 'tsu', octave: 2, meri: true }, // tsu meri dai-kan
-  "e'": { step: 'tsu', octave: 2, chu_meri: true }, // tsu chu-meri dai-kan
+  "^d'": { step: 'tsu', octave: 2, meriKari: 'meri' }, // tsu meri dai-kan
+  "_e'": { step: 'tsu', octave: 2, meriKari: 'meri' }, // tsu meri dai-kan
+  "e'": { step: 'tsu', octave: 2, meriKari: 'chu-meri' }, // tsu chu-meri dai-kan
   "=f'": { step: 'tsu', octave: 2 }, // tsu dai-kan (ツ大甲) - natural
   "f'": { step: 'tsu', octave: 2 }, // tsu dai-kan (ツ大甲)
 
   // Re dai-kan (レ大甲) - G6
-  "^f'": { step: 're', octave: 2, meri: true }, // re meri dai-kan
-  "_g'": { step: 're', octave: 2, meri: true }, // re meri dai-kan
+  "^f'": { step: 're', octave: 2, meriKari: 'meri' }, // re meri dai-kan
+  "_g'": { step: 're', octave: 2, meriKari: 'meri' }, // re meri dai-kan
   "=g'": { step: 're', octave: 2 }, // re dai-kan (レ大甲) - natural
   "g'": { step: 're', octave: 2 }, // re dai-kan (レ大甲)
 
   // Chi dai-kan (チ大甲) - A6
-  "^g'": { step: 'chi', octave: 2, meri: true }, // chi meri dai-kan
-  "_a'": { step: 'chi', octave: 2, meri: true }, // chi meri dai-kan
+  "^g'": { step: 'chi', octave: 2, meriKari: 'meri' }, // chi meri dai-kan
+  "_a'": { step: 'chi', octave: 2, meriKari: 'meri' }, // chi meri dai-kan
   "=a'": { step: 'chi', octave: 2 }, // chi dai-kan (チ大甲) - natural
   "a'": { step: 'chi', octave: 2 }, // chi dai-kan (チ大甲)
 
   // Hi dai-kan (ヒ大甲) - B6 (upper limit)
-  "^a'": { step: 'hi', octave: 2, meri: true }, // hi meri dai-kan
-  "_b'": { step: 'hi', octave: 2, meri: true }, // hi meri dai-kan
+  "^a'": { step: 'hi', octave: 2, meriKari: 'meri' }, // hi meri dai-kan
+  "_b'": { step: 'hi', octave: 2, meriKari: 'meri' }, // hi meri dai-kan
   "=b'": { step: 'hi', octave: 2 }, // hi dai-kan (ヒ大甲) - natural
   "b'": { step: 'hi', octave: 2 }, // hi dai-kan (ヒ大甲)
 };
 
 /**
  * Create reverse mapping for serialization (shakuhachi → ABC)
- * Returns a map from "step-octave-meri-chu_meri-dai_meri" to ABC notation
+ * Returns a map from "step-octave-meriKari" to ABC notation
  */
 export function createReverseABCMap(): Map<string, string> {
   const reverseMap = new Map<string, string>();
 
   for (const [abcPitch, mapping] of Object.entries(ABC_TO_KINKO_MAP)) {
     // Create key from mapping properties
-    const key = `${mapping.step}-${mapping.octave}-${mapping.meri || false}-${mapping.chu_meri || false}-${mapping.dai_meri || false}`;
+    const key = `${mapping.step}-${mapping.octave}-${mapping.meriKari ?? ''}`;
 
     // Prefer shorter notation (without accidentals/naturals) when multiple options exist
     if (

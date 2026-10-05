@@ -30,9 +30,7 @@ interface ScoreNote {
   duration: number; // 4 = whole, 2 = half, 1 = quarter, 0.5 = eighth
   pitch?: { step: PitchStep; octave: number }; // omit for a rest
   rest?: boolean;
-  meri?: boolean; // lowers ~a half step
-  chu_meri?: boolean; // between normal and meri
-  dai_meri?: boolean; // lowers ~a whole step
+  meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
   dotted?: boolean; // extends duration by half
 }
 

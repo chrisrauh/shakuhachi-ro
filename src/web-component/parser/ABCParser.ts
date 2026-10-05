@@ -184,15 +184,8 @@ export class ABCParser {
         duration,
       };
 
-      // Add meri modifiers
-      if (shakuPitch.meri) {
-        note.meri = true;
-      }
-      if (shakuPitch.chu_meri) {
-        note.chu_meri = true;
-      }
-      if (shakuPitch.dai_meri) {
-        note.dai_meri = true;
+      if (shakuPitch.meriKari) {
+        note.meriKari = shakuPitch.meriKari;
       }
 
       notes.push(note);

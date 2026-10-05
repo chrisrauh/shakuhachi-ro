@@ -23,7 +23,7 @@ Note = {
     "octave": number         // 0=otsu (base), 1=kan, 2=daikan
   },
   "duration": number,        // Duration in relative timing units
-  "meri"?: boolean           // Optional: true if meri mark present
+  "meriKari"?: string        // Optional: "dai-meri" | "meri" | "chu-meri"
 }
 ```
 
@@ -35,7 +35,7 @@ Note = {
 
 ## Optional Fields
 
-- `meri` - Meri pitch alteration (optional, defaults to false)
+- `meriKari` - Meri or kari, if the note is played with one: `"dai-meri"`, `"meri"` or `"chu-meri"`. It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not a `meriKari` value.
 
 ## Column Layout
 
@@ -58,7 +58,11 @@ This separation allows the same score data to be rendered differently on mobile,
     { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "re", "octave": 1 }, "duration": 1 },
     { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 },
-    { "pitch": { "step": "ri", "octave": 0 }, "duration": 1, "meri": true },
+    {
+      "pitch": { "step": "ri", "octave": 0 },
+      "duration": 1,
+      "meriKari": "meri"
+    },
     { "pitch": { "step": "ro", "octave": 0 }, "duration": 4 }
   ]
 }
@@ -73,7 +77,7 @@ This separation allows the same score data to be rendered differently on mobile,
 
 When needed, we can add:
 
-- `kari` - For kari pitch marks
+- `"kari"` as a `meriKari` value, once the renderer can draw it
 - `atari` - For atari technique marks
 - More pitch modifiers
 - Additional metadata (composer, tempo, etc.)
