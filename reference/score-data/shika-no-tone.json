@@ -9,7 +9,7 @@
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },
     { "pitch": { "step": "ro", "octave": 0 }, "duration": 4 },
 
-    { "pitch": { "step": "ro", "octave": 0 }, "chu_meri": true, "duration": 4 },
+    { "pitch": { "step": "ro", "octave": 0 }, "meriKari": "chu-meri", "duration": 4 },
     { "pitch": { "step": "ro", "octave": 0 }, "duration": 4 },
     { "rest": true, "duration": 2 },
     { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2 },

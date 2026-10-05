@@ -17,7 +17,7 @@
       "_comment": "ro meri (C#4/Db4) - メ",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "tsu (F4)",
@@ -28,7 +28,7 @@
       "_comment": "tsu meri (E4) - メ",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "re (G4)",
@@ -39,7 +39,7 @@
       "_comment": "re meri (F#4/Gb4) - メ",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "=== CHU MERI EXAMPLES (Middle Meri - 中) ===",
@@ -55,7 +55,7 @@
       "_comment": "ro chu meri - 中",
       "pitch": { "step": "ro", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "tsu (F4)",
@@ -66,7 +66,7 @@
       "_comment": "tsu chu meri - 中",
       "pitch": { "step": "tsu", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "re (G4)",
@@ -77,7 +77,7 @@
       "_comment": "re chu meri - 中",
       "pitch": { "step": "re", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "=== DAI MERI EXAMPLES (Great Meri - 大) ===",
@@ -93,7 +93,7 @@
       "_comment": "chi dai meri - 大",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
-      "dai_meri": true
+      "meriKari": "dai-meri"
     },
     {
       "_comment": "ri (C5)",
@@ -104,7 +104,7 @@
       "_comment": "ri dai meri - 大",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1,
-      "dai_meri": true
+      "meriKari": "dai-meri"
     },
     {
       "_comment": "hi (A5)",
@@ -115,7 +115,7 @@
       "_comment": "hi dai meri - 大",
       "pitch": { "step": "hi", "octave": 0 },
       "duration": 1,
-      "dai_meri": true
+      "meriKari": "dai-meri"
     },
     {
       "_comment": "=== MORE MERI EXAMPLES ===",
@@ -131,7 +131,7 @@
       "_comment": "chi meri (G#4/Ab4) - メ",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "ri (C5)",
@@ -142,7 +142,7 @@
       "_comment": "ri meri (B4) - メ",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "hi (A5)",
@@ -153,7 +153,7 @@
       "_comment": "hi meri (G#5/Ab5) - メ",
       "pitch": { "step": "hi", "octave": 0 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "=== MORE CHU MERI EXAMPLES ===",
@@ -169,7 +169,7 @@
       "_comment": "chi chu meri - 中",
       "pitch": { "step": "chi", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "ri (C5)",
@@ -180,7 +180,7 @@
       "_comment": "ri chu meri - 中",
       "pitch": { "step": "ri", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "hi (A5)",
@@ -191,7 +191,7 @@
       "_comment": "hi chu meri - 中",
       "pitch": { "step": "hi", "octave": 0 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "=== KAN REGISTER WITH MERI ===",
@@ -207,7 +207,7 @@
       "_comment": "ro (kan) meri (C#5/Db5) - メ",
       "pitch": { "step": "ro", "octave": 1 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "tsu (kan) - F5",
@@ -218,7 +218,7 @@
       "_comment": "tsu (kan) meri (E5) - メ",
       "pitch": { "step": "tsu", "octave": 1 },
       "duration": 1,
-      "meri": true
+      "meriKari": "meri"
     },
     {
       "_comment": "=== KAN REGISTER WITH CHU MERI ===",
@@ -234,7 +234,7 @@
       "_comment": "re (kan) chu meri - 中",
       "pitch": { "step": "re", "octave": 1 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     },
     {
       "_comment": "chi (kan) - A5",
@@ -245,7 +245,7 @@
       "_comment": "chi (kan) chu meri - 中",
       "pitch": { "step": "chi", "octave": 1 },
       "duration": 1,
-      "chu_meri": true
+      "meriKari": "chu-meri"
     }
   ]
 }
