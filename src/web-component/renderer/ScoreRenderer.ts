@@ -14,6 +14,7 @@ import type { ScoreData } from '../types/ScoreData';
 import type { ShakuNote } from '../notes/ShakuNote';
 import { ScoreParser } from '../parser/ScoreParser';
 import { SVGRenderer } from './SVGRenderer';
+import type { RenderingBackend } from './RenderingBackend';
 import { ModifierConfigurator } from './ModifierConfigurator';
 import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
 import {
@@ -160,14 +161,14 @@ export class ScoreRenderer {
    *
    * Shows note index, romanji, octave, and meri info
    *
-   * @param renderer - SVGRenderer to draw into
+   * @param renderer - Backend to draw into
    * @param note - ShakuNote to create label for
    * @param globalIndex - Global index of note in score
    * @param x - X position of note
    * @param y - Y position of note
    */
   private renderDebugLabel(
-    renderer: SVGRenderer,
+    renderer: RenderingBackend,
     note: ShakuNote,
     globalIndex: number,
     x: number,

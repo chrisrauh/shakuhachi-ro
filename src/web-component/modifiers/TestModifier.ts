@@ -6,7 +6,7 @@
  */
 
 import { Modifier, type ModifierPosition } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 export class TestModifier extends Modifier {
   private color: string;
@@ -58,7 +58,7 @@ export class TestModifier extends Modifier {
   /**
    * Renders the test modifier (a colored circle)
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
 

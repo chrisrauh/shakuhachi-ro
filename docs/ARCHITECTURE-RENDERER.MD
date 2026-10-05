@@ -14,7 +14,8 @@ src/web-component/
 │   ├── RenderOptions.ts    # Configuration
 │   ├── ColumnLayoutCalculator.ts
 │   ├── ModifierConfigurator.ts
-│   ├── SVGRenderer.ts      # Low-level SVG drawing
+│   ├── RenderingBackend.ts # Drawing primitives notes and modifiers depend on
+│   ├── SVGRenderer.ts      # Low-level SVG drawing (implements RenderingBackend)
 │   └── convenience.ts      # Factory functions
 ├── parser/                 # Data parsing
 │   ├── ScoreParser.ts      # ScoreData → ShakuNote[]
@@ -104,7 +105,9 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 
 ## Extension Points
 
-**New modifiers:** Extend `Modifier` base class, implement `render()`, add to `ModifierConfigurator` if needed.
+**New modifiers:** Extend `Modifier` base class, implement `render()`, add to `ModifierConfigurator` if needed. `render()` receives a `RenderingBackend`, not an `SVGRenderer`, so a unit test can pass a plain object with the draw methods it needs.
+
+**New backends:** Implement `RenderingBackend` (`drawText`, `drawCircle`, `drawLine`). `ScoreRenderer` still constructs `SVGRenderer` directly; choosing a backend there is not wired up yet. Colours reach the backend as given, including `var(--…)` references, which a non-SVG backend must resolve itself (#371).
 
 **New options:** Add to `RenderOptions` interface and `DEFAULT_RENDER_OPTIONS`.
 

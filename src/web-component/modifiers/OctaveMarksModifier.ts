@@ -17,7 +17,7 @@
  */
 
 import { Modifier } from './Modifier';
-import type { SVGRenderer } from '../renderer/SVGRenderer';
+import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 export type OctaveRegister = 'otsu' | 'kan' | 'daikan';
@@ -71,11 +71,11 @@ export class OctaveMarksModifier extends Modifier {
   /**
    * Renders the octave mark as a small kanji character
    *
-   * @param renderer - SVGRenderer instance
+   * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
    */
-  render(renderer: SVGRenderer, noteX: number, noteY: number): void {
+  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
     const chars = [...OctaveMarksModifier.registerSymbols[this.register]];
