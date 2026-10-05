@@ -4,7 +4,8 @@ const url = new URL(Astro.request.url);
 const slug = url.searchParams.get('slug');
 
 if (slug) {
-  return Astro.redirect(`/score/${slug}`);
+  // Encoded: a header value can't hold a raw Japanese slug (#425)
+  return Astro.redirect(`/score/${encodeURIComponent(slug)}`);
 }
 
 // If no slug, redirect to home
