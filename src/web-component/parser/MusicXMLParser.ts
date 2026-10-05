@@ -6,7 +6,13 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { fingeringForPitch, isNoteLetter } from '../constants/kinko-pitch-map';
+import {
+  fingeringForPitch,
+  isNoteLetter,
+  PITCH_RANGE,
+  rangePosition,
+  type WrittenPitch,
+} from '../constants/kinko-pitch-map';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /**
@@ -26,10 +32,37 @@ function toBaseDuration(
   return dotted ? sounding / 1.5 : sounding;
 }
 
-/** Writes an alter as accidentals for messages: 1 → "#", -2 → "bb" */
-function alterSign(alter: number): string {
-  if (!Number.isInteger(alter)) return ` (alter ${alter})`;
-  return alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
+const MESSAGES = PARSER_STRINGS.ERRORS.MusicXMLParser;
+
+/** Where a note is, as a reader of the source would find it */
+function locate(noteElement: Element): string {
+  const measure = noteElement.closest('measure');
+  const notes = measure ? [...measure.querySelectorAll('note')] : [];
+  return MESSAGES.noteLocation(
+    measure?.getAttribute('number') ?? '?',
+    notes.indexOf(noteElement) + 1,
+  );
+}
+
+/**
+ * Says why a note cannot be imported. Quotes only validated values: the
+ * message can be shown in a page, and the source is user content.
+ */
+function describeUnplayable(
+  noteElement: Element,
+  written: WrittenPitch | undefined,
+  alter: number,
+): string {
+  const where = locate(noteElement);
+  if (!written) return MESSAGES.invalidStep(where);
+  if (!Number.isInteger(alter)) {
+    return MESSAGES.microtone(where, written.letter, alter);
+  }
+  const accidentals = alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
+  const name = `${written.letter}${accidentals}${written.octave}`;
+  const position = rangePosition(written);
+  if (position === 'within') return MESSAGES.notInTable(where, name);
+  return MESSAGES.outOfRange(where, name, position, PITCH_RANGE);
 }
 
 export class MusicXMLParser {
@@ -67,6 +100,10 @@ export class MusicXMLParser {
     // Extract all notes from all measures
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
+    // Notes the table has no fingering for. Import fails rather than dropping
+    // them, which would change the piece without telling anyone; all of them
+    // are counted so a score written in the wrong octave reads as such.
+    const unplayable: string[] = [];
 
     noteElements.forEach((noteElement, i) => {
       const rawDuration = parseInt(
@@ -102,19 +139,13 @@ export class MusicXMLParser {
         pitchElement.querySelector('alter')?.textContent ?? '0',
       );
 
-      // A note the table has no fingering for fails the import rather than
-      // being dropped, which would change the piece without telling anyone
-      const shakuPitch = isNoteLetter(step)
-        ? fingeringForPitch({ letter: step, alter, octave })
+      const written = isNoteLetter(step)
+        ? { letter: step, alter, octave }
         : undefined;
+      const shakuPitch = written && fingeringForPitch(written);
       if (!shakuPitch) {
-        throw new Error(
-          PARSER_STRINGS.ERRORS.MusicXMLParser.unknownPitch(
-            i,
-            // Only validated values: the message can end up in a page
-            `${isNoteLetter(step) ? step : '?'}${alterSign(alter)}${octave}`,
-          ),
-        );
+        unplayable.push(describeUnplayable(noteElement, written, alter));
+        return;
       }
 
       // Create note
@@ -137,6 +168,15 @@ export class MusicXMLParser {
 
       notes.push(note);
     });
+
+    if (unplayable.length > 0) {
+      throw new Error(
+        PARSER_STRINGS.ERRORS.MusicXMLParser.unplayableNotes(
+          unplayable[0],
+          unplayable.length - 1,
+        ),
+      );
+    }
 
     return {
       title,

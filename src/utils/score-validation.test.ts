@@ -57,6 +57,15 @@ describe('validateScoreInput', () => {
       '<score-partwise version="3.1"><part id="P1"></part></score-partwise>';
     expect(validateScoreInput(xml, 'musicxml')).toEqual({ valid: true });
   });
+  it('rejects MusicXML the score page could not display', () => {
+    const xml = `<score-partwise><part id="P1"><measure number="3">
+      <note><pitch><step>A</step><octave>3</octave></pitch><duration>1</duration></note>
+    </measure></part></score-partwise>`;
+    expect(validateScoreInput(xml, 'musicxml')).toEqual({
+      valid: false,
+      error: expect.stringContaining('Measure 3, note 1: A3 is below'),
+    });
+  });
   it('returns invalid with error for malformed MusicXML', () => {
     const result = validateScoreInput('<unclosed', 'musicxml');
     expect(result.valid).toBe(false);

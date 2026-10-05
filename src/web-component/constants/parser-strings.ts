@@ -76,8 +76,24 @@ export const PARSER_STRINGS = {
     },
 
     MusicXMLParser: {
-      unknownPitch: (index: number, pitch: string) =>
-        `Note ${index + 1} (${pitch}) has no shakuhachi fingering in the pitch table`,
+      noteLocation: (measure: string, position: number) =>
+        `Measure ${measure}, note ${position}`,
+      outOfRange: (
+        where: string,
+        pitch: string,
+        position: 'below' | 'above',
+        range: string,
+      ) =>
+        `${where}: ${pitch} is ${position} the shakuhachi's range (${range})`,
+      notInTable: (where: string, pitch: string) =>
+        `${where}: ${pitch} has no shakuhachi fingering`,
+      microtone: (where: string, letter: string, alter: number) =>
+        `${where}: ${letter} is altered by ${alter} semitones, and microtones can't be imported`,
+      invalidStep: (where: string) => `${where}: the pitch has no valid step`,
+      unplayableNotes: (first: string, others: number) =>
+        others === 0
+          ? `${first}. Change or transpose it in the source and import again.`
+          : `${first}, and ${others} other ${others === 1 ? 'note' : 'notes'} can't be imported either. Change or transpose them in the source and import again.`,
       loadFailed: (statusText: string) =>
         `Failed to load MusicXML file: ${statusText}`,
     },

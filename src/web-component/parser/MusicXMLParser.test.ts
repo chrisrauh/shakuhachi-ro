@@ -149,22 +149,49 @@ describe('MusicXMLParser', () => {
       warnSpy.mockRestore();
     });
 
-    it('should fail on a pitch the table has no fingering for, naming the note', () => {
+    it('should fail on a note outside the range, saying where, why and what to do', () => {
       const xml = makeXML(makeNote('D', 4) + makeNote('A', 3));
 
-      expect(() => MusicXMLParser.parse(xml)).toThrow('Note 2 (A3)');
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "Measure 1, note 2: A3 is below the shakuhachi's range (C4–B6). Change or transpose it in the source and import again.",
+      );
+    });
+
+    it('should count every note that cannot be imported', () => {
+      const xml = makeXML(
+        makeNote('D', 3) +
+          makeNote('E', 3) +
+          makeNote('F', 3) +
+          makeAlteredNote('C', 1, 7),
+      );
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "Measure 1, note 1: D3 is below the shakuhachi's range (C4–B6), and 3 other notes can't be imported either.",
+      );
+    });
+
+    it('should say when a note is above the range', () => {
+      const xml = makeXML(makeAlteredNote('C', 1, 7));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "C#7 is above the shakuhachi's range",
+      );
     });
 
     it('should not quote an unrecognised step in the error', () => {
       const xml = makeXML(makeNote('&lt;img src=x&gt;', 4));
 
-      expect(() => MusicXMLParser.parse(xml)).toThrow('Note 1 (?4)');
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 1: the pitch has no valid step.',
+      );
     });
 
     it('should fail on a quarter-tone alter rather than round it', () => {
       const xml = makeXML(makeAlteredNote('D', -0.5, 4));
 
-      expect(() => MusicXMLParser.parse(xml)).toThrow('alter -0.5');
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "D is altered by -0.5 semitones, and microtones can't be imported",
+      );
     });
 
     it('should read sharps and flats through the pitch table', () => {

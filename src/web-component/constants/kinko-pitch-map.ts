@@ -140,6 +140,26 @@ for (const [key, fingering] of Object.entries(KINKO_PITCH_MAP)) {
   BY_FINGERING.set(fingeringKey(fingering), written);
 }
 
+const PITCHES = Object.keys(KINKO_PITCH_MAP).map((key) => ({
+  key,
+  midi: midiNumber(parseTableKey(key)),
+}));
+const LOWEST = PITCHES.reduce((a, b) => (b.midi < a.midi ? b : a));
+const HIGHEST = PITCHES.reduce((a, b) => (b.midi > a.midi ? b : a));
+
+/** The table's range as written, e.g. "C4–B6" */
+export const PITCH_RANGE = `${LOWEST.key}–${HIGHEST.key}`;
+
+/** Whether a note lies below or above the table, or within it */
+export function rangePosition(
+  written: WrittenPitch,
+): 'below' | 'above' | 'within' {
+  const midi = midiNumber(written);
+  if (midi < LOWEST.midi) return 'below';
+  if (midi > HIGHEST.midi) return 'above';
+  return 'within';
+}
+
 /**
  * The default fingering for a written note, matched by sounding pitch.
  * Undefined when the note is outside the table (out of range, or a

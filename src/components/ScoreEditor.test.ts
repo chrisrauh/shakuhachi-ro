@@ -512,6 +512,37 @@ describe('ScoreEditor preview error', () => {
     expectEscapedError(container.querySelector('#preview-pane'));
   });
 
+  it('escapes the validation error under the notation input', async () => {
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+
+    editor['validationError'] = 'bad <b>markup</b> here';
+    editor['renderValidation']();
+
+    const validation = container.querySelector('#validation-error')!;
+    expect(validation.textContent).toContain('bad <b>markup</b> here');
+    expect(validation.querySelector('b')).toBeNull();
+  });
+
+  it('says why a format switch failed', async () => {
+    const { confirmDialog } = await import('../utils/init-header');
+    const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
+    await flushLoadScore();
+    editor['scoreData'] = JSON.stringify({
+      notes: [
+        { pitch: { step: 'ri', octave: 0 }, meriKari: 'meri', duration: 1 },
+      ],
+    });
+
+    await editor['handleFormatChange']('musicxml');
+
+    expect(vi.mocked(confirmDialog.show)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('ri meri in octave 0'),
+      }),
+    );
+  });
+
   it('escapes the error message in the external preview', async () => {
     const external = document.createElement('div');
     external.id = 'score-preview';
