@@ -111,7 +111,8 @@ export class MusicXMLParser {
         throw new Error(
           PARSER_STRINGS.ERRORS.MusicXMLParser.unknownPitch(
             i,
-            `${step ?? ''}${alterSign(alter)}${octave}`,
+            // Only validated values: the message can end up in a page
+            `${isNoteLetter(step) ? step : '?'}${alterSign(alter)}${octave}`,
           ),
         );
       }

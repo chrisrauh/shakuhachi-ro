@@ -155,6 +155,12 @@ describe('MusicXMLParser', () => {
       expect(() => MusicXMLParser.parse(xml)).toThrow('Note 2 (A3)');
     });
 
+    it('should not quote an unrecognised step in the error', () => {
+      const xml = makeXML(makeNote('&lt;img src=x&gt;', 4));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow('Note 1 (?4)');
+    });
+
     it('should fail on a quarter-tone alter rather than round it', () => {
       const xml = makeXML(makeAlteredNote('D', -0.5, 4));
 
