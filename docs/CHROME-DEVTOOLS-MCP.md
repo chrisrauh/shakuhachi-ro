@@ -1,6 +1,6 @@
 # Chrome DevTools MCP recipes
 
-Call patterns for visual checks with chrome-devtools-mcp. Setup, the dev server and the stale-process fix are in [CLAUDE.md](../CLAUDE.md#chrome-devtools-mcp).
+Call patterns for visual checks with chrome-devtools-mcp. Local terminal only — the cloud uses a Playwright script instead. Setup and the stale-process fix are in [ENVIRONMENT-LOCAL.md](./ENVIRONMENT-LOCAL.md); the dev server is in [CLAUDE.md](../CLAUDE.md#dev-server).
 
 ## Visual Verification Patterns
 
