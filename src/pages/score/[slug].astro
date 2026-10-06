@@ -208,13 +208,11 @@ const license =
     width: 100%; /* Fill viewport width */
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-medium) var(--spacing-medium) 0;
     position: relative;
     flex: 1;
     min-height: 0; /* Shrink to main's height, so nothing is clipped below */
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* Include padding in width calculation */
   }
 
   #score-renderer {
@@ -233,7 +231,6 @@ const license =
   .score-credit {
     flex-shrink: 0; /* The score gives up the space, not the credit */
     margin-top: var(--spacing-small);
-    padding-bottom: var(--spacing-medium);
     color: var(--color-text-secondary);
     font-size: var(--font-size-small); /* Matches the header's metadata */
     line-height: var(--line-height-dense);
