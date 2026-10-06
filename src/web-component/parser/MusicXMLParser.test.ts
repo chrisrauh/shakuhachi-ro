@@ -56,6 +56,28 @@ function makeAttributes(divisions: number): string {
   return `<attributes><divisions>${divisions}</divisions></attributes>`;
 }
 
+/** A score with one part per entry, each named and holding one measure. */
+function makeMultiPartXML(parts: { name: string; body: string }[]): string {
+  const ids = parts.map((_, i) => `P${i + 1}`);
+  const partList = parts
+    .map(
+      (p, i) =>
+        `<score-part id="${ids[i]}"><part-name>${p.name}</part-name></score-part>`,
+    )
+    .join('');
+  const partElements = parts
+    .map(
+      (p, i) =>
+        `<part id="${ids[i]}"><measure number="1">${p.body}</measure></part>`,
+    )
+    .join('');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise>
+  <part-list>${partList}</part-list>
+  ${partElements}
+</score-partwise>`;
+}
+
 describe('MusicXMLParser', () => {
   describe('parse()', () => {
     it('should parse valid MusicXML → correct ScoreData', () => {
@@ -124,6 +146,73 @@ describe('MusicXMLParser', () => {
       expect(score.notes[0].rest).toBe(true);
       expect(score.notes[0].duration).toBe(2);
       expect(score.notes[0].dotted).toBe(true);
+    });
+
+    it('should apply a <divisions> change from the measure that makes it', () => {
+      const xml = `<?xml version="1.0"?>
+<score-partwise>
+  <part id="P1">
+    <measure number="1">${makeAttributes(1) + makeNote('D', 4, 1)}</measure>
+    <measure number="2">${makeAttributes(4) + makeNote('F', 4, 4)}</measure>
+  </part>
+</score-partwise>`;
+
+      const durations = MusicXMLParser.parse(xml).notes.map((n) => n.duration);
+
+      expect(durations).toEqual([1, 1]);
+    });
+
+    it('should import only the part named shakuhachi from a multi-part file', () => {
+      const xml = makeMultiPartXML([
+        { name: 'Koto', body: makeNote('A', 4) + makeNote('B', 4) },
+        { name: 'Shakuhachi', body: makeNote('D', 4) + makeNote('F', 4) },
+      ]);
+
+      const steps = MusicXMLParser.parse(xml).notes.map((n) => n.pitch?.step);
+
+      expect(steps).toEqual(['ro', 'tsu']);
+    });
+
+    it('should fail on a multi-part file with no part named shakuhachi', () => {
+      const xml = makeMultiPartXML([
+        { name: 'Flute', body: makeNote('D', 4) },
+        { name: 'Koto', body: makeNote('A', 4) },
+      ]);
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'The file has 2 parts, and none is named shakuhachi',
+      );
+    });
+
+    it('should fail on a chord, saying where', () => {
+      const xml = makeXML(
+        makeNote('D', 4) + makeNote('F', 4) + makeNote('A', 4, 2, '<chord/>'),
+      );
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 3: the note is part of a chord, and the shakuhachi plays one note at a time.',
+      );
+    });
+
+    it('should fail on a part with more than one voice, saying where', () => {
+      const xml = makeXML(
+        makeNote('D', 4, 2, '<voice>1</voice>') +
+          '<backup><duration>2</duration></backup>' +
+          makeNote('A', 4, 2, '<voice>2</voice>'),
+      );
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1: the part has more than one voice',
+      );
+    });
+
+    it('should fail on timewise MusicXML rather than import nothing', () => {
+      const xml = `<?xml version="1.0"?>
+<score-timewise>
+  <measure number="1"><part id="P1">${makeNote('D', 4)}</part></measure>
+</score-timewise>`;
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow('timewise MusicXML');
     });
 
     it('should produce dotted: true for note with <dot> element', () => {

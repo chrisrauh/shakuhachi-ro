@@ -68,6 +68,29 @@ function describeUnplayable(
   return MESSAGES.outOfRange(where, name, position, PITCH_RANGE);
 }
 
+/** Matches a part's name, abbreviation, instrument name or instrument sound */
+const SHAKUHACHI = /shakuhachi|尺八/i;
+
+/**
+ * The part to import. A file with one part is taken as it is; with several,
+ * the one part named shakuhachi, because koto or piano interleaved into the
+ * shakuhachi line would import wrong without an error.
+ */
+function choosePart(xmlDoc: Document): Element | undefined {
+  const parts = [...xmlDoc.querySelectorAll('score-partwise > part')];
+  if (parts.length <= 1) return parts[0];
+
+  const scoreParts = [...xmlDoc.querySelectorAll('part-list > score-part')];
+  const shakuhachiParts = parts.filter((part) => {
+    const id = part.getAttribute('id');
+    const scorePart = scoreParts.find((sp) => sp.getAttribute('id') === id);
+    return SHAKUHACHI.test(scorePart?.textContent ?? '');
+  });
+  if (shakuhachiParts.length === 1) return shakuhachiParts[0];
+  // Part names are user content, so the message counts parts, not names
+  throw new Error(MESSAGES.partNotChosen(parts.length, shakuhachiParts.length));
+}
+
 export class MusicXMLParser {
   /**
    * Parses a MusicXML file and converts to shakuhachi JSON format
@@ -87,28 +110,60 @@ export class MusicXMLParser {
     const composerElement = xmlDoc.querySelector('creator[type="composer"]');
     const composer = composerElement?.textContent || undefined;
 
-    // <divisions> is divisions-per-quarter-note. Absent means 1. A score may
-    // redefine it per measure; we read the first and apply it throughout,
-    // which matches how this parser already flattens every measure into one
-    // note list.
-    const divisionsValue = parseInt(
-      xmlDoc.querySelector('divisions')?.textContent ?? '',
-      10,
-    );
-    const divisions =
-      Number.isFinite(divisionsValue) && divisionsValue > 0
-        ? divisionsValue
-        : 1;
+    if (xmlDoc.querySelector('score-timewise')) {
+      throw new Error(MESSAGES.timewise);
+    }
+    const part = choosePart(xmlDoc);
 
-    // Extract all notes from all measures
+    // <divisions> is divisions-per-quarter-note. Absent means 1. A score may
+    // redefine it in any measure, and it applies from there on.
+    let divisions = 1;
+    // The voice of the part's first note. Shakuhachi plays one note at a
+    // time, so a second voice fails the import rather than interleaving.
+    // A note without <voice> is in voice 1.
+    let voice: string | undefined;
+
     const notes: ScoreNote[] = [];
-    const noteElements = xmlDoc.querySelectorAll('note');
-    // Notes the table has no fingering for. Import fails rather than dropping
-    // them, which would change the piece without telling anyone; all of them
-    // are counted so a score written in the wrong octave reads as such.
+    // Notes that can't be played: no fingering in the table, or part of a
+    // chord. Import fails rather than dropping them, which would change the
+    // piece without telling anyone; all of them are counted so a score
+    // written in the wrong octave reads as such.
     const unplayable: string[] = [];
 
-    noteElements.forEach((noteElement) => {
+    // A measure's children in order, so a <divisions> change in <attributes>
+    // applies to the notes after it
+    const elements = [...(part?.querySelectorAll('measure') ?? [])].flatMap(
+      (measure) => [...measure.children],
+    );
+
+    elements.forEach((element) => {
+      if (element.tagName === 'attributes') {
+        const value = parseInt(
+          element.querySelector('divisions')?.textContent ?? '',
+          10,
+        );
+        if (Number.isFinite(value) && value > 0) divisions = value;
+        return;
+      }
+      if (element.tagName !== 'note') return;
+      const noteElement = element;
+
+      const noteVoice =
+        noteElement.querySelector('voice')?.textContent?.trim() || '1';
+      voice ??= noteVoice;
+      if (noteVoice !== voice) {
+        throw new Error(
+          MESSAGES.multipleVoices(
+            noteElement.closest('measure')?.getAttribute('number') ?? '?',
+          ),
+        );
+      }
+
+      if (noteElement.querySelector('chord')) {
+        unplayable.push(MESSAGES.chord(locate(noteElement)));
+        return;
+      }
+
       const rawDuration = parseInt(
         noteElement.querySelector('duration')?.textContent || '1',
         10,

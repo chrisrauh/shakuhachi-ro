@@ -102,6 +102,16 @@ export const PARSER_STRINGS = {
       invalidStep: (where: string) => `${where}: the pitch has no valid step`,
       noPitch: (where: string) =>
         `${where}: the note has no pitch (an unpitched note, such as percussion)`,
+      chord: (where: string) =>
+        `${where}: the note is part of a chord, and the shakuhachi plays one note at a time`,
+      partNotChosen: (parts: number, shakuhachiParts: number) =>
+        shakuhachiParts === 0
+          ? `The file has ${parts} parts, and none is named shakuhachi, so it isn't clear which one to import. Name the shakuhachi part "Shakuhachi", or delete the other parts, in the source and import again.`
+          : `The file has ${shakuhachiParts} parts named shakuhachi, so it isn't clear which one to import. Delete or rename all but one of them in the source and import again.`,
+      multipleVoices: (measure: string) =>
+        `Measure ${measure}: the part has more than one voice, and the shakuhachi plays one note at a time. Merge the voices into one, or delete the others, in the source and import again.`,
+      timewise:
+        "The file is timewise MusicXML, which can't be imported. Export it as partwise MusicXML (the usual kind) and import again.",
       unplayableNotes: (first: string, others: number) =>
         others === 0
           ? `${first}. Change or transpose it in the source and import again.`
