@@ -2,3 +2,6 @@ src/content/pages/about.mdx
 
 # Collected reference material, not maintained source
 reference/
+
+# Spec assets, kept verbatim as linked from their issue
+docs/spec-assets/
