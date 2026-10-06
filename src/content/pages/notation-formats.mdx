@@ -28,14 +28,13 @@ Shakuhachi score notation in JSON format. Each note has a pitch (step and octave
 
 ### ABC Notation
 
-Text-based music notation. Must include K: (key) field.
-
-**Example:**
+Text-based music notation. A score can be just its notes:
 
 ```
-K:D
 D F G A d
 ```
+
+Header fields such as `T:` (title) and `K:` (key) are optional. Without a key, notes read as written. With one, the key works as in standard ABC: in `K:D`, F means F♯, so it reads as re meri, and `=F` is tsu. An accidental lasts until the next bar line.
 
 [ABC Notation Standard](https://abcnotation.com/wiki/abc:standard:v2.1)
 

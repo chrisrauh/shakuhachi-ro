@@ -6,7 +6,11 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { toABCPitch } from '../constants/abc-pitch-map';
+import {
+  ABCAccidentals,
+  keySignature,
+  toABCPitch,
+} from '../constants/abc-pitch-map';
 import {
   fingeringName,
   isDefaultFingering,
@@ -22,11 +26,21 @@ export class ABCSerializer {
    * @returns ABC notation string
    */
   static serialize(scoreData: ScoreData): string {
+    // K: field (key, required) - default to D for D shakuhachi
+    const key = scoreData.key || 'D';
+    const signature = keySignature(key);
+    if (!signature) {
+      throw new Error(PARSER_STRINGS.ERRORS.Serializer.unknownABCKey(key));
+    }
+
     // Generate header
-    const header = this.generateHeader(scoreData);
+    const header = this.generateHeader(scoreData, key);
 
     // Convert notes to ABC notation
-    const abcNotes = this.serializeNotes(scoreData.notes);
+    const abcNotes = this.serializeNotes(
+      scoreData.notes,
+      new ABCAccidentals(signature),
+    );
 
     // Combine header and notes
     return `${header}\n\n${abcNotes}\n`;
@@ -35,7 +49,7 @@ export class ABCSerializer {
   /**
    * Generate ABC header from ScoreData metadata
    */
-  private static generateHeader(scoreData: ScoreData): string {
+  private static generateHeader(scoreData: ScoreData, key: string): string {
     const lines: string[] = [];
 
     // X: field (index, required) - always use 1
@@ -61,8 +75,6 @@ export class ABCSerializer {
       lines.push(`Q:${scoreData.tempo}`);
     }
 
-    // K: field (key, required) - default to D for D shakuhachi
-    const key = scoreData.key || 'D';
     lines.push(`K:${key}`);
 
     return lines.join('\n');
@@ -78,9 +90,14 @@ export class ABCSerializer {
   }
 
   /**
-   * Serialize notes array to ABC notation string
+   * Serialize notes array to ABC notation string. Notes are written relative
+   * to the key and to accidentals earlier in the bar, which here is the whole
+   * tune, since no bar lines are written.
    */
-  private static serializeNotes(notes: ScoreNote[]): string {
+  private static serializeNotes(
+    notes: ScoreNote[],
+    accidentals: ABCAccidentals,
+  ): string {
     const abcNotes: string[] = [];
 
     notes.forEach((note, index) => {
@@ -102,7 +119,7 @@ export class ABCSerializer {
         const decoration = isDefaultFingering(fingering)
           ? ''
           : `!${fingeringName(fingering)}!`;
-        const abcPitch = decoration + toABCPitch(written);
+        const abcPitch = decoration + toABCPitch(written, accidentals);
 
         // A dot is written as the sounding length (a dotted 1 is 3/2), not as
         // >, which in ABC is broken rhythm and would also halve the next note
