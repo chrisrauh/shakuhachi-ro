@@ -83,7 +83,7 @@ The same name at a different pitch, or different holes. Since Koga is canonical,
 
 ## D. Not read, or left out
 
-**BC characters I couldn't identify.** These are brush characters with a ※, in the "special notes" row. Please read them:
+**BC characters I couldn't identify.** These are brush characters with a ※, in the "special notes" row. Asked on #423 (https://github.com/chrisrauh/shakuhachi-ro/issues/423#issuecomment-6012369749):
 
 | BC position | Pitch | Holes | Chin |
 |---|---|---|---|
