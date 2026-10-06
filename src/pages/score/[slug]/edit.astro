@@ -95,8 +95,8 @@ if (!score) return new Response(null, { status: 404 });
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--spacing-large);
-      height: calc(100vh - 80px);
-      padding: var(--spacing-medium);
+      flex: 1;
+      min-height: 0; /* Shrink to main's height, so the panels scroll inside it */
     }
 
     .mobile-toggle {
@@ -126,7 +126,6 @@ if (!score) return new Response(null, { status: 404 });
       .edit-layout {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
-        padding: var(--spacing-medium);
       }
 
       .mobile-toggle {
