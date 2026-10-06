@@ -129,6 +129,7 @@ The fingering table (`src/web-component/constants/kinko-fingerings.ts`) adds the
 |---|---|---|---|---|
 | G♭6 | ●●●●○ | レメ re meri (大甲) | meri | Nyokai-An; the holes of Koga's #76 |
 | C♯4 | ●●●●● | ロ中 ro chu-meri | chu-meri | Nyokai-An. Not the import default: Koga calls this pitch ro meri (#2) |
+| D♭7 | ●○●●● | ヒ (small) read as go no hi meri (大甲) | meri | shak-fingering only. The import default for D♭7; low confidence |
 
 ## Names on page 109 not yet placed
 

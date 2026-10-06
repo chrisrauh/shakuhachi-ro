@@ -174,12 +174,13 @@ describe('MusicXMLParser', () => {
       );
     });
 
-    it('should say when no chart has a fingering for a note in range', () => {
-      const xml = makeXML(makeAlteredNote('C', 1, 7));
+    it('should import every semitone at the top of the range', () => {
+      const xml = makeXML(makeAlteredNote('C', 1, 7) + makeNote('D', 7));
 
-      expect(() => MusicXMLParser.parse(xml)).toThrow(
-        'C#7 has no shakuhachi fingering',
-      );
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
+        { step: 'go-no-hi', octave: 2 },
+        { step: 'ha', octave: 2 },
+      ]);
     });
 
     it('should keep a fingering named in <technical>, and ignore finger numbers', () => {

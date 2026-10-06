@@ -39,7 +39,7 @@ Candidates to add as named fingerings. "New step" means a new character for the 
 | A18 | ru | ル | kan | G5 | ●●○●◐ | ⤋ (BC), メ (SF) | BC, SF | **New step.** Not Kinko's ru, which means "strike hole 1" (N) |
 | A19 | ra | ラ | otsu ⚠ | C♯5 (BC) | BC: ○●●○● (hole 2 partly); SF: ◐◐●●○ | ↓, メ | BC, SF | **New step.** ⚠ The holes conflict; SF gives no pitch |
 | A20 | tsu chu-meri | ツ中 | daikan | E6 | ◐●○○○ | — | SF | Koga's E6 is shi no ha, ●●○○○ |
-| A21 | ヒ, small | ヒ゜ | daikan | D♭7 | ●○●●● | — | SF | Would fill D♭7, the one pitch without a fingering. ⚠ SF writes a small ヒ at every C♯/D♭ (go no hi meri in Koga); the name is unclear. |
+| A21 | go no hi meri | ヒ゜ (small ヒ) | daikan | D♭7 | ●○●●● | — | SF | **In the table, with low confidence.** SF writes a small ヒ at C♯5 and C♯6, where Koga has go no hi meri, so this is read as go no hi meri in daikan. It fills D♭7, the one pitch that had no fingering. |
 | A22 | ri dai-meri | リ大メ | otsu | B♭4 | ●◐○●● | 大メ | SF | Koga calls B♭4 ri meri |
 | A23 | hi dai-meri | ヒ大メ | kan | B♭5 | ●◐○●● | 大メ | SF | Koga calls B♭5 hi meri |
 

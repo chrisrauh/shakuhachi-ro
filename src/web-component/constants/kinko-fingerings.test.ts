@@ -57,11 +57,11 @@ describe('fingering table', () => {
     expect(PITCH_RANGE).toBe('C4–D7');
   });
 
-  it('gives every pitch in range one default, except D♭7, which no chart names', () => {
+  it('gives every pitch in range one default', () => {
     const missing = RANGE.filter(
       (pitch) => !defaultFingering(parseTablePitch(pitch)),
     );
-    expect(missing).toEqual(['C#7']);
+    expect(missing).toEqual([]);
   });
 
   it('says where every row that is not from Koga comes from', () => {

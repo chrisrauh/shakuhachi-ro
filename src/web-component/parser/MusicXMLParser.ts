@@ -62,6 +62,8 @@ function describeUnplayable(
   const accidentals = alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
   const name = `${written.letter}${accidentals}${written.octave}`;
   const position = rangePosition(written);
+  // Every semitone in range has a fingering today; this guards against a
+  // review removing one
   if (position === 'within') return MESSAGES.notInTable(where, name);
   return MESSAGES.outOfRange(where, name, position, PITCH_RANGE);
 }
