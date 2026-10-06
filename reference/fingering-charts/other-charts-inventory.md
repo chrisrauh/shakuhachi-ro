@@ -17,6 +17,8 @@ Holes are written 5·4·3·2·1, as in the Koga inventory: ● closed, ○ open,
 
 Candidates to add as named fingerings. "New step" means a new character for the renderer.
 
+**In the fingering table** (decided on #430): all of these except ra (A19), whose holes and pitch the charts don't agree on. Where a candidate matches one of Koga's unnamed columns, that column takes the name: #33 (A4), #36 (A7), #42 (A16) and #59 (A15). Daikan ro (A10) is stored as other holes for go no ha. Nyokai-An's i meri at C conflicts with Koga's naming and is left out; its i chu-meri is in. Every row has a confidence and why in the table.
+
 | # | Name | Written | Octave | Pitch | Holes | Chin | Source | Notes |
 |---|---|---|---|---|---|---|---|---|
 | A1 | ro chu-meri | ロ中 | kan | C♯5 | ●●●●● | ↓↓ | N | Already added in otsu. Koga calls C♯5 ro meri. |

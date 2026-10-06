@@ -85,6 +85,24 @@ export const kinkoMap: Record<PitchStep, KinkoSymbol> = {
     romaji: 'ni-shi-go-no-ha',
     pitch: 'Eb5',
   },
+  i: { kana: 'イ', romaji: 'i', pitch: 'D5' },
+  a: { kana: 'ア', romaji: 'a', pitch: 'D5' },
+  ru: { kana: 'ル', romaji: 'ru', pitch: 'G4' },
+  'yon-go-no-ha': {
+    kana: 'ハ',
+    numerals: '四五',
+    romaji: 'yon-go-no-ha',
+    pitch: 'D5',
+  },
+  'ni-no-ha': { kana: 'ハ', numerals: '二', romaji: 'ni-no-ha', pitch: 'Eb5' },
+  'yon-no-hi': { kana: 'ヒ', numerals: '四', romaji: 'yon-no-hi', pitch: 'B4' },
+  'ni-no-re': { kana: 'レ', numerals: '二', romaji: 'ni-no-re', pitch: 'Gb4' },
+  'ichi-san-no-u': {
+    kana: 'ウ',
+    numerals: '一三',
+    romaji: 'ichi-san-no-u',
+    pitch: 'G4',
+  },
 };
 
 /**

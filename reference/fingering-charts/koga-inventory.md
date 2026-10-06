@@ -63,16 +63,16 @@ All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), chec
 | 30 | D5 | ●●●●● | ロ ro | neutral (p37) | |
 | 31 | D5 | ○○○●● | 五 go no hi | neutral (p39) | |
 | 32 | D5 | ○○○○○ | — | ? | |
-| 33 | D5 | ●●●●◕ | — | meri (inferred) | Same holes as #34, a semitone lower |
+| 33 | D5 | ●●●●◕ | — | dai-meri (other charts) | Same holes as #34, a semitone lower. Nyokai-An names it tsu dai-meri (kan), and the fingering table does too |
 | 34 | E♭5 | ●●●●◕ | ツメ tsu meri | meri (p37) | |
 | 35 | E♭5 | ◐●●●◕ | — | ? | |
-| 36 | E♭5 | ○○●●● | — | ? | |
+| 36 | E♭5 | ○○●●● | — | kari (other charts) | Nyokai-An and shak-fingering name it ro kari (kan), and the fingering table does too |
 | 37 | E5 | ●●●●◐ | ツ中 tsu chu-meri | chu-meri (p37) | |
 | 38 | E5 | ●●●●○ | — | chu-meri (other charts) | Same holes as #39, a semitone lower. Nyokai-An names it tsu chu-meri, and the fingering table does too. |
 | 39 | F5 | ●●●●○ | ツ tsu | neutral (p37) | |
 | 40 | F5 | ●●●◕◐ | — | ? | |
 | 41 | G♭5 | ●●●◐○ | レメ re meri | meri (p39) | |
-| 42 | G♭5 | ●●●○● | — | ? | |
+| 42 | G♭5 | ●●●○● | — | chu-meri (other charts) | The B.C. chart names it ni no re (レ二), and the fingering table does too |
 | 43 | G5 | ●●●○○ | レ re | neutral (p37) | |
 | 44 | G5 | ●●◐●○ | — | ? | |
 | 45 | A♭5 | ●●◐○○ | チメ chi meri | meri (p39) | |
@@ -89,7 +89,7 @@ All 84 fingerings from Koga's fingering chart (*Koga II*, pages 107–108), chec
 | 56 | B5 | ●◔○●● | ヒ中 hi chu-meri | chu-meri (p39) | |
 | 57 | B5 | ●○○●● | — | meri (inferred) | Same holes as #60, a semitone lower |
 | 58 | B5 | ●○○○○ | — | ? | |
-| 59 | B5 | ●○●●● | — | ? | |
+| 59 | B5 | ●○●●● | — | meri (other charts) | The B.C. chart names it yon no hi (ヒ四), and the fingering table does too |
 | 60 | C6 | ●○○●● | ヒ hi | neutral (p37) | |
 | 61 | C6 | ●○○○● | — | neutral (other charts) | Nyokai-An and fingchart6 name it hi, and the fingering table does too |
 | 62 | C6 | ◐○○●● | — | meri (inferred) | Same holes as #63, a semitone lower |

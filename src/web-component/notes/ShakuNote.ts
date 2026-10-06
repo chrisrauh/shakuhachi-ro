@@ -36,7 +36,8 @@ const STACKED_NUMERAL_SIZE_RATIO = 0.26;
 
 /**
  * Where the numerals sit inside each kana, as in Koga's chart: between the
- * strokes of ハ, inside ウ, in the open lower right of ヒ. Offsets of the
+ * strokes of ハ, inside ウ, in the open lower right of ヒ, at the upper right
+ * of レ (as the B.C. chart writes レ二). Offsets of the
  * lowest numeral from the kana's centre and baseline, as fractions of the
  * font size.
  */
@@ -44,6 +45,7 @@ const NUMERAL_OFFSET_RATIO: Record<string, { x: number; y: number }> = {
   ハ: { x: 0, y: 0 },
   ウ: { x: 0.04, y: -0.16 },
   ヒ: { x: 0.16, y: 0 },
+  レ: { x: 0.24, y: -0.42 },
 };
 
 /**

@@ -24,7 +24,7 @@ describe('getSymbolByKana', () => {
   });
 
   it('returns undefined for invalid kana', () => {
-    expect(getSymbolByKana('ア')).toBeUndefined();
+    expect(getSymbolByKana('カ')).toBeUndefined();
   });
 });
 

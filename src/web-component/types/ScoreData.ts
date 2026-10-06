@@ -10,8 +10,9 @@
 
 /**
  * Shakuhachi pitch steps (Kinko-ryū). Each names a written character: the five
- * basic notes, u, hi and ha, and the fingerings Kinko writes with a small
- * numeral beside the character, such as go no hi (ヒ with 五). Which pitch each
+ * basic notes, u, hi and ha, the fingerings written with small hole numbers
+ * inside the character, such as go no hi (ヒ with 五), and characters other
+ * Kinko charts use (i, a, ru). Which pitch each
  * gives, and how it is fingered, is in the fingering table
  * (constants/kinko-fingerings.ts).
  */
@@ -30,6 +31,14 @@ export const PITCH_STEPS = [
   'san-no-ha',
   'shi-no-ha',
   'ni-shi-go-no-ha',
+  'i',
+  'a',
+  'ru',
+  'yon-go-no-ha',
+  'ni-no-ha',
+  'yon-no-hi',
+  'ni-no-re',
+  'ichi-san-no-u',
 ] as const;
 export type PitchStep = (typeof PITCH_STEPS)[number];
 
