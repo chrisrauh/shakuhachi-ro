@@ -52,7 +52,7 @@ digraph dev_workflow {
   "Tests pass?" [shape=diamond];
   "Fix failures" [shape=box];
   "UI change?" [shape=diamond];
-  "Visual verify (chrome-devtools-mcp)" [shape=box];
+  "Visual verify (browser)" [shape=box];
   "Run npm run test:visual" [shape=box];
   "Baselines need update?" [shape=diamond];
   "Show playwright report URL" [shape=box];
@@ -87,9 +87,9 @@ digraph dev_workflow {
   "Tests pass?" -> "Fix failures" [label="no"];
   "Fix failures" -> "Run npm test";
   "Tests pass?" -> "UI change?" [label="yes"];
-  "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
+  "UI change?" -> "Visual verify (browser)" [label="yes"];
   "UI change?" -> "Ask user to review changes" [label="no"];
-  "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
+  "Visual verify (browser)" -> "Run npm run test:visual";
   "Run npm run test:visual" -> "Baselines need update?";
   "Baselines need update?" -> "Show playwright report URL" [label="yes"];
   "Show playwright report URL" -> "STOP: wait for user baseline approval";
@@ -185,18 +185,9 @@ Only report "all tests passing" when all three steps succeeded. Never assume suc
 
 **After creating new files:** new files often have formatting errors — run `npx eslint <file> --fix` before committing.
 
-**For UI changes:** use chrome-devtools-mcp to verify visually.
+**For UI changes:** verify visually in a browser — screenshots in light and dark mode, and no new console errors. Your environment guide has the tooling (chrome-devtools-mcp locally, a Playwright script in the cloud).
 
-```
-navigate_page({ url: "http://localhost:3001/path" })
-emulate({ colorScheme: "light" })
-take_screenshot()
-emulate({ colorScheme: "dark" })
-take_screenshot()
-list_console_messages({ types: ["error", "warn"] })
-```
-
-**For UI changes — run visual regression tests after chrome-devtools-mcp verification:**
+**For UI changes — run visual regression tests after browser verification**, where your environment can run them (in the cloud it cannot — say so in the PR test plan):
 
 ```bash
 npm run test:visual

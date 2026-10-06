@@ -13,14 +13,14 @@ Follow this sequence to get context:
 
 ### 0. Identify Your Environment
 
-This project is worked on in two environments. Work out which one you are in before anything else — the tooling differs.
+This project is worked on in two environments. Work out which one you are in before anything else, then read **that environment's guide now** — and only that one. `CLAUDE.md` and the skills are environment-neutral; credentials, browser verification, the visual regression suite and GitHub access are in the guide.
 
-| Environment                                                                                                                    | How to tell                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                             |
-| **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt names a `claude/...` branch to develop on; `gh` is not installed. |
+| Environment                                                                                                                    | How to tell                                                                                              | Guide                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Local terminal** (macOS)                                                                                                     | Platform is `darwin`; `gh` is installed; no injected branch.                                             | [docs/ENVIRONMENT-LOCAL.md](../../../docs/ENVIRONMENT-LOCAL.md) |
+| **Claude Code cloud** — claude.ai/code on the web, and sessions started from the Claude mobile or desktop app (same container) | Platform is `linux`; the system prompt names a `claude/...` branch to develop on; `gh` is not installed. | [docs/ENVIRONMENT-CLOUD.md](../../../docs/ENVIRONMENT-CLOUD.md) |
 
-In the cloud environment, read [docs/ENVIRONMENT-CLOUD.md](../../../docs/ENVIRONMENT-CLOUD.md) now. It lists what is unavailable there (`gh`, the visual regression suite, chrome-devtools-mcp) and what to use instead. Everywhere this skill and `/dev-workflow` say `gh`, use the GitHub MCP tools (`mcp__github__*`).
+The `gh` commands below and in `/dev-workflow` are written for the local CLI. The cloud guide translates them.
 
 ### 1. Review Guidelines (CLAUDE.md)
 

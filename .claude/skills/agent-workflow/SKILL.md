@@ -48,11 +48,8 @@ Sessions run concurrently — a terminal session and a Claude Code on the Web se
 2. Create an isolated worktree using `superpowers:using-git-worktrees`
    - Branch name: `feature/<task-slug>` (e.g. `feature/extract-score-error-wrapping`)
    - **Never** use `worktree-*` as a branch prefix — that is a directory naming convention only
-3. Link the environment file into the worktree, from inside it:
-   ```bash
-   ln -s ../../../.env .env
-   ```
-   `.env` is gitignored, so it exists only in the main checkout. `npm test` passes without this (vitest supplies placeholder Supabase vars), but the **dev server and any visual verification need the real file** — without it the score library renders empty and score pages break. The symlink is itself gitignored, and the relative path resolves from `.claude/worktrees/<name>/` back to the repo root.
+   - In the cloud, skip the worktree and use the injected `claude/...` branch — see your environment guide
+3. Make the credentials available to the worktree — your environment guide says how. Without them `npm test` still passes, but the dev server and any visual verification break.
 4. Work exclusively in the worktree for all subsequent steps
 5. **Early exit rule:** if you need to abort before Phase 6 (task too vague, unresolvable failure), remove the worktree before stopping:
    ```bash
@@ -113,8 +110,8 @@ Read the **entire** output — type-check, lint, format check, and vitest must a
 
 If the task touches UI:
 
-- Use `chrome-devtools-mcp` to verify visually (light + dark mode)
-- Run `npm run test:visual`
+- Verify visually in a browser, light + dark mode — your environment guide has the tooling
+- Run `npm run test:visual` where your environment can (in the cloud it cannot — note it in the PR test plan)
 - **If baselines fail:** do NOT wait for approval — note the failing tests in the PR body and mark the PR as draft
 - Never block on visual baseline approval — flag and move on
 

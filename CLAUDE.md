@@ -3,7 +3,7 @@
 - Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now, and `bug` ranks alongside it — a bug is a promise already broken. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:ux` (user-facing — changes what users see or do; **preferred over internal work when choosing what to do next**), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
 - **Claim before you build:** assign an issue to yourself (`gh issue edit <n> --add-assignee @me`) before writing code, pick only unassigned issues (`--search "no:assignee"`), unassign if you abandon it, and re-check it is still open before pushing. Terminal and web sessions run concurrently against one backlog and will otherwise build the same thing twice. See `/dev-workflow` Phase 1.
 - Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
-- Environment: [Cloud (claude.ai/code, mobile app)](./docs/ENVIRONMENT-CLOUD.md)
+- Environment: [Local terminal (macOS)](./docs/ENVIRONMENT-LOCAL.md) | [Cloud (claude.ai/code, mobile app)](./docs/ENVIRONMENT-CLOUD.md) — read the one you are in; `/get-ready` tells you which
 
 ## ⚠️ MANDATORY SKILL RULES — HIGHEST PRIORITY
 
@@ -64,9 +64,14 @@ Use project skills for structured workflows:
 
 ## Runtime Environment
 
-This project is used in two environments: a local macOS terminal and the **Claude Code cloud** environment (claude.ai/code on the web, and sessions started from the Claude mobile or desktop app — they run in the same container). The guidelines in this file are written for the terminal environment. `/get-ready` explains how to tell which one you are in.
+This project is worked on in two environments. This file and the skills apply to both; everything that differs — where credentials come from, how to verify visually, whether the visual regression suite runs, how to reach GitHub — lives in one guide per environment. `/get-ready` tells you which one you are in. Read that guide, and only that one.
 
-**If you are running in the cloud environment**, read [docs/ENVIRONMENT-CLOUD.md](./docs/ENVIRONMENT-CLOUD.md) for constraints and workflow differences that apply there.
+| Environment                                                                                              | Guide                                                    |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Local terminal on the maintainer's Mac (`darwin`)                                                        | [docs/ENVIRONMENT-LOCAL.md](./docs/ENVIRONMENT-LOCAL.md) |
+| Claude Code cloud — claude.ai/code, or a session started from the Claude mobile or desktop app (`linux`) | [docs/ENVIRONMENT-CLOUD.md](./docs/ENVIRONMENT-CLOUD.md) |
+
+Where this file says "your environment guide", it means that one.
 
 ## Dev Workflow
 
@@ -94,7 +99,7 @@ The web component renderer lives in a separate package and must be built:
 1. Make renderer changes
 2. Run `npm run build:wc` (needed only if the dev server is already running)
 3. Refresh browser (dev server serves from `public/`)
-4. Verify changes with chrome-devtools-mcp
+4. Verify changes in the browser — see your environment guide
 
 ## Design System
 
@@ -123,8 +128,8 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 ### Visual Verification
 
 - Always check light **and** dark mode after styling changes
-- Use chrome-devtools-mcp (`take_screenshot()`, `emulate({ colorScheme })`) — not scripts
-- Run `npm run test:visual` before PR — see `/dev-workflow` for the baseline approval workflow.
+- Look at screenshots, not only the markup — your environment guide says how to take them
+- Run `npm run test:visual` before PR where your environment can — see `/dev-workflow` for the baseline approval workflow.
 
 ### Component Patterns
 
@@ -138,7 +143,7 @@ Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE
 
 - Unit tests (Vitest): Logic, validation, transformations
 - Visual tests (Browser): Rendering, layout
-- **Always test visual changes with chrome-devtools-mcp** - See "Chrome DevTools MCP" section
+- **Always verify visual changes in a browser** — see your environment guide
 - **When you find an error during development, implement a unit test that would have caught that error**
 - **Run full test suite after each task**: `npm test` (includes type-check, lint, format check, and vitest; fix formatting with `npm run format`)
 - **CRITICAL: Run full test suite before pushing**: `npm test` must pass before any push to remote
@@ -163,7 +168,7 @@ Example: For a slug utility, test core transformations (lowercase, spaces→hyph
 - **SVG**: `overflow: visible` to prevent clipping of modifiers beyond boundaries
 - **Modes**: Debug and non-debug render identically
 - **Edge cases**: First/last notes in columns, multiple modifiers, rests
-- **Process**: Use chrome-devtools-mcp during development; run `npm run test:visual` before PR — see `/dev-workflow` for the baseline approval gate.
+- **Process**: Verify in a browser during development; run `npm run test:visual` before PR where your environment can — see `/dev-workflow` for the baseline approval gate.
 
 **Visual Regression Tests**
 
@@ -192,7 +197,7 @@ When implementing or testing features that require test data:
 
 - Create permanent test fixtures for common testing scenarios
 - Document test fixtures in this file so they're discoverable
-- Use the test account (credentials in `.env`) to create test data
+- Use the test account (see "Test Account Credentials") to create test data
 - Give fixtures descriptive, memorable names/slugs
 
 **Evaluating Visual Regression Test Coverage**
@@ -231,14 +236,9 @@ For non-trivial tasks (anything requiring 3+ steps or touching multiple files):
 
 **Don't use for:** Single-file changes, trivial updates, simple bug fixes
 
-## Chrome DevTools MCP
+## Dev Server
 
-Use chrome-devtools-mcp for visual verification (not Bash scripts, not saving to files).
-
-- `take_snapshot()` = markup structure
-- `take_screenshot()` = rendered appearance
-
-**Dev server:** Start once per session (port 3001), leave running throughout. Always verify both light and dark modes.
+Start once per session (port 3001), leave running throughout. How to look at it in a browser depends on the environment — see your environment guide. Always verify both light and dark modes.
 
 ```
 # Start dev server — use run_in_background parameter, no shell operators
@@ -250,36 +250,12 @@ Astro 7 detects agent environments and daemonizes `astro dev`, so this command e
 - Stop it with `npx astro dev stop` (not by killing the Bash task, which has already exited). `npx astro dev status` and `npx astro dev logs` also work.
 - `npm run test:visual` fails with `Process from config.webServer exited early` when no server is up, because Playwright's `webServer` starts `npm run dev` and sees it exit. Start the dev server first — Playwright then reuses it (`reuseExistingServer`). CI is unaffected: outside an agent environment `astro dev` stays in the foreground.
 
-**Stale Chrome process (MCP connection fails repeatedly):** When the MCP-controlled Chrome process doesn't exit cleanly (e.g. after a session crash), `list_pages` returns a "browser already running" lock error. Fix:
-
-```
-pkill -f "chrome-devtools-mcp"
-```
-
-Then run `/mcp` to reconnect. This kills the stale MCP Chrome without affecting the user's regular Chrome (they use separate user data dirs).
-
-**Call patterns** for styling, refactors, single elements, performance, viewports and debugging: [docs/CHROME-DEVTOOLS-MCP.md](./docs/CHROME-DEVTOOLS-MCP.md).
-
 ### Test Account Credentials
 
-When testing authenticated features (score editor, creating scores, forking):
-
-**For visual testing with chrome-devtools-mcp:**
-
-- Authenticate directly in the browser using credentials from `.env` file
-- Use `fill()` tool to enter email and password in login form
-- Access credentials using `source .env && echo $VAR` command (requires one-time authorization per session):
-  ```bash
-  source .env && echo "Email: $TEST_EMAIL" && echo "Password: $TEST_PASSWORD"
-  ```
-- **Note:** This is an acceptable exception to the "avoid &&" guideline since `.env` cannot be read directly and each Bash call is a separate shell session
-
-**Important:**
+When testing authenticated features (score editor, creating scores, forking), log in through the browser as the test account: `TEST_EMAIL` and `TEST_PASSWORD`. The Supabase config is `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Where all four come from — a `.env` file or environment variables — depends on the environment; see your environment guide.
 
 - Never hardcode credentials in code or memory files
-- Store in `.env` file (gitignored)
-- Use `.env.example` as template with placeholder values
-- Test credentials are documented in `.env.example` with `TEST_EMAIL` and `TEST_PASSWORD` variables
+- `.env.example` lists the variables with placeholder values
 
 **Test Score for Editor Testing:**
 
