@@ -73,9 +73,10 @@ export const PARSER_STRINGS = {
 
     ABCParser: {
       contentRequired: 'ABC notation content is required',
-      keyFieldRequired: 'ABC notation must include K: (key) field',
+      unknownKey: (key: string) =>
+        `The K: field's key, "${key}", isn't one ABC defines. Use a key such as D, Dm, D dorian or none.`,
       noNotesFound:
-        'No notes found in ABC notation. Ensure K: field is followed by note data.',
+        'No notes found in ABC notation. Write the notes after the header fields, e.g. D F G A d.',
       unknownPitch: (pitch: string) =>
         `Unknown ABC pitch: "${pitch}". Valid pitches: D, F, G, A, C (uppercase/lowercase) with optional ^, _, =, ', or ,`,
       invalidDuration: (duration: string) =>
@@ -112,6 +113,8 @@ export const PARSER_STRINGS = {
     Serializer: {
       invalidFingering: (index: number, format: string) =>
         `Note ${index + 1} has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to ${format}. Fix that note, or keep the score in its current format.`,
+      unknownABCKey: (key: string) =>
+        `The score's key, "${key}", isn't one ABC defines, so the score can't be converted to ABC. Change it to a key such as D, Dm or D dorian.`,
     },
   },
 } as const;

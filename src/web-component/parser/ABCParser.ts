@@ -6,18 +6,25 @@
  *
  * ABC Notation Reference:
  * - Header fields: X: (index), T: (title), C: (composer), M: (meter), L: (unit length), K: (key)
+ *   All are optional; a tune can be just its notes
  * - Notes: A-G (uppercase = octave 4), a-g (lowercase = octave 5), ' (upper octave), , (lower octave)
  * - Accidentals: ^ (sharp), ^^ (double sharp), _ (flat), __ (double flat), = (natural)
  * - Duration: 2 (double), /2 (half), 3/2 (dotted), default is L: value
  * - Broken rhythm: A>B dots A and halves B; A<B halves A and dots B
  * - Rests: z (with duration modifiers)
- * - Bar lines: | (measure separator, ignored in output)
+ * - Key: K: sets the accidentals of notes written without one. Without K:,
+ *   notes read as written
+ * - Bar lines: | ends the accidentals written in a bar; not kept in output
  * - Decorations: !name! before a note. One naming a fingering (as our export
  *   writes, e.g. !ri-meri!) chooses it; others are ignored
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { parseABCPitch } from '../constants/abc-pitch-map';
+import {
+  ABCAccidentals,
+  keySignature,
+  parseABCPitch,
+} from '../constants/abc-pitch-map';
 import {
   defaultFingering,
   namedFingering,
@@ -53,10 +60,15 @@ export class ABCParser {
         continue;
       }
 
-      // Check for header fields (before K: field)
+      // The header is fields such as T:Title. It ends at K:, or, when a
+      // tune has no K:, at the first line that isn't a field
+      if (!inBody && !/^[A-Za-z]:/.test(trimmed)) {
+        inBody = true;
+      }
+
       if (!inBody) {
         if (trimmed.startsWith('X:')) {
-          // Index field (required but we don't use it)
+          // Index field (not used)
           continue;
         } else if (trimmed.startsWith('T:')) {
           title = trimmed.substring(2).trim() || 'Untitled';
@@ -75,18 +87,21 @@ export class ABCParser {
           inBody = true; // K: field marks end of header
         }
       } else {
-        // Body: collect note lines (after K: field)
         noteLines.push(trimmed);
       }
     }
 
-    // Validate required headers
-    if (!inBody) {
-      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.keyFieldRequired);
+    // Without K:, notes read as written
+    const signature = keySignature(key ?? '');
+    if (!signature) {
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownKey(key ?? ''));
     }
 
     // Parse notes from body
-    const notes = this.parseNotes(noteLines.join(' '));
+    const notes = this.parseNotes(
+      noteLines.join(' '),
+      new ABCAccidentals(signature),
+    );
 
     return {
       title,
@@ -102,21 +117,24 @@ export class ABCParser {
    * Parse note sequence from ABC body
    *
    * @param noteString - ABC note sequence (e.g., "D2 F G3/2 z/2 A>B c")
+   * @param accidentals - The key signature, and accidentals as they're written
    * @returns Array of ScoreNote objects
    */
-  private static parseNotes(noteString: string): ScoreNote[] {
+  private static parseNotes(
+    noteString: string,
+    accidentals: ABCAccidentals,
+  ): ScoreNote[] {
     const notes: ScoreNote[] = [];
     // The broken-rhythm marker (> or <) after each note, by note index
     const brokenRhythm: string[] = [];
 
-    // Remove bar lines and extra whitespace
-    const cleaned = noteString.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim();
+    const cleaned = noteString.replace(/\s+/g, ' ').trim();
 
     // Tokenize: split into note tokens (pitch + optional duration + optional dotted marker)
     // Regex matches: optional accidental + ANY letter (we'll validate later) + optional octave marks + optional duration + optional dotted
     // Examples: "D", "^D2", "d'", "_a/2", "G>", "X", "Q", "z"
     const tokenRegex =
-      /!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
+      /(\|)|!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
     // Decorations seen since the last note
     let decorations: string[] = [];
     let match: RegExpExecArray | null;
@@ -143,6 +161,7 @@ export class ABCParser {
     while ((match = tokenRegex.exec(cleaned)) !== null) {
       const [
         fullMatch,
+        barLine,
         decoration,
         accidental,
         pitch,
@@ -153,6 +172,11 @@ export class ABCParser {
 
       // Skip if empty match or whitespace
       if (!fullMatch.trim()) {
+        continue;
+      }
+
+      if (barLine) {
+        accidentals.barLine();
         continue;
       }
 
@@ -184,7 +208,12 @@ export class ABCParser {
       const abcPitch = `${accidental || ''}${pitch}${octaveMarks}`;
 
       // Map to shakuhachi
-      const written = parseABCPitch(accidental || '', pitch, octaveMarks);
+      const written = parseABCPitch(
+        accidental || '',
+        pitch,
+        octaveMarks,
+        accidentals,
+      );
       const shakuPitch =
         written &&
         (noteDecorations
