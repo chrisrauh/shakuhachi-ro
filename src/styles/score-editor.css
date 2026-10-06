@@ -171,10 +171,12 @@
 
 .validation-error.show {
   display: flex;
-  align-items: center;
   gap: var(--spacing-x-small);
   padding: var(--spacing-small) var(--spacing-large);
   max-height: 100px;
+  /* Long messages scroll. Centring would clip their first line out of reach. */
+  overflow-y: auto;
+  align-items: flex-start;
 }
 
 .validation-error svg {
