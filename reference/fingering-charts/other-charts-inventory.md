@@ -54,12 +54,12 @@ The same name at a different pitch, or different holes. Since Koga is canonical,
 | B3 | go no hi meri, i meri | D♭5, D♭6 | N: C5, C6 |
 | B4 | tsu dai-meri | D4 | SF: E♭4 (Koga's tsu meri) |
 | B5 | ハ二 | — | F6: ○○●○●, Koga's ni shi go no ha. BC and SF: ○●●○● (A14). |
-| B6 | shi no ha / yon no ha | E6, ●●○○○ | N, F6: ○●○○● |
+| B6 | shi no ha / yon no ha | E6, ●●○○○ | N, F6: ○●○○●. The same name (四 reads shi or yon) at the same pitch, so the table stores it as other holes for shi no ha. |
 | B7 | a | — | N ○○●●● vs BC and SF ○○●○● (A12) |
 
 ## C. Other holes for fingerings Koga names
 
-Alternatives the table could store, for fingering diagrams. The table holds one set of holes per named fingering today, so storing these needs a small model change (several rows with the same name, at the same pitch).
+**In the fingering table** (decided on #430): a fingering can have several rows, one per set of holes, all at one pitch. Where the other holes are one of Koga's unnamed columns, that column gets the name instead: #38 tsu chu-meri (kan), #61 hi (kan) and #68 go no hi (kan). Chin follows the name, except for shi no ha's other holes, which no chart marks.
 
 | Fingering | Koga | Other charts |
 |---|---|---|

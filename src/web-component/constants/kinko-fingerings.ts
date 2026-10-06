@@ -56,7 +56,8 @@ export interface Fingering {
 
 /**
  * Koga's 84 fingerings, in his order, then fingerings other charts name
- * where Koga doesn't. Chin positions come from Koga's
+ * where Koga doesn't, then other charts' holes for fingerings Koga names. A
+ * fingering with several rows has several sets of holes, all at one pitch. Chin positions come from Koga's
  * "Meri" and "Kari" labels (vol. I, pp. 37 and 39), from the name, or are
  * inferred; the inventory says which. #76 is unnamed in Koga and takes its
  * name, re meri in daikan, from the Nyokai-An chart.
@@ -100,7 +101,7 @@ export const FINGERINGS: readonly Fingering[] = [
   { koga: 35, pitch: 'D#5', holes: '◐●●●◕', chin: undefined },
   { koga: 36, pitch: 'D#5', holes: '○○●●●', chin: undefined },
   { koga: 37, pitch: 'E5', holes: '●●●●◐', chin: 'chu-meri', written: { step: 'tsu', octave: 1, meriKari: 'chu-meri' }, default: true },
-  { koga: 38, pitch: 'E5', holes: '●●●●○', chin: 'meri' },
+  { koga: 38, pitch: 'E5', holes: '●●●●○', chin: 'chu-meri', written: { step: 'tsu', octave: 1, meriKari: 'chu-meri' } },
   { koga: 39, pitch: 'F5', holes: '●●●●○', chin: 'neutral', written: { step: 'tsu', octave: 1 }, default: true },
   { koga: 40, pitch: 'F5', holes: '●●●◕◐', chin: undefined },
   { koga: 41, pitch: 'F#5', holes: '●●●◐○', chin: 'meri', written: { step: 're', octave: 1, meriKari: 'meri' }, default: true },
@@ -123,14 +124,14 @@ export const FINGERINGS: readonly Fingering[] = [
   { koga: 58, pitch: 'B5', holes: '●○○○○', chin: undefined },
   { koga: 59, pitch: 'B5', holes: '●○●●●', chin: undefined },
   { koga: 60, pitch: 'C6', holes: '●○○●●', chin: 'neutral', written: { step: 'hi', octave: 1 }, default: true },
-  { koga: 61, pitch: 'C6', holes: '●○○○●', chin: undefined },
+  { koga: 61, pitch: 'C6', holes: '●○○○●', chin: 'neutral', written: { step: 'hi', octave: 1 } },
   { koga: 62, pitch: 'C6', holes: '◐○○●●', chin: 'meri' },
   { koga: 63, pitch: 'C#6', holes: '◐○○●●', chin: 'meri', written: { step: 'go-no-hi', octave: 1, meriKari: 'meri' }, default: true },
   { koga: 64, pitch: 'C#6', holes: '◐○○○○', chin: undefined },
   { koga: 65, pitch: 'C#6', holes: '●○○●○', chin: undefined },
   { koga: 66, pitch: 'D6', holes: '◐●●●●', chin: 'meri', written: { step: 'go-no-ha', octave: 1 } },
   { koga: 67, pitch: 'D6', holes: '○○○●●', chin: 'neutral', written: { step: 'go-no-hi', octave: 1 }, default: true },
-  { koga: 68, pitch: 'D6', holes: '○○○○●', chin: undefined },
+  { koga: 68, pitch: 'D6', holes: '○○○○●', chin: 'neutral', written: { step: 'go-no-hi', octave: 1 } },
   { koga: 69, pitch: 'D#6', holes: '○●○●●', chin: 'meri', written: { step: 'san-no-ha', octave: 1 }, default: true },
   { koga: 70, pitch: 'D#6', holes: '◐●◐○●', chin: undefined },
   { koga: 71, pitch: 'D#6', holes: '○○●○●', chin: undefined, written: { step: 'ni-shi-go-no-ha', octave: 1 } },
@@ -149,6 +150,28 @@ export const FINGERINGS: readonly Fingering[] = [
   { koga: 84, pitch: 'D7', holes: '○○○○○', chin: undefined },
   // From other charts, where Koga doesn't name a fingering
   { source: 'Nyokai-An', pitch: 'C#4', holes: '●●●●●', chin: 'chu-meri', written: { step: 'ro', octave: 0, meriKari: 'chu-meri' } },
+  // Other holes for fingerings Koga names, from other charts
+  { source: 'Nyokai-An', pitch: 'E4', holes: '●●●●○', chin: 'chu-meri', written: { step: 'tsu', octave: 0, meriKari: 'chu-meri' } },
+  { source: 'Nyokai-An', pitch: 'G4', holes: '●●◐●○', chin: 'meri', written: { step: 'u', octave: 0, meriKari: 'meri' } },
+  { source: 'Nyokai-An', pitch: 'G4', holes: '●●○●●', chin: 'meri', written: { step: 'u', octave: 0, meriKari: 'meri' } },
+  { source: 'Nyokai-An', pitch: 'G#4', holes: '●●◐●○', chin: 'meri', written: { step: 'u', octave: 0 } },
+  { source: 'Nyokai-An', pitch: 'G#4', holes: '●●◐○○', chin: 'meri', written: { step: 'u', octave: 0 } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'A#4', holes: '●◐○●●', chin: 'meri', written: { step: 'ri', octave: 0, meriKari: 'meri' } },
+  { source: 'Nyokai-An, fingchart6, shak-fingering', pitch: 'B4', holes: '●◐○●●', chin: 'chu-meri', written: { step: 'ri', octave: 0, meriKari: 'chu-meri' } },
+  { source: 'shak-fingering', pitch: 'D5', holes: '●◐●●●', chin: 'neutral', written: { step: 'ro', octave: 1 } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'D5', holes: '○○○○●', chin: 'neutral', written: { step: 'go-no-hi', octave: 0 } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'A#5', holes: '●◐○●●', chin: 'meri', written: { step: 'hi', octave: 1, meriKari: 'meri' } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'A#5', holes: '●◐○○●', chin: 'meri', written: { step: 'hi', octave: 1, meriKari: 'meri' } },
+  { source: 'Nyokai-An, fingchart6, shak-fingering', pitch: 'B5', holes: '●◐○●●', chin: 'chu-meri', written: { step: 'hi', octave: 1, meriKari: 'chu-meri' } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'B5', holes: '●◐○○●', chin: 'chu-meri', written: { step: 'hi', octave: 1, meriKari: 'chu-meri' } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'C#6', holes: '◐○○○●', chin: 'meri', written: { step: 'go-no-hi', octave: 1, meriKari: 'meri' } },
+  { source: 'Nyokai-An', pitch: 'D6', holes: '○●●●●', chin: 'meri', written: { step: 'go-no-ha', octave: 1 } },
+  { source: 'shak-fingering', pitch: 'D6', holes: '●◐●●●', chin: 'meri', written: { step: 'go-no-ha', octave: 1 } },
+  { source: 'Nyokai-An, fingchart6', pitch: 'E6', holes: '○●○○●', chin: undefined, written: { step: 'shi-no-ha', octave: 1 } },
+  { source: 'Nyokai-An', pitch: 'F6', holes: '●●●●○', chin: 'neutral', written: { step: 'tsu', octave: 2 } },
+  { source: 'shak-fingering', pitch: 'F6', holes: '●●●●◐', chin: 'neutral', written: { step: 'tsu', octave: 2 } },
+  { source: 'Nyokai-An', pitch: 'G6', holes: '●◐●○○', chin: 'neutral', written: { step: 're', octave: 2 } },
+  { source: 'Nyokai-An, shak-fingering', pitch: 'A#6', holes: '○●●●○', chin: 'meri', written: { step: 'hi', octave: 2, meriKari: 'meri' } },
 ];
 
 export type NoteLetter = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
@@ -213,9 +236,11 @@ const PITCH_BY_WRITTEN = new Map<string, WrittenPitch>();
 
 for (const fingering of NAMED) {
   const pitch = parseTablePitch(fingering.pitch);
-  // Export relies on each written fingering having exactly one pitch
-  if (PITCH_BY_WRITTEN.has(writtenKey(fingering.written))) {
-    throw new Error(`Two rows write ${writtenKey(fingering.written)}`);
+  // A fingering may have several rows, one per set of holes, but export
+  // relies on all of them giving it one pitch
+  const known = PITCH_BY_WRITTEN.get(writtenKey(fingering.written));
+  if (known && midiNumber(known) !== midiNumber(pitch)) {
+    throw new Error(`Two pitches for ${writtenKey(fingering.written)}`);
   }
   PITCH_BY_WRITTEN.set(writtenKey(fingering.written), pitch);
   if (fingering.default) {

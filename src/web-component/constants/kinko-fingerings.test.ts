@@ -70,6 +70,16 @@ describe('fingering table', () => {
     }
   });
 
+  it('can store several sets of holes for one fingering, all at one pitch', () => {
+    const kanHi = FINGERINGS.filter(
+      ({ written }) =>
+        written?.step === 'hi' && written.octave === 1 && !written.meriKari,
+    );
+
+    expect(kanHi.map((f) => f.holes)).toEqual(['●○○●●', '●○○○●']);
+    expect(new Set(kanHi.map((f) => f.pitch))).toEqual(new Set(['C6']));
+  });
+
   it('marks only named fingerings as defaults', () => {
     for (const f of FINGERINGS) {
       if (f.default) expect(f.written).toBeDefined();
