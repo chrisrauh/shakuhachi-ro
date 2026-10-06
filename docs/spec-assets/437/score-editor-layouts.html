@@ -1,0 +1,598 @@
+<title>Score Editor Layouts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: a prototype bar on top, then a phone-sized editor (full screen on phones) with three palette columns beside the score */
+:root {
+  /* Values from src/styles/theme.css, named for their role there */
+  --bg: oklch(0.967 0.003 264.542);            /* gray-100 */
+  --surface: oklch(0.985 0.002 247.839);       /* gray-50, --page-background-color */
+  --panel: oklch(0.967 0.003 264.542);          /* gray-100: the palette panel */
+  --key-bg: oklch(1 0 0);                       /* white keys on the gray panel */
+  --key-hover: oklch(0.985 0.002 247.839);      /* gray-50 */
+  --head-bg: oklch(0.928 0.006 264.531);        /* gray-200 */
+  /* Elevation, after claude.ai's shadow-panel-sm: a 1px outer ring in the darkest gray at 10% (--cds-alpha-2)
+     instead of a border, then --cds-shadow-sm: 0 1px 2px at 6% and 0 2px 8px at 8% (--cds-shadow-color) */
+  --elevation: 0 0 0 1px oklch(0.21 0.034 264.665 / 10%), 0 1px 2px 0 oklch(0.21 0.034 264.665 / 6%), 0 2px 8px 0 oklch(0.21 0.034 264.665 / 8%);
+  --fg: oklch(0.373 0.034 259.733);            /* gray-700, --color-text-primary */
+  --fg-strong: oklch(0.21 0.034 264.665);      /* gray-900, --color-text-heading */
+  --fg-muted: oklch(0.551 0.027 264.364);      /* gray-500, --color-text-tertiary */
+  --line: oklch(0.872 0.01 258.338);           /* gray-300, --color-border */
+  --line-hover: oklch(0.707 0.022 261.325);    /* gray-400, --color-border-hover */
+  --bg-active: oklch(0.928 0.006 264.531);     /* gray-200, --color-bg-active */
+  --accent: oklch(0.623 0.214 259.815);        /* blue-500, --color-input-border-focus */
+  --accent-soft: oklch(0.97 0.014 254.604);    /* blue-50, --color-bg-primary-brand */
+  --primary: oklch(0.623 0.214 259.815);       /* --color-button-primary */
+  --on-primary: oklch(1 0 0);                  /* --color-text-on-dark */
+  --note: oklch(0.21 0.034 264.665);           /* gray-900 */
+  --shadow: 0 4px 16px oklch(0.551 0.027 264.364 / 12%); /* --shadow-x-large */
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-notation: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --radius: 0.25rem;      /* --border-radius-medium, as buttons and inputs */
+  --radius-large: 0.5rem; /* --border-radius-large */
+  --key: 46px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(0.065 0.014 261.692);
+    --surface: oklch(0.13 0.028 261.692);       /* gray-50 in dark, --page-background-color */
+    --panel: oklch(0.21 0.034 264.665);         /* gray-100 in dark */
+    --key-bg: oklch(0.278 0.033 256.848);       /* a step lighter than the panel, so keys still read as raised */
+    --key-hover: oklch(0.326 0.034 258.29);
+    --head-bg: oklch(0.244 0.034 260.756);
+    --elevation: 0 0 0 1px oklch(0.967 0.003 264.542 / 10%), 0 1px 2px 0 oklch(0 0 0 / 24%), 0 2px 8px 0 oklch(0 0 0 / 32%); /* same layers; stronger, as 6–8% doesn't show on a dark page */
+    --fg: oklch(0.872 0.01 258.338);
+    --fg-strong: oklch(0.967 0.003 264.542);
+    --fg-muted: oklch(0.551 0.027 264.364);
+    --line: oklch(0.373 0.034 259.733);
+    --line-hover: oklch(0.446 0.03 256.802);
+    --bg-active: oklch(0.278 0.033 256.848);
+    --accent: oklch(0.623 0.214 259.815);
+    --accent-soft: oklch(0.623 0.214 259.815 / 16%);
+    --primary: oklch(0.379 0.146 265.522);      /* blue-900, dark --color-button-primary */
+    --on-primary: oklch(1 0 0);
+    --note: oklch(0.967 0.003 264.542);
+    --shadow: 0 4px 16px oklch(0 0 0 / 24%);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: oklch(0.065 0.014 261.692);
+  --surface: oklch(0.13 0.028 261.692);       /* gray-50 in dark, --page-background-color */
+  --panel: oklch(0.21 0.034 264.665);         /* gray-100 in dark */
+  --key-bg: oklch(0.278 0.033 256.848);       /* a step lighter than the panel, so keys still read as raised */
+  --key-hover: oklch(0.326 0.034 258.29);
+  --head-bg: oklch(0.244 0.034 260.756);
+  --elevation: 0 0 0 1px oklch(0.967 0.003 264.542 / 10%), 0 1px 2px 0 oklch(0 0 0 / 24%), 0 2px 8px 0 oklch(0 0 0 / 32%); /* same layers; stronger, as 6–8% doesn't show on a dark page */
+  --fg: oklch(0.872 0.01 258.338);
+  --fg-strong: oklch(0.967 0.003 264.542);
+  --fg-muted: oklch(0.551 0.027 264.364);
+  --line: oklch(0.373 0.034 259.733);
+  --line-hover: oklch(0.446 0.03 256.802);
+  --bg-active: oklch(0.278 0.033 256.848);
+  --accent: oklch(0.623 0.214 259.815);
+  --accent-soft: oklch(0.623 0.214 259.815 / 16%);
+  --primary: oklch(0.379 0.146 265.522);      /* blue-900, dark --color-button-primary */
+  --on-primary: oklch(1 0 0);
+  --note: oklch(0.967 0.003 264.542);
+  --shadow: 0 4px 16px oklch(0 0 0 / 24%);
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 14px; overflow: hidden; }
+.app { height: 100%; display: flex; flex-direction: column; }
+
+/* Prototype controls */
+.proto-bar { display: flex; flex-wrap: nowrap; gap: 14px; align-items: center; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--surface); overflow-x: auto; white-space: nowrap; scrollbar-width: thin; }
+.proto-bar .group { flex: none; }
+.proto-bar .group { display: flex; align-items: center; gap: 6px; }
+.proto-bar .label { font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--fg); padding: 5px 9px; cursor: pointer; min-width: 30px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+.seg button:disabled { color: var(--fg-muted); opacity: 0.5; cursor: default; }
+.proto-bar details { flex: none; font-size: 13px; color: var(--fg-muted); }
+.proto-bar summary { cursor: pointer; }
+.help { position: fixed; z-index: 10; top: 48px; left: 16px; right: 16px; max-width: 60ch; padding: 12px 14px; line-height: 1.45; white-space: normal; background: var(--panel); color: var(--fg); border-radius: var(--radius-large); box-shadow: var(--shadow); }
+.help p { margin: 0 0 4px; }
+
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; }
+/* Page background candidates for the site, light mode only; dark mode keeps today's page */
+.device[data-page="white"] { --surface: oklch(1 0 0); }
+.device[data-page="lightest"] { --surface: oklch(0.992 0.001 247.839); } /* gray-25 */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .device { --surface: oklch(0.13 0.028 261.692); } }
+:root[data-theme="dark"] .device { --surface: oklch(0.13 0.028 261.692); }
+.device { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--surface); overflow: hidden; }
+@media (min-width: 640px) and (min-height: 700px) {
+  .stage { padding-block: 16px; }
+  .device { width: 390px; height: min(800px, 100%); border-radius: 28px; border: 1px solid var(--line); box-shadow: 0 10px 40px oklch(20% 0.02 255 / 0.15); }
+}
+.status { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px 4px; font-size: 13px; color: var(--fg-muted); min-height: 20px; }
+.status .mode { color: var(--fg-strong); font-weight: 600; }
+.status { align-items: center; }
+.status #status-detail { margin-inline-start: auto; }
+.status .glyph { font-family: var(--font-notation); }
+.swap { font: inherit; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: transparent; color: var(--fg); cursor: pointer; flex: none; }
+.swap:hover { background: var(--bg-active); border-color: var(--line-hover); }
+.swap svg { width: 18px; height: 18px; }
+.swap:focus-visible { outline: none; border-color: var(--accent); }
+
+.workspace { position: relative; flex: 1; min-height: 0; display: flex; }
+.score-scroll { position: relative; flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.score-inner { position: relative; width: max-content; margin-inline: auto; padding-block: 8px 24px; min-height: 120px; }
+shakuhachi-score { position: relative; z-index: 1; --shakuhachi-note-color: var(--note); }
+/* Selection: the highlighted note looks like a focused input, and the cursor is drawn in the same blue */
+.hl { position: absolute; z-index: 0; border-radius: var(--radius); background: var(--accent-soft); border: 1px solid var(--accent); box-sizing: border-box; pointer-events: none; transition: top 140ms ease, left 140ms ease; }
+.cursor { position: absolute; z-index: 2; height: 2px; border-radius: 1px; background: var(--accent); pointer-events: none; transition: top 140ms ease, left 140ms ease, width 140ms ease; }
+/* Solid while notes are being entered; blinks only after a pause, as a text cursor does */
+.cursor.idle { animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .cursor.idle { animation: none; } .hl, .cursor { transition: none; } }
+.empty-hint { position: absolute; z-index: 1; top: 70px; left: 50%; transform: translateX(-50%); width: 160px; text-align: center; font-size: 13px; line-height: 1.4; color: var(--fg-muted); }
+
+/* Palettes */
+/* The palette strip is an app panel: its own fill, a light border, rounded corners, and margins instead of dividers */
+.strip { position: absolute; z-index: 3; top: 4px; bottom: 8px; display: flex; flex-direction: column; background: var(--panel); border-radius: 12px; box-shadow: var(--elevation); min-height: 0; }
+.strip .scroller { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 10px; }
+.strip.cols .scroller { gap: 6px; }
+/* Three palette columns that scroll on their own, with headers and edit controls fixed */
+.strip.cols { display: grid; grid-template-rows: auto 1fr auto; }
+.col-heads, .col-body, .edit-bar { display: grid; grid-template-columns: repeat(var(--cols), var(--key)); column-gap: 8px; padding-inline: 8px; }
+.col-heads { padding-block: 8px 6px; }
+.col-heads span, .group-label.head { font-size: 11px; letter-spacing: normal; text-transform: none; text-align: center; color: var(--fg); padding: 5px 0; border-radius: var(--radius); background: var(--head-bg); }
+.group-label.head { margin: 4px 0 6px; }
+.group-label:empty { display: none; }
+.col-body { min-height: 0; }
+.col-body .scroller { padding: 2px 0 8px; overflow-y: auto; min-height: 0; scrollbar-width: none; }
+/* No visible scrollbars in the palette columns; they still scroll by touch, wheel and trackpad */
+.col-body .scroller::-webkit-scrollbar { display: none; }
+.col-body .scroller .grid { grid-template-columns: var(--key); }
+.edit-bar { padding-block: 6px 8px; row-gap: 6px; }
+.grid { display: grid; grid-template-columns: var(--key); gap: 6px; justify-content: center; }
+.group-label { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); text-align: center; }
+/* The panel floats over the score, inset from every edge. The only raised element in the app for now */
+.strip.at-left { left: 8px; }
+.strip.at-right { right: 8px; }
+
+/* Keys are the app's icon buttons; the note's current value is shown as a primary button */
+.key { font: inherit; display: grid; place-items: center; width: var(--key); height: var(--key); padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--key-bg); color: var(--fg-strong); cursor: pointer; touch-action: manipulation; position: relative; transition: background 120ms ease, border-color 120ms ease; }
+.key:hover:not(:disabled) { background: var(--key-hover); border-color: var(--line-hover); }
+.key:focus-visible { outline: none; border-color: var(--accent); }
+.key:active:not(:disabled) { transform: translateY(1px); }
+.key[aria-pressed="true"], .key[aria-pressed="true"]:hover { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.key:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Rounded: the earlier key shape, for comparison. Same colours as App; only the corners differ */
+.device[data-keys="rounded"] .key { border-radius: 10px; }
+.device[data-keys="rounded"] .col-heads span, .device[data-keys="rounded"] .group-label.head { border-radius: 8px; }
+.key .g { font-family: var(--font-notation); font-size: 22px; line-height: 1; display: inline-flex; align-items: center; }
+.key .g small { font-size: 11px; writing-mode: vertical-rl; margin-left: 1px; }
+.key .g.mark { font-size: 17px; letter-spacing: -0.04em; }
+.key .cap { position: absolute; bottom: 2px; left: 0; right: 0; font-size: 9px; color: var(--fg-muted); text-align: center; }
+.key[aria-pressed="true"] .cap { color: inherit; }
+.key svg { width: 22px; height: 22px; }
+
+
+
+</style>
+
+<div class="app">
+  <header class="proto-bar">
+    <div class="group"><span class="label">Page</span><div class="seg" id="ctl-page"></div></div>
+    <div class="group"><span class="label">Keys</span><div class="seg" id="ctl-keys"></div></div>
+    <div class="group"><span class="label">Score</span><div class="seg" id="ctl-score"></div></div>
+    <details>
+      <summary>How to use</summary>
+      <div class="help">
+        <p>Three palette columns: notes, length and octave, marks, with the edit controls fixed at the bottom. The ⇄ button at the top of the editor moves the palettes to the other side.</p>
+        <p>Tap a note to highlight it, and tap it again for a cursor after it. Tap between notes for a cursor there.</p>
+        <p>With a cursor, a note is inserted. With a highlight, it replaces the note. Durations and marks change the highlighted note, or the note before the cursor.</p>
+      </div>
+    </details>
+  </header>
+  <main class="stage">
+    <div class="device" id="device">
+      <div class="status"><span class="mode" id="status-mode" aria-live="polite"></span><span id="status-detail" aria-live="polite"></span><button type="button" class="swap" id="swap"></button></div>
+      <div class="workspace" id="workspace">
+        <div class="score-scroll" id="scroll">
+          <div class="score-inner" id="inner">
+            <div class="hl" id="hl" hidden></div>
+            <shakuhachi-score id="score" columns="1" notation-font="sans"></shakuhachi-score>
+            <div class="cursor" id="cursor" hidden></div>
+            <p class="empty-hint" id="empty-hint" hidden>An empty score. Choose a note to start.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>var ShakuhachiScore=(function(e){Object.defineProperty(e,Symbol.toStringTag,{value:`Module`});var t=class{offsetX=0;offsetY=0;position;constructor(e=`above`){this.position=e}setOffset(e,t){return this.offsetX=e,this.offsetY=t,this}getPosition(){return this.position}setPosition(e){return this.position=e,this}getOffset(){return{x:this.offsetX,y:this.offsetY}}getWidth(){return 0}getHeight(){return 0}},n=class extends t{dotRadius=2.5;color=`#000`;constructor(e=`right`){super(e),this.setDefaultOffsets()}setDefaultOffsets(){this.position===`right`?(this.offsetX=15,this.offsetY=0):(this.offsetX=0,this.offsetY=12)}render(e,t,n){let r=t+this.offsetX,i=n+this.offsetY;e.drawCircle(r,i,this.dotRadius,this.color)}setDotRadius(e){return this.dotRadius=e,this}setColor(e){return this.color=e,this}getWidth(){return this.dotRadius*2}getHeight(){return this.dotRadius*2}},r={ro:{kana:`ロ`,romaji:`ro`,pitch:`D4`},tsu:{kana:`ツ`,romaji:`tsu`,pitch:`F4`},re:{kana:`レ`,romaji:`re`,pitch:`G4`},u:{kana:`ウ`,romaji:`u`,pitch:`Ab4`},chi:{kana:`チ`,romaji:`chi`,pitch:`A4`},ri:{kana:`リ`,romaji:`ri`,pitch:`C5`},hi:{kana:`ヒ`,romaji:`hi`,pitch:`C5`},ha:{kana:`ハ`,romaji:`ha`,pitch:`D5`},"go-no-hi":{kana:`ヒ`,numerals:`五`,romaji:`go-no-hi`,pitch:`D5`},"go-no-ha":{kana:`ハ`,numerals:`五`,romaji:`go-no-ha`,pitch:`D5`},"san-no-u":{kana:`ウ`,numerals:`三`,romaji:`san-no-u`,pitch:`Bb4`},"san-no-ha":{kana:`ハ`,numerals:`三`,romaji:`san-no-ha`,pitch:`Eb5`},"shi-no-ha":{kana:`ハ`,numerals:`四`,romaji:`shi-no-ha`,pitch:`E5`},"ni-shi-go-no-ha":{kana:`ハ`,numerals:`二四五`,romaji:`ni-shi-go-no-ha`,pitch:`Eb5`},i:{kana:`イ`,romaji:`i`,pitch:`D5`},a:{kana:`ア`,romaji:`a`,pitch:`D5`},ru:{kana:`ル`,romaji:`ru`,pitch:`G4`},"yon-go-no-ha":{kana:`ハ`,numerals:`四五`,romaji:`yon-go-no-ha`,pitch:`D5`},"ni-no-ha":{kana:`ハ`,numerals:`二`,romaji:`ni-no-ha`,pitch:`Eb5`},"yon-no-hi":{kana:`ヒ`,numerals:`四`,romaji:`yon-no-hi`,pitch:`B4`},"ni-no-re":{kana:`レ`,numerals:`二`,romaji:`ni-no-re`,pitch:`Gb4`},"ichi-san-no-u":{kana:`ウ`,numerals:`一三`,romaji:`ichi-san-no-u`,pitch:`G4`}};function i(e){let t=e.toLowerCase();return Object.hasOwn(r,t)?r[t]:void 0}function a(e){let t={C:0,D:2,E:4,F:5,G:7,A:9,B:11},n=e.match(/^([A-G])(#|b)?(\d+)$/);if(!n)throw Error(`Invalid pitch notation: ${e}`);let[,r,i,a]=n,o=t[r],s=i===`#`?1:i===`b`?-1:0;return(parseInt(a,10)+1)*12+o+s}function o(e,t){let n=i(e);if(!n)throw Error(`Unknown note: ${e}`);return a(n.pitch)+t*12}var s={sans:`Noto Sans JP, sans-serif`,serif:`Noto Serif JP, serif`},c=`sans`;function l(e){return Object.prototype.hasOwnProperty.call(s,e)}function u(e){let t=e?.trim().toLowerCase();return t&&l(t)?s[t]:s[c]}var d={showOctaveMarks:!0,showDebugLabels:!1,notesPerColumn:10,columnSpacing:35,columnWidth:100,topMargin:34,noteFontSize:32,noteFontWeight:400,noteVerticalSpacing:44,noteFontFamily:s[c],noteColor:`#000`,octaveMarkFontSize:12,octaveMarkFontWeight:500,meriKariFontSize:14,meriKariFontWeight:500,durationDotExtraSpacing:12,debugLabelFontSize:7,debugLabelOffsetX:25,debugLabelOffsetY:-6,debugLabelFontFamily:`monospace`,debugLabelColor:`#999`,autoResize:!0};function f(e={}){return{...d,...e}}var p=.4,m=.36,h=.26,g={ハ:{x:0,y:0},ウ:{x:.04,y:-.16},ヒ:{x:.16,y:0},レ:{x:.24,y:-.42}},_=class{kana;symbolInfo;x=0;y=0;duration;fontSize;fontWeight;fontFamily;color;modifiers=[];bbox=null;isRest;constructor(e){this.symbolInfo=i(e.symbol),this.kana=this.symbolInfo?.kana||e.symbol,this.x=e.x??0,this.y=e.y??0,this.duration=e.duration??`q`,this.fontSize=e.fontSize??32,this.fontWeight=e.fontWeight??400,this.fontFamily=e.fontFamily??d.noteFontFamily,this.color=e.color??`#000`,this.isRest=e.isRest??!1,e.modifiers&&(this.modifiers=[...e.modifiers])}render(e){if(this.isRest){let t=this.fontSize/8,n=Math.max(1.5,t/1.9),r=this.y-this.fontSize*p;e.drawCircle(this.x,r,t,void 0,this.color,n)}else e.drawText(this.kana,this.x,this.y,this.fontSize,this.fontFamily,this.color,`middle`,this.fontWeight),this.renderNumerals(e);this.modifiers.forEach(t=>{t.render(e,this.x,this.y)}),this.bbox=null}renderNumerals(e){let t=[...this.symbolInfo?.numerals??``],n=this.fontSize*(t.length>1?h:m),r=g[this.kana]??{x:0,y:0};t.forEach((i,a)=>{e.drawText(i,this.x+this.fontSize*r.x,this.y+this.fontSize*r.y-(t.length-1-a)*n,n,this.fontFamily,this.color,`middle`,this.fontWeight)})}addModifier(e){return this.modifiers.push(e),this.bbox=null,this}addModifiers(e){return this.modifiers.push(...e),this.bbox=null,this}getModifiers(){return[...this.modifiers]}needsExtraSpacing(){return this.modifiers.some(e=>e instanceof n)}setModifiers(e){this.modifiers=e}setPosition(e,t){return this.x=e,this.y=t,this.bbox=null,this}getPosition(){return{x:this.x,y:this.y}}getKana(){return this.kana}getSymbolInfo(){return this.symbolInfo}getDuration(){return this.duration}setDuration(e){return this.duration=e,this}getBBox(){if(this.bbox)return this.bbox;let e=this.fontSize*.8,t=this.fontSize,n=this.x-e/2,r=this.y-t,i=this.x+e/2,a=this.y;return this.modifiers.forEach(e=>{let t=e.getOffset(),o=e.getWidth(),s=e.getHeight(),c=this.x+t.x,l=this.y+t.y;n=Math.min(n,c-o/2),r=Math.min(r,l-s/2),i=Math.max(i,c+o/2),a=Math.max(a,l+s/2)}),this.bbox={x:n,y:r,width:i-n,height:a-r},this.bbox}getWidth(){return this.getBBox().width}getHeight(){return this.getBBox().height}setFontSize(e){return this.fontSize=e,this.bbox=null,this}setFontWeight(e){return this.fontWeight=e,this.bbox=null,this}setFontFamily(e){return this.fontFamily=e,this.bbox=null,this}setColor(e){return this.color=e,this}},v=class e extends t{register;fontSize=d.octaveMarkFontSize;fontWeight=d.octaveMarkFontWeight;fontFamily=d.noteFontFamily;color=`#000`;static registerSymbols={otsu:`乙`,kan:`甲`,daikan:`大甲`};constructor(e=`kan`){super(`above`),this.register=e,this.setDefaultOffsets()}setDefaultOffsets(){this.offsetX=18,this.offsetY=-22}render(t,n,r){let i=n+this.offsetX,a=r+this.offsetY;[...e.registerSymbols[this.register]].forEach((e,n)=>{t.drawText(e,i,a+n*this.fontSize,this.fontSize,this.fontFamily,this.color,`middle`,this.fontWeight)})}setFontSize(e){return this.fontSize=e,this}setFontWeight(e){return this.fontWeight=e,this}setFontFamily(e){return this.fontFamily=e,this}setColor(e){return this.color=e,this}getRegister(){return this.register}getWidth(){return this.fontSize*.8}getHeight(){return this.fontSize}},y=class e extends t{type;fontSize=d.meriKariFontSize;fontWeight=d.meriKariFontWeight;fontFamily=d.noteFontFamily;color=`#000`;static symbols={meri:`メ`,"chu-meri":`中`,"dai-meri":`大メ`,kari:`カ`,"chu-kari":`中カ`,"dai-kari":`大カ`};constructor(e=`meri`,t=`left`){super(t),this.type=e,this.setDefaultOffsets()}setDefaultOffsets(){this.position===`left`?(this.offsetX=-22,this.offsetY=0):this.position===`right`?(this.offsetX=22,this.offsetY=0):(this.offsetX=0,this.offsetY=this.position===`above`?-30:20)}render(t,n,r){let i=n+this.offsetX,a=r+this.offsetY,o=[...e.symbols[this.type]];o.forEach((e,n)=>{t.drawText(e,i,a-(o.length-1-n)*this.fontSize,this.fontSize,this.fontFamily,this.color,`middle`,this.fontWeight)})}setFontSize(e){return this.fontSize=e,this}setFontWeight(e){return this.fontWeight=e,this}setFontFamily(e){return this.fontFamily=e,this}setColor(e){return this.color=e,this}getType(){return this.type}getWidth(){return this.fontSize*.8}getHeight(){return this.fontSize*[...e.symbols[this.type]].length}},b=.25,x=-22,S=class extends t{lineCount;lastInSequence;lineLength;lineSpacing=8;lineWidth=1.5;color=`#000`;constructor(e,t=!1,n=`right`){super(n),this.lineCount=e,this.lastInSequence=t,this.setDefaultOffsets(),this.lineLength=this.computeLineLength(d.noteVerticalSpacing,d.noteFontSize)}fitToLayout(e,t){return this.lineLength=this.computeLineLength(e,t),this}computeLineLength(e,t){return this.lastInSequence?-t*b-x:e}setDefaultOffsets(){this.position===`right`?(this.offsetX=26,this.offsetY=x):(this.offsetX=0,this.offsetY=15)}render(e,t,n){let r=t+this.offsetX,i=n+this.offsetY;for(let t=0;t<this.lineCount;t++){let n=t*this.lineSpacing;e.drawLine(r+n,i,r+n,i+this.lineLength,this.color,this.lineWidth)}}setLineLength(e){return this.lineLength=e,this}setLineSpacing(e){return this.lineSpacing=e,this}setLineWidth(e){return this.lineWidth=e,this}setColor(e){return this.color=e,this}getWidth(){return this.lineCount===0?0:this.lineWidth+(this.lineCount-1)*this.lineSpacing}getHeight(){return this.lineLength}getLineCount(){return this.lineCount}},C=[`ro`,`tsu`,`re`,`u`,`chi`,`ri`,`hi`,`ha`,`go-no-hi`,`go-no-ha`,`san-no-u`,`san-no-ha`,`shi-no-ha`,`ni-shi-go-no-ha`,`i`,`a`,`ru`,`yon-go-no-ha`,`ni-no-ha`,`yon-no-hi`,`ni-no-re`,`ichi-san-no-u`],w=[`dai-meri`,`meri`,`chu-meri`,`chu-kari`,`kari`,`dai-kari`],T={invalidDuration:e=>`Invalid duration: ${e}`,noteIndexError:(e,t)=>`Note at index ${e} is missing ${t}`,noteIndexInvalid:(e,t,n,r)=>`Note at index ${e} has invalid ${t}: ${n}. ${r}`},E={ERRORS:{ScoreParser:{scoreDataRequired:`Score data is required`,notesArrayRequired:`Score notes must be an array`,noteIndexPitchRequired:e=>T.noteIndexError(e,`pitch`),noteIndexPitchWhenNotRest:e=>`Note at index ${e} must have pitch when rest is not set`,noteIndexPitchStep:e=>T.noteIndexError(e,`pitch.step`),noteIndexStepInvalid:(e,t)=>T.noteIndexInvalid(e,`pitch.step`,t,`Must be one of: ${C.join(`, `)}.`),noteIndexPitchOctave:e=>T.noteIndexError(e,`pitch.octave`),noteIndexDuration:e=>T.noteIndexError(e,`duration`),noteIndexOctaveInvalid:(e,t)=>T.noteIndexInvalid(e,`octave`,t,`Must be 0-2.`),noteIndexDurationInvalid:(e,t)=>T.noteIndexInvalid(e,`duration`,t,`Must be > 0.`),noteIndexMeriKariInvalid:(e,t)=>T.noteIndexInvalid(e,`meriKari`,t,`Must be one of: ${w.join(`, `)}.`),restIndexDuration:e=>`Rest at index ${e} is missing duration`,invalidJSON:e=>`Invalid JSON: ${e}`,loadFailed:e=>`Failed to load score: ${e}`,loadFailedFromURL:e=>`Failed to load score from URL: ${e}`},ABCParser:{contentRequired:`ABC notation content is required`,unknownKey:e=>`The K: field's key, "${e}", isn't one ABC defines. Use a key such as D, Dm, D dorian or none.`,noNotesFound:`No notes found in ABC notation. Write the notes after the header fields, e.g. D F G A d.`,unknownPitch:e=>`Unknown ABC pitch: "${e}". Valid pitches: D, F, G, A, C (uppercase/lowercase) with optional ^, _, =, ', or ,`,invalidDuration:e=>T.invalidDuration(e),loadFailed:e=>`Failed to load ABC file: ${e}`},MusicXMLParser:{noteLocation:(e,t)=>`Measure ${e}, note ${t}`,outOfRange:(e,t,n,r)=>`${e}: ${t} is ${n} the shakuhachi's range (${r})`,notInTable:(e,t)=>`${e}: ${t} has no shakuhachi fingering`,microtone:(e,t,n)=>`${e}: ${t} is altered by ${n} semitones, and microtones can't be imported`,invalidStep:e=>`${e}: the pitch has no valid step`,noPitch:e=>`${e}: the note has no pitch (an unpitched note, such as percussion)`,unplayableNotes:(e,t)=>t===0?`${e}. Change or transpose it in the source and import again.`:`${e}, and ${t} other ${t===1?`note`:`notes`} can't be imported either. Change or transpose them in the source and import again.`,loadFailed:e=>`Failed to load MusicXML file: ${e}`},Serializer:{invalidFingering:(e,t)=>`Note ${e+1} has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to ${t}. Fix that note, or keep the score in its current format.`,unknownABCKey:e=>`The score's key, "${e}", isn't one ABC defines, so the score can't be converted to ABC. Change it to a key such as D, Dm or D dorian.`}}},D=[`otsu`,`kan`,`daikan`];function O(e){switch(e){case 1:return`q`;case 2:return`h`;case 4:return`w`;default:return`q`}}function k(e){return e>=2?0:e>=1?1:e>=.5?2:3}var A=class{static parse(e,t=`#000`){this.validate(e);let r=[],i=null;for(let a=0;a<e.notes.length;a++){let s=e.notes[a];if(s.rest){let n=new _({symbol:`rest`,duration:O(s.duration),isRest:!0,color:t}),i=k(s.duration);if(i>0){let t=new S(i,a===e.notes.length-1||k(e.notes[a+1].duration)===0,`right`);n.addModifier(t)}r.push(n);continue}if(!s.pitch)throw Error(E.ERRORS.ScoreParser.noteIndexPitchWhenNotRest(a));let c=this.needsOctaveMark(s.pitch.step,s.pitch.octave,i,a===0||i===null),l=new _({symbol:s.pitch.step,duration:O(s.duration),color:t});if(c){let e=new v(D[s.pitch.octave]);l.addModifier(e)}if(s.meriKari&&l.addModifier(new y(s.meriKari)),s.dotted){let e=new n(`below`);l.addModifier(e)}let u=k(s.duration);if(u>0){let t=new S(u,a===e.notes.length-1||k(e.notes[a+1].duration)===0,`right`);l.addModifier(t)}r.push(l),i=o(s.pitch.step,s.pitch.octave)}return r}static needsOctaveMark(e,t,n,r){return r||n===null?t!==0:t!==this.findClosestOctave(e,n)}static findClosestOctave(e,t){let n=0,r=1/0;for(let i=0;i<=2;i++){let a=o(e,i),s=Math.abs(a-t);s<r&&(r=s,n=i)}return n}static validate(e){let t=E.ERRORS.ScoreParser;if(!e)throw Error(t.scoreDataRequired);let{notes:n}=e;if(!Array.isArray(n))throw Error(t.notesArrayRequired);n.forEach((e,n)=>{if(e.rest){if(!e.duration)throw Error(t.restIndexDuration(n));return}if(!e.pitch)throw Error(t.noteIndexPitchRequired(n));if(!e.pitch.step)throw Error(t.noteIndexPitchStep(n));if(!C.includes(e.pitch.step))throw Error(t.noteIndexStepInvalid(n,e.pitch.step));if(e.pitch.octave===void 0||e.pitch.octave===null)throw Error(t.noteIndexPitchOctave(n));if(e.duration===void 0||e.duration===null)throw Error(t.noteIndexDuration(n));if(e.pitch.octave<0||e.pitch.octave>2)throw Error(t.noteIndexOctaveInvalid(n,e.pitch.octave));if(e.duration<=0)throw Error(t.noteIndexDurationInvalid(n,e.duration));if(e.meriKari!==void 0&&!w.includes(e.meriKari))throw Error(t.noteIndexMeriKariInvalid(n,e.meriKari))})}static parseJSON(e){try{let t=JSON.parse(e);return this.parse(t)}catch(e){throw e instanceof SyntaxError?Error(E.ERRORS.ScoreParser.invalidJSON(e.message),{cause:e}):e}}static async loadFromURL(e){try{let t=await fetch(e);if(!t.ok)throw Error(E.ERRORS.ScoreParser.loadFailed(t.statusText));let n=await t.json();return this.parse(n)}catch(e){throw e instanceof Error?Error(E.ERRORS.ScoreParser.loadFailedFromURL(e.message),{cause:e}):e}}},j=`http://www.w3.org/2000/svg`,M=class{svg;width;height;groups=[];currentParent;constructor(e,t=800,n=600){this.width=t,this.height=n,this.svg=document.createElementNS(j,`svg`),this.svg.setAttribute(`width`,String(t)),this.svg.setAttribute(`height`,String(n)),this.svg.setAttribute(`viewBox`,`0 0 ${t} ${n}`),this.currentParent=this.svg,e.appendChild(this.svg)}round(e){return+e.toFixed(3)}create(e){return document.createElementNS(j,e)}add(e){this.currentParent.appendChild(e)}drawText(e,t,n,r=24,i=`Noto Sans JP, sans-serif`,a=`#000`,o=`middle`,s=400){let c=this.create(`text`);return c.setAttribute(`x`,String(this.round(t))),c.setAttribute(`y`,String(this.round(n))),c.setAttribute(`font-size`,String(r)),c.setAttribute(`font-family`,i),c.setAttribute(`font-weight`,String(s)),c.setAttribute(`fill`,a),c.setAttribute(`text-anchor`,o),c.textContent=e,this.add(c),c}drawCircle(e,t,n,r,i,a=1){let o=this.create(`circle`);return o.setAttribute(`cx`,String(this.round(e))),o.setAttribute(`cy`,String(this.round(t))),o.setAttribute(`r`,String(this.round(n))),r?o.setAttribute(`fill`,r):o.setAttribute(`fill`,`none`),i&&(o.setAttribute(`stroke`,i),o.setAttribute(`stroke-width`,String(a))),this.add(o),o}drawLine(e,t,n,r,i=`#000`,a=1){let o=this.create(`line`);return o.setAttribute(`x1`,String(this.round(e))),o.setAttribute(`y1`,String(this.round(t))),o.setAttribute(`x2`,String(this.round(n))),o.setAttribute(`y2`,String(this.round(r))),o.setAttribute(`stroke`,i),o.setAttribute(`stroke-width`,String(a)),this.add(o),o}drawPath(e,t,n,r=1){let i=this.create(`path`);return i.setAttribute(`d`,e),t?i.setAttribute(`fill`,t):i.setAttribute(`fill`,`none`),n&&(i.setAttribute(`stroke`,n),i.setAttribute(`stroke-width`,String(r))),this.add(i),i}openGroup(e,t){let n=this.create(`g`);return e&&n.setAttribute(`class`,e),t&&n.setAttribute(`id`,t),this.currentParent.appendChild(n),this.groups.push(n),this.currentParent=n,n}closeGroup(){if(this.groups.length===0)throw Error(`closeGroup() called but no groups are open — mismatched openGroup/closeGroup calls`);this.groups.pop(),this.currentParent=this.groups.length>0?this.groups[this.groups.length-1]:this.svg}drawRect(e,t,n,r,i,a,o=1){let s=this.create(`rect`);return s.setAttribute(`x`,String(this.round(e))),s.setAttribute(`y`,String(this.round(t))),s.setAttribute(`width`,String(this.round(n))),s.setAttribute(`height`,String(this.round(r))),i?s.setAttribute(`fill`,i):s.setAttribute(`fill`,`none`),a&&(s.setAttribute(`stroke`,a),s.setAttribute(`stroke-width`,String(o))),this.add(s),s}resize(e,t){this.width=e,this.height=t,this.svg.setAttribute(`width`,String(e)),this.svg.setAttribute(`height`,String(t)),this.svg.setAttribute(`viewBox`,`0 0 ${e} ${t}`)}clear(){for(;this.svg.firstChild;)this.svg.removeChild(this.svg.firstChild);this.groups=[],this.currentParent=this.svg}getSVG(){return this.svg}getSize(){return{width:this.width,height:this.height}}},N=class{static configureModifiers(e,t){e.forEach(e=>{if(!t.showOctaveMarks){let t=e.getModifiers().filter(e=>!(e instanceof v));e.setModifiers(t)}e.getModifiers().forEach(e=>{e instanceof v&&this.configureOctaveMark(e,t),e instanceof y&&this.configureMeriKariMark(e,t),e instanceof S&&e.setColor(t.noteColor),e instanceof n&&e.setColor(t.noteColor)})})}static configureOctaveMark(e,t){e.setFontSize(t.octaveMarkFontSize).setFontWeight(t.octaveMarkFontWeight).setFontFamily(t.noteFontFamily).setColor(t.noteColor)}static configureMeriKariMark(e,t){e.setFontSize(t.meriKariFontSize).setFontWeight(t.meriKariFontWeight).setFontFamily(t.noteFontFamily).setColor(t.noteColor)}},P=class{static calculateLayout(e,t,n,r){let i=r.columnWidth,a=r.columnSpacing,o=r.topMargin,s=r.noteVerticalSpacing,c=this.calculateColumnBreaks(e,n,o,s,r),l=c.length,u=(t-(l*i+(l-1)*a))/2+i/2,d=[];for(let t=0;t<l;t++){let n=c[t].startIndex,f=c[t].endIndex;d.push(this.calculateColumnLayout(t,l,u,o,i,a,n,f,s,e,r))}return{totalColumns:l,startX:u,startY:o,columnWidth:i,columnSpacing:a,columns:d}}static calculateColumnBreaks(e,t,n,r,i){if(e.length===0)return[];let a=[],o=0,s=n;for(let c=0;c<e.length;c++){let l=r+(e[c].needsExtraSpacing()?i.durationDotExtraSpacing:0);c>o&&s+20>t?(a.push({startIndex:o,endIndex:c}),o=c,s=n+l):s+=l}return a.push({startIndex:o,endIndex:e.length}),a}static calculateColumnLayout(e,t,n,r,i,a,o,s,c,l,u){return{columnIndex:e,xPosition:n+(t-1-e)*(i+a),noteStartIndex:o,noteEndIndex:s,notePositions:this.calculateNotePositions(o,s,r,c,l,u)}}static calculateNotePositions(e,t,n,r,i,a){let o=[],s=n;for(let n=e;n<t;n++){let e=i[n].needsExtraSpacing()?a.durationDotExtraSpacing:0,t=s+r+e;o.push({noteIndex:n,y:s,nextY:t}),s=t}return o}},F={width:800,height:600},I=class{container;options;currentNotes=[];currentScoreData=null;resizeObserver;constructor(e,t={}){this.container=e,this.options=f(t),this.options.autoResize&&this.setupResizeObserver()}renderFromScoreData(e){this.currentScoreData=e;let t=A.parse(e,this.options.noteColor);this.renderNotes(t)}renderNotes(e){this.currentNotes=e,this.container.innerHTML=``;let{width:t,height:n}=this.getViewportDimensions(),r=new M(this.container,t,n);N.configureModifiers(e,this.options),P.calculateLayout(e,t,n,this.options).columns.forEach(t=>{let n=e.slice(t.noteStartIndex,t.noteEndIndex);t.notePositions.forEach((e,i)=>{let a=n[i],o=t.xPosition,s=e.y;a.setFontSize(this.options.noteFontSize),a.setFontWeight(this.options.noteFontWeight),a.setFontFamily(this.options.noteFontFamily),a.setPosition(o,s),this.fitDurationLines(a,e.nextY-s),a.render(r),this.options.showDebugLabels&&this.renderDebugLabel(r,a,e.noteIndex,o,s)})})}fitDurationLines(e,t){e.getModifiers().forEach(e=>{e instanceof S&&e.fitToLayout(t,this.options.noteFontSize)})}renderDebugLabel(e,t,n,r,i){let a=t.getSymbolInfo(),o=a?a?.romaji||`unknown`:`rest`,s=t.getModifiers().find(e=>e instanceof v),c=s?`(${s.getRegister()})`:``,l=t.getModifiers().find(e=>e instanceof y),u=l?l.getType():``,d=`${n+1} ${o} ${c} ${u}`.trim();e.drawText(d,r+this.options.debugLabelOffsetX,i+this.options.debugLabelOffsetY,this.options.debugLabelFontSize,this.options.debugLabelFontFamily,this.options.debugLabelColor,`start`)}getViewportDimensions(){let e=this.container.getBoundingClientRect();return{width:this.options.width===void 0?e.width||F.width:this.options.width,height:this.options.height===void 0?e.height||F.height:this.options.height}}refresh(){this.currentNotes.length>0&&this.renderNotes(this.currentNotes)}setOptions(e,t=!0){this.options=f({...this.options,...e}),t&&this.refresh()}resize(e,t){this.setOptions({width:e,height:t},!0)}getOptions(){return{...this.options}}getNotes(){return[...this.currentNotes]}getScoreData(){return this.currentScoreData}clear(){this.container.innerHTML=``,this.currentNotes=[],this.currentScoreData=null}setupResizeObserver(){typeof ResizeObserver<`u`&&(this.resizeObserver=new ResizeObserver(()=>{this.handleResize()}),this.resizeObserver.observe(this.container))}handleResize(){this.currentNotes.length>0&&this.renderNotes(this.currentNotes)}destroy(){this.resizeObserver&&this.resizeObserver.disconnect()}},L=class extends HTMLElement{renderer=null;shadow;static get observedAttributes(){return[`data-score`,`columns`,`auto-resize`,`notation-font`]}constructor(){super(),this.shadow=this.attachShadow({mode:`open`})}connectedCallback(){if(typeof ResizeObserver>`u`){this.render();return}let e=!1,t=window.setTimeout(()=>{e||(e=!0,this.render())},50),n=new ResizeObserver(()=>{e||(e=!0,clearTimeout(t),this.render(),n.disconnect())});n.observe(this)}attributeChangedCallback(e,t,n){this.isConnected&&t!==n&&this.render()}disconnectedCallback(){this.renderer&&=(this.renderer.destroy(),null)}forceRender(){this.render()}parseScoreData(){let e=this.getAttribute(`data-score`);if(e)try{return JSON.parse(e)}catch(e){throw Error(`Invalid JSON in data-score attribute: ${e instanceof Error?e.message:`Unknown error`}`,{cause:e})}let t=this.textContent?.trim();if(t)try{return JSON.parse(t)}catch(e){throw Error(`Invalid JSON in textContent: ${e instanceof Error?e.message:`Unknown error`}`,{cause:e})}return null}parseColumnsAttribute(){let e=this.getAttribute(`columns`);if(!e||e===`auto`)return`auto`;let t=parseInt(e);return!isNaN(t)&&t>0?t:(console.warn(`shakuhachi-score: invalid columns value "${e}". Use "auto" or a positive number. Defaulting to "auto".`),`auto`)}calculateMultiColumnIntrinsicWidth(e){let t=d.columnWidth,n=d.columnSpacing;return e*t+(e-1)*n+40}calculateMultiColumnIntrinsicHeight(e,t){let n=Math.ceil(e.length/t),r=d.topMargin,i=d.noteVerticalSpacing,a=d.durationDotExtraSpacing,o=0;for(let s=0;s<t;s++){let t=r,c=s*n,l=Math.min((s+1)*n,e.length);for(let n=c;n<l;n++){let r=e[n];n>c&&(t+=i),r.needsExtraSpacing()&&(t+=a)}t+=20,o=Math.max(o,t)}return o}render(){try{let e=this.parseScoreData();if(!e)return;let t=A.parse(e),n=this.parseColumnsAttribute(),r=!1,i,a;n===`auto`?(a=void 0,r=!1):(a=Math.ceil(t.length/n),r=!0,i=n);let o=document.createElement(`div`);o.className=`shakuhachi-score-container`;let s=document.createElement(`style`);s.textContent=`@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap");`;let c=document.createElement(`style`);c.textContent=`
+        :host {
+          display: block;
+          box-sizing: border-box;
+          contain-intrinsic-size: 300px 150px;
+          ${r&&i?`width: ${this.calculateMultiColumnIntrinsicWidth(i)}px;`:``}
+          --shakuhachi-note-color: #000;
+        }
+        .shakuhachi-score-container {
+          overflow: visible;
+          width: 100%;
+          height: 100%;
+        }
+      `,this.shadow.innerHTML=``,this.shadow.appendChild(s),this.shadow.appendChild(c),this.shadow.appendChild(o);let l,f,p=this.getAttribute(`width`),m=this.getAttribute(`height`);r&&i?(l=p?parseInt(p):this.calculateMultiColumnIntrinsicWidth(i),f=m?parseInt(m):this.calculateMultiColumnIntrinsicHeight(t,i)):(l=p?parseInt(p):this.clientWidth,f=m?parseInt(m):this.clientHeight,(l===0||f===0)&&(l||=300,f||=150));let h={notesPerColumn:a,showDebugLabels:this.hasAttribute(`debug`),autoResize:this.getAttribute(`auto-resize`)!==`false`,width:l,height:f,noteColor:`var(--shakuhachi-note-color)`,noteFontSize:d.noteFontSize,noteFontWeight:d.noteFontWeight,noteFontFamily:u(this.getAttribute(`notation-font`)),noteVerticalSpacing:d.noteVerticalSpacing};this.renderer=new I(o,h),this.renderer.renderFromScoreData(e)}catch(e){this.renderError(e)}}renderError(e){let t=document.createElement(`div`);t.textContent=`Error: ${e.message}`,t.style.cssText=`color: #ef4444; font-family: system-ui; font-size: 14px;`,this.shadow.innerHTML=``,this.shadow.appendChild(t),console.error(`shakuhachi-score rendering error:`,e),console.error(`Stack trace:`,e.stack)}};return customElements.define(`shakuhachi-score`,L),e.ShakuhachiScore=L,e})({});</script>
+<script>
+(() => {
+  const SAMPLE = {"title": "Kojo no Tsuki", "notes": [{"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 4}, {"pitch": {"step": "ri", "octave": 0}, "duration": 4}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "tsu", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 8}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 4}, {"pitch": {"step": "ri", "octave": 0}, "duration": 4}, {"pitch": {"step": "ro", "octave": 1}, "duration": 2}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 8}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 2}, {"pitch": {"step": "tsu", "octave": 1}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 4}, {"pitch": {"step": "ri", "octave": 0}, "duration": 4}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "tsu", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 8}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "ro", "octave": 1}, "duration": 2}, {"pitch": {"step": "ri", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 4}, {"pitch": {"step": "chi", "octave": 0}, "duration": 4}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "chi", "octave": 0}, "duration": 2}, {"pitch": {"step": "tsu", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 2}, {"pitch": {"step": "re", "octave": 0}, "duration": 8}]};
+
+  // Characters and base pitches (MIDI, octave 0), as in kinko-symbols.ts
+  const STEPS = {
+    ro: ['ロ', '', 62], tsu: ['ツ', '', 65], re: ['レ', '', 67], chi: ['チ', '', 69], ri: ['リ', '', 72],
+    u: ['ウ', '', 68], hi: ['ヒ', '', 72], ha: ['ハ', '', 74], 'go-no-hi': ['ヒ', '五', 74], 'go-no-ha': ['ハ', '五', 74],
+    'san-no-u': ['ウ', '三', 70], 'san-no-ha': ['ハ', '三', 75], 'shi-no-ha': ['ハ', '四', 76], 'ni-shi-go-no-ha': ['ハ', '二四五', 75],
+    i: ['イ', '', 74], a: ['ア', '', 74], ru: ['ル', '', 67], 'yon-go-no-ha': ['ハ', '四五', 74], 'ni-no-ha': ['ハ', '二', 75],
+    'yon-no-hi': ['ヒ', '四', 71], 'ni-no-re': ['レ', '二', 66], 'ichi-san-no-u': ['ウ', '一三', 67],
+  };
+  const MAIN_NOTES = ['ro', 'tsu', 're', 'chi', 'ri', 'u', 'hi'];
+  const MORE_NOTES = ['ha', 'go-no-hi', 'go-no-ha', 'san-no-u', 'san-no-ha', 'shi-no-ha', 'ni-shi-go-no-ha', 'i', 'a', 'ru', 'yon-go-no-ha', 'ni-no-ha', 'yon-no-hi', 'ni-no-re', 'ichi-san-no-u'];
+  const MARKS = [['dai-meri', '大メ'], ['meri', 'メ'], ['chu-meri', '中'], ['chu-kari', '中カ'], ['kari', 'カ'], ['dai-kari', '大カ']];
+  const DURATIONS = [[4, 0, '2 beats'], [2, 0, '1 beat'], [1, 1, '½ beat'], [0.5, 2, '¼ beat']];
+  const OCTAVES = ['otsu', 'kan', 'daikan'];
+  const ICONS = {
+    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z"/><path d="m17 9-5 6M12 9l5 6"/></svg>',
+    undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+    redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>',
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const device = $('device'), workspace = $('workspace'), scroll = $('scroll'), inner = $('inner');
+  const scoreEl = $('score'), cursorEl = $('cursor'), hlEl = $('hl'), emptyHint = $('empty-hint');
+
+  const settings = { page: 'white', side: 'right', score: 'sample', keys: 'app' };
+  try { Object.assign(settings, JSON.parse(localStorage.getItem('editor-proto-settings') || '{}')); } catch {}
+  if (!['white', 'lightest', 'current'].includes(settings.page)) settings.page = 'white';
+  if (!['app', 'rounded'].includes(settings.keys)) settings.keys = 'app';
+  const saveSettings = () => { try { localStorage.setItem('editor-proto-settings', JSON.stringify(settings)); } catch {} };
+
+  let notes = [];
+  let sel = { type: 'cursor', pos: 0 };
+  let undoStack = [], redoStack = [];
+  let geometry = [];
+  let firstRender = true;
+  let idleTimer;
+  const HL_HALF_WIDTH = 35;
+
+  function loadScore() {
+    notes = settings.score === 'sample' ? structuredClone(SAMPLE.notes) : [];
+    sel = { type: 'cursor', pos: notes.length };
+    undoStack = []; redoStack = []; firstRender = true;
+  }
+
+  // ---- Editing ----
+  const snapshot = () => ({ notes: structuredClone(notes), sel: { ...sel } });
+  function commit(fn) {
+    const before = snapshot();
+    fn();
+    undoStack.push(before);
+    if (undoStack.length > 200) undoStack.shift();
+    redoStack = [];
+    render();
+  }
+  function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); ({ notes, sel } = undoStack.pop()); render(); }
+  function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); ({ notes, sel } = redoStack.pop()); render(); }
+
+  const midiOf = (n) => STEPS[n.pitch.step][2] + 12 * n.pitch.octave;
+  function previousPitched(before) {
+    for (let i = before - 1; i >= 0; i--) if (!notes[i].rest) return notes[i];
+    return null;
+  }
+  function closestOctave(step, prev) {
+    if (!prev) return 0;
+    const target = midiOf(prev);
+    let best = 0;
+    for (let o = 1; o <= 2; o++) {
+      if (Math.abs(STEPS[step][2] + 12 * o - target) < Math.abs(STEPS[step][2] + 12 * best - target)) best = o;
+    }
+    return best;
+  }
+  // The note durations and marks act on: the highlight, or the note before the cursor
+  const targetIndex = () => (sel.type === 'highlight' ? sel.index : sel.pos - 1);
+
+  function chooseNote(step) {
+    commit(() => {
+      if (sel.type === 'highlight') {
+        const n = notes[sel.index];
+        const keep = { duration: n.duration, dotted: n.dotted };
+        const octave = n.rest ? closestOctave(step, previousPitched(sel.index)) : n.pitch.octave;
+        const replaced = step === 'rest' ? { rest: true, duration: keep.duration } : { pitch: { step, octave }, duration: keep.duration };
+        if (keep.dotted) replaced.dotted = true;
+        // Changing a note keeps its meri or kari mark
+        if (n.meriKari && step !== 'rest') replaced.meriKari = n.meriKari;
+        notes[sel.index] = replaced;
+      } else {
+        const before = notes[sel.pos - 1];
+        const duration = before ? before.duration : 2;
+        const note = step === 'rest' ? { rest: true, duration } : { pitch: { step, octave: closestOctave(step, previousPitched(sel.pos)) }, duration };
+        notes.splice(sel.pos, 0, note);
+        sel = { type: 'cursor', pos: sel.pos + 1 };
+      }
+    });
+  }
+  function setDuration(d) {
+    const i = targetIndex(); if (i < 0) return;
+    commit(() => { notes[i].duration = d; });
+  }
+  function toggleDot() {
+    const i = targetIndex(); if (i < 0) return;
+    commit(() => { if (notes[i].dotted) delete notes[i].dotted; else notes[i].dotted = true; });
+  }
+  function setMark(m) {
+    const i = targetIndex(); if (i < 0 || notes[i].rest) return;
+    commit(() => { if (notes[i].meriKari === m) delete notes[i].meriKari; else notes[i].meriKari = m; });
+  }
+  function shiftOctave(delta) {
+    const i = targetIndex(); if (i < 0 || notes[i].rest) return;
+    const o = notes[i].pitch.octave + delta; if (o < 0 || o > 2) return;
+    commit(() => { notes[i].pitch.octave = o; });
+  }
+  function del() {
+    if (sel.type === 'highlight') commit(() => { notes.splice(sel.index, 1); sel = { type: 'cursor', pos: sel.index }; });
+    else if (sel.pos > 0) commit(() => { notes.splice(sel.pos - 1, 1); sel = { type: 'cursor', pos: sel.pos - 1 }; });
+  }
+  function select(next) { sel = next; render(); }
+
+  // ---- Palettes ----
+  function glyph(step) {
+    if (step === 'rest') return '<span class="g" aria-hidden="true">○</span>';
+    const [kana, numerals] = STEPS[step];
+    return `<span class="g" aria-hidden="true">${kana}${numerals ? `<small>${numerals}</small>` : ''}</span>`;
+  }
+  const name = (step) => (step === 'rest' ? 'rest' : step.replace(/-/g, ' '));
+  function key({ html, label, title, action, pressed, disabled, extra = '' }) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = `key ${extra}`; b.innerHTML = html;
+    b.setAttribute('aria-label', label); b.title = title || label;
+    if (pressed !== undefined) b.setAttribute('aria-pressed', String(pressed));
+    if (disabled) b.disabled = true;
+    b.addEventListener('click', action);
+    return b;
+  }
+  function durationIcon(lines) {
+    let svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><text x="2" y="18" font-size="16" fill="currentColor" stroke="none" font-family="Noto Sans JP, sans-serif">ロ</text>';
+    for (let l = 0; l < lines; l++) svg += `<line x1="${19 + l * 3.5}" y1="3" x2="${19 + l * 3.5}" y2="21"/>`;
+    return svg + '</svg>';
+  }
+  function noteKeys() {
+    const t = notes[targetIndex()];
+    const keys = MAIN_NOTES.map((s) => key({ html: glyph(s), label: name(s), title: sel.type === 'highlight' ? `Change to ${name(s)}` : `Insert ${name(s)}`, action: () => chooseNote(s) }));
+    keys.push(key({ html: glyph('rest'), label: 'rest', title: sel.type === 'highlight' ? 'Change to a rest' : 'Insert a rest', action: () => chooseNote('rest') }));
+    // Notes have their own column, so the other fingerings follow the common ones directly
+    keys.push(...MORE_NOTES.map((s) => key({ html: glyph(s), label: name(s), title: sel.type === 'highlight' ? `Change to ${name(s)}` : `Insert ${name(s)}`, action: () => chooseNote(s) })));
+    return keys;
+  }
+  function durationKeys() {
+    const t = notes[targetIndex()];
+    const keys = DURATIONS.map(([d, lines, cap]) => key({ html: durationIcon(lines) + `<span class="cap">${cap}</span>`, label: cap, title: `Make it ${cap}`, action: () => setDuration(d), pressed: !!t && t.duration === d, disabled: !t }));
+    keys.push(key({ html: '<span class="g" aria-hidden="true">・</span><span class="cap">dot</span>', label: 'dot', title: 'Add or remove the dot', action: toggleDot, pressed: !!t && !!t.dotted, disabled: !t }));
+    return keys;
+  }
+  function markKeys() {
+    const t = notes[targetIndex()];
+    const pitched = t && !t.rest;
+    const keys = MARKS.map(([m, g]) => key({ html: `<span class="g mark" aria-hidden="true">${g}</span>`, label: m, title: `Mark ${m}`, action: () => setMark(m), pressed: !!t && t.meriKari === m, disabled: !pitched }));
+    return keys;
+  }
+  function octaveKeys() {
+    const t = notes[targetIndex()];
+    const pitched = t && !t.rest;
+    return [
+      key({ html: '<span class="g" aria-hidden="true">甲</span><span class="cap">up</span>', label: 'octave up', title: 'Move it an octave up', action: () => shiftOctave(1), disabled: !pitched || t.pitch.octave === 2 }),
+      key({ html: '<span class="g" aria-hidden="true">乙</span><span class="cap">down</span>', label: 'octave down', title: 'Move it an octave down', action: () => shiftOctave(-1), disabled: !pitched || t.pitch.octave === 0 }),
+    ];
+  }
+  function actionKeys() {
+    const canDelete = sel.type === 'highlight' || sel.pos > 0;
+    return [
+      key({ html: ICONS.del, label: 'delete', title: sel.type === 'highlight' ? 'Delete the highlighted note' : 'Delete the note before the cursor', action: del, disabled: !canDelete }),
+      key({ html: ICONS.undo, label: 'undo', title: 'Undo', action: undo, disabled: !undoStack.length }),
+      key({ html: ICONS.redo, label: 'redo', title: 'Redo', action: redo, disabled: !redoStack.length }),
+    ];
+  }
+  function group(label, keys, { head = false } = {}) {
+    const wrap = document.createElement('div');
+    // head: styled like the fixed column headers, for a section inside a column
+    wrap.innerHTML = `<div class="group-label${head ? ' head' : ''}">${label}</div>`;
+    const grid = document.createElement('div'); grid.className = 'grid'; grid.append(...keys);
+    wrap.append(grid); return wrap;
+  }
+  function buildPalettes() {
+    // Keep each strip's scroll position across rebuilds
+    const scrolls = [...workspace.querySelectorAll('.scroller')].map((e) => e.scrollTop);
+    workspace.querySelectorAll('.strip').forEach((e) => e.remove());
+    queueMicrotask(() => workspace.querySelectorAll('.scroller').forEach((e, i) => { if (scrolls[i]) e.scrollTop = scrolls[i]; }));
+    const side = settings.side;
+    const s = document.createElement('div'); s.className = `strip cols at-${side}`;
+    // Octave sits under length, so the length and marks columns are the same height
+    const columns = [
+      { head: 'Notes', groups: [group('', noteKeys())] },
+      { head: 'Length', groups: [group('', durationKeys()), group('Octave', octaveKeys(), { head: true })] },
+      { head: 'Marks', groups: [group('', markKeys())] },
+    ];
+    // The notes column sits on the outer edge, where the thumb rests
+    if (side === 'right') columns.reverse();
+    s.style.setProperty('--cols', columns.length);
+    const heads = document.createElement('div'); heads.className = 'col-heads';
+    const body = document.createElement('div'); body.className = 'col-body';
+    for (const c of columns) {
+      const h = document.createElement('span'); h.textContent = c.head; heads.append(h);
+      const sc = document.createElement('div'); sc.className = 'scroller'; sc.append(...c.groups); body.append(sc);
+    }
+    const bar = document.createElement('div'); bar.className = 'edit-bar';
+    const [delK, undoK, redoK] = actionKeys();
+    // Delete sits on the notes side
+    bar.append(...(side === 'right' ? [undoK, redoK, delK] : [delK, undoK, redoK]));
+    s.append(heads, body, bar);
+    workspace.append(s);
+  }
+
+  // ---- Rendering ----
+  function overlaySize() {
+    const s = workspace.querySelector('.strip');
+    // The floating panel covers the score, which keeps room to stay clear of it
+    return { strip: s ? s.offsetWidth + 16 : 0 };
+  }
+  function render() {
+    buildPalettes();
+    const { strip: stripW } = overlaySize();
+    // Over: the score keeps the full width; the column is centred in the space the strip leaves
+    scroll.style.paddingLeft = scroll.style.paddingRight = '0px';
+    if (stripW) scroll.style[settings.side === 'left' ? 'paddingLeft' : 'paddingRight'] = `${stripW}px`;
+    // One column that scrolls vertically, as the score page does on phones
+    scoreEl.setAttribute('columns', '1');
+    scoreEl.setAttribute('data-score', JSON.stringify({ title: 'Edit', style: 'kinko', notes }));
+    // The drawing is taller than the element's box; size the box to it so the score scrolls to its end
+    const svg = scoreEl.shadowRoot && scoreEl.shadowRoot.querySelector('svg');
+    scoreEl.style.height = svg ? `${svg.getAttribute('height')}px` : '';
+    measure();
+    place();
+    status();
+    if (firstRender) { firstRender = false; }
+    requestAnimationFrame(keepInView);
+  }
+  function measure() {
+    geometry = [];
+    const svg = scoreEl.shadowRoot && scoreEl.shadowRoot.querySelector('svg');
+    const r = scoreEl.renderer;
+    if (!svg || !r) return;
+    const vb = svg.viewBox.baseVal;
+    const sr = svg.getBoundingClientRect(), ir = inner.getBoundingClientRect();
+    const scale = vb && vb.width ? sr.width / vb.width : 1;
+    const ox = sr.left - ir.left - (vb ? vb.x * scale : 0), oy = sr.top - ir.top - (vb ? vb.y * scale : 0);
+    geometry = r.getNotes().map((n) => {
+      const b = n.getBBox(), p = n.getPosition();
+      return { x: ox + b.x * scale, y: oy + b.y * scale, w: b.width * scale, h: b.height * scale, cx: ox + p.x * scale };
+    });
+  }
+  function place() {
+    hlEl.hidden = cursorEl.hidden = true;
+    emptyHint.hidden = notes.length > 0;
+    if (sel.type === 'highlight' && geometry[sel.index]) {
+      const g = geometry[sel.index];
+      // One size for every note, wide enough for a meri mark on the left and an octave mark on the right
+      Object.assign(hlEl.style, { left: `${g.cx - HL_HALF_WIDTH}px`, top: `${g.y - 5}px`, width: `${2 * HL_HALF_WIDTH}px`, height: `${g.h + 10}px` });
+      hlEl.hidden = false;
+    } else if (sel.type === 'cursor') {
+      // Centred in the gap between the note before and the note after, as wide as the note
+      const before = geometry[sel.pos - 1], after = geometry[sel.pos];
+      let x, y, w = 32;
+      if (before && after && Math.abs(before.cx - after.cx) < 1) { x = before.cx; y = (before.y + before.h + after.y) / 2; w = Math.max(before.w, after.w) + 8; }
+      else if (before) { x = before.cx; y = before.y + before.h + 6; w = before.w + 8; }
+      else if (after) { x = after.cx; y = after.y - 6; w = after.w + 8; }
+      else { x = inner.offsetWidth / 2; y = 40; }
+      Object.assign(cursorEl.style, { left: `${x - w / 2}px`, top: `${y - 1.5}px`, width: `${w}px` });
+      cursorEl.classList.remove('idle');
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => cursorEl.classList.add('idle'), 700);
+      cursorEl.hidden = false;
+    }
+  }
+  function describe(i) {
+    const n = notes[i];
+    if (!n) return '';
+    if (n.rest) return 'rest';
+    const [kana, numerals] = STEPS[n.pitch.step];
+    return `<span class="glyph">${kana}${numerals}</span> ${name(n.pitch.step)}${n.meriKari ? ' ' + n.meriKari : ''}, ${OCTAVES[n.pitch.octave]}`;
+  }
+  function status() {
+    const total = notes.length;
+    if (sel.type === 'highlight') {
+      $('status-mode').textContent = 'Changing';
+      $('status-detail').innerHTML = `${describe(sel.index)} · ${sel.index + 1} of ${total}`;
+    } else {
+      $('status-mode').textContent = 'Inserting';
+      $('status-detail').innerHTML = sel.pos === 0 ? (total ? `at the start · of ${total}` : 'empty score') : `after ${describe(sel.pos - 1)} · ${sel.pos} of ${total}`;
+    }
+  }
+  function keepInView() {
+    const target = sel.type === 'highlight' ? hlEl : cursorEl;
+    if (target.hidden) return;
+    const t = target.getBoundingClientRect(), v = scroll.getBoundingClientRect();
+    const top = v.top + 24, bottom = v.bottom - 32;
+    if (t.top < top) scroll.scrollTop -= top - t.top;
+    else if (t.bottom > bottom) scroll.scrollTop += t.bottom - bottom;
+  }
+
+  // ---- Tapping ----
+  // Taps anywhere in the score area count, not only on the column itself
+  scroll.addEventListener('click', (e) => {
+    if (!geometry.length) return;
+    const ir = inner.getBoundingClientRect();
+    const x = e.clientX - ir.left, y = e.clientY - ir.top;
+    const hit = geometry.findIndex((g) => x >= g.x - 10 && x <= g.x + g.w + 10 && y >= g.y - 4 && y <= g.y + g.h + 4);
+    if (hit >= 0) {
+      if (sel.type === 'highlight' && sel.index === hit) select({ type: 'cursor', pos: hit + 1 });
+      else select({ type: 'highlight', index: hit });
+      return;
+    }
+    // Between notes: the nearest column, then the gap above the first note lower than the tap
+    let col = null, best = Infinity;
+    for (const g of geometry) { const d = Math.abs(g.cx - x); if (d < best) { best = d; col = g.cx; } }
+    const inCol = geometry.map((g, i) => ({ g, i })).filter(({ g }) => Math.abs(g.cx - col) < 1);
+    const below = inCol.find(({ g }) => g.y + g.h / 2 > y);
+    select({ type: 'cursor', pos: below ? below.i : inCol[inCol.length - 1].i + 1 });
+  });
+
+  // ---- Keyboard ----
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('.proto-bar')) return;
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+    if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); del(); return; }
+    if (e.key === 'Escape' && sel.type === 'highlight') { select({ type: 'cursor', pos: sel.index + 1 }); return; }
+    if (e.key === 'Enter' && sel.type === 'cursor' && sel.pos > 0 && !e.target.closest('button')) { select({ type: 'highlight', index: sel.pos - 1 }); return; }
+    const step = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    if (sel.type === 'highlight') select({ type: 'highlight', index: Math.min(notes.length - 1, Math.max(0, sel.index + step)) });
+    else select({ type: 'cursor', pos: Math.min(notes.length, Math.max(0, sel.pos + step)) });
+  });
+
+  // ---- Prototype controls ----
+  function seg(id, key, options, onChange) {
+    const el = $(id);
+    const draw = () => {
+      el.innerHTML = '';
+      for (const [value, label] of options) {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+        b.setAttribute('aria-pressed', String(settings[key] === value));
+        b.addEventListener('click', () => { settings[key] = value; saveSettings(); drawAll(); onChange && onChange(); render(); });
+        el.append(b);
+      }
+    };
+    return draw;
+  }
+  const draws = [
+    seg('ctl-page', 'page', [['white', 'White'], ['lightest', 'Lightest gray'], ['current', 'Current']]),
+    seg('ctl-keys', 'keys', [['app', 'App'], ['rounded', 'Rounded']]),
+    seg('ctl-score', 'score', [['sample', 'Kōjō no Tsuki'], ['empty', 'Empty']], loadScore),
+  ];
+  function drawAll() {
+    device.dataset.page = settings.page;
+    device.dataset.keys = settings.keys;
+    draws.forEach((d) => d());
+    const swap = $('swap'), to = settings.side === 'right' ? 'left' : 'right';
+    swap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>';
+    swap.setAttribute('aria-label', `Move palettes to the ${to}`);
+    swap.title = `Move the palettes to the ${to} side`;
+  }
+  $('swap').addEventListener('click', () => { settings.side = settings.side === 'right' ? 'left' : 'right'; saveSettings(); drawAll(); render(); });
+
+  loadScore();
+  drawAll();
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+  customElements.whenDefined('shakuhachi-score').then(() => requestAnimationFrame(render));
+})();
+</script>
