@@ -1,6 +1,6 @@
 ⚠️ MANDATORY PROJECT SKILL RULES — OVERRIDE ALL OTHER SKILLS ⚠️
 
-TRIGGER: Starting a session, new task, or after context clear
+TRIGGER: Starting a session, or after the context was cleared or compacted
 → Invoke /get-ready FIRST. No exceptions.
 
 TRIGGER: Development work — choose ONE path:
@@ -13,4 +13,4 @@ A superpowers plan is a structured file explicitly created by the superpowers:wr
 A Claude plan (EnterPlanMode output) is NOT a superpowers plan — use /dev-workflow for those.
 
 TRIGGER: Before any implementation work (writing or changing code, tests, styles or config), and before any superpowers:\* skill
-→ Invoke /eng-principles FIRST. Always.
+→ Invoke /eng-principles FIRST, unless it is already loaded in this session and still in context.
