@@ -5,7 +5,15 @@
  * For D shakuhachi (1.8 shaku) in Kinko style.
  */
 
-import type { ScoreData, ScoreNote, PitchStep } from '../types/ScoreData';
+import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import { PARSER_STRINGS } from '../constants/parser-strings';
+import {
+  fingeringName,
+  isDefaultFingering,
+  pitchForFingering,
+  type WrittenFingering,
+  type WrittenPitch,
+} from '../constants/kinko-fingerings';
 
 /**
  * Divisions per quarter note.
@@ -19,30 +27,7 @@ import type { ScoreData, ScoreNote, PitchStep } from '../types/ScoreData';
  */
 const DIVISIONS_PER_QUARTER = 8;
 
-interface WesternPitch {
-  step: string; // C, D, E, F, G, A, B
-  octave: number; // 4, 5, 6
-  alter?: number; // -1 = flat, 0 = natural, 1 = sharp
-}
-
 export class MusicXMLSerializer {
-  /**
-   * Map shakuhachi pitch steps to Western pitch equivalents (for D shakuhachi)
-   * Based on KINKO_PITCH_MAP reverse mapping
-   */
-  private static readonly SHAKU_TO_WESTERN_MAP: Record<
-    PitchStep,
-    { step: string; baseOctave: number }
-  > = {
-    ro: { step: 'D', baseOctave: 4 }, // ro otsu = D4
-    tsu: { step: 'F', baseOctave: 4 }, // tsu otsu = F4
-    re: { step: 'G', baseOctave: 4 }, // re otsu = G4
-    u: { step: 'G', baseOctave: 4 }, // u otsu = G#4/Ab4
-    chi: { step: 'A', baseOctave: 4 }, // chi otsu = A4
-    ri: { step: 'C', baseOctave: 5 }, // ri otsu = C5
-    hi: { step: 'C', baseOctave: 6 }, // hi kan = C6
-  };
-
   /**
    * Serializes ScoreData to MusicXML string
    *
@@ -105,9 +90,9 @@ export class MusicXMLSerializer {
     parts.push('      </attributes>');
 
     // Serialize notes
-    for (const note of scoreData.notes) {
-      parts.push(this.serializeNote(note));
-    }
+    scoreData.notes.forEach((note, index) => {
+      parts.push(this.serializeNote(note, index));
+    });
 
     parts.push('    </measure>');
     parts.push('  </part>');
@@ -119,22 +104,25 @@ export class MusicXMLSerializer {
   /**
    * Serialize a single note to MusicXML
    */
-  private static serializeNote(note: ScoreNote): string {
+  private static serializeNote(note: ScoreNote, index: number): string {
     const parts: string[] = [];
+    const fingering: WrittenFingering | undefined = note.pitch && {
+      ...note.pitch,
+      meriKari: note.meriKari,
+    };
 
     parts.push('      <note>');
 
     if (note.rest) {
       // Rest
       parts.push('        <rest/>');
-    } else if (note.pitch) {
-      // Convert shakuhachi pitch to Western pitch
-      const westernPitch = this.convertToWesternPitch(note);
+    } else if (fingering) {
+      const westernPitch = this.convertToWesternPitch(fingering, index);
 
       parts.push('        <pitch>');
-      parts.push(`          <step>${westernPitch.step}</step>`);
+      parts.push(`          <step>${westernPitch.letter}</step>`);
 
-      if (westernPitch.alter !== undefined && westernPitch.alter !== 0) {
+      if (westernPitch.alter !== 0) {
         parts.push(`          <alter>${westernPitch.alter}</alter>`);
       }
 
@@ -160,48 +148,40 @@ export class MusicXMLSerializer {
       parts.push('        <dot/>');
     }
 
+    // Several fingerings can share a pitch. One that import wouldn't choose
+    // for its pitch is named, so it reads back as itself. Other software
+    // shows <fingering> as text by the note.
+    if (fingering && !isDefaultFingering(fingering)) {
+      parts.push('        <notations>');
+      parts.push('          <technical>');
+      parts.push(
+        `            <fingering>${fingeringName(fingering)}</fingering>`,
+      );
+      parts.push('          </technical>');
+      parts.push('        </notations>');
+    }
+
     parts.push('      </note>');
 
     return parts.join('\n');
   }
 
   /**
-   * Convert shakuhachi pitch to Western pitch
+   * The written note for a fingering: its pitch in the fingering table, or an
+   * estimate for one the table doesn't list (see pitchForFingering). Fails
+   * only for a step, octave or mark that isn't valid.
    */
-  private static convertToWesternPitch(note: ScoreNote): WesternPitch {
-    if (!note.pitch) {
-      throw new Error('Cannot convert rest to Western pitch');
+  private static convertToWesternPitch(
+    fingering: WrittenFingering,
+    index: number,
+  ): WrittenPitch {
+    const written = pitchForFingering(fingering);
+    if (!written) {
+      throw new Error(
+        PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'MusicXML'),
+      );
     }
-
-    const mapping = this.SHAKU_TO_WESTERN_MAP[note.pitch.step];
-    if (!mapping) {
-      throw new Error(`Unknown shakuhachi pitch step: ${note.pitch.step}`);
-    }
-
-    // Calculate octave: base octave + shakuhachi octave offset
-    // Shakuhachi octave: 0=otsu, 1=kan (+1 octave), 2=daikan (+2 octaves)
-    let octave = mapping.baseOctave + note.pitch.octave;
-
-    // Determine alteration based on meri
-    let alter: number | undefined;
-
-    // A fixed rule that disagrees with the pitch table in places; #417
-    if (note.meriKari === 'dai-meri') {
-      alter = -2;
-    } else if (note.meriKari === 'chu-meri' || note.meriKari === 'meri') {
-      alter = -1;
-    }
-
-    // Special case: 'u' (chi meri) is G# or Ab
-    if (note.pitch.step === 'u') {
-      alter = 1; // Sharp (G#)
-    }
-
-    return {
-      step: mapping.step,
-      octave,
-      alter,
-    };
+    return written;
   }
 
   /**

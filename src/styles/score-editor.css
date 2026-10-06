@@ -171,10 +171,13 @@
 
 .validation-error.show {
   display: flex;
-  align-items: center;
+  /* safe: a message taller than the box starts at its top and scrolls,
+     instead of centring its first line out of reach */
+  align-items: safe center;
   gap: var(--spacing-x-small);
   padding: var(--spacing-small) var(--spacing-large);
   max-height: 100px;
+  overflow-y: auto;
 }
 
 .validation-error svg {

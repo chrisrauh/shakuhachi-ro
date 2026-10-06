@@ -155,11 +155,15 @@ export class ScoreEditor {
         const { convertFormat } = await import('../utils/format-converter');
         this.scoreData = convertFormat(this.scoreData, this.dataFormat, format);
         this.dataFormat = format;
-      } catch {
+      } catch (error) {
         const dialog = STRINGS.DIALOGS.ScoreEditor.formatConversionFailed;
         confirmDialog.show({
           title: dialog.title,
-          message: dialog.message(this.dataFormat, format),
+          message: dialog.message(
+            this.dataFormat,
+            format,
+            error instanceof Error ? error.message : '',
+          ),
           confirmText: dialog.confirmText,
           cancelText: dialog.cancelText,
           onConfirm: () => {
@@ -603,7 +607,7 @@ export class ScoreEditor {
     const validationDiv = this.container.querySelector('#validation-error');
     if (validationDiv) {
       if (this.validationError) {
-        validationDiv.innerHTML = `${renderIcon('circle-alert')} ${this.validationError}`;
+        validationDiv.innerHTML = `${renderIcon('circle-alert')} ${this.escapeHtml(this.validationError)}`;
         validationDiv.classList.add('show');
         initIcons();
       } else {

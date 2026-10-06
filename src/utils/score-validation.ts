@@ -1,4 +1,5 @@
 import { ABCParser } from '../web-component/parser/ABCParser';
+import { MusicXMLParser } from '../web-component/parser/MusicXMLParser';
 import { ScoreParser } from '../web-component/parser/ScoreParser';
 import type { ScoreDataFormat } from '../api/scores';
 import { STRINGS } from '../constants/strings';
@@ -27,10 +28,11 @@ export function validateScoreInput(
           error: STRINGS.VALIDATION.scoreInput.invalidMusicXML,
         };
       }
+      // The same import the score page runs, so what saves also renders
+      MusicXMLParser.parse(data);
       return { valid: true };
     }
   } catch (error) {
-    // Only reachable from JSON and ABC branches — DOMParser never throws
     return {
       valid: false,
       error:

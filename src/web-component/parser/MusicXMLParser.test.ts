@@ -27,6 +27,13 @@ function makeXML(
 </score-partwise>`;
 }
 
+function makeAlteredNote(step: string, alter: number, octave: number): string {
+  return `<note>
+    <pitch><step>${step}</step><alter>${alter}</alter><octave>${octave}</octave></pitch>
+    <duration>2</duration>
+  </note>`;
+}
+
 function makeNote(
   step: string,
   octave: number,
@@ -128,62 +135,110 @@ describe('MusicXMLParser', () => {
       expect(score.notes[0].dotted).toBe(true);
     });
 
-    it('should skip note with no <pitch> and call console.warn with index', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      // A note element with no <pitch> or <rest>
-      const xml = makeXML('<note><duration>2</duration></note>');
+    it('should fail on a note with no <pitch>, such as percussion', () => {
+      const xml = makeXML(
+        makeNote('D', 4) + '<note><unpitched/><duration>2</duration></note>',
+      );
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(0);
-      expect(warnSpy).toHaveBeenCalledOnce();
-      expect(warnSpy.mock.calls[0][0]).toContain('0'); // index 0
-
-      warnSpy.mockRestore();
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 2: the note has no pitch',
+      );
     });
 
-    it('should skip note with unknown pitch and call console.warn', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      // "Z9" is not in KINKO_PITCH_MAP
-      const xml = makeXML(makeNote('Z', 9));
+    it('should fail on a note outside the range, saying where, why and what to do', () => {
+      const xml = makeXML(makeNote('D', 4) + makeNote('A', 3));
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(0);
-      expect(warnSpy).toHaveBeenCalledOnce();
-      expect(warnSpy.mock.calls[0][0]).toContain('Unknown pitch');
-
-      warnSpy.mockRestore();
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "Measure 1, note 2: A3 is below the shakuhachi's range (C4–D7). Change or transpose it in the source and import again.",
+      );
     });
 
-    it('should set dai-meri for a pitch that maps to dai-meri', () => {
-      // D#4 → tsu meri
-      // MusicXML encodes D# as step=D with an <alter>1</alter>
-      // But the parser builds pitchName from step+octave only → "D4" → ro
-      // So use a pitch that maps directly without alter: C#4 = ro meri
-      // The parser uses step+octave, no alter handling yet → use Db4
-      // But "Db4" would require step=D+alter=-1 which parser doesn't combine.
-      // Instead, use step=C, octave=4 → "C4" → ro dai-meri
-      const xml = makeXML(makeNote('C', 4));
+    it('should count every note that cannot be imported', () => {
+      const xml = makeXML(
+        makeNote('D', 3) +
+          makeNote('E', 3) +
+          makeNote('F', 3) +
+          makeNote('E', 7),
+      );
 
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(1);
-      expect(score.notes[0].pitch?.step).toBe('ro');
-      expect(score.notes[0].meriKari).toBe('dai-meri');
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "Measure 1, note 1: D3 is below the shakuhachi's range (C4–D7), and 3 other notes can't be imported either.",
+      );
     });
 
-    it('should set chu-meri for a pitch with a chu-meri mapping', () => {
-      // F#4 → re meri. Parser builds "F4" → tsu, "G4" → re.
-      // There's no direct single-step meri without alter in standard note names.
-      // Use E4 → tsu chu-meri (step=E, octave=4 → "E4" in KINKO_PITCH_MAP)
-      const xml = makeXML(makeNote('E', 4));
+    it('should say when a note is above the range', () => {
+      const xml = makeXML(makeNote('E', 7));
 
-      const score = MusicXMLParser.parse(xml);
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "E7 is above the shakuhachi's range",
+      );
+    });
 
-      expect(score.notes).toHaveLength(1);
-      expect(score.notes[0].pitch?.step).toBe('tsu');
-      expect(score.notes[0].meriKari).toBe('chu-meri');
+    it('should import every semitone at the top of the range', () => {
+      const xml = makeXML(makeAlteredNote('C', 1, 7) + makeNote('D', 7));
+
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
+        { step: 'go-no-hi', octave: 2 },
+        { step: 'ha', octave: 2 },
+      ]);
+    });
+
+    it('should keep a fingering named in <technical>, and ignore finger numbers', () => {
+      const withFingering = (name: string) =>
+        makeAlteredNote('B', -1, 5).replace(
+          '</note>',
+          `<notations><technical><fingering>${name}</fingering></technical></notations></note>`,
+        );
+      const xml = makeXML(withFingering('san-no-u') + withFingering('2'));
+
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
+        { step: 'san-no-u', octave: 1 },
+        { step: 'hi', octave: 1 },
+      ]);
+    });
+
+    it('should not quote an unrecognised step in the error', () => {
+      const xml = makeXML(makeNote('&lt;img src=x&gt;', 4));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 1: the pitch has no valid step.',
+      );
+    });
+
+    it('should fail on a quarter-tone alter rather than round it', () => {
+      const xml = makeXML(makeAlteredNote('D', -0.5, 4));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "D is altered by -0.5 semitones, and microtones can't be imported",
+      );
+    });
+
+    it('should read sharps and flats through the pitch table', () => {
+      const xml = makeXML(
+        makeAlteredNote('F', 1, 4) + // F#4 → re meri
+          makeAlteredNote('B', -1, 4) + // Bb4 → ri meri
+          makeAlteredNote('D', 1, 4) + // D#4 → tsu meri
+          makeNote('C', 4), // C4 → ro dai-meri
+      );
+
+      const fingerings = MusicXMLParser.parse(xml).notes.map((n) => [
+        n.pitch?.step,
+        n.meriKari,
+      ]);
+
+      expect(fingerings).toEqual([
+        ['re', 'meri'],
+        ['ri', 'meri'],
+        ['tsu', 'meri'],
+        ['ro', 'dai-meri'],
+      ]);
+    });
+
+    it('should give enharmonic spellings the same fingering', () => {
+      const sharp = MusicXMLParser.parse(makeXML(makeAlteredNote('F', 1, 4)));
+      const flat = MusicXMLParser.parse(makeXML(makeAlteredNote('G', -1, 4)));
+
+      expect(flat.notes).toEqual(sharp.notes);
     });
 
     it('should default title to "Untitled" when <work-title> is missing', () => {

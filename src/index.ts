@@ -72,7 +72,6 @@ export type {
   KinkoSymbol,
   Octave,
   Technique,
-  Fingering,
 } from './web-component/constants/kinko-symbols';
 
 // Score Data types

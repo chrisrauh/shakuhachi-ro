@@ -51,7 +51,7 @@ describe('MusicXMLSerializer', () => {
         notes: [
           { pitch: { step: 'ro', octave: 0 }, duration: 1 }, // D4 (otsu)
           { pitch: { step: 'ro', octave: 1 }, duration: 1 }, // D5 (kan)
-          { pitch: { step: 'ro', octave: 2 }, duration: 1 }, // D6 (daikan)
+          { pitch: { step: 'tsu', octave: 2 }, duration: 1 }, // F6 (daikan)
         ],
       };
 
@@ -63,18 +63,59 @@ describe('MusicXMLSerializer', () => {
       expect(xml).toContain('<octave>6</octave>');
     });
 
-    it('should serialize notes with meri as altered pitches', () => {
+    it('should write each fingering as its note in the pitch table', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meriKari: 'meri' }, // F4 meri → E4 (alter -1)
+          { pitch: { step: 'tsu', octave: 0 }, duration: 1, meriKari: 'meri' }, // D#4
+          {
+            pitch: { step: 'tsu', octave: 0 },
+            duration: 1,
+            meriKari: 'chu-meri',
+          }, // E4
         ],
       };
 
-      const xml = MusicXMLSerializer.serialize(scoreData);
+      const pitches = [
+        ...MusicXMLSerializer.serialize(scoreData).matchAll(
+          /<pitch>([\s\S]*?)<\/pitch>/g,
+        ),
+      ].map((m) => m[1].replace(/\s+/g, ''));
 
-      expect(xml).toContain('<alter>-1</alter>');
+      expect(pitches).toEqual([
+        '<step>D</step><alter>1</alter><octave>4</octave>',
+        '<step>E</step><octave>4</octave>',
+      ]);
+    });
+
+    it('should fail on a note whose octave is not valid', () => {
+      const scoreData: ScoreData = {
+        title: 'Test',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+          { pitch: { step: 'ro', octave: 3 }, duration: 1 },
+        ],
+      };
+
+      expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
+        "Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to MusicXML",
+      );
+    });
+
+    it('names a fingering that is not its pitch default', () => {
+      const xml = MusicXMLSerializer.serialize({
+        title: 'Test',
+        notes: [
+          { pitch: { step: 'san-no-u', octave: 1 }, duration: 1 },
+          { pitch: { step: 'hi', octave: 1 }, duration: 1, meriKari: 'meri' },
+        ],
+      });
+
+      // Both are B♭5; hi meri is the default, so only san no u is named
+      expect(xml.match(/<fingering>.*<\/fingering>/g)).toEqual([
+        '<fingering>san-no-u</fingering>',
+      ]);
     });
 
     it('should serialize rests', () => {

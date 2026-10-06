@@ -19,23 +19,25 @@
 
 Note = {
   "pitch": {
-    "step": string,          // Fingering: "ro" | "tsu" | "re" | "chi" | "ri" | "u" | "hi"
+    "step": string,          // Written character, e.g. "ro", "tsu", "go-no-hi" (see below)
     "octave": number         // 0=otsu (base), 1=kan, 2=daikan
   },
   "duration": number,        // Duration in relative timing units
-  "meriKari"?: string        // Optional: "dai-meri" | "meri" | "chu-meri"
+  "meriKari"?: string        // Optional: "dai-meri" | "meri" | "chu-meri" | "chu-kari" | "kari" | "dai-kari"
 }
 ```
 
 ## Required Fields
 
-- `pitch.step` - The fingering/pitch step (required)
+- `pitch.step` - The written character (required). The five basic notes `"ro"`, `"tsu"`, `"re"`, `"chi"` and `"ri"`; `"u"`, `"hi"` and `"ha"`; and the fingerings written with a small numeral: `"go-no-hi"` (ヒ五), `"go-no-ha"` (ハ五), `"san-no-u"` (ウ三), `"san-no-ha"` (ハ三), `"shi-no-ha"` (ハ四) and `"ni-shi-go-no-ha"` (ハ二四五). The list is `PITCH_STEPS` in `src/web-component/types/ScoreData.ts`.
 - `pitch.octave` - Octave indicator (required, 0=otsu, 1=kan, 2=daikan)
 - `duration` - Duration value (required)
 
 ## Optional Fields
 
-- `meriKari` - Meri or kari, if the note is played with one: `"dai-meri"`, `"meri"` or `"chu-meri"`. It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not a `meriKari` value.
+- `meriKari` - The meri or kari mark the score writes beside the note: `"dai-meri"` (大メ), `"meri"` (メ), `"chu-meri"` (中), `"chu-kari"` (中カ), `"kari"` (カ) or `"dai-kari"` (大カ). It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. It is only what is written: u and san no u are played meri and kari without a mark, and the fingering table (`src/web-component/constants/kinko-fingerings.ts`) records that. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not a `meriKari` value.
+
+A step, octave and mark that the fingering table doesn't list still render. Converted to MusicXML or ABC, they get an estimated Western pitch (the character's pitch, moved by the mark) and their name, so they read back exactly; other software plays the estimate.
 
 ## Column Layout
 
@@ -77,7 +79,6 @@ This separation allows the same score data to be rendered differently on mobile,
 
 When needed, we can add:
 
-- `"kari"` as a `meriKari` value, once the renderer can draw it
 - `atari` - For atari technique marks
 - More pitch modifiers
 - Additional metadata (composer, tempo, etc.)
