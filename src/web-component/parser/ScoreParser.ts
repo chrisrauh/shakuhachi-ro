@@ -15,7 +15,7 @@ import {
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
-import { MERI_KARI, type ScoreData } from '../types/ScoreData';
+import { MERI_KARI, PITCH_STEPS, type ScoreData } from '../types/ScoreData';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
@@ -273,6 +273,10 @@ export class ScoreParser {
 
       if (!note.pitch.step) {
         throw new Error(S.noteIndexPitchStep(index));
+      }
+
+      if (!(PITCH_STEPS as readonly string[]).includes(note.pitch.step)) {
+        throw new Error(S.noteIndexStepInvalid(index, note.pitch.step));
       }
 
       if (note.pitch.octave === undefined || note.pitch.octave === null) {

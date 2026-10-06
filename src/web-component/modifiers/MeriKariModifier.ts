@@ -1,17 +1,13 @@
 /**
- * MeriKariModifier - Pitch alteration marks for shakuhachi notation
+ * MeriKariModifier - Meri and kari marks for shakuhachi notation
  *
- * In shakuhachi notation, meri indicates pitch lowering through embouchure:
- * - Meri (メリ): Lowering pitch by tilting head downward (~half step)
- * - Chu-meri (中メリ): Middle/half meri - halfway between normal and full meri
- * - Dai-meri (大メリ): Great/big meri - lowering pitch further (~whole step)
+ * Meri lowers a note and kari raises it, by changing the angle of the lips to
+ * the blowing edge. Kinko notation marks them beside the note, following
+ * Koga's chart (and Nyokai-An's for the kari marks Koga doesn't use):
+ * - Meri メ, chu-meri 中, dai-meri 大メ
+ * - Kari カ, chu-kari 中カ, dai-kari 大カ
  *
- * Note: Kari (raising pitch) is rarely notated as it's the default/normal playing state.
- *
- * Visual representation in Kinko notation:
- * - Meri: メ (katakana "me") to the left of note
- * - Chu-meri: 中 (kanji "chu" meaning "middle") to the left of note
- * - Dai-meri: 大 (kanji "dai" meaning "big/great") to the left of note
+ * A two-character mark is stacked, the first above the second.
  *
  * Position: Left of note character
  *
@@ -39,17 +35,20 @@ export class MeriKariModifier extends Modifier {
   /** Color of the mark */
   private color: string = '#000'; // Black, like traditional notation
 
-  /** Katakana/Kanji characters for each alteration type */
+  /** The mark for each meri and kari */
   private static readonly symbols: Record<MeriKari, string> = {
-    meri: 'メ', // Katakana "me" - full meri
-    'chu-meri': '中', // Kanji "chu" (middle) - half meri
-    'dai-meri': '大', // Kanji "dai" (big/great) - great meri
+    meri: 'メ',
+    'chu-meri': '中',
+    'dai-meri': '大メ',
+    kari: 'カ',
+    'chu-kari': '中カ',
+    'dai-kari': '大カ',
   };
 
   /**
    * Creates a meri modifier
    *
-   * @param type - Type of alteration: 'meri', 'chu-meri', or 'dai-meri'
+   * @param type - Which meri or kari
    * @param position - Where to position relative to note (default: 'left')
    */
   constructor(type: MeriKari = 'meri', position: ModifierPosition = 'left') {
@@ -85,18 +84,21 @@ export class MeriKariModifier extends Modifier {
   render(renderer: RenderingBackend, noteX: number, noteY: number): void {
     const x = noteX + this.offsetX;
     const y = noteY + this.offsetY;
-    const symbol = MeriKariModifier.symbols[this.type];
+    const characters = [...MeriKariModifier.symbols[this.type]];
 
-    renderer.drawText(
-      symbol,
-      x,
-      y,
-      this.fontSize,
-      this.fontFamily,
-      this.color,
-      'middle',
-      this.fontWeight,
-    );
+    // Stacked upwards from the note's baseline, last character lowest
+    characters.forEach((character, i) => {
+      renderer.drawText(
+        character,
+        x,
+        y - (characters.length - 1 - i) * this.fontSize,
+        this.fontSize,
+        this.fontFamily,
+        this.color,
+        'middle',
+        this.fontWeight,
+      );
+    });
   }
 
   /**
@@ -150,6 +152,6 @@ export class MeriKariModifier extends Modifier {
    * Gets the height occupied by this modifier
    */
   getHeight(): number {
-    return this.fontSize;
+    return this.fontSize * [...MeriKariModifier.symbols[this.type]].length;
   }
 }

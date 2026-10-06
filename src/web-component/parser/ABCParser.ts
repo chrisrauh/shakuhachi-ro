@@ -12,10 +12,16 @@
  * - Broken rhythm: A>B dots A and halves B; A<B halves A and dots B
  * - Rests: z (with duration modifiers)
  * - Bar lines: | (measure separator, ignored in output)
+ * - Decorations: !name! before a note. One naming a fingering (as our export
+ *   writes, e.g. !ri-meri!) chooses it; others are ignored
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { ABC_TO_KINKO_MAP } from '../constants/abc-pitch-map';
+import { parseABCPitch } from '../constants/abc-pitch-map';
+import {
+  defaultFingering,
+  namedFingering,
+} from '../constants/kinko-fingerings';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class ABCParser {
@@ -109,7 +115,10 @@ export class ABCParser {
     // Tokenize: split into note tokens (pitch + optional duration + optional dotted marker)
     // Regex matches: optional accidental + ANY letter (we'll validate later) + optional octave marks + optional duration + optional dotted
     // Examples: "D", "^D2", "d'", "_a/2", "G>", "X", "Q", "z"
-    const tokenRegex = /([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
+    const tokenRegex =
+      /!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
+    // Decorations seen since the last note
+    let decorations: string[] = [];
     let match: RegExpExecArray | null;
 
     // Valid ABC note letters and rest
@@ -134,6 +143,7 @@ export class ABCParser {
     while ((match = tokenRegex.exec(cleaned)) !== null) {
       const [
         fullMatch,
+        decoration,
         accidental,
         pitch,
         octaveMarks,
@@ -145,6 +155,13 @@ export class ABCParser {
       if (!fullMatch.trim()) {
         continue;
       }
+
+      if (decoration !== undefined) {
+        decorations.push(decoration);
+        continue;
+      }
+      const noteDecorations = decorations;
+      decorations = [];
 
       // Validate letter first
       if (!validLetters.has(pitch)) {
@@ -167,7 +184,13 @@ export class ABCParser {
       const abcPitch = `${accidental || ''}${pitch}${octaveMarks}`;
 
       // Map to shakuhachi
-      const shakuPitch = ABC_TO_KINKO_MAP[abcPitch];
+      const written = parseABCPitch(accidental || '', pitch, octaveMarks);
+      const shakuPitch =
+        written &&
+        (noteDecorations
+          .map((name) => namedFingering(written, name))
+          .find(Boolean) ??
+          defaultFingering(written));
       if (!shakuPitch) {
         throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(abcPitch));
       }

@@ -77,8 +77,8 @@ export const STRINGS = {
     ScoreEditor: {
       formatConversionFailed: {
         title: 'Format Conversion Failed',
-        message: (fromFormat: string, toFormat: string) =>
-          `Could not convert ${fromFormat} to ${toFormat}. Clear content and switch format?`,
+        message: (fromFormat: string, toFormat: string, reason: string) =>
+          `Could not convert ${fromFormat} to ${toFormat}. ${reason ? `${reason.replace(/\.?$/, '.')} ` : ''}Clear content and switch format?`,
         confirmText: 'Clear and Switch',
         cancelText: 'Keep Current Format',
       },

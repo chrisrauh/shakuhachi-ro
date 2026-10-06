@@ -6,7 +6,14 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { KINKO_PITCH_MAP } from '../constants/kinko-pitch-map';
+import {
+  defaultFingering,
+  isNoteLetter,
+  namedFingering,
+  PITCH_RANGE,
+  rangePosition,
+  type WrittenPitch,
+} from '../constants/kinko-fingerings';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /**
@@ -24,6 +31,41 @@ function toBaseDuration(
 ): number {
   const sounding = raw / divisions;
   return dotted ? sounding / 1.5 : sounding;
+}
+
+const MESSAGES = PARSER_STRINGS.ERRORS.MusicXMLParser;
+
+/** Where a note is, as a reader of the source would find it */
+function locate(noteElement: Element): string {
+  const measure = noteElement.closest('measure');
+  const notes = measure ? [...measure.querySelectorAll('note')] : [];
+  return MESSAGES.noteLocation(
+    measure?.getAttribute('number') ?? '?',
+    notes.indexOf(noteElement) + 1,
+  );
+}
+
+/**
+ * Says why a note cannot be imported. Quotes only validated values: the
+ * message can be shown in a page, and the source is user content.
+ */
+function describeUnplayable(
+  noteElement: Element,
+  written: WrittenPitch | undefined,
+  alter: number,
+): string {
+  const where = locate(noteElement);
+  if (!written) return MESSAGES.invalidStep(where);
+  if (!Number.isInteger(alter)) {
+    return MESSAGES.microtone(where, written.letter, alter);
+  }
+  const accidentals = alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
+  const name = `${written.letter}${accidentals}${written.octave}`;
+  const position = rangePosition(written);
+  // Every semitone in range has a fingering today; this guards against a
+  // review removing one
+  if (position === 'within') return MESSAGES.notInTable(where, name);
+  return MESSAGES.outOfRange(where, name, position, PITCH_RANGE);
 }
 
 export class MusicXMLParser {
@@ -61,8 +103,12 @@ export class MusicXMLParser {
     // Extract all notes from all measures
     const notes: ScoreNote[] = [];
     const noteElements = xmlDoc.querySelectorAll('note');
+    // Notes the table has no fingering for. Import fails rather than dropping
+    // them, which would change the piece without telling anyone; all of them
+    // are counted so a score written in the wrong octave reads as such.
+    const unplayable: string[] = [];
 
-    noteElements.forEach((noteElement, i) => {
+    noteElements.forEach((noteElement) => {
       const rawDuration = parseInt(
         noteElement.querySelector('duration')?.textContent || '1',
         10,
@@ -84,21 +130,33 @@ export class MusicXMLParser {
       // Extract pitch
       const pitchElement = noteElement.querySelector('pitch');
       if (!pitchElement) {
-        console.warn(`Skipping note at index ${i}: no <pitch> element`);
+        unplayable.push(MESSAGES.noPitch(locate(noteElement)));
         return;
       }
 
-      const step = pitchElement.querySelector('step')?.textContent || '';
-      const octave = pitchElement.querySelector('octave')?.textContent || '4';
-      // const alter = pitchElement.querySelector('alter')?.textContent || '0'; // TODO: Use for accidentals
+      const step = pitchElement.querySelector('step')?.textContent?.trim();
+      const octave = Number(
+        pitchElement.querySelector('octave')?.textContent ?? '4',
+      );
+      const alter = Number(
+        pitchElement.querySelector('alter')?.textContent ?? '0',
+      );
 
-      // Build pitch name (e.g., "D4", "G5")
-      const pitchName = `${step}${octave}`;
-
-      // Map to shakuhachi notation
-      const shakuPitch = KINKO_PITCH_MAP[pitchName];
+      const written = isNoteLetter(step)
+        ? { letter: step, alter, octave }
+        : undefined;
+      // A fingering our export named wins over the pitch's default. Other
+      // software's fingerings (finger numbers) don't match a name, and fall
+      // back to the default.
+      const named = noteElement
+        .querySelector('technical > fingering')
+        ?.textContent?.trim();
+      const shakuPitch =
+        written &&
+        ((named && namedFingering(written, named)) ||
+          defaultFingering(written));
       if (!shakuPitch) {
-        console.warn(`Unknown pitch: ${pitchName}, skipping`);
+        unplayable.push(describeUnplayable(noteElement, written, alter));
         return;
       }
 
@@ -122,6 +180,15 @@ export class MusicXMLParser {
 
       notes.push(note);
     });
+
+    if (unplayable.length > 0) {
+      throw new Error(
+        PARSER_STRINGS.ERRORS.MusicXMLParser.unplayableNotes(
+          unplayable[0],
+          unplayable.length - 1,
+        ),
+      );
+    }
 
     return {
       title,

@@ -112,12 +112,18 @@ export class ScoreDetailClient {
       // This MUST come after width/height attributes are set
       container.setAttribute('data-score', JSON.stringify(scoreData));
     } catch (error) {
-      container.innerHTML = `
-        <div class="page-error">
-          <p>${STRINGS.ERRORS.ScoreDetailClient.renderError}</p>
-          <p>${error instanceof Error ? error.message : 'Unknown error'}</p>
-        </div>
-      `;
+      // Set as text: a parse error can quote the score, which is user content
+      const box = document.createElement('div');
+      box.className = 'page-error';
+      for (const text of [
+        STRINGS.ERRORS.ScoreDetailClient.renderError,
+        error instanceof Error ? error.message : 'Unknown error',
+      ]) {
+        const p = document.createElement('p');
+        p.textContent = text;
+        box.append(p);
+      }
+      container.replaceChildren(box);
     }
   }
 

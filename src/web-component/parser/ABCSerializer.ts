@@ -6,7 +6,13 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { createReverseABCMap } from '../constants/abc-pitch-map';
+import { toABCPitch } from '../constants/abc-pitch-map';
+import {
+  fingeringName,
+  isDefaultFingering,
+  pitchForFingering,
+} from '../constants/kinko-fingerings';
+import { PARSER_STRINGS } from '../constants/parser-strings';
 
 export class ABCSerializer {
   /**
@@ -75,39 +81,35 @@ export class ABCSerializer {
    * Serialize notes array to ABC notation string
    */
   private static serializeNotes(notes: ScoreNote[]): string {
-    const reverseMap = createReverseABCMap();
     const abcNotes: string[] = [];
 
-    for (const note of notes) {
+    notes.forEach((note, index) => {
       if (note.rest) {
         // Rest: "z" + duration
         const durationStr = this.formatDuration(note.duration);
         abcNotes.push(`z${durationStr}`);
       } else if (note.pitch) {
-        // Build key for reverse map lookup
-        const key = `${note.pitch.step}-${note.pitch.octave}-${note.meriKari ?? ''}`;
-
-        // Find ABC pitch notation
-        let abcPitch = reverseMap.get(key);
-
-        if (!abcPitch) {
-          // Fallback: construct basic ABC pitch without meri
-          const baseKey = `${note.pitch.step}-${note.pitch.octave}-`;
-          abcPitch = reverseMap.get(baseKey);
-
-          if (!abcPitch) {
-            throw new Error(
-              `Cannot serialize pitch: ${note.pitch.step} octave ${note.pitch.octave}`,
-            );
-          }
+        const fingering = { ...note.pitch, meriKari: note.meriKari };
+        const written = pitchForFingering(fingering);
+        if (!written) {
+          throw new Error(
+            PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'ABC'),
+          );
         }
+        // A fingering import wouldn't choose for its pitch is named in a
+        // decoration, so it reads back as itself. ABC software that doesn't
+        // know the decoration ignores it.
+        const decoration = isDefaultFingering(fingering)
+          ? ''
+          : `!${fingeringName(fingering)}!`;
+        const abcPitch = decoration + toABCPitch(written);
 
         // A dot is written as the sounding length (a dotted 1 is 3/2), not as
         // >, which in ABC is broken rhythm and would also halve the next note
         const sounding = note.dotted ? note.duration * 1.5 : note.duration;
         abcNotes.push(`${abcPitch}${this.formatDuration(sounding)}`);
       }
-    }
+    });
 
     // Join notes with spaces (could add bar lines based on meter)
     return abcNotes.join(' ');

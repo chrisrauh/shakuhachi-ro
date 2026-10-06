@@ -27,6 +27,28 @@ import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 const KANA_OPTICAL_CENTER_RATIO = 0.4;
 
 /**
+ * Size of the small numerals some fingerings write with their kana (ヒ with
+ * 五 for go no hi), as a fraction of the font size. Several stacked (ハ with
+ * 二四五) are smaller, to stay within the kana's height.
+ */
+const NUMERAL_SIZE_RATIO = 0.36;
+const STACKED_NUMERAL_SIZE_RATIO = 0.26;
+
+/**
+ * Where the numerals sit inside each kana, as in Koga's chart: between the
+ * strokes of ハ, inside ウ, in the open lower right of ヒ, at the upper right
+ * of レ (as the B.C. chart writes レ二). Offsets of the
+ * lowest numeral from the kana's centre and baseline, as fractions of the
+ * font size.
+ */
+const NUMERAL_OFFSET_RATIO: Record<string, { x: number; y: number }> = {
+  ハ: { x: 0, y: 0 },
+  ウ: { x: 0.04, y: -0.16 },
+  ヒ: { x: 0.16, y: 0 },
+  レ: { x: 0.24, y: -0.42 },
+};
+
+/**
  * Duration for spacing calculations
  * Mirrors VexFlow's duration notation
  */
@@ -174,6 +196,7 @@ export class ShakuNote {
         'middle',
         this.fontWeight,
       );
+      this.renderNumerals(renderer);
     }
 
     // Render all modifiers
@@ -183,6 +206,27 @@ export class ShakuNote {
 
     // Invalidate cached bbox after rendering
     this.bbox = null;
+  }
+
+  /** Draws the kana's numerals inside it, stacked upwards from its baseline */
+  private renderNumerals(renderer: RenderingBackend): void {
+    const numerals = [...(this.symbolInfo?.numerals ?? '')];
+    const size =
+      this.fontSize *
+      (numerals.length > 1 ? STACKED_NUMERAL_SIZE_RATIO : NUMERAL_SIZE_RATIO);
+    const offset = NUMERAL_OFFSET_RATIO[this.kana] ?? { x: 0, y: 0 };
+    numerals.forEach((numeral, i) => {
+      renderer.drawText(
+        numeral,
+        this.x + this.fontSize * offset.x,
+        this.y + this.fontSize * offset.y - (numerals.length - 1 - i) * size,
+        size,
+        this.fontFamily,
+        this.color,
+        'middle',
+        this.fontWeight,
+      );
+    });
   }
 
   /**

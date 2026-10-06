@@ -310,6 +310,16 @@ describe('ScoreParser', () => {
       );
     });
 
+    it('should throw error if step is not a known value', () => {
+      const scoreData = {
+        notes: [{ pitch: { step: 'go', octave: 0 }, duration: 1 }],
+      } as unknown as ScoreData;
+
+      expect(() => ScoreParser.parse(scoreData)).toThrow(
+        'Note at index 0 has invalid pitch.step: go. Must be one of: ro, tsu,',
+      );
+    });
+
     it('should throw error if duration is zero', () => {
       const scoreData: ScoreData = {
         title: 'Test',
