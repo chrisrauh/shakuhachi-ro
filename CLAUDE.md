@@ -11,17 +11,19 @@ These rules OVERRIDE all superpowers:\* skills and all other instructions.
 
 | Trigger                                                                      | Required Action                                                           |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Session start / new task / context cleared                                   | Invoke `/get-ready` FIRST                                                 |
+| Session start, or context cleared or compacted                               | Invoke `/get-ready` FIRST                                                 |
 | Development work, no plan OR Claude plan (EnterPlanMode)                     | Invoke `/dev-workflow` — NOT `superpowers:finishing-a-development-branch` |
 | Development work, superpowers plan exists (from `superpowers:writing-plans`) | Use `superpowers:subagent-driven-development`                             |
 | Autonomous work on `autonomy:high` issues                                    | Invoke `/agent-workflow` — NOT `/dev-workflow`                            |
-| Before any implementation work, and before any `superpowers:*` skill         | Invoke `/eng-principles` FIRST                                            |
+| Before implementation work, and before any `superpowers:*` skill             | Invoke `/eng-principles` FIRST                                            |
+
+**Once per session.** A loaded skill stays in context, so don't invoke one that is already loaded in this session. Invoke it again only when its text is no longer in your context: after `/clear` or a compaction. A new task in the same session does not need `/get-ready` again.
 
 **Red flags — if you think any of these, STOP:**
 
 - "I'll use `superpowers:finishing-a-development-branch` since the work is done" → Use `/dev-workflow`
-- "This is a quick task, I don't need `/get-ready`" → You still do
-- "I already know the principles" → Still invoke `/eng-principles` before implementation work and before any superpowers skill
+- "This is a quick task, I don't need `/get-ready`" → You still do, at session start
+- "I already know the principles" → Only if `/eng-principles` was loaded in this session and its text is still in your context. Otherwise invoke it before implementation work and before any superpowers skill
 - "This change is too small for `/eng-principles`" → Small changes still add abstractions, handlers and coupling. Invoke it before writing code
 - "There's a plan, so I'll use `superpowers:subagent-driven-development`" → Only if it's a superpowers plan (from `superpowers:writing-plans`). Claude plans (EnterPlanMode) → use `/dev-workflow`
 - "This is an `autonomy:high` issue, I'll use `/dev-workflow`" → Use `/agent-workflow` for autonomous execution
@@ -256,73 +258,7 @@ pkill -f "chrome-devtools-mcp"
 
 Then run `/mcp` to reconnect. This kills the stale MCP Chrome without affecting the user's regular Chrome (they use separate user data dirs).
 
-### Visual Verification Patterns
-
-**For styling/layout work:**
-
-```
-navigate_page({ url: "http://localhost:PORT/path" })
-emulate({ colorScheme: "light" })
-take_screenshot()
-emulate({ colorScheme: "dark" })
-take_screenshot()
-take_snapshot()
-list_console_messages()
-```
-
-**For refactors (verify nothing changed):**
-
-```
-# Before changes
-navigate_page({ url: "http://localhost:PORT/path" })
-take_screenshot()
-
-# After changes
-navigate_page({ type: "reload" })
-take_screenshot()
-emulate({ colorScheme: "dark" })
-take_screenshot()
-list_console_messages()
-```
-
-### Element-Specific Debugging
-
-```
-take_snapshot({ verbose: false })              // Get element tree with UIDs
-take_screenshot({ uid: "element-uid" })        // Screenshot specific element
-evaluate_script({
-  function: "(el) => ({ bounds: el.getBoundingClientRect(), styles: window.getComputedStyle(el) })",
-  args: [{ uid: "element-uid" }]
-})
-```
-
-### Performance Profiling
-
-```
-navigate_page({ url: "http://localhost:PORT/score/akatombo" })
-performance_start_trace({ reload: true, autoStop: true })
-performance_analyze_insight({ insightSetId: "...", insightName: "LCPBreakdown" })
-performance_stop_trace({ filePath: "traces/score-rendering.json.gz" })  // Optional
-```
-
-### Multi-Viewport Testing
-
-```
-emulate({ viewport: { width: 1280, height: 720, deviceScaleFactor: 1 } })                              // Desktop
-emulate({ viewport: { width: 768, height: 1024, deviceScaleFactor: 2, isMobile: true } })              // Tablet
-emulate({ viewport: { width: 375, height: 667, deviceScaleFactor: 3, isMobile: true, hasTouch: true } }) // Mobile
-```
-
-### Debugging Visual Issues
-
-```
-take_screenshot()
-take_snapshot({ verbose: true })
-list_console_messages({ types: ["error", "warn"] })
-list_network_requests({ resourceTypes: ["xhr", "fetch"] })
-get_network_request({ reqid: 123 })
-evaluate_script({ function: "() => ({ scoreData: window.__SCORE_DATA__, renderState: window.__RENDER_STATE__ })" })
-```
+**Call patterns** for styling, refactors, single elements, performance, viewports and debugging: [docs/CHROME-DEVTOOLS-MCP.md](./docs/CHROME-DEVTOOLS-MCP.md).
 
 ### Test Account Credentials
 

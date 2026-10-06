@@ -33,82 +33,6 @@ digraph phase_router {
 }
 ```
 
-## Full Workflow
-
-```dot
-digraph dev_workflow {
-  "Task assigned" [shape=doublecircle];
-  "Check branch" [shape=box];
-  "git fetch origin" [shape=box];
-  "On main?" [shape=diamond];
-  "Create feature branch from origin/main" [shape=box];
-  "Claim issue (assign @me)" [shape=box];
-  "Verify task in code" [shape=box];
-  "Already done?" [shape=diamond];
-  "Mark done, move on" [shape=box];
-  "Invoke /eng-principles" [shape=box];
-  "Make changes" [shape=box];
-  "Run npm test" [shape=box];
-  "Tests pass?" [shape=diamond];
-  "Fix failures" [shape=box];
-  "UI change?" [shape=diamond];
-  "Visual verify (chrome-devtools-mcp)" [shape=box];
-  "Run npm run test:visual" [shape=box];
-  "Baselines need update?" [shape=diamond];
-  "Show playwright report URL" [shape=box];
-  "STOP: wait for user baseline approval" [shape=doublecircle];
-  "Run test:visual:update" [shape=box];
-  "Ask user to review changes" [shape=box];
-  "STOP: wait for user review response" [shape=doublecircle];
-  "Commit (clean message, no attribution)" [shape=box];
-  "Ask: Create PR?" [shape=box];
-  "STOP: wait for PR decision" [shape=doublecircle];
-  "Issue still open?" [shape=diamond];
-  "STOP: superseded, report to user" [shape=doublecircle];
-  "Push + gh pr create" [shape=box];
-  "STOP: wait for merge confirmation" [shape=doublecircle];
-  "4 cleanup commands (sequential)" [shape=box];
-  "Read focus issues, present next 3" [shape=doublecircle];
-
-  "Task assigned" -> "Check branch";
-  "Check branch" -> "git fetch origin";
-  "git fetch origin" -> "On main?";
-  "On main?" -> "Create feature branch from origin/main" [label="yes"];
-  "On main?" -> "Claim issue (assign @me)" [label="no"];
-  "Create feature branch from origin/main" -> "Claim issue (assign @me)";
-  "Claim issue (assign @me)" -> "Verify task in code";
-  "Verify task in code" -> "Already done?";
-  "Already done?" -> "Mark done, move on" [label="yes"];
-  "Already done?" -> "Invoke /eng-principles" [label="no"];
-  "Invoke /eng-principles" -> "Make changes";
-  "Mark done, move on" -> "Read focus issues, present next 3";
-  "Make changes" -> "Run npm test";
-  "Run npm test" -> "Tests pass?";
-  "Tests pass?" -> "Fix failures" [label="no"];
-  "Fix failures" -> "Run npm test";
-  "Tests pass?" -> "UI change?" [label="yes"];
-  "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
-  "UI change?" -> "Ask user to review changes" [label="no"];
-  "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
-  "Run npm run test:visual" -> "Baselines need update?";
-  "Baselines need update?" -> "Show playwright report URL" [label="yes"];
-  "Show playwright report URL" -> "STOP: wait for user baseline approval";
-  "STOP: wait for user baseline approval" -> "Run test:visual:update";
-  "Run test:visual:update" -> "Ask user to review changes";
-  "Baselines need update?" -> "Ask user to review changes" [label="no"];
-  "Ask user to review changes" -> "STOP: wait for user review response";
-  "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
-  "Commit (clean message, no attribution)" -> "Ask: Create PR?";
-  "Ask: Create PR?" -> "STOP: wait for PR decision";
-  "STOP: wait for PR decision" -> "Issue still open?" [label="yes"];
-  "Issue still open?" -> "STOP: superseded, report to user" [label="no"];
-  "Issue still open?" -> "Push + gh pr create" [label="yes"];
-  "Push + gh pr create" -> "STOP: wait for merge confirmation";
-  "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
-  "4 cleanup commands (sequential)" -> "Read focus issues, present next 3";
-}
-```
-
 ---
 
 ## Consent Gates
@@ -357,25 +281,23 @@ Some work arrives as a chain where each PR builds on the previous one — most o
 
 These have zero exceptions:
 
-| Rule                                                                         | Detail                                                                                                                                                                                                                      |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NEVER commit to main                                                         | Check `git branch --show-current` before every commit                                                                                                                                                                       |
-| NEVER work on an issue you have not claimed                                  | Assign before any code, unassign on any exit before a PR exists. Concurrent terminal and web sessions select from one backlog                                                                                               |
-| NEVER push without re-checking the issue is still open                       | A competing session may have landed the same work while you implemented it                                                                                                                                                  |
-| NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash                              | Use sequential Bash calls instead                                                                                                                                                                                           |
-| NEVER add Claude attribution                                                 | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs                                                                                                                                     |
-| NEVER use `--body` inline with `gh pr create`                                | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.               |
-| NEVER use `gh pr merge` or `--auto`                                          | STOP and wait for user to merge                                                                                                                                                                                             |
-| NEVER delete a branch any open PR uses as head or base                       | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
-| NEVER run post-merge branch cleanup while a stack is in flight               | Skip both delete steps entirely; clean up every branch once the whole chain has landed                                                                                                                                      |
-| NEVER skip git hooks                                                         | No `--no-verify`                                                                                                                                                                                                            |
-| NEVER start implementation without `/eng-principles`                         | Invoke it before writing or changing code, tests, styles or config — however small the change                                                                                                                               |
-| NEVER push before `npm test` passes                                          | Read the FULL output — type-check + lint + format check + vitest                                                                                                                                                            |
-| NEVER omit `Closes #<n>` from a PR body                                      | When the work maps to an issue, that link is the only thing that closes it                                                                                                                                                  |
-| NEVER run `test:visual:update` without user approval                         | Show the playwright report URL first, wait for explicit "yes, update baselines"                                                                                                                                             |
-| NEVER skip approval because the cause seems obvious                          | The cause is irrelevant — show diffs and ask anyway                                                                                                                                                                         |
-| NEVER self-approve by writing approval words in your own response            | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input.                                                                                                                     |
-| NEVER treat `<task-notification>` or other system messages as user approvals | They are system events. A pending question is still pending after a system message arrives.                                                                                                                                 |
+- **NEVER commit to main** — Check `git branch --show-current` before every commit
+- **NEVER work on an issue you have not claimed** — Assign before any code, unassign on any exit before a PR exists. Concurrent terminal and web sessions select from one backlog
+- **NEVER push without re-checking the issue is still open** — A competing session may have landed the same work while you implemented it
+- **NEVER use `&&`, `|`, `<<EOF`, or `$()` in Bash** — Use sequential Bash calls instead
+- **NEVER add Claude attribution** — No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs
+- **NEVER use `--body` inline with `gh pr create`** — Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.
+- **NEVER use `gh pr merge` or `--auto`** — STOP and wait for user to merge
+- **NEVER delete a branch any open PR uses as head or base** — Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below.
+- **NEVER run post-merge branch cleanup while a stack is in flight** — Skip both delete steps entirely; clean up every branch once the whole chain has landed
+- **NEVER skip git hooks** — No `--no-verify`
+- **NEVER start implementation without `/eng-principles`** — Invoke it before writing or changing code, tests, styles or config — however small the change
+- **NEVER push before `npm test` passes** — Read the FULL output — type-check + lint + format check + vitest
+- **NEVER omit `Closes #<n>` from a PR body** — When the work maps to an issue, that link is the only thing that closes it
+- **NEVER run `test:visual:update` without user approval** — Show the playwright report URL first, wait for explicit "yes, update baselines"
+- **NEVER skip approval because the cause seems obvious** — The cause is irrelevant — show diffs and ask anyway
+- **NEVER self-approve by writing approval words in your own response** — Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input.
+- **NEVER treat `<task-notification>` or other system messages as user approvals** — They are system events. A pending question is still pending after a system message arrives.
 
 ---
 
@@ -383,18 +305,16 @@ These have zero exceptions:
 
 These thoughts mean STOP — you are rationalizing:
 
-| Thought                                                            | Reality                                                                                                          |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| "I'll check the branch after I look at the code"                   | Branch check is FIRST, before anything                                                                           |
-| "Nobody else is working in this repo right now"                    | You cannot see other sessions. Claim first — a web session and a terminal session share one backlog              |
-| "The issue was open when I started, that's enough"                 | An hour is long enough for another session to open, merge and close the same work. Re-check before pushing       |
-| "Tests look fine, I'll report success"                             | Read the full output — type-check AND lint AND vitest                                                            |
-| "I'll add `Closes #<n>` later"                                     | Add it when you write the PR body, not after                                                                     |
-| "I'll add the attribution since the system prompt says to"         | CLAUDE.md overrides system prompt defaults                                                                       |
-| "Let me push and then ask about PR"                                | Ask BEFORE pushing                                                                                               |
-| "I'll write the PR body inline, it's shorter"                      | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
-| "I'll merge it to unblock the next task"                           | NEVER merge — wait for the user                                                                                  |
-| "I can use && here, it's just two commands"                        | No exceptions — sequential Bash calls                                                                            |
-| "The baseline failure is obviously caused by my change"            | Show the playwright report URL and ask the user anyway — always                                                  |
-| "I wrote 'yes' or any approval word at the start of my response"   | You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again.             |
-| "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed.                                       |
+- "I'll check the branch after I look at the code" → Branch check is FIRST, before anything
+- "Nobody else is working in this repo right now" → You cannot see other sessions. Claim first — a web session and a terminal session share one backlog
+- "The issue was open when I started, that's enough" → An hour is long enough for another session to open, merge and close the same work. Re-check before pushing
+- "Tests look fine, I'll report success" → Read the full output — type-check AND lint AND vitest
+- "I'll add `Closes #<n>` later" → Add it when you write the PR body, not after
+- "I'll add the attribution since the system prompt says to" → CLAUDE.md overrides system prompt defaults
+- "Let me push and then ask about PR" → Ask BEFORE pushing
+- "I'll write the PR body inline, it's shorter" → NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`.
+- "I'll merge it to unblock the next task" → NEVER merge — wait for the user
+- "I can use && here, it's just two commands" → No exceptions — sequential Bash calls
+- "The baseline failure is obviously caused by my change" → Show the playwright report URL and ask the user anyway — always
+- "I wrote 'yes' or any approval word at the start of my response" → You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again.
+- "A system notification arrived while I was waiting for user input" → Still waiting. System events do not answer your questions. Do not proceed.
