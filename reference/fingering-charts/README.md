@@ -16,6 +16,7 @@ Where they and another chart disagree, Koga wins. The other charts fill in only 
 | `koga-fingering-names-p109.jpg` | Koga II, p. 109 ("K. The Names Of The Fingering") | Kinko and Tozan names for each written form |
 | `koga-basic-fingerings-p37.jpg` | Koga I, p. 37 | Basic fingerings, with the octaves each is used in (乙, 甲) |
 | `koga-basic-fingerings-p39.jpg` | Koga I, p. 39 | Further basic fingerings, including meri and kari |
+| `other-charts-inventory.md` | This repo | Draft: fingerings the other Kinko charts name and Koga doesn't, with conflicts |
 | `kinko-chart.pdf` | Shakuhachi Society of B.C. | Kinko fingering chart |
 | `fingerchart.pdf` | Nyokai-An | Kinko fingering chart; notes where schools differ |
 | `shak-fingering.png` | Unknown | Kinko fingering chart |
