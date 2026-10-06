@@ -33,6 +33,82 @@ digraph phase_router {
 }
 ```
 
+## Full Workflow
+
+```dot
+digraph dev_workflow {
+  "Task assigned" [shape=doublecircle];
+  "Check branch" [shape=box];
+  "git fetch origin" [shape=box];
+  "On main?" [shape=diamond];
+  "Create feature branch from origin/main" [shape=box];
+  "Claim issue (assign @me)" [shape=box];
+  "Verify task in code" [shape=box];
+  "Already done?" [shape=diamond];
+  "Mark done, move on" [shape=box];
+  "Invoke /eng-principles" [shape=box];
+  "Make changes" [shape=box];
+  "Run npm test" [shape=box];
+  "Tests pass?" [shape=diamond];
+  "Fix failures" [shape=box];
+  "UI change?" [shape=diamond];
+  "Visual verify (chrome-devtools-mcp)" [shape=box];
+  "Run npm run test:visual" [shape=box];
+  "Baselines need update?" [shape=diamond];
+  "Show playwright report URL" [shape=box];
+  "STOP: wait for user baseline approval" [shape=doublecircle];
+  "Run test:visual:update" [shape=box];
+  "Ask user to review changes" [shape=box];
+  "STOP: wait for user review response" [shape=doublecircle];
+  "Commit (clean message, no attribution)" [shape=box];
+  "Ask: Create PR?" [shape=box];
+  "STOP: wait for PR decision" [shape=doublecircle];
+  "Issue still open?" [shape=diamond];
+  "STOP: superseded, report to user" [shape=doublecircle];
+  "Push + gh pr create" [shape=box];
+  "STOP: wait for merge confirmation" [shape=doublecircle];
+  "4 cleanup commands (sequential)" [shape=box];
+  "Read focus issues, present next 3" [shape=doublecircle];
+
+  "Task assigned" -> "Check branch";
+  "Check branch" -> "git fetch origin";
+  "git fetch origin" -> "On main?";
+  "On main?" -> "Create feature branch from origin/main" [label="yes"];
+  "On main?" -> "Claim issue (assign @me)" [label="no"];
+  "Create feature branch from origin/main" -> "Claim issue (assign @me)";
+  "Claim issue (assign @me)" -> "Verify task in code";
+  "Verify task in code" -> "Already done?";
+  "Already done?" -> "Mark done, move on" [label="yes"];
+  "Already done?" -> "Invoke /eng-principles" [label="no"];
+  "Invoke /eng-principles" -> "Make changes";
+  "Mark done, move on" -> "Read focus issues, present next 3";
+  "Make changes" -> "Run npm test";
+  "Run npm test" -> "Tests pass?";
+  "Tests pass?" -> "Fix failures" [label="no"];
+  "Fix failures" -> "Run npm test";
+  "Tests pass?" -> "UI change?" [label="yes"];
+  "UI change?" -> "Visual verify (chrome-devtools-mcp)" [label="yes"];
+  "UI change?" -> "Ask user to review changes" [label="no"];
+  "Visual verify (chrome-devtools-mcp)" -> "Run npm run test:visual";
+  "Run npm run test:visual" -> "Baselines need update?";
+  "Baselines need update?" -> "Show playwright report URL" [label="yes"];
+  "Show playwright report URL" -> "STOP: wait for user baseline approval";
+  "STOP: wait for user baseline approval" -> "Run test:visual:update";
+  "Run test:visual:update" -> "Ask user to review changes";
+  "Baselines need update?" -> "Ask user to review changes" [label="no"];
+  "Ask user to review changes" -> "STOP: wait for user review response";
+  "STOP: wait for user review response" -> "Commit (clean message, no attribution)";
+  "Commit (clean message, no attribution)" -> "Ask: Create PR?";
+  "Ask: Create PR?" -> "STOP: wait for PR decision";
+  "STOP: wait for PR decision" -> "Issue still open?" [label="yes"];
+  "Issue still open?" -> "STOP: superseded, report to user" [label="no"];
+  "Issue still open?" -> "Push + gh pr create" [label="yes"];
+  "Push + gh pr create" -> "STOP: wait for merge confirmation";
+  "STOP: wait for merge confirmation" -> "4 cleanup commands (sequential)";
+  "4 cleanup commands (sequential)" -> "Read focus issues, present next 3";
+}
+```
+
 ---
 
 ## Consent Gates
