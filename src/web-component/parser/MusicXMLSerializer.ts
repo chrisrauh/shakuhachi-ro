@@ -167,9 +167,9 @@ export class MusicXMLSerializer {
   }
 
   /**
-   * The written note for a fingering, from the pitch table in reverse. A
-   * fingering the table has no note for fails rather than being written as a
-   * nearby note, which would read back as a different fingering.
+   * The written note for a fingering: its pitch in the fingering table, or an
+   * estimate for one the table doesn't list (see pitchForFingering). Fails
+   * only for a step, octave or mark that isn't valid.
    */
   private static convertToWesternPitch(
     fingering: WrittenFingering,
@@ -178,12 +178,7 @@ export class MusicXMLSerializer {
     const written = pitchForFingering(fingering);
     if (!written) {
       throw new Error(
-        PARSER_STRINGS.ERRORS.Serializer.noWesternNote(
-          index,
-          fingeringName(fingering),
-          fingering.octave,
-          'MusicXML',
-        ),
+        PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'MusicXML'),
       );
     }
     return written;

@@ -529,7 +529,7 @@ describe('ScoreEditor preview error', () => {
     const editor = new ScoreEditor(containerId, SCORE_ID, SLUG);
     await flushLoadScore();
     editor['scoreData'] = JSON.stringify({
-      notes: [{ pitch: { step: 'ri', octave: 1 }, duration: 1 }],
+      notes: [{ pitch: { step: 'go', octave: 0 }, duration: 1 }],
     });
 
     await editor['handleFormatChange']('musicxml');
@@ -537,7 +537,7 @@ describe('ScoreEditor preview error', () => {
     expect(vi.mocked(confirmDialog.show)).toHaveBeenCalledWith(
       expect.objectContaining({
         message: expect.stringContaining(
-          'Note 1: ri in kan has no Western note',
+          "Note 1 has a step, octave or meri/kari mark that isn't valid",
         ),
       }),
     );

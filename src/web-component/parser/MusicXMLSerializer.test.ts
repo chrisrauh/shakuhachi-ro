@@ -89,18 +89,17 @@ describe('MusicXMLSerializer', () => {
       ]);
     });
 
-    it('should fail on a fingering the table has no note for', () => {
+    it('should fail on a note whose octave is not valid', () => {
       const scoreData: ScoreData = {
         title: 'Test',
-        style: 'kinko',
         notes: [
           { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-          { pitch: { step: 'ri', octave: 1 }, duration: 1 },
+          { pitch: { step: 'ro', octave: 3 }, duration: 1 },
         ],
       };
 
       expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
-        "Note 2: ri in kan has no Western note in the fingering table, so the score can't be converted to MusicXML",
+        "Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to MusicXML",
       );
     });
 

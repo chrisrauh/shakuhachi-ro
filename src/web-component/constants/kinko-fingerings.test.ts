@@ -3,7 +3,9 @@ import {
   FINGERINGS,
   PITCH_RANGE,
   defaultFingering,
+  namedFingering,
   parseTablePitch,
+  pitchForFingering,
   type WrittenFingering,
 } from './kinko-fingerings';
 import { MusicXMLSerializer } from '../parser/MusicXMLSerializer';
@@ -84,5 +86,41 @@ describe('fingering table', () => {
     const notes = named.map(toNote);
     const abc = ABCSerializer.serialize({ title: 'All', notes });
     expect(ABCParser.parse(abc).notes).toEqual(notes);
+  });
+
+  describe('fingerings no chart lists', () => {
+    const unlisted: WrittenFingering[] = [
+      { step: 'ri', octave: 1 }, // kan ri
+      { step: 'ri', octave: 1, meriKari: 'meri' }, // as otsu ri meri, a tone down
+      { step: 'ro', octave: 0, meriKari: 'kari' }, // no ro kari anywhere
+      { step: 're', octave: 0, meriKari: 'chu-meri' },
+      { step: 'chi', octave: 0, meriKari: 'dai-kari' },
+    ];
+
+    it('estimates a pitch from the character, the octave and the mark', () => {
+      expect(unlisted.map(pitchForFingering)).toEqual([
+        { letter: 'C', alter: 0, octave: 6 },
+        { letter: 'A', alter: 1, octave: 5 },
+        { letter: 'D', alter: 1, octave: 4 },
+        { letter: 'F', alter: 1, octave: 4 },
+        { letter: 'A', alter: 1, octave: 4 },
+      ]);
+    });
+
+    it('keeps them through MusicXML and ABC, and back', () => {
+      const notes = unlisted.map(toNote);
+      const xml = MusicXMLSerializer.serialize({ title: 'Unlisted', notes });
+      const abc = ABCSerializer.serialize({ title: 'Unlisted', notes });
+
+      expect(MusicXMLParser.parse(xml).notes).toEqual(notes);
+      expect(ABCParser.parse(abc).notes).toEqual(notes);
+    });
+
+    it("gives the pitch's default when the note was changed after export", () => {
+      // Exported as C6, then moved to D6 in other software
+      expect(
+        namedFingering({ letter: 'D', alter: 0, octave: 6 }, 'ri'),
+      ).toBeUndefined();
+    });
   });
 });

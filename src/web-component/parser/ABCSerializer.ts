@@ -93,12 +93,7 @@ export class ABCSerializer {
         const written = pitchForFingering(fingering);
         if (!written) {
           throw new Error(
-            PARSER_STRINGS.ERRORS.Serializer.noWesternNote(
-              index,
-              fingeringName(fingering),
-              fingering.octave,
-              'ABC',
-            ),
+            PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'ABC'),
           );
         }
         // A fingering import wouldn't choose for its pitch is named in a

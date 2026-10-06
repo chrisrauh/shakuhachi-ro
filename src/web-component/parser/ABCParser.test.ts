@@ -523,17 +523,17 @@ Q
         expect(abc).toContain("D d f'");
       });
 
-      it('should fail on a fingering the table has no note for, rather than drop its meri', () => {
-        const scoreData: ScoreData = {
+      it('should fail on a note whose step is not valid', () => {
+        const scoreData = {
           title: 'Test',
           notes: [
             { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-            { pitch: { step: 'ro', octave: 0 }, duration: 1, meriKari: 'kari' },
+            { pitch: { step: 'go', octave: 0 }, duration: 1 },
           ],
-        };
+        } as unknown as ScoreData;
 
         expect(() => ABCSerializer.serialize(scoreData)).toThrow(
-          "Note 2: ro kari in otsu has no Western note in the fingering table, so the score can't be converted to ABC",
+          "Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to ABC",
         );
       });
 

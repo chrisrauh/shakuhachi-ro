@@ -7,8 +7,6 @@
 
 import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
 
-const REGISTERS = ['otsu', 'kan', 'daikan'];
-
 // Shared string factory functions for parser validation
 export const PARSER_STRING_FACTORIES = {
   invalidDuration: (duration: string) => `Invalid duration: ${duration}`,
@@ -112,13 +110,8 @@ export const PARSER_STRINGS = {
     },
 
     Serializer: {
-      noWesternNote: (
-        index: number,
-        name: string,
-        octave: number,
-        format: string,
-      ) =>
-        `Note ${index + 1}: ${name.replaceAll('-', ' ')} in ${REGISTERS[octave] ?? `octave ${octave}`} has no Western note in the fingering table, so the score can't be converted to ${format}. Change that note, or keep the score in its current format.`,
+      invalidFingering: (index: number, format: string) =>
+        `Note ${index + 1} has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to ${format}. Fix that note, or keep the score in its current format.`,
     },
   },
 } as const;

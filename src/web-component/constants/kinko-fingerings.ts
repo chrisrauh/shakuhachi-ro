@@ -16,7 +16,13 @@
  * Community review of the table is #423.
  */
 
-import type { MeriKari, PitchStep } from '../types/ScoreData';
+import {
+  MERI_KARI,
+  PITCH_STEPS,
+  type MeriKari,
+  type PitchStep,
+} from '../types/ScoreData';
+import { kinkoMap, pitchToMidi } from './kinko-symbols';
 
 /** What a score writes for a fingering */
 export interface WrittenFingering {
@@ -252,26 +258,115 @@ export function defaultFingering(
 }
 
 /**
- * The named fingering for a written note, if the table has one by that name
- * at that pitch. Lets import keep a fingering that isn't the pitch's default.
+ * How far a mark moves a note, in semitones, for a step and mark no chart
+ * lists in any octave. Chosen with the owner (#430): the commonest offset in
+ * the charts, and +1 for dai-kari as Nyokai-An gives chi dai-kari.
+ *
+ * These are part of the export format. Import finds an unlisted fingering's
+ * octave by recomputing its pitch, so changing an offset would make files
+ * exported before the change read back as the pitch's default. Add offsets
+ * for new marks; never change existing ones.
+ */
+const MARK_OFFSETS: Record<MeriKari, number> = {
+  'dai-meri': -2,
+  meri: -1,
+  'chu-meri': -1,
+  'chu-kari': 1,
+  kari: 1,
+  'dai-kari': 1,
+};
+
+const NOTE_NAMES: [NoteLetter, number][] = [
+  ['C', 0],
+  ['C', 1],
+  ['D', 0],
+  ['D', 1],
+  ['E', 0],
+  ['F', 0],
+  ['F', 1],
+  ['G', 0],
+  ['G', 1],
+  ['A', 0],
+  ['A', 1],
+  ['B', 0],
+];
+
+/** A MIDI note number as a written note, altered notes spelled sharp */
+function fromMidi(midi: number): WrittenPitch {
+  const [letter, alter] = NOTE_NAMES[midi % 12];
+  return { letter, alter, octave: Math.floor(midi / 12) - 1 };
+}
+
+/** The pitch of a step's plain character in an octave, e.g. kan ri: C6 */
+function plainMidi(step: PitchStep, octave: number): number {
+  return pitchToMidi(kinkoMap[step].pitch) + 12 * octave;
+}
+
+/** How far a mark moves this step: from the table if any octave lists it */
+function markOffset(step: PitchStep, meriKari: MeriKari): number {
+  const listed = NAMED.find(
+    (f) => f.written.step === step && f.written.meriKari === meriKari,
+  );
+  if (!listed) return MARK_OFFSETS[meriKari];
+  const { pitch, written } = listed;
+  return midiNumber(parseTablePitch(pitch)) - plainMidi(step, written.octave);
+}
+
+/**
+ * The written note export uses for a fingering. A listed fingering has its
+ * table pitch. Any other is estimated from its character's pitch, moved by
+ * its mark as the same mark moves that step in another octave, or else by
+ * MARK_OFFSETS. Undefined for a step, octave or mark this table doesn't know.
+ */
+export function pitchForFingering(
+  written: WrittenFingering,
+): WrittenPitch | undefined {
+  const listed = PITCH_BY_WRITTEN.get(writtenKey(written));
+  if (listed) return listed;
+  const { step, octave, meriKari } = written;
+  if (
+    !Object.hasOwn(kinkoMap, step) ||
+    ![0, 1, 2].includes(octave) ||
+    (meriKari !== undefined && !Object.hasOwn(MARK_OFFSETS, meriKari))
+  ) {
+    return undefined;
+  }
+  const offset = meriKari ? markOffset(step, meriKari) : 0;
+  return fromMidi(plainMidi(step, octave) + offset);
+}
+
+/** Reads a fingering name, e.g. "ri-chu-meri", into its step and mark */
+function parseFingeringName(
+  name: string,
+): Omit<WrittenFingering, 'octave'> | undefined {
+  // Longest first, so "ri-chu-meri" isn't read as ri-chu with meri
+  const meriKari = [...MERI_KARI]
+    .sort((a, b) => b.length - a.length)
+    .find((mark) => name.endsWith(`-${mark}`));
+  const step = meriKari ? name.slice(0, -meriKari.length - 1) : name;
+  if (!(PITCH_STEPS as readonly string[]).includes(step)) return undefined;
+  return { step: step as PitchStep, ...(meriKari && { meriKari }) };
+}
+
+/**
+ * The fingering a name gives a written note, if export would have written
+ * that fingering as that note. The octave is the one whose pitch matches.
+ * Undefined when none does, e.g. when the note was edited after export, so
+ * import falls back to the pitch's default.
  */
 export function namedFingering(
   written: WrittenPitch,
   name: string,
 ): WrittenFingering | undefined {
+  const parsed = parseFingeringName(name);
+  if (!parsed) return undefined;
   const midi = midiNumber(written);
-  return NAMED.find(
-    (f) =>
-      fingeringName(f.written) === name &&
-      midiNumber(parseTablePitch(f.pitch)) === midi,
-  )?.written;
-}
-
-/** The written note for a fingering, if the table has one */
-export function pitchForFingering(
-  written: WrittenFingering,
-): WrittenPitch | undefined {
-  return PITCH_BY_WRITTEN.get(writtenKey(written));
+  for (const octave of [0, 1, 2]) {
+    const candidate = { ...parsed, octave };
+    const pitch = pitchForFingering(candidate);
+    if (pitch && midiNumber(pitch) === midi) return candidate;
+  }
+  return undefined;
 }
 
 /** Whether import gives this fingering without being told which */
