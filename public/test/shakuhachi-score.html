@@ -133,6 +133,24 @@
           <div class="score-container" id="score-dark-3"></div>
         </div>
       </div>
+
+      <!-- Example 5: Fingerings written with numerals, and every meri/kari mark -->
+      <div class="example-row">
+        <div class="example-column light">
+          <h3>
+            5. Numeral fingerings (ヒ五 ウ三 ハ五 ハ三 ハ四 ハ二四五) and
+            meri/kari marks
+          </h3>
+          <div class="score-container" id="score-light-4"></div>
+        </div>
+        <div class="example-column dark">
+          <h3>
+            5. Numeral fingerings (ヒ五 ウ三 ハ五 ハ三 ハ四 ハ二四五) and
+            meri/kari marks
+          </h3>
+          <div class="score-container" id="score-dark-4"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Load the built web component bundle -->
@@ -224,13 +242,59 @@
             { pitch: { step: 're', octave: 2 }, duration: 1 }, // 大甲, line, first note
             { pitch: { step: 'ro', octave: 0 }, duration: 1 }, // 乙, line
             { pitch: { step: 'tsu', octave: 0 }, duration: 2 }, // no mark
-            { pitch: { step: 'ri', octave: 1 }, duration: 2 }, // 甲, no line
+            { pitch: { step: 'hi', octave: 1 }, duration: 2 }, // 甲, no line
             { pitch: { step: 'ro', octave: 0 }, duration: 2 }, // 乙, no line
             { pitch: { step: 'chi', octave: 2 }, duration: 2 }, // 大甲, no line
             { pitch: { step: 'tsu', octave: 1 }, duration: 0.5 }, // 甲, two lines
             { pitch: { step: 're', octave: 1 }, duration: 0.5 },
             { pitch: { step: 'ro', octave: 0 }, dotted: true, duration: 1 }, // 乙, line
             { pitch: { step: 'ro', octave: 0 }, duration: 4 },
+          ],
+        },
+        // 5. Every step written with a numeral, ha, and every meri and kari
+        // mark. The two-character marks (大メ 中カ 大カ) are stacked
+        {
+          title: 'Numerals and Marks',
+          style: 'kinko',
+          notes: [
+            { pitch: { step: 'go-no-hi', octave: 0 }, duration: 1 }, // ヒ五
+            {
+              pitch: { step: 'go-no-hi', octave: 0 },
+              duration: 1,
+              meriKari: 'meri',
+            },
+            { pitch: { step: 'san-no-u', octave: 1 }, duration: 1 }, // ウ三
+            { pitch: { step: 'go-no-ha', octave: 1 }, duration: 1 }, // ハ五
+            { pitch: { step: 'san-no-ha', octave: 1 }, duration: 1 }, // ハ三
+            { pitch: { step: 'shi-no-ha', octave: 1 }, duration: 1 }, // ハ四
+            { pitch: { step: 'ni-shi-go-no-ha', octave: 1 }, duration: 1 }, // ハ二四五
+            { pitch: { step: 'ha', octave: 2 }, duration: 2 }, // ハ, 大甲
+            {
+              pitch: { step: 'ro', octave: 0 },
+              duration: 1,
+              meriKari: 'dai-meri',
+            }, // 大メ
+            { pitch: { step: 'ro', octave: 0 }, duration: 1, meriKari: 'meri' }, // メ
+            {
+              pitch: { step: 'tsu', octave: 0 },
+              duration: 1,
+              meriKari: 'chu-meri',
+            }, // 中
+            {
+              pitch: { step: 'chi', octave: 0 },
+              duration: 1,
+              meriKari: 'chu-kari',
+            }, // 中カ
+            {
+              pitch: { step: 'chi', octave: 0 },
+              duration: 1,
+              meriKari: 'kari',
+            }, // カ
+            {
+              pitch: { step: 'chi', octave: 0 },
+              duration: 2,
+              meriKari: 'dai-kari',
+            }, // 大カ
           ],
         },
       ];
@@ -243,7 +307,7 @@
           const component = document.createElement('shakuhachi-score');
           component.setAttribute('data-score', JSON.stringify(scoreData));
 
-          // Examples 1, 2 and 4: single column with intrinsic height
+          // Every example but 3: single column with intrinsic height
           if (i !== 2) {
             component.setAttribute('columns', '1');
           }
@@ -265,7 +329,7 @@
           component.setAttribute('data-score', JSON.stringify(scoreData));
           component.style.setProperty('--shakuhachi-note-color', '#fff');
 
-          // Examples 1, 2 and 4: single column with intrinsic height
+          // Every example but 3: single column with intrinsic height
           if (i !== 2) {
             component.setAttribute('columns', '1');
           }
