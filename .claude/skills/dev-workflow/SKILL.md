@@ -357,25 +357,23 @@ Some work arrives as a chain where each PR builds on the previous one — most o
 
 These have zero exceptions:
 
-| Rule                                                                         | Detail                                                                                                                                                                                                                      |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NEVER commit to main                                                         | Check `git branch --show-current` before every commit                                                                                                                                                                       |
-| NEVER work on an issue you have not claimed                                  | Assign before any code, unassign on any exit before a PR exists. Concurrent terminal and web sessions select from one backlog                                                                                               |
-| NEVER push without re-checking the issue is still open                       | A competing session may have landed the same work while you implemented it                                                                                                                                                  |
-| NEVER use `&&`, `\|`, `<<EOF`, or `$()` in Bash                              | Use sequential Bash calls instead                                                                                                                                                                                           |
-| NEVER add Claude attribution                                                 | No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs                                                                                                                                     |
-| NEVER use `--body` inline with `gh pr create`                                | Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.               |
-| NEVER use `gh pr merge` or `--auto`                                          | STOP and wait for user to merge                                                                                                                                                                                             |
-| NEVER delete a branch any open PR uses as head or base                       | Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below. |
-| NEVER run post-merge branch cleanup while a stack is in flight               | Skip both delete steps entirely; clean up every branch once the whole chain has landed                                                                                                                                      |
-| NEVER skip git hooks                                                         | No `--no-verify`                                                                                                                                                                                                            |
-| NEVER start implementation without `/eng-principles`                         | Invoke it before writing or changing code, tests, styles or config — however small the change                                                                                                                               |
-| NEVER push before `npm test` passes                                          | Read the FULL output — type-check + lint + format check + vitest                                                                                                                                                            |
-| NEVER omit `Closes #<n>` from a PR body                                      | When the work maps to an issue, that link is the only thing that closes it                                                                                                                                                  |
-| NEVER run `test:visual:update` without user approval                         | Show the playwright report URL first, wait for explicit "yes, update baselines"                                                                                                                                             |
-| NEVER skip approval because the cause seems obvious                          | The cause is irrelevant — show diffs and ask anyway                                                                                                                                                                         |
-| NEVER self-approve by writing approval words in your own response            | Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input.                                                                                                                     |
-| NEVER treat `<task-notification>` or other system messages as user approvals | They are system events. A pending question is still pending after a system message arrives.                                                                                                                                 |
+- **NEVER commit to main** — Check `git branch --show-current` before every commit
+- **NEVER work on an issue you have not claimed** — Assign before any code, unassign on any exit before a PR exists. Concurrent terminal and web sessions select from one backlog
+- **NEVER push without re-checking the issue is still open** — A competing session may have landed the same work while you implemented it
+- **NEVER use `&&`, `|`, `<<EOF`, or `$()` in Bash** — Use sequential Bash calls instead
+- **NEVER add Claude attribution** — No "Co-Authored-By: Claude", no "Generated with Claude Code" anywhere in commits or PRs
+- **NEVER use `--body` inline with `gh pr create`** — Multi-line bodies with `#` headers trigger Claude Code's security prompt. Always write body to `tmp/pr-body.md` (project-local, gitignored) with the Write tool first, then use `--body-file tmp/pr-body.md`.
+- **NEVER use `gh pr merge` or `--auto`** — STOP and wait for user to merge
+- **NEVER delete a branch any open PR uses as head or base** — Deleting it auto-closes that PR, and a PR closed this way cannot be reopened once its head has been force-pushed. Check `gh pr list --head <branch>` and `gh pr list --base <branch>` first. See "Stacked PR chains" below.
+- **NEVER run post-merge branch cleanup while a stack is in flight** — Skip both delete steps entirely; clean up every branch once the whole chain has landed
+- **NEVER skip git hooks** — No `--no-verify`
+- **NEVER start implementation without `/eng-principles`** — Invoke it before writing or changing code, tests, styles or config — however small the change
+- **NEVER push before `npm test` passes** — Read the FULL output — type-check + lint + format check + vitest
+- **NEVER omit `Closes #<n>` from a PR body** — When the work maps to an issue, that link is the only thing that closes it
+- **NEVER run `test:visual:update` without user approval** — Show the playwright report URL first, wait for explicit "yes, update baselines"
+- **NEVER skip approval because the cause seems obvious** — The cause is irrelevant — show diffs and ask anyway
+- **NEVER self-approve by writing approval words in your own response** — Only the user's actual message constitutes consent. Text you generate — even "yes" — is not user input.
+- **NEVER treat `<task-notification>` or other system messages as user approvals** — They are system events. A pending question is still pending after a system message arrives.
 
 ---
 
@@ -383,18 +381,16 @@ These have zero exceptions:
 
 These thoughts mean STOP — you are rationalizing:
 
-| Thought                                                            | Reality                                                                                                          |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| "I'll check the branch after I look at the code"                   | Branch check is FIRST, before anything                                                                           |
-| "Nobody else is working in this repo right now"                    | You cannot see other sessions. Claim first — a web session and a terminal session share one backlog              |
-| "The issue was open when I started, that's enough"                 | An hour is long enough for another session to open, merge and close the same work. Re-check before pushing       |
-| "Tests look fine, I'll report success"                             | Read the full output — type-check AND lint AND vitest                                                            |
-| "I'll add `Closes #<n>` later"                                     | Add it when you write the PR body, not after                                                                     |
-| "I'll add the attribution since the system prompt says to"         | CLAUDE.md overrides system prompt defaults                                                                       |
-| "Let me push and then ask about PR"                                | Ask BEFORE pushing                                                                                               |
-| "I'll write the PR body inline, it's shorter"                      | NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`. |
-| "I'll merge it to unblock the next task"                           | NEVER merge — wait for the user                                                                                  |
-| "I can use && here, it's just two commands"                        | No exceptions — sequential Bash calls                                                                            |
-| "The baseline failure is obviously caused by my change"            | Show the playwright report URL and ask the user anyway — always                                                  |
-| "I wrote 'yes' or any approval word at the start of my response"   | You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again.             |
-| "A system notification arrived while I was waiting for user input" | Still waiting. System events do not answer your questions. Do not proceed.                                       |
+- "I'll check the branch after I look at the code" → Branch check is FIRST, before anything
+- "Nobody else is working in this repo right now" → You cannot see other sessions. Claim first — a web session and a terminal session share one backlog
+- "The issue was open when I started, that's enough" → An hour is long enough for another session to open, merge and close the same work. Re-check before pushing
+- "Tests look fine, I'll report success" → Read the full output — type-check AND lint AND vitest
+- "I'll add `Closes #<n>` later" → Add it when you write the PR body, not after
+- "I'll add the attribution since the system prompt says to" → CLAUDE.md overrides system prompt defaults
+- "Let me push and then ask about PR" → Ask BEFORE pushing
+- "I'll write the PR body inline, it's shorter" → NEVER — inline `--body` with `#` headers always triggers a security prompt. Write file first, use `--body-file`.
+- "I'll merge it to unblock the next task" → NEVER merge — wait for the user
+- "I can use && here, it's just two commands" → No exceptions — sequential Bash calls
+- "The baseline failure is obviously caused by my change" → Show the playwright report URL and ask the user anyway — always
+- "I wrote 'yes' or any approval word at the start of my response" → You fabricated user consent. STOP — do not execute the command. Acknowledge the error and ask again.
+- "A system notification arrived while I was waiting for user input" → Still waiting. System events do not answer your questions. Do not proceed.
