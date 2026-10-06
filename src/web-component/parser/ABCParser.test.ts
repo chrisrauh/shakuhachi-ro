@@ -400,6 +400,26 @@ G
       expect(fingerings('X:1\nK:D clef=treble\nF')).toEqual(['re meri']);
     });
 
+    it('reads notes as written when there is no K: field', () => {
+      const scoreData = ABCParser.parse('D F G A d');
+
+      expect(scoreData.key).toBeUndefined();
+      expect(fingerings('D F G A d')).toEqual([
+        'ro',
+        'tsu',
+        're',
+        'chi',
+        'ro 1',
+      ]);
+    });
+
+    it('starts the notes at the first line that is not a header field', () => {
+      const scoreData = ABCParser.parse('X:1\nT:No Key\n\nD F');
+
+      expect(scoreData.title).toBe('No Key');
+      expect(fingerings('X:1\nT:No Key\n\nD F')).toEqual(['ro', 'tsu']);
+    });
+
     it('fails on a key it cannot read', () => {
       expect(() => ABCParser.parse('X:1\nK:Q\nD')).toThrow(
         'The K: field\'s key, "Q", isn\'t one ABC defines',
@@ -426,19 +446,6 @@ G
     it('should throw error for whitespace-only input', () => {
       expect(() => ABCParser.parse('   \n  \n  ')).toThrow(
         'ABC notation content is required',
-      );
-    });
-
-    it('should throw error if K: field is missing', () => {
-      const abc = `
-X:1
-T:No Key
-
-D F G
-`;
-
-      expect(() => ABCParser.parse(abc)).toThrow(
-        'ABC notation must include K: (key) field',
       );
     });
 
