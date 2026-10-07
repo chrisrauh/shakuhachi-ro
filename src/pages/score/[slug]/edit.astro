@@ -2,9 +2,10 @@
 import Layout from '../../../layouts/Layout.astro';
 import PageHeader from '../../../components/PageHeader.astro';
 import DetailsDialog from '../../../components/score-editor/DetailsDialog.astro';
+import PalettePanel from '../../../components/score-editor/PalettePanel.astro';
 import { getScoreBySlug } from '../../../api/scores';
 import { embedJson } from '../../../utils/embed-json';
-import { CircleAlert, CircleQuestionMark } from '@lucide/astro';
+import { ArrowRightLeft, CircleAlert, CircleQuestionMark } from '@lucide/astro';
 import '../../../styles/score-editor.css';
 
 const { slug } = Astro.params;
@@ -44,13 +45,26 @@ const formats = [
       <button type="button" id="source-toggle" class="btn btn-link">
         <span class="btn-text">Source</span>
       </button>
+      <button
+        type="button"
+        id="palette-side-toggle"
+        class="btn btn-icon palette-side-toggle"
+        aria-label="Move palettes to the left"
+        title="Move the palettes to the left side"
+      >
+        <ArrowRightLeft size={16} />
+      </button>
       <span id="save-status" class="save-status" role="status"></span>
       <button type="button" id="save-btn" class="btn btn-small btn-primary">
         <span class="btn-text">Save</span>
       </button>
     </div>
 
-    <div class="editor-workspace">
+    <div
+      class="editor-workspace"
+      id="editor-workspace"
+      data-palette-side="right"
+    >
       <div class="editor-score-area" id="score-area">
         <shakuhachi-score id="score-renderer" columns="1"></shakuhachi-score>
         <p class="editor-empty-hint" id="score-empty-hint" hidden>
@@ -98,6 +112,8 @@ const formats = [
           spellcheck="false"
         ></textarea>
       </section>
+
+      <PalettePanel />
     </div>
   </div>
 

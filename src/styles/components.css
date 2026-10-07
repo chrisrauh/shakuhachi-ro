@@ -260,7 +260,9 @@
    </button>
 
    Variants of the content: .palette-key-mark on the glyph for meri and kari
-   marks, a .palette-key-caption under the glyph, or an icon (sized 1em).
+   marks, .palette-key-length for a length (a small ロ, followed by an
+   svg.palette-key-lines with one <line> per duration line, as the score draws
+   them), a .palette-key-caption under the glyph, or an icon (sized 1em).
    ============================================ */
 
 .palette-key {
@@ -324,6 +326,18 @@
 .palette-key-glyph.palette-key-mark {
   font-size: var(--font-size-medium);
   letter-spacing: var(--letter-spacing-dense);
+}
+
+.palette-key-glyph.palette-key-length {
+  font-size: var(--font-size-medium);
+}
+
+/* Duration lines to the right of the ロ, as tall as it is. The svg sets their
+   width and gaps in its own units, so they scale with the glyph */
+.palette-key .palette-key-lines {
+  width: auto;
+  height: 1em;
+  margin-inline-start: var(--spacing-3x-small);
 }
 
 /* Hole numbers, small and vertical to the right of the kana (ヒ五 for go no hi) */
