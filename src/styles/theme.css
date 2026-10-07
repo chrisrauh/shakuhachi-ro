@@ -626,6 +626,13 @@
   --color-bg-hover: var(--color-gray-100); /* Hover states */
   --color-bg-active: var(--color-gray-200); /* Active/pressed states */
 
+  /* PALETTE - the score editor's floating panel of note keys. Keys are a step
+     lighter than the panel, so they read as raised on it. */
+  --color-bg-palette: var(--color-gray-100);
+  --color-bg-palette-header: var(--color-gray-200);
+  --color-bg-key: oklch(1 0 0);
+  --color-bg-key-hover: var(--color-gray-50);
+
   /* SPECIAL */
   --color-separator: var(--color-gray-400); /* Visual separators */
   --color-logo: var(
@@ -698,6 +705,7 @@
      ============================================ */
 
   --size-toolbar-item: 2rem; /* 32px - height of icon buttons, small buttons, logo, and other header row items */
+  --size-palette-key: 2.875rem; /* 46px - square keys in the score editor's palette, sized for a thumb */
   --size-dialog-max-width: 400px;
   --size-dialog-button-min-width: 80px;
 
@@ -766,6 +774,10 @@
   /* Font family removed - overridden in Layout.astro */
   --font-serif: Georgia, 'Times New Roman', serif;
   --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Notation glyphs outside the score (palette keys), in the reader's chosen
+     notation font. Same stacks as NOTATION_FONTS in the renderer. */
+  --font-notation: 'Noto Sans JP', sans-serif;
 
   --font-size-2x-small: 0.625rem; /* 10px */
   --font-size-x-small: 0.75rem; /* 12px */
@@ -1073,6 +1085,12 @@
   ); /* Hover states - slightly lighter than panel */
   --color-bg-active: var(--color-gray-200); /* Active/pressed states */
 
+  /* PALETTE - --color-bg-palette needs no override: gray-100 is already the
+     dark value here */
+  --color-bg-palette-header: var(--color-gray-150);
+  --color-bg-key: var(--color-gray-200);
+  --color-bg-key-hover: var(--color-gray-250);
+
   /* SUCCESS - the light values are pale tints, which glare on dark surfaces.
      Lightness tracks the dark grays: text ≈ text-secondary, bg ≈ bg-hover,
      border ≈ panel border. */
@@ -1082,4 +1100,9 @@
   --color-border-success: var(--color-green-800);
 
   /* SPECIAL - gray-800 auto-adapts via inverted grays, no override needed */
+}
+
+/* Set on <html> by Layout.astro and NotationFontSwitcher */
+:root[data-notation-font='serif'] {
+  --font-notation: 'Noto Serif JP', serif;
 }

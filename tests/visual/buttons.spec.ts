@@ -25,7 +25,7 @@ test.describe('Button Component Visual Regression', () => {
       await setTheme(page, 'light');
 
       await expect(page).toHaveScreenshot('buttons-light.png', {
-        fullPage: false,
+        fullPage: true,
       });
     });
 
@@ -35,7 +35,7 @@ test.describe('Button Component Visual Regression', () => {
       await setTheme(page, 'dark');
 
       await expect(page).toHaveScreenshot('buttons-dark.png', {
-        fullPage: false,
+        fullPage: true,
       });
     });
   });

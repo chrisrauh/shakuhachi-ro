@@ -250,6 +250,103 @@
 }
 
 /* ============================================
+   PALETTE KEY
+   A square key in the score editor's palette panel: a note, length, mark or
+   edit action. Raised on the panel by a lighter fill. A key whose value the
+   selected note already has is aria-pressed, and shown as a primary button.
+
+   <button class="palette-key" aria-label="go no hi" title="Insert go no hi">
+     <span class="palette-key-glyph" aria-hidden="true">ヒ<span class="palette-key-holes">五</span></span>
+   </button>
+
+   Variants of the content: .palette-key-mark on the glyph for meri and kari
+   marks, a .palette-key-caption under the glyph, or an icon (sized 1em).
+   ============================================ */
+
+.palette-key {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--size-palette-key);
+  height: var(--size-palette-key);
+  padding: 0;
+  border: var(--panel-border-width) solid var(--color-border);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-bg-key);
+  color: var(--color-text-heading);
+  font-family: inherit;
+  font-size: var(--font-size-large);
+  line-height: var(--line-height-denser);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out);
+}
+
+.palette-key:hover:not(:disabled) {
+  background: var(--color-bg-key-hover);
+  border-color: var(--color-border-hover);
+}
+
+.palette-key:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.palette-key[aria-pressed='true'],
+.palette-key[aria-pressed='true']:hover:not(:disabled) {
+  background: var(--color-button-primary);
+  border-color: var(--color-button-primary);
+  color: var(--color-text-on-dark);
+}
+
+.palette-key:focus-visible {
+  outline: none;
+  border-color: var(--color-input-border-focus);
+}
+
+.palette-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.palette-key svg {
+  width: 1em;
+  height: 1em;
+}
+
+.palette-key-glyph {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-notation);
+}
+
+.palette-key-glyph.palette-key-mark {
+  font-size: var(--font-size-medium);
+  letter-spacing: var(--letter-spacing-dense);
+}
+
+/* Hole numbers, small and vertical to the right of the kana (ヒ五 for go no hi) */
+.palette-key-holes {
+  font-size: var(--font-size-2x-small);
+  writing-mode: vertical-rl;
+  margin-inline-start: var(--spacing-3x-small);
+}
+
+.palette-key-caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--spacing-3x-small);
+  font-size: var(--font-size-2x-small);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.palette-key[aria-pressed='true'] .palette-key-caption {
+  color: inherit;
+}
+
+/* ============================================
    PAGE ERROR STATE
    For blocking load failures (not transient action errors — use toast for those)
    ============================================ */
