@@ -63,6 +63,21 @@ function renderPage(): void {
       <div id="validation-error" hidden><span id="validation-message"></span></div>
       <textarea id="score-data-input"></textarea>
     </section>
+    <button id="palette-side-toggle"></button>
+    <div id="editor-workspace">
+      <div id="palette-panel">
+        <div id="palette-columns">
+          <div data-column="marks"></div>
+          <div data-column="length"></div>
+          <div data-column="notes"></div>
+        </div>
+        <div id="palette-edit-row">
+          <button data-key="undo"></button>
+          <button data-key="redo"></button>
+          <button data-key="delete"></button>
+        </div>
+      </div>
+    </div>
     <dialog id="details-dialog">
       <input id="title-input" value="Test Score" />
       <input id="composer-input" />
@@ -131,6 +146,7 @@ describe('ScoreEditor score and source', () => {
     $('source-toggle').click();
     expect($('source-view').hidden).toBe(false);
     expect($('score-area').hidden).toBe(true);
+    expect($('palette-panel').hidden).toBe(true);
     expect($('source-toggle').textContent).toBe('Score');
     expect($<HTMLTextAreaElement>('score-data-input').value).toBe(
       JSON.stringify(JSON_DATA, null, 2),
@@ -141,6 +157,7 @@ describe('ScoreEditor score and source', () => {
 
     expect(renderedScore()).toEqual(TWO_NOTES);
     expect($('score-empty-hint').hidden).toBe(true);
+    expect($('palette-panel').hidden).toBe(false);
     expect($('save-status').textContent).toBe('Unsaved changes');
   });
 

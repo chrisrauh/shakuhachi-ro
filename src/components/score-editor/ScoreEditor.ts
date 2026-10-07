@@ -19,6 +19,7 @@ import type { ScoreData } from '../../web-component/types/ScoreData';
 import { STRINGS } from '../../constants/strings';
 import { DetailsDialog } from './DetailsDialog';
 import { SourceView } from './SourceView';
+import { PalettePanel } from './PalettePanel';
 
 /**
  * The score edit page (/score/[slug]/edit). Holds the score being edited — its
@@ -39,6 +40,7 @@ export class ScoreEditor {
   private readonly autosave: EditorAutosave;
   private readonly details: DetailsDialog;
   private readonly sourceView: SourceView;
+  private readonly palettes: PalettePanel;
   private readonly scoreArea: HTMLElement;
   private readonly renderer: HTMLElement;
   private readonly emptyHint: HTMLElement;
@@ -79,6 +81,7 @@ export class ScoreEditor {
       onFormatChange: (format) => this.handleFormatChange(format),
     });
     this.sourceView.setSource(this.source, this.format);
+    this.palettes = new PalettePanel();
 
     byId('details-btn').addEventListener('click', () => this.details.open());
     this.sourceToggle.addEventListener('click', () =>
@@ -138,6 +141,7 @@ export class ScoreEditor {
   private showSource(visible: boolean): void {
     this.sourceView.visible = visible;
     this.scoreArea.hidden = visible;
+    this.palettes.visible = !visible;
     this.sourceToggle.querySelector('.btn-text')!.textContent = visible
       ? 'Score'
       : 'Source';

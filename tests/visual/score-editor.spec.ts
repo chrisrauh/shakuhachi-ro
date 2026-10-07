@@ -2,7 +2,8 @@
  * Visual Regression Tests for the Score Editor (/score/[slug]/edit)
  *
  * Coverage:
- * - The score, the source view and the details dialog
+ * - The score with the palette panel on either side, the source view and the
+ *   details dialog
  * - Desktop (1280x720) and mobile (375x667) viewports, light and dark themes
  * - Validation and format conversion in the source view
  *
@@ -51,6 +52,15 @@ async function openSource(page: Page) {
   await expect(page.locator('#source-view')).toBeVisible();
 }
 
+/** Moves the palettes to the left with ⇄, the way a viewer does. */
+async function movePalettesLeft(page: Page) {
+  await page.click('#palette-side-toggle');
+  await expect(page.locator('#editor-workspace')).toHaveAttribute(
+    'data-palette-side',
+    'left',
+  );
+}
+
 async function openDetails(page: Page) {
   await page.click('#details-btn');
   await expect(page.locator('#details-dialog')).toBeVisible();
@@ -73,6 +83,12 @@ test.describe('Score Editor Visual Regression', () => {
     test('Score - dark', async ({ page }) => {
       await openEditor(page, 'dark');
       await expect(page).toHaveScreenshot('desktop-score-dark.png');
+    });
+
+    test('Palettes on the left - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await movePalettesLeft(page);
+      await expect(page).toHaveScreenshot('desktop-palettes-left-light.png');
     });
 
     test('Source - light', async ({ page }) => {
@@ -126,6 +142,12 @@ test.describe('Score Editor Visual Regression', () => {
     test('Score - dark', async ({ page }) => {
       await openEditor(page, 'dark');
       await expect(page).toHaveScreenshot('mobile-score-dark.png');
+    });
+
+    test('Palettes on the left - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await movePalettesLeft(page);
+      await expect(page).toHaveScreenshot('mobile-palettes-left-dark.png');
     });
 
     test('Source - dark', async ({ page }) => {
