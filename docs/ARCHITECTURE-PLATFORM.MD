@@ -37,9 +37,9 @@ SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client in
 
 ### Score Edit Page (`/score/[slug]/edit`)
 
-Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). Notation input supports ABC, JSON, MusicXML. Automatic format conversion when switching. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Saves to Supabase on submit.
+Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). The page fills the viewport on every screen size (`fullHeightOnMobile`): a toolbar (Details, Source, save status, Save) over the score, rendered in one column, which scrolls inside the page. The source view replaces the score and holds the notation as stored — ABC, JSON or MusicXML — with automatic conversion when switching formats; an unreadable source keeps the last readable render. Title, composer, description and licence live in the details dialog. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Save writes to Supabase and stays on the page. The visual editor (#437) is being built on this page in parts.
 
-**Components:** `ScoreEditor.ts` (form, notation input), `<shakuhachi-score>` (live preview)
+**Components** (`src/components/score-editor/`): `ScoreEditor.ts` (controller: state, render, save), `SourceView.ts` (source text and format), `DetailsDialog.astro` / `DetailsDialog.ts` (metadata and licence), `<shakuhachi-score columns="1">` (the score)
 
 ## Header Architecture
 
@@ -61,7 +61,7 @@ Header concerns are split across three layers:
 "Create" UI action → startNewScore(authModal) → auth check (prompts login if needed)
   → createEmptyScore() → Supabase creates score with random slug
   → redirect to /score/[slug]/edit
-User edits title + notation → live preview → autosave to localStorage → save to Supabase
+User edits details + notation → score re-renders → autosave to localStorage → save to Supabase
   → POST /api/purge-score → the score's cached page is dropped
 ```
 
@@ -198,7 +198,7 @@ Vanilla TypeScript classes with a simple `constructor(containerId) → render() 
 - `MobileMenu.ts` — mobile navigation (type-aware via `data-menu-type`)
 - `ScoreLibrary.ts` — browse page grid (fetches and renders all scores client-side)
 - `ScoreDetailClient.ts` — score page interactions (fork, delete)
-- `ScoreEditor.ts` — edit page notation input and preview (edit-only, per-slug localStorage autosave)
+- `score-editor/` — the edit page: `ScoreEditor.ts`, `SourceView.ts`, `DetailsDialog.ts` (edit-only, per-slug localStorage autosave)
 - `Toast.ts` — toast notifications
 - `ConfirmDialog.ts` — confirmation dialogs
 - `LoadingSpinner.ts` — loading state

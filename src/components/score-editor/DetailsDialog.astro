@@ -1,0 +1,119 @@
+---
+/**
+ * The score editor's details: title, composer, description and licence, in a
+ * dialog so the score keeps the screen. DetailsDialog.ts wires it up.
+ */
+import type { Score } from '../../api/scores';
+import { LICENSES, licenseChoices } from '../../utils/license';
+import { licenseDescriptionHTML } from './license-description';
+
+interface Props {
+  score: Score;
+}
+
+const { score } = Astro.props;
+
+// Most owners keep the default licence, so it is one line with a Change button
+// that swaps it for the select, keeping the choice out of the way until asked for.
+const choices = licenseChoices(score.license, score.user_id, score.parent);
+const parent = score.parent;
+const parentHref = parent ? `/score/${encodeURIComponent(parent.slug)}` : '';
+---
+
+<dialog
+  id="details-dialog"
+  class="app-dialog details-dialog"
+  aria-labelledby="details-dialog-title"
+>
+  <form method="dialog">
+    <div class="app-dialog-header">
+      <h2 id="details-dialog-title" class="app-dialog-title">
+        Details
+      </h2>
+    </div>
+
+    <div class="app-dialog-body details-fields">
+      <div class="details-field">
+        <label for="title-input">Title</label>
+        <input
+          type="text"
+          id="title-input"
+          value={score.title}
+          placeholder="Score title"
+          required
+        />
+      </div>
+
+      <div class="details-field">
+        <label for="composer-input">Composer</label>
+        <input
+          type="text"
+          id="composer-input"
+          value={score.composer ?? ''}
+          placeholder="Composer name"
+        />
+      </div>
+
+      <div class="details-field">
+        <label for="description-input">Description</label>
+        <textarea
+          id="description-input"
+          placeholder="Brief description of the score"
+          rows="3"
+        >{score.description ?? ''}</textarea>
+      </div>
+
+      <div class="details-field">
+        <label for={choices.locked ? undefined : 'license-select'}>
+          Score licence
+        </label>
+        <div class="license-summary" id="license-summary">
+          <span>{LICENSES[score.license].name}</span>
+          {!choices.locked && (
+            <button type="button" id="license-change" class="btn btn-link">
+              <span class="btn-text">Change</span>
+            </button>
+          )}
+        </div>
+        {!choices.locked && (
+          <select id="license-select" hidden>
+            {choices.options.map((id) => (
+              <option value={id} selected={id === score.license}>
+                {LICENSES[id].name}
+              </option>
+            ))}
+          </select>
+        )}
+        <p
+          class="field-hint"
+          id="license-description"
+          set:html={licenseDescriptionHTML(score.license)}
+        />
+        {parent && choices.reason === 'share_alike' && (
+          <p class="field-hint">
+            Fixed: this is a fork of <a href={parentHref}>{parent.title}</a>,
+            whose licence requires adaptations to keep it.
+          </p>
+        )}
+        {parent && choices.reason === 'unestablished' && (
+          <p class="field-hint">
+            Fixed until the licence of <a href={parentHref}>{parent.title}</a>,
+            which this was forked from, is established.
+          </p>
+        )}
+        {parent && choices.reason === 'non_commercial' && (
+          <p class="field-hint">
+            Only NonCommercial licences, because{' '}
+            <a href={parentHref}>{parent.title}</a> is NonCommercial.
+          </p>
+        )}
+      </div>
+    </div>
+
+    <div class="app-dialog-footer">
+      <button type="submit" class="btn btn-primary">
+        <span class="btn-text">Done</span>
+      </button>
+    </div>
+  </form>
+</dialog>

@@ -261,4 +261,22 @@ describe('EditorAutosave', () => {
 
     expect(localStorage.getItem(KEY)).toBeNull();
   });
+
+  it('drops a save still waiting on the debounce', () => {
+    autosave.save({
+      scoreData: 'data',
+      dataFormat: 'json',
+      metadata: {
+        title: 'T',
+        composer: '',
+        description: '',
+        license: 'CC-BY-SA-4.0',
+      },
+    });
+
+    autosave.clear();
+    vi.advanceTimersByTime(2000);
+
+    expect(localStorage.getItem(KEY)).toBeNull();
+  });
 });

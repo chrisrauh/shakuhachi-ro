@@ -1,8 +1,10 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import PageHeader from '../../../components/PageHeader.astro';
+import DetailsDialog from '../../../components/score-editor/DetailsDialog.astro';
 import { getScoreBySlug } from '../../../api/scores';
 import { embedJson } from '../../../utils/embed-json';
+import { CircleAlert, CircleQuestionMark } from '@lucide/astro';
 import '../../../styles/score-editor.css';
 
 const { slug } = Astro.params;
@@ -13,34 +15,93 @@ const { score } = scoreResult;
 
 // 404 if score not found (no more create mode via this route)
 if (!score) return new Response(null, { status: 404 });
+
+const formats = [
+  { value: 'json', label: 'JSON' },
+  { value: 'musicxml', label: 'MusicXML' },
+  { value: 'abc', label: 'ABC' },
+];
 ---
 
 <Layout
   title={`Edit ${score.title}`}
   currentPage="score"
   fullHeight={true}
+  fullHeightOnMobile={true}
   preconnectSupabase
 >
   <PageHeader slot="header-metadata" title={`Edit ${score.title}`} />
 
-  <div class="edit-layout">
-    <div class="mobile-toggle">
-      <button id="toggle-preview" class="btn">
-        <span class="btn-text">Preview</span>
+  <div class="score-editor">
+    <div class="editor-toolbar" role="toolbar" aria-label="Score editor">
+      <button
+        type="button"
+        id="details-btn"
+        class="btn btn-small btn-secondary"
+      >
+        <span class="btn-text">Details</span>
       </button>
-      <button id="toggle-editor" class="btn btn-primary">
-        <span class="btn-text">Edit</span>
+      <button type="button" id="source-toggle" class="btn btn-link">
+        <span class="btn-text">Source</span>
+      </button>
+      <span id="save-status" class="save-status" role="status"></span>
+      <button type="button" id="save-btn" class="btn btn-small btn-primary">
+        <span class="btn-text">Save</span>
       </button>
     </div>
 
-    <div class="preview-panel" id="preview-panel">
-      <div id="score-preview"></div>
-    </div>
+    <div class="editor-workspace">
+      <div class="editor-score-area" id="score-area">
+        <shakuhachi-score id="score-renderer" columns="1"></shakuhachi-score>
+        <p class="editor-empty-hint" id="score-empty-hint" hidden>
+          An empty score. Choose a note to start.
+        </p>
+      </div>
 
-    <div class="editor-panel" id="editor-panel">
-      <div id="score-editor"></div>
+      <section
+        class="editor-source"
+        id="source-view"
+        aria-label="Score source"
+        hidden
+      >
+        <div class="editor-source-header">
+          <div class="format-toggle" role="radiogroup" aria-label="Format">
+            {formats.map(({ value, label }) => (
+              <label>
+                <input
+                  type="radio"
+                  name="format"
+                  value={value}
+                  checked={value === score.data_format}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <a
+            href="/help/notation-formats"
+            target="_blank"
+            class="help-link"
+            aria-label="Format help"
+            title="How to write JSON, MusicXML and ABC scores"
+          >
+            <CircleQuestionMark size={16} />
+          </a>
+        </div>
+        <div class="validation-error" id="validation-error" hidden>
+          <CircleAlert size={16} />
+          <span id="validation-message"></span>
+        </div>
+        <textarea
+          id="score-data-input"
+          aria-label="Score source"
+          spellcheck="false"
+        ></textarea>
+      </section>
     </div>
   </div>
+
+  <DetailsDialog score={score} />
 
   <!-- Always embed score data — safe because 404 above ensures score is non-null.
        embedJson, not JSON.stringify: score fields are user-supplied and
@@ -53,120 +114,33 @@ if (!score) return new Response(null, { status: 404 });
   ></script>
   <script is:inline src="/embed/shakuhachi-score.js"></script>
   <script>
-    import { ScoreEditor } from '../../../components/ScoreEditor';
+    import { ScoreEditor } from '../../../components/score-editor/ScoreEditor';
     import { onAuthReady } from '../../../api/auth';
     import { toast } from '../../../components/Toast';
     import { STRINGS } from '../../../constants/strings';
+    import type { Score } from '../../../api/scores';
 
-    // Simplified auth check — no "create mode" branch
-    const checkAuthAndPermissions = (user: any) => {
-      const scoreData = JSON.parse(
-        document.getElementById('score-data')!.textContent!,
-      );
+    const { score } = JSON.parse(
+      document.getElementById('score-data')!.textContent!,
+    ) as { score: Score };
 
+    // Only the owner can save (RLS enforces it); send anyone else to the score
+    onAuthReady((user) => {
       if (!user) {
-        window.location.href = `/score/${scoreData.score.slug}`;
+        window.location.href = `/score/${score.slug}`;
         return;
       }
 
-      if (user.id !== scoreData.score.user_id) {
+      if (user.id !== score.user_id) {
         toast.error(STRINGS.ERRORS.ScoreEditor.editPermissionDenied, {
           duration: 2000,
         });
         setTimeout(() => {
-          window.location.href = `/score/${scoreData.score.slug}`;
+          window.location.href = `/score/${score.slug}`;
         }, 2000);
-        return;
       }
-    };
-
-    onAuthReady((user) => {
-      checkAuthAndPermissions(user);
     });
 
-    // scoreId and slug always present — SSR 404 above ensures page is never served without a score
-    const scoreData = JSON.parse(
-      document.getElementById('score-data')!.textContent!,
-    );
-    new ScoreEditor('score-editor', scoreData.score.id, scoreData.score.slug);
-  </script>
-  <style>
-    .edit-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--spacing-large);
-      flex: 1;
-      min-height: 0; /* Shrink to main's height, so the panels scroll inside it */
-    }
-
-    .mobile-toggle {
-      display: none;
-    }
-
-    .preview-panel,
-    .editor-panel {
-      overflow-y: auto;
-      min-height: 0;
-      height: 100%;
-    }
-
-    .preview-panel {
-      border: var(--panel-border-width) solid var(--panel-border-color);
-      border-radius: var(--border-radius-large);
-      background: var(--panel-background-color);
-      padding: var(--spacing-large);
-    }
-
-    #score-preview {
-      width: 100%;
-      min-height: 100%;
-    }
-
-    @media (max-width: 768px) {
-      .edit-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-      }
-
-      .mobile-toggle {
-        display: flex;
-        gap: var(--spacing-small);
-        margin-bottom: var(--spacing-medium);
-      }
-
-      .mobile-toggle button {
-        flex: 1;
-      }
-
-      .preview-panel.hidden,
-      .editor-panel.hidden {
-        display: none;
-      }
-    }
-  </style>
-
-  <script>
-    const togglePreview = document.getElementById('toggle-preview');
-    const toggleEditor = document.getElementById('toggle-editor');
-    const previewPanel = document.getElementById('preview-panel');
-    const editorPanel = document.getElementById('editor-panel');
-
-    togglePreview?.addEventListener('click', () => {
-      previewPanel?.classList.remove('hidden');
-      editorPanel?.classList.add('hidden');
-      togglePreview.classList.add('btn-primary');
-      toggleEditor?.classList.remove('btn-primary');
-    });
-
-    toggleEditor?.addEventListener('click', () => {
-      editorPanel?.classList.remove('hidden');
-      previewPanel?.classList.add('hidden');
-      toggleEditor.classList.add('btn-primary');
-      togglePreview?.classList.remove('btn-primary');
-    });
-
-    if (window.innerWidth < 768) {
-      previewPanel?.classList.add('hidden');
-    }
+    new ScoreEditor(score);
   </script>
 </Layout>
