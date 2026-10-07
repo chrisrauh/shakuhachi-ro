@@ -1,40 +1,33 @@
 /**
- * Visual Regression Tests for Score Editor Page
- *
- * Tests the score editor (/score/[slug]/edit) across viewports, themes, and data formats.
+ * Visual Regression Tests for the Score Editor (/score/[slug]/edit)
  *
  * Coverage:
- * - Desktop (1280x720) and mobile (375x667) viewports
- * - Light and dark themes
- * - All three notation formats (JSON, MusicXML, ABC)
- * - Mobile panel toggle (editor vs preview — mobile-only behaviour)
- * - Authenticated state (editor requires login)
+ * - The score, the source view and the details dialog
+ * - Desktop (1280x720) and mobile (375x667) viewports, light and dark themes
+ * - Validation and format conversion in the source view
  *
  * Authentication:
  * - Session provided by auth-setup.ts via project storageState
- * - TEST_EMAIL and TEST_PASSWORD must be set in .env file
- * - Test score available at /score/test/edit
+ * - Test score at /score/test/edit (MusicXML, three notes; see CLAUDE.md)
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 import { setTheme, waitForScoreRendered } from './helpers';
 
 const TEST_SCORE_SLUG = 'test'; // Test score fixture (see CLAUDE.md)
 
-/**
- * Wait for the editor to be fully loaded.
- * Uses `attached` for #score-preview so it works on both desktop (visible)
- * and mobile (hidden until toggled). The SVG check is the real readiness gate.
- */
-async function waitForEditor(page: any) {
+/** Opens the editor on the test score, in the given theme, and waits for the score. */
+async function openEditor(page: Page, theme: 'light' | 'dark') {
+  await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
+  await setTheme(page, theme);
+
   // The editor's auth gate is client-side: an unauthenticated visit still gets
-  // HTTP 200, then `onAuthReady` redirects to the score view page. None of the
-  // selectors below ever appear, so a missing session reads as "the editor is
-  // broken". The timeout here must stay under the 30s test timeout, otherwise
-  // the test dies before this diagnosis can run.
+  // HTTP 200, then `onAuthReady` redirects to the score view page, and the
+  // editor never appears. Say so, rather than failing as a broken editor. The
+  // timeout must stay under the 30s test timeout for this diagnosis to run.
   try {
-    await page.waitForSelector('#score-editor', {
+    await page.waitForSelector('.editor-toolbar', {
       state: 'visible',
       timeout: 15000,
     });
@@ -50,301 +43,101 @@ async function waitForEditor(page: any) {
     throw error;
   }
 
-  await page.waitForSelector('input[placeholder="Score title"]', {
-    state: 'visible',
-  });
-  await page.waitForSelector('#score-preview', { state: 'attached' });
   await waitForScoreRendered(page);
-  // Wait for score data to be loaded into the textarea
-  await page.waitForFunction(() => {
-    const el = document.getElementById(
-      'score-data-input',
-    ) as HTMLTextAreaElement;
-    return el?.value?.trim().length > 0;
-  });
+}
+
+async function openSource(page: Page) {
+  await page.click('#source-toggle');
+  await expect(page.locator('#source-view')).toBeVisible();
+}
+
+async function openDetails(page: Page) {
+  await page.click('#details-btn');
+  await expect(page.locator('#details-dialog')).toBeVisible();
+  // Let the dialog and its backdrop finish fading in, so no screenshot of the
+  // page, including the one taken on failure, catches them part-way
+  await page.evaluate(() =>
+    Promise.all(document.getAnimations().map((a) => a.finished)),
+  );
 }
 
 test.describe('Score Editor Visual Regression', () => {
   test.describe('Desktop (1280x720)', () => {
     test.use({ viewport: { width: 1280, height: 720 } });
 
-    test('Light mode - Existing score (JSON format)', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await expect(page).toHaveScreenshot('desktop-light-existing-score.png', {
-        fullPage: false,
-      });
+    test('Score - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await expect(page).toHaveScreenshot('desktop-score-light.png');
     });
 
-    test('Dark mode - Existing score (JSON format)', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'dark');
-      await waitForEditor(page);
-
-      await expect(page).toHaveScreenshot('desktop-dark-existing-score.png', {
-        fullPage: false,
-      });
+    test('Score - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await expect(page).toHaveScreenshot('desktop-score-dark.png');
     });
 
-    test('Side-by-side layout (editor and preview)', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await expect(page.locator('#editor-panel')).toBeVisible();
-      await expect(page.locator('#preview-panel')).toBeVisible();
-
-      await expect(page).toHaveScreenshot('desktop-side-by-side-layout.png', {
-        fullPage: false,
-      });
+    test('Source - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await openSource(page);
+      await expect(page.locator('#score-area')).toBeHidden();
+      await expect(page.locator('#source-toggle')).toHaveText('Score');
+      await expect(page).toHaveScreenshot('desktop-source-light.png');
     });
 
-    test('JSON format - Syntax highlighting and preview', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
+    test('Details - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await openDetails(page);
+      await expect(page).toHaveScreenshot('desktop-details-light.png');
+    });
 
-      await page.click('input[type="radio"][value="json"]');
-      await page.waitForFunction(
-        () => {
-          const el = document.getElementById(
-            'score-data-input',
-          ) as HTMLTextAreaElement;
-          if (!el?.value?.trim()) return false;
-          try {
-            JSON.parse(el.value);
-            return true;
-          } catch {
-            return false;
-          }
-        },
-        null,
-        { timeout: 5000 },
+    test('Invalid source shows the reason, and keeps the score', async ({
+      page,
+    }) => {
+      await openEditor(page, 'light');
+      await openSource(page);
+
+      await page.locator('#score-data-input').fill('<unclosed');
+      await expect(page.locator('#validation-error')).toContainText(
+        'Invalid MusicXML',
       );
+      await expect(page).toHaveScreenshot('desktop-source-invalid-light.png');
 
-      await expect(page).toHaveScreenshot('format-json-editor.png', {
-        fullPage: false,
-      });
+      await page.click('#source-toggle');
+      await expect(page.locator('#score-area')).toBeVisible();
+      await waitForScoreRendered(page);
     });
 
-    test('MusicXML format selection', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await page.click('input[type="radio"][value="musicxml"]');
-      await page.waitForFunction(
-        () => {
-          const el = document.getElementById(
-            'score-data-input',
-          ) as HTMLTextAreaElement;
-          return el?.value?.trim().startsWith('<?xml');
-        },
-        null,
-        { timeout: 5000 },
-      );
-
-      await expect(page).toHaveScreenshot('format-musicxml-editor.png', {
-        fullPage: false,
-      });
-    });
-
-    test('ABC notation format selection', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
+    test('Switching format converts the source', async ({ page }) => {
+      await openEditor(page, 'light');
+      await openSource(page);
 
       await page.click('input[type="radio"][value="abc"]');
-      await page.waitForFunction(
-        () => {
-          const el = document.getElementById(
-            'score-data-input',
-          ) as HTMLTextAreaElement;
-          return el?.value?.trim().startsWith('X:');
-        },
-        null,
-        { timeout: 5000 },
-      );
-
-      await expect(page).toHaveScreenshot('format-abc-editor.png', {
-        fullPage: false,
-      });
-    });
-
-    test('Invalid MusicXML shows validation error', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await page.click('input[type="radio"][value="musicxml"]');
-      const textarea = page.locator('#score-data-input');
-      await textarea.clear();
-      await textarea.fill('<unclosed');
-
-      const validationError = page.locator('.validation-error');
-      await expect(validationError).toBeVisible();
-      await expect(validationError).toContainText('Invalid MusicXML');
-    });
-
-    test('Format mismatch error and empty preview', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      // Select MusicXML format then enter JSON data — triggers format mismatch
-      // error in the data section and an empty/error state in the preview.
-      await page.click('input[type="radio"][value="musicxml"]');
-      const notationTextarea = page.locator('#score-data-input');
-      await notationTextarea.clear();
-      await notationTextarea.fill('{"notes":[]}');
-      await page.waitForTimeout(500);
-
-      await expect(page).toHaveScreenshot('editor-format-mismatch-error.png', {
-        fullPage: false,
-      });
-    });
-
-    test('Metadata fields visible', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await expect(
-        page.locator('input[placeholder="Score title"]'),
-      ).toBeVisible();
-      await expect(
-        page.locator('input[placeholder="Composer name"]'),
-      ).toBeVisible();
-      await expect(
-        page.locator('textarea[placeholder="Brief description of the score"]'),
-      ).toBeVisible();
-
-      const metadataSection = page.locator('#score-editor').first();
-      await expect(metadataSection).toHaveScreenshot(
-        'editor-metadata-fields.png',
-      );
-    });
-
-    test('Preview renders score notation', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      const previewPanel = page.locator('#preview-panel');
-      await expect(previewPanel).toHaveScreenshot('editor-preview-panel.png');
-    });
-
-    test('Preview updates on content change', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      const titleInput = page.locator('input[placeholder="Score title"]');
-      await titleInput.clear();
-      await titleInput.fill('Modified Test Score');
-      await page.waitForTimeout(500);
-
-      await expect(
-        page.locator('#preview-panel shakuhachi-score'),
-      ).toBeVisible();
-    });
-
-    test('Dark mode - Full editor UI', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'dark');
-      await waitForEditor(page);
-
-      const bgColor = await page.evaluate(() => {
-        return getComputedStyle(document.body).backgroundColor;
-      });
-      expect(bgColor).not.toBe('rgb(255, 255, 255)');
-
-      await expect(page).toHaveScreenshot('editor-dark-theme-full.png', {
-        fullPage: false,
-      });
-    });
-
-    test('Light to dark theme transition', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await setTheme(page, 'dark');
-      await page.waitForTimeout(200);
-
-      await expect(page).toHaveScreenshot('editor-theme-transition.png', {
-        fullPage: false,
-      });
+      await expect(page.locator('#score-data-input')).toHaveValue(/^X:/);
     });
   });
 
   test.describe('Mobile (375x667)', () => {
     test.use({ viewport: { width: 375, height: 667 } });
 
-    test('Light mode - Editor panel default', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await expect(page.locator('#editor-panel')).toBeVisible();
-      await expect(page.locator('#preview-panel')).toBeHidden();
-
-      await expect(page).toHaveScreenshot('mobile-light-editor-panel.png', {
-        fullPage: false,
-      });
+    test('Score - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await expect(page).toHaveScreenshot('mobile-score-light.png');
     });
 
-    test('Dark mode - Editor panel default', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'dark');
-      await waitForEditor(page);
-
-      await expect(page).toHaveScreenshot('mobile-dark-editor-panel.png', {
-        fullPage: false,
-      });
+    test('Score - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await expect(page).toHaveScreenshot('mobile-score-dark.png');
     });
 
-    // Mobile-only: editor has a toggle to switch between editor and preview panels
-    test('Toggle to preview panel', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      await page.click('#toggle-preview');
-
-      // Wait for the score component to re-render after the panel becomes visible.
-      // On mobile the preview panel starts hidden (0 dimensions), so shakuhachi-score
-      // defers rendering until the ResizeObserver fires with real dimensions.
-      await page.waitForFunction(
-        () => {
-          const c = document.querySelector('shakuhachi-score');
-          const svg = c?.shadowRoot?.querySelector('svg');
-          if (!svg) return false;
-          return (
-            svg.querySelectorAll('text').length > 0 ||
-            svg.querySelectorAll('path').length > 0
-          );
-        },
-        { timeout: 5000 },
-      );
-
-      await expect(page.locator('#preview-panel')).toBeVisible();
-      await expect(page.locator('#editor-panel')).toBeHidden();
-
-      await expect(page).toHaveScreenshot('mobile-light-preview-panel.png', {
-        fullPage: false,
-      });
+    test('Source - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await openSource(page);
+      await expect(page).toHaveScreenshot('mobile-source-dark.png');
     });
 
-    test('Toggle buttons state', async ({ page }) => {
-      await page.goto(`/score/${TEST_SCORE_SLUG}/edit`);
-      await setTheme(page, 'light');
-      await waitForEditor(page);
-
-      const toggleButtons = page.locator('.mobile-toggle');
-      await expect(toggleButtons).toHaveScreenshot('mobile-toggle-buttons.png');
+    test('Details - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await openDetails(page);
+      await expect(page).toHaveScreenshot('mobile-details-dark.png');
     });
   });
 });
