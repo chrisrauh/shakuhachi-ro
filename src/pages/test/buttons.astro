@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { Book, Plus, Info } from '@lucide/astro';
+import { Book, Plus, Info, Delete, Undo2 } from '@lucide/astro';
 
 const title = 'Button Components';
 ---
@@ -229,6 +229,114 @@ const title = 'Button Components';
         </div>
       </section>
 
+      <!-- Palette Keys -->
+      <section class="test-section">
+        <h2>Palette Keys (46x46px, on the palette panel)</h2>
+        <div class="palette-sample">
+          <div class="btn-sample">
+            <button class="palette-key" aria-label="ro" title="Insert ro">
+              <span class="palette-key-glyph" aria-hidden="true">
+                ロ
+              </span>
+            </button>
+            <span>Note</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="go no hi"
+              title="Insert go no hi"
+            >
+              <span class="palette-key-glyph" aria-hidden="true">
+                ヒ<span class="palette-key-holes">五</span>
+              </span>
+            </button>
+            <span>Holes</span>
+          </div>
+          <div class="btn-sample">
+            <button class="palette-key" aria-label="rest" title="Insert a rest">
+              <span class="palette-key-glyph" aria-hidden="true">
+                ○
+              </span>
+            </button>
+            <span>Rest</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="dai-meri"
+              title="Mark dai-meri"
+              aria-pressed="false"
+            >
+              <span
+                class="palette-key-glyph palette-key-mark"
+                aria-hidden="true"
+              >
+                大メ
+              </span>
+            </button>
+            <span>Mark</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="dot"
+              title="Add or remove the dot"
+              aria-pressed="true"
+            >
+              <span class="palette-key-glyph" aria-hidden="true">
+                ・
+              </span>
+              <span class="palette-key-caption">dot</span>
+            </button>
+            <span>Pressed</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="octave up"
+              title="Move it an octave up"
+            >
+              <span class="palette-key-glyph" aria-hidden="true">
+                甲
+              </span>
+              <span class="palette-key-caption">up</span>
+            </button>
+            <span>Caption</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="octave down"
+              title="Move it an octave down"
+              disabled
+            >
+              <span class="palette-key-glyph" aria-hidden="true">
+                乙
+              </span>
+              <span class="palette-key-caption">down</span>
+            </button>
+            <span>Disabled</span>
+          </div>
+          <div class="btn-sample">
+            <button
+              class="palette-key"
+              aria-label="delete"
+              title="Delete the note before the cursor"
+            >
+              <Delete aria-hidden="true" />
+            </button>
+            <span>Icon</span>
+          </div>
+          <div class="btn-sample">
+            <button class="palette-key" aria-label="undo" title="Undo" disabled>
+              <Undo2 aria-hidden="true" />
+            </button>
+            <span>Disabled</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Alignment Test -->
       <section class="test-section">
         <h2>Alignment & Sizing</h2>
@@ -310,6 +418,17 @@ const title = 'Button Components';
   .btn-sample > span {
     font-size: var(--font-size-x-small);
     color: var(--color-text-secondary);
+  }
+
+  /* The palette panel's surface and elevation, so the keys are seen where they are used */
+  .palette-sample {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-x-small);
+    padding: var(--spacing-x-small);
+    background: var(--color-bg-palette);
+    border-radius: var(--border-radius-panel);
+    box-shadow: var(--shadow-ring), var(--shadow-small);
   }
 
   .state-comparison {
