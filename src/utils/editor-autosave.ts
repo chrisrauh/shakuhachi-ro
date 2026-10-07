@@ -75,6 +75,9 @@ export class EditorAutosave {
   }
 
   clear(): void {
+    // A save still waiting on the debounce would otherwise write the draft back
+    // after a successful Save, and the next visit would offer to restore it.
+    this.pendingData = null;
     localStorage.removeItem(this.key);
   }
 }

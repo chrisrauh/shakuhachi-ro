@@ -8,6 +8,10 @@ interface Props {
   title: string;
   currentPage: 'browse' | 'create' | 'score';
   fullHeight?: boolean;
+  // Keeps the fullHeight layout on phones too, where it otherwise reverts to
+  // document scrolling. For pages whose content scrolls inside a fixed frame,
+  // such as the score editor, whose palette floats over a scrolling score.
+  fullHeightOnMobile?: boolean;
   noPadding?: boolean;
   mobileMenuType?: 'standard' | 'score-edit';
   // For pages whose scripts call Supabase as soon as they load: opens the
@@ -20,6 +24,7 @@ const {
   title,
   currentPage: _currentPage,
   fullHeight = false,
+  fullHeightOnMobile = false,
   noPadding = false,
   mobileMenuType,
   preconnectSupabase = false,
@@ -85,7 +90,12 @@ const {
       })();
     </script>
   </head>
-  <body class={fullHeight ? 'full-height' : ''}>
+  <body
+    class:list={{
+      'full-height': fullHeight,
+      'full-height-on-mobile': fullHeight && fullHeightOnMobile,
+    }}
+  >
     <SiteHeader mobileMenuType={mobileMenuType}>
       <slot name="header-metadata" slot="header-metadata" />
       <slot name="header-actions" slot="header-actions" />
@@ -142,15 +152,21 @@ const {
 
       /* On mobile, revert to natural document scrolling */
       @media (max-width: 768px) {
-        body.full-height {
+        body.full-height:not(.full-height-on-mobile) {
           height: auto;
           min-height: 100vh;
         }
 
-        body.full-height main {
+        body.full-height:not(.full-height-on-mobile) main {
           flex: none;
           overflow: visible;
         }
+      }
+
+      /* The visible viewport, not 100vh, which on phones includes the area
+         under the browser's toolbars and would push the bottom out of view */
+      body.full-height-on-mobile {
+        height: 100dvh;
       }
 
       main {
