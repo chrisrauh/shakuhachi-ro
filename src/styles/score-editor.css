@@ -25,8 +25,12 @@
   gap: var(--spacing-small);
 }
 
-.save-status {
+/* ⇄, the save status and Save sit at the far end */
+.palette-side-toggle {
   margin-inline-start: auto;
+}
+
+.save-status {
   font-size: var(--font-size-small);
   color: var(--color-text-secondary);
 }
@@ -34,10 +38,33 @@
 /* ---- Workspace ---- */
 
 .editor-workspace {
+  /* Three columns of keys, with the gaps between them and the panel's padding */
+  --palette-panel-width: calc(
+    3 * var(--size-palette-key) + 4 * var(--spacing-x-small)
+  );
+
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
+}
+
+/* The score keeps clear of the panel floating over its side, and its column is
+   centred in the space left */
+.editor-workspace[data-palette-side='right'] .editor-score-area {
+  padding-right: calc(var(--palette-panel-width) + var(--spacing-medium));
+}
+
+.editor-workspace[data-palette-side='left'] .editor-score-area {
+  padding-left: calc(var(--palette-panel-width) + var(--spacing-medium));
+}
+
+/* When ⇄ moves the panel, the column glides to its new centre. Set only once
+   ⇄ is used, so opening on a remembered side doesn't animate */
+@media (prefers-reduced-motion: no-preference) {
+  .editor-workspace[data-palette-moved] .editor-score-area {
+    transition: padding var(--transition-medium) var(--ease-snap);
+  }
 }
 
 .editor-score-area:not([hidden]) {
@@ -62,6 +89,84 @@
   line-height: var(--line-height-dense);
   text-align: center;
   color: var(--color-text-tertiary);
+}
+
+/* ---- Palette panel ----
+   The app's one raised element: it floats over the score's side, inset from
+   the edges. Its columns scroll on their own under fixed headers, over a fixed
+   row of edit keys. */
+
+.palette-panel:not([hidden]) {
+  position: absolute;
+  top: var(--spacing-2x-small);
+  bottom: var(--spacing-x-small);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-x-small);
+  padding: var(--spacing-x-small);
+  background: var(--color-bg-palette);
+  border-radius: var(--border-radius-panel);
+  box-shadow: var(--shadow-ring), var(--shadow-small);
+}
+
+[data-palette-side='right'] .palette-panel {
+  right: var(--spacing-x-small);
+}
+
+[data-palette-side='left'] .palette-panel {
+  left: var(--spacing-x-small);
+}
+
+.palette-columns {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--spacing-x-small);
+}
+
+.palette-column {
+  width: var(--size-palette-key);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-x-small);
+}
+
+/* Column headers, and the Octave header inside the Length column */
+.palette-header {
+  flex: none;
+  padding-block: var(--spacing-2x-small);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-bg-palette-header);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-x-small);
+  text-align: center;
+}
+
+/* Scrolls by touch, wheel and trackpad, with no visible scrollbar */
+.palette-keys {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-x-small);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.palette-keys::-webkit-scrollbar {
+  display: none;
+}
+
+.palette-keys .palette-key {
+  flex: none;
+}
+
+.palette-edit-row {
+  flex: none;
+  display: flex;
+  gap: var(--spacing-x-small);
 }
 
 /* ---- Source view ---- */

@@ -1,0 +1,227 @@
+---
+/**
+ * The score editor's palette panel: three columns of keys (marks, length and
+ * octave, notes) over a fixed row of edit keys. Rendered for the default side,
+ * the right; PalettePanel.ts reorders it for the left.
+ *
+ * The keys' titles describe cursor mode, the mode the editor opens in.
+ */
+import { Delete, Redo2, Undo2 } from '@lucide/astro';
+import { kinkoMap } from '../../web-component/constants/kinko-symbols';
+import { LENGTHS, MAIN_NOTES, MARKS, OTHER_NOTES, stepName } from './palette';
+import type { PitchStep } from '../../web-component/types/ScoreData';
+
+const noteKey = (step: PitchStep) => ({
+  step,
+  name: stepName(step),
+  kana: kinkoMap[step].kana,
+  numerals: kinkoMap[step].numerals,
+});
+const mainNotes = MAIN_NOTES.map(noteKey);
+const otherNotes = OTHER_NOTES.map(noteKey);
+---
+
+<div
+  class="palette-panel"
+  id="palette-panel"
+  role="group"
+  aria-label="Palettes"
+>
+  <div class="palette-columns" id="palette-columns">
+    <div
+      class="palette-column"
+      data-column="marks"
+      role="group"
+      aria-labelledby="palette-marks-title"
+    >
+      <span class="palette-header" id="palette-marks-title">
+        Marks
+      </span>
+      <div class="palette-keys">
+        {MARKS.map(({ mark, glyph }) => (
+          <button
+            type="button"
+            class="palette-key"
+            data-mark={mark}
+            aria-label={mark}
+            title={`Mark ${mark}`}
+            aria-pressed="false"
+          >
+            <span class="palette-key-glyph palette-key-mark" aria-hidden="true">
+              {glyph}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div
+      class="palette-column"
+      data-column="length"
+      role="group"
+      aria-labelledby="palette-length-title"
+    >
+      <span class="palette-header" id="palette-length-title">
+        Length
+      </span>
+      <div class="palette-keys">
+        {LENGTHS.map(({ duration, lines, caption }) => (
+          <button
+            type="button"
+            class="palette-key"
+            data-duration={duration}
+            aria-label={caption}
+            title={`Make it ${caption}`}
+            aria-pressed="false"
+          >
+            <span
+              class="palette-key-glyph palette-key-length"
+              aria-hidden="true"
+            >
+              ロ
+              {lines > 0 && (
+                <svg
+                  class="palette-key-lines"
+                  viewBox={`0 0 ${4 * lines - 1} 20`}
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  {Array.from({ length: lines }, (_, i) => (
+                    <line x1={1 + 4 * i} y1="0" x2={1 + 4 * i} y2="20" />
+                  ))}
+                </svg>
+              )}
+            </span>
+            <span class="palette-key-caption">{caption}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          class="palette-key"
+          data-key="dot"
+          aria-label="dot"
+          title="Add or remove the dot"
+          aria-pressed="false"
+        >
+          <span class="palette-key-glyph" aria-hidden="true">
+            ・
+          </span>
+          <span class="palette-key-caption">dot</span>
+        </button>
+
+        <span class="palette-header" id="palette-octave-title">
+          Octave
+        </span>
+        <button
+          type="button"
+          class="palette-key"
+          data-key="octave-up"
+          aria-label="octave up"
+          title="Move it an octave up"
+          aria-describedby="palette-octave-title"
+        >
+          <span class="palette-key-glyph" aria-hidden="true">
+            甲
+          </span>
+          <span class="palette-key-caption">up</span>
+        </button>
+        <button
+          type="button"
+          class="palette-key"
+          data-key="octave-down"
+          aria-label="octave down"
+          title="Move it an octave down"
+          aria-describedby="palette-octave-title"
+        >
+          <span class="palette-key-glyph" aria-hidden="true">
+            乙
+          </span>
+          <span class="palette-key-caption">down</span>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="palette-column"
+      data-column="notes"
+      role="group"
+      aria-labelledby="palette-notes-title"
+    >
+      <span class="palette-header" id="palette-notes-title">
+        Notes
+      </span>
+      <div class="palette-keys">
+        {mainNotes.map(({ step, name, kana }) => (
+          <button
+            type="button"
+            class="palette-key"
+            data-step={step}
+            aria-label={name}
+            title={`Insert ${name}`}
+          >
+            <span class="palette-key-glyph" aria-hidden="true">
+              {kana}
+            </span>
+          </button>
+        ))}
+        <button
+          type="button"
+          class="palette-key"
+          data-step="rest"
+          aria-label="rest"
+          title="Insert a rest"
+        >
+          <span class="palette-key-glyph" aria-hidden="true">
+            ○
+          </span>
+        </button>
+        {otherNotes.map(({ step, name, kana, numerals }) => (
+          <button
+            type="button"
+            class="palette-key"
+            data-step={step}
+            aria-label={name}
+            title={`Insert ${name}`}
+          >
+            <span class="palette-key-glyph" aria-hidden="true">
+              {kana}
+              {numerals && <span class="palette-key-holes">{numerals}</span>}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-edit-row" id="palette-edit-row">
+    <button
+      type="button"
+      class="palette-key"
+      data-key="undo"
+      aria-label="undo"
+      title="Undo"
+      disabled
+    >
+      <Undo2 aria-hidden="true" />
+    </button>
+    <button
+      type="button"
+      class="palette-key"
+      data-key="redo"
+      aria-label="redo"
+      title="Redo"
+      disabled
+    >
+      <Redo2 aria-hidden="true" />
+    </button>
+    <button
+      type="button"
+      class="palette-key"
+      data-key="delete"
+      aria-label="delete"
+      title="Delete the note before the cursor"
+    >
+      <Delete aria-hidden="true" />
+    </button>
+  </div>
+</div>
