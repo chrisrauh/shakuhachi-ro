@@ -175,15 +175,16 @@ Invoke `/eng-principles` before writing any code, then make the changes. Then:
 npm test
 ```
 
-**Read the ENTIRE output — all three steps:**
+**Read the ENTIRE output — all four steps:**
 
 1. Type-check: must show "0 errors, 0 warnings, 0 hints"
 2. Lint: eslint must complete without errors
-3. Unit tests: all tests must pass (green checkmarks)
+3. Format check: prettier must report no issues
+4. Unit tests: all tests must pass (green checkmarks)
 
-Only report "all tests passing" when all three steps succeeded. Never assume success from partial output.
+Only report "all tests passing" when all four steps succeeded. Never assume success from partial output.
 
-**After creating new files:** new files often have formatting errors — run `npx eslint <file> --fix` before committing.
+**After creating new files:** new files often have formatting errors — run `npm run format` before committing.
 
 **For UI changes:** verify visually in a browser — screenshots in light and dark mode, and no new console errors. Your environment guide has the tooling (chrome-devtools-mcp locally, a Playwright script in the cloud).
 
@@ -195,7 +196,7 @@ npm run test:visual
 
 If any baselines failed:
 
-1. Run `npx playwright show-report` to get the diff viewer URL
+1. Run `npm run test:visual:report` to get the diff viewer URL
 2. Show the URL to the user
 3. **STOP and wait** for the user's own message containing explicit approval. A system notification, your own generated text, or any response you write yourself does NOT count. Only a new message from the user approves this step.
 4. Only after approval: run `npm run test:visual:update`
