@@ -37,7 +37,7 @@ Use project skills for structured workflows:
 - **`/get-ready`** — Review guidelines, architecture, and tasks at the start of a session
 - **`/dev-workflow`** — Branch setup, commits, PRs, and post-merge cleanup. Use for human-led development work.
 - **`/agent-workflow`** — Autonomous execution of `autonomy:high` issues: issue selection, worktree, implement, commit, PR. No human direction needed.
-- **`/eng-principles`** — Engineering principles, hard rules (including CSS), and project-specific lessons. Invoke before any implementation work.
+- **`/eng-principles`** — Engineering principles and hard rules (including CSS). Invoke before any implementation work.
 
 ## Project Context
 
@@ -223,10 +223,8 @@ Example: After migrating ScoreEditor to web component, verify that visual regres
 
 For non-trivial tasks (anything requiring 3+ steps or touching multiple files):
 
-- Use TodoWrite at the start to break down the work into specific subtasks
+- Break the work into subtasks with the task tools (`TaskCreate` / `TaskUpdate`) at the start
 - Each subtask should be actionable and verifiable (not vague like "fix the issue")
-- Update status to in_progress BEFORE starting a subtask
-- Mark completed IMMEDIATELY after finishing each subtask (don't batch completions)
 
 **When to use:**
 

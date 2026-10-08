@@ -67,7 +67,7 @@ Useful filters: `--label type:ux` (user-facing), `--label autonomy:high` (agent-
 Once you've reviewed these documents:
 
 1. State which environment you are in, and summarize the most important points from the guidelines
-2. Ask the user which issue they'd like to work on, quoting issue numbers
+2. If the user already gave you a task, continue with it. Otherwise ask which issue they'd like to work on, quoting issue numbers
 3. If unclear, suggest the top issue from the first non-empty tier above
 
 **Remember**: This review ensures you have full context before starting work. Take time to understand the project's patterns and principles.

@@ -11,6 +11,7 @@ B) Plan was created by superpowers:writing-plans → Use superpowers:subagent-dr
 Subagents may commit after each task per that skill's workflow.
 A superpowers plan is a structured file explicitly created by the superpowers:writing-plans skill.
 A Claude plan (EnterPlanMode output) is NOT a superpowers plan — use /dev-workflow for those.
+C) Autonomous work on an `autonomy:high` issue → Invoke /agent-workflow, not /dev-workflow.
 
 TRIGGER: Before any implementation work (writing or changing code, tests, styles or config), and before any superpowers:\* skill
 → Invoke /eng-principles FIRST, unless it is already loaded in this session and still in context.
