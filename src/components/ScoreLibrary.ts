@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { buildSpinnerSVG } from './LoadingSpinner';
+import { SCHOOLS, composerLine } from '../utils/school';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -84,19 +85,12 @@ export class ScoreLibrary {
   private applyFilters(): void {
     const query = this.searchQuery.toLowerCase();
 
-    // Filter user's scores
-    this.filteredMyScores = this.myScores.filter(
-      (score) =>
-        score.title.toLowerCase().includes(query) ||
-        (score.composer && score.composer.toLowerCase().includes(query)),
-    );
-
-    // Filter library scores
-    this.filteredLibraryScores = this.libraryScores.filter(
-      (score) =>
-        score.title.toLowerCase().includes(query) ||
-        (score.composer && score.composer.toLowerCase().includes(query)),
-    );
+    const matches = (score: Score) =>
+      [score.title, score.composer, score.school && SCHOOLS[score.school]].some(
+        (text) => text?.toLowerCase().includes(query),
+      );
+    this.filteredMyScores = this.myScores.filter(matches);
+    this.filteredLibraryScores = this.libraryScores.filter(matches);
 
     this.renderGrid();
   }
@@ -142,7 +136,7 @@ export class ScoreLibrary {
             <input
               type="text"
               id="search-input"
-              placeholder="Search by title or composer..."
+              placeholder="Search by title, composer or school..."
             />
             <button
               class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
@@ -339,11 +333,7 @@ export class ScoreLibrary {
 
         <div class="score-card-body">
           <p class="score-composer">
-            ${
-              score.composer
-                ? this.escapeHtml(score.composer)
-                : 'Unknown composer'
-            }
+            ${this.escapeHtml(composerLine(score.composer, score.school))}
           </p>
 
           ${

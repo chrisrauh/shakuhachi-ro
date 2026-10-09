@@ -36,6 +36,7 @@ function makeScore(overrides: Partial<Score> = {}): Score {
     user_id: OWNER,
     title: 'Test Score',
     composer: null,
+    school: null,
     description: null,
     data_format: 'json',
     data: JSON_DATA,
@@ -87,6 +88,10 @@ function renderPage(): void {
     <dialog id="details-dialog">
       <input id="title-input" value="Test Score" />
       <input id="composer-input" />
+      <select id="school-select">
+        <option value="">None</option>
+        <option value="kinko">Kinko-ryū</option>
+      </select>
       <textarea id="description-input"></textarea>
       <div id="license-summary"><button id="license-change"></button></div>
       <select id="license-select" hidden>
@@ -346,6 +351,21 @@ describe('ScoreEditor.save', () => {
     expect($('save-status').textContent).toBe('Saved');
   });
 
+  it('saves None as no school, clearing the stored one', async () => {
+    const { updateScore } = await import('../../api/scores');
+    new ScoreEditor(makeScore({ school: 'kinko' }));
+
+    const school = $<HTMLSelectElement>('school-select');
+    school.value = '';
+    school.dispatchEvent(new Event('change'));
+    await save();
+
+    expect(updateScore).toHaveBeenCalledWith(
+      'score-123',
+      expect.objectContaining({ school: null }),
+    );
+  });
+
   it('saves ABC as the text the author typed, so it reopens as ABC', async () => {
     const { updateScore } = await import('../../api/scores');
     const abc = 'X:1\nT:Akatombo\n% a comment the parser drops\nK:D\nD F G|';
@@ -456,6 +476,7 @@ describe('ScoreEditor draft restore', () => {
       metadata: {
         title: 'Draft title',
         composer: '',
+        school: 'kinko',
         description: '',
         license: 'CC0-1.0',
       },
@@ -463,6 +484,7 @@ describe('ScoreEditor draft restore', () => {
     });
 
     expect($<HTMLInputElement>('title-input').value).toBe('Draft title');
+    expect($<HTMLSelectElement>('school-select').value).toBe('kinko');
     expect($<HTMLSelectElement>('license-select').value).toBe('CC0-1.0');
     expect(renderedScore()).toEqual(TWO_NOTES);
     expect($('save-status').textContent).toBe('Unsaved');

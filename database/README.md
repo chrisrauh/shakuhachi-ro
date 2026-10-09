@@ -51,6 +51,7 @@ CREATE TABLE scores (
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   composer TEXT,
+  school school,             -- the school (ryū) this version comes from; NULL = none recorded
   description TEXT,
   data_format TEXT NOT NULL CHECK (data_format IN ('json', 'musicxml', 'abc')),
   data JSONB NOT NULL,        -- a ScoreData object for json; the text as a JSON string otherwise
@@ -86,6 +87,7 @@ CREATE TABLE scores (
 | `default_license_nc_sa.sql`         | New scores default to CC BY-NC-SA 4.0                                       |
 | `allow_abc_data_format.sql`         | Allows `data_format` `abc`, so ABC is stored as typed (#262)                |
 | `meri_kari_field.sql`               | Replaces the `meri`/`chu_meri`/`dai_meri` note flags with `meriKari` (#288) |
+| `add_school_to_scores.sql`          | Adds `school`, and moves the schools out of `composer` (#405)               |
 | `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                              |
 
 ## Seeded Songs
