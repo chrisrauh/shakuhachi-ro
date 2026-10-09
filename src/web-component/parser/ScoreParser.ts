@@ -27,6 +27,29 @@ export const OCTAVE_REGISTERS: readonly OctaveRegister[] = [
 ];
 
 /**
+ * Which octave (0, 1 or 2) of a note is closest to a reference pitch: the
+ * octave a reader assumes when a note has no octave mark. The editor inserts
+ * notes in this octave, so most melodies need no octave changes.
+ *
+ * @param romaji - Note to find the closest octave for
+ * @param referenceMidi - MIDI pitch to measure the distance from
+ */
+export function closestOctave(romaji: string, referenceMidi: number): number {
+  let closest = 0;
+  let smallestDistance = Infinity;
+
+  for (let octave = 0; octave <= 2; octave++) {
+    const distance = Math.abs(getNoteMidi(romaji, octave) - referenceMidi);
+    if (distance < smallestDistance) {
+      smallestDistance = distance;
+      closest = octave;
+    }
+  }
+
+  return closest;
+}
+
+/**
  * Maps numeric duration to NoteDuration
  *
  * Simple mapping for now:
@@ -204,39 +227,8 @@ export class ScoreParser {
       return actualOctave !== 0;
     }
 
-    // Find which octave of this note is closest to previous note
-    const expectedOctave = this.findClosestOctave(romaji, previousNoteMidi);
-
-    // Mark needed if actual octave differs from expected
-    return actualOctave !== expectedOctave;
-  }
-
-  /**
-   * Finds which octave (0, 1, or 2) of a note is closest to a reference MIDI pitch
-   *
-   * @param romaji - Note to find closest octave for
-   * @param referenceMidi - Reference MIDI pitch to measure distance from
-   * @returns Octave number (0, 1, or 2) that is closest
-   */
-  private static findClosestOctave(
-    romaji: string,
-    referenceMidi: number,
-  ): number {
-    let closestOctave = 0;
-    let smallestDistance = Infinity;
-
-    // Check all three possible octaves
-    for (let octave = 0; octave <= 2; octave++) {
-      const midi = getNoteMidi(romaji, octave);
-      const distance = Math.abs(midi - referenceMidi);
-
-      if (distance < smallestDistance) {
-        smallestDistance = distance;
-        closestOctave = octave;
-      }
-    }
-
-    return closestOctave;
+    // Mark needed if actual octave differs from the closest one
+    return actualOctave !== closestOctave(romaji, previousNoteMidi);
   }
 
   /**

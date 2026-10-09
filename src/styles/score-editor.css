@@ -257,6 +257,14 @@
   display: none;
 }
 
+/* The notes column glides to the highlighted note's key (PalettePanel.reveal).
+   Only scrolling set from code animates; the browser sets its duration */
+@media (prefers-reduced-motion: no-preference) {
+  .palette-keys {
+    scroll-behavior: smooth;
+  }
+}
+
 .palette-keys .palette-key {
   flex: none;
 }

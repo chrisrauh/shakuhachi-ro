@@ -5,6 +5,8 @@
  * - The score with the palette panel on either side, the cursor (in every
  *   score screenshot), a highlighted note, an empty score, the source view
  *   and the details dialog
+ * - Editing from the palette, on the score converted to JSON (the test score
+ *   is MusicXML, whose editing keys stay disabled)
  * - Desktop (1280x720) and mobile (375x667) viewports, light and dark themes
  * - Validation and format conversion in the source view
  *
@@ -80,13 +82,36 @@ async function tapNote(page: Page, index: number) {
   await expect(page.locator('#score-highlight')).toBeVisible();
 }
 
-/** Empties the score through the source view, without saving. */
-async function emptyScore(page: Page) {
+/** Converts the score to JSON in the source view, without saving. */
+async function convertToJson(page: Page) {
   await openSource(page);
   await page.click('input[type="radio"][value="json"]');
-  // The conversion loads the converter first. Filling before it is done would
-  // have it overwrite the empty score with the converted one
+  // The conversion loads the converter first. Changing the source before it is
+  // done would have it overwrite the change with the converted score
   await expect(page.locator('#score-data-input')).toHaveValue(/"notes"/);
+}
+
+/**
+ * Edits the second note from the palette, the way a viewer does: a JSON score's
+ * keys are enabled, and the ones the note now matches are pressed.
+ */
+async function editNote(page: Page) {
+  await convertToJson(page);
+  await page.click('#source-toggle');
+  await waitForScoreRendered(page);
+  await tapNote(page, 1);
+  await page.click('.palette-key[data-mark="chu-meri"]');
+  await page.click('.palette-key[data-duration="2"]'); // 1 beat
+  await expect(
+    page.locator('.palette-key[data-mark="chu-meri"]'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#status-detail')).toContainText('chu-meri');
+  await expect(page.locator('.palette-key[data-key="undo"]')).toBeEnabled();
+}
+
+/** Empties the score through the source view, without saving. */
+async function emptyScore(page: Page) {
+  await convertToJson(page);
   await page
     .locator('#score-data-input')
     .fill('{"title": "", "style": "kinko", "notes": []}');
@@ -98,9 +123,15 @@ async function openDetails(page: Page) {
   await page.click('#details-btn');
   await expect(page.locator('#details-dialog')).toBeVisible();
   // Let the dialog and its backdrop finish fading in, so no screenshot of the
-  // page, including the one taken on failure, catches them part-way
+  // page, including the one taken on failure, catches them part-way. Only
+  // animations that end: the cursor blinks forever once it has rested 700ms
   await page.evaluate(() =>
-    Promise.all(document.getAnimations().map((a) => a.finished)),
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished),
+    ),
   );
 }
 
@@ -129,6 +160,12 @@ test.describe('Score Editor Visual Regression', () => {
       await tapNote(page, 1);
       await expect(page.locator('#status-mode')).toHaveText('Changing');
       await expect(page).toHaveScreenshot('desktop-highlight-light.png');
+    });
+
+    test('Editing a note - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await editNote(page);
+      await expect(page).toHaveScreenshot('desktop-editing-light.png');
     });
 
     test('Source - light', async ({ page }) => {
@@ -194,6 +231,12 @@ test.describe('Score Editor Visual Regression', () => {
       await openEditor(page, 'dark');
       await tapNote(page, 1);
       await expect(page).toHaveScreenshot('mobile-highlight-dark.png');
+    });
+
+    test('Editing a note - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await editNote(page);
+      await expect(page).toHaveScreenshot('mobile-editing-dark.png');
     });
 
     test('Empty score - light', async ({ page }) => {
