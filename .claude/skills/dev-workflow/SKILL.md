@@ -281,7 +281,7 @@ No heredocs (`<<EOF`), no pipes (`|`), no `&&` chaining, no `$()` substitution i
 
 **After creating the PR: STOP.** Do not merge. Do not use `gh pr merge` or `--auto`. Wait for the user to confirm the merge.
 
-**After user confirms merge** — run these 4 commands as separate Bash calls:
+**After user confirms merge** — run these 4 commands as separate Bash calls. In the cloud, run only the first two; see your environment guide.
 
 ```bash
 git checkout main
