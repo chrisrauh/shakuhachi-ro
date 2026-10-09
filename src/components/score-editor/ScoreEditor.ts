@@ -15,12 +15,15 @@ import type {
   ScoreDataFormat,
   UpdateScoreData,
 } from '../../api/scores';
-import type { ScoreData } from '../../web-component/types/ScoreData';
+import type { ScoreData, ScoreNote } from '../../web-component/types/ScoreData';
 import { STRINGS } from '../../constants/strings';
 import { DetailsDialog } from './DetailsDialog';
 import { SourceView } from './SourceView';
 import { PalettePanel } from './PalettePanel';
 import { SelectionView } from './SelectionView';
+import { applyEdit, type EditorCommand, type EditorState } from './editing';
+import { EditHistory } from './history';
+import type { Selection } from './selection';
 
 /**
  * The save status when there are changes to save. One word, so it fits on one
@@ -32,6 +35,7 @@ const UNSAVED = 'Unsaved';
  * The score edit page (/score/[slug]/edit). Holds the score being edited — its
  * source text and format, and its details — and saves it. The markup is
  * rendered by edit.astro; the details and the source have their own views.
+ * Edits from the palette and keyboard rewrite the source, and can be undone.
  */
 export class ScoreEditor {
   private readonly scoreId: string;
@@ -39,6 +43,9 @@ export class ScoreEditor {
   /** The score as stored: JSON as indented text, MusicXML and ABC as typed. */
   private source: string;
   private format: ScoreDataFormat;
+  /** The notes of the score last drawn, which edits start from. */
+  private notes: ScoreNote[] = [];
+  private readonly history = new EditHistory();
   private metadata: ScoreMetadata;
   /** The licence as saved, so a save only writes it when the owner changed it. */
   private savedLicense: ScoreLicense;
@@ -90,8 +97,12 @@ export class ScoreEditor {
       onFormatChange: (format) => this.handleFormatChange(format),
     });
     this.sourceView.setSource(this.source, this.format);
-    this.palettes = new PalettePanel();
-    this.selection = new SelectionView();
+    this.palettes = new PalettePanel((command) => this.handleCommand(command));
+    this.selection = new SelectionView({
+      // Every draw of the score shows a selection, so this follows edits too
+      onChange: () => this.updatePalettes(),
+      onCommand: (command) => this.handleCommand(command),
+    });
 
     byId('details-btn').addEventListener('click', () => this.details.open());
     this.sourceToggle.addEventListener('click', () =>
@@ -119,18 +130,62 @@ export class ScoreEditor {
   }
 
   /**
-   * Draws the source in the score area. An unreadable source leaves the last
-   * score that could be read in place. Returns whether the source could be read.
+   * Draws the source in the score area, with the selection an edit leaves, if
+   * given. An unreadable source leaves the last score that could be read in
+   * place. Returns whether the source could be read.
    */
-  private renderScore(): boolean {
+  private renderScore(selection?: Selection): boolean {
     const { data, error } = this.readSource();
     this.sourceView.showValidation(error ?? null);
     if (!data) return false;
 
     this.renderer.setAttribute('data-score', JSON.stringify(data));
     this.emptyHint.hidden = data.notes.length > 0;
-    this.selection.show(data.notes);
+    this.notes = data.notes;
+    this.selection.show(data.notes, selection);
     return true;
+  }
+
+  /** Only JSON scores are edited from the palette for now. */
+  private get editable(): boolean {
+    return this.format === 'json';
+  }
+
+  private handleCommand(command: EditorCommand): void {
+    if (!this.editable) return;
+    const current: EditorState = {
+      notes: this.notes,
+      selection: this.selection.selection,
+    };
+
+    if (command.type === 'undo' || command.type === 'redo') {
+      const restored = this.history[command.type](current);
+      if (restored) this.applyState(restored);
+      return;
+    }
+    const next = applyEdit(current, command);
+    if (!next) return;
+    this.history.record(current);
+    this.applyState(next);
+  }
+
+  /** Writes notes into the JSON source, keeping its other fields as they are. */
+  private applyState({ notes, selection }: EditorState): void {
+    const data = JSON.parse(this.source) as ScoreData;
+    this.source = JSON.stringify({ ...data, notes }, null, 2);
+    this.sourceView.setSource(this.source, this.format);
+    this.renderScore(selection);
+    this.markChanged();
+  }
+
+  private updatePalettes(): void {
+    this.palettes.update({
+      notes: this.notes,
+      selection: this.selection.selection,
+      canUndo: this.history.canUndo,
+      canRedo: this.history.canRedo,
+      editable: this.editable,
+    });
   }
 
   private readSource(): { data?: ScoreData; error?: string } {
@@ -160,8 +215,10 @@ export class ScoreEditor {
     if (!visible) this.renderScore();
   }
 
+  /** A source edit is not an undo step, and what came before can't be undone. */
   private handleSourceInput(source: string): void {
     this.source = source;
+    this.history.clear();
     this.sourceView.showValidation(this.readSource().error ?? null);
     this.markChanged();
   }
@@ -199,6 +256,7 @@ export class ScoreEditor {
 
   private setFormat(format: ScoreDataFormat): void {
     this.format = format;
+    this.history.clear();
     this.sourceView.setSource(this.source, this.format);
     this.sourceView.showValidation(this.readSource().error ?? null);
     this.markChanged();
@@ -212,6 +270,7 @@ export class ScoreEditor {
     this.metadata = { ...this.metadata, ...draft.metadata };
     this.details.setMetadata(this.metadata);
     this.sourceView.setSource(this.source, this.format);
+    this.history.clear();
     if (!this.renderScore()) this.showSource(true);
     this.hasUnsavedChanges = true;
     this.showSaveStatus(UNSAVED);
