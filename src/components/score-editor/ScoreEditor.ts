@@ -3,7 +3,6 @@ import { purgeScoreCache } from '../../api/purge';
 import { getCurrentUser } from '../../api/auth';
 import { toast } from '../Toast';
 import { ButtonLoadingState } from '../LoadingSpinner';
-import { confirmDialog } from '../../utils/init-header';
 import { parseScoreText } from '../../utils/score-data';
 import { validateScoreInput } from '../../utils/score-validation';
 import { EditorAutosave } from '../../utils/editor-autosave';
@@ -231,23 +230,16 @@ export class ScoreEditor {
         const { convertFormat } = await import('../../utils/format-converter');
         this.source = convertFormat(this.source, this.format, format);
       } catch (error) {
-        const dialog = STRINGS.DIALOGS.ScoreEditor.formatConversionFailed;
-        confirmDialog.show({
-          title: dialog.title,
-          message: dialog.message(
-            this.format,
+        // The source stays as it is, so the radio goes back to its format and
+        // the validation line says why. The next edit shows the source's own
+        // state again.
+        this.sourceView.setSource(this.source, this.format);
+        this.sourceView.showValidation(
+          STRINGS.VALIDATION.scoreInput.formatSwitchFailed(
             format,
             error instanceof Error ? error.message : '',
           ),
-          confirmText: dialog.confirmText,
-          cancelText: dialog.cancelText,
-          onConfirm: () => {
-            this.source = '';
-            this.setFormat(format);
-          },
-          // Puts the radio back on the format the source is still in
-          onCancel: () => this.sourceView.setSource(this.source, this.format),
-        });
+        );
         return;
       }
     }

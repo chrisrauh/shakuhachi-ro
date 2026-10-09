@@ -99,7 +99,7 @@ describe('MusicXMLSerializer', () => {
       };
 
       expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
-        "Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to MusicXML",
+        "Note 2 has a step, octave or meri/kari mark that isn't valid.",
       );
     });
 
