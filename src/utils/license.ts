@@ -54,15 +54,21 @@ const MUSIC_STATUS: Partial<
   },
 };
 
+/**
+ * "Traditional" fills the composer field for pieces with no known author. It
+ * is not a name, so it must not read as one ("Music by Traditional").
+ */
+export function isTraditional(composer: string | null): boolean {
+  return composer?.trim().toLowerCase() === 'traditional';
+}
+
 /** The music half of the score page's credit line; null when nothing is known. */
 export function musicCredit(
   status: CopyrightStatus,
   composer: string | null,
 ): string | null {
   const name = composer?.trim() || null;
-  // "Traditional" fills the composer field for pieces with no known author;
-  // "Music by Traditional" would read as if it were a name.
-  if (name?.toLowerCase() === 'traditional') {
+  if (isTraditional(name)) {
     const phrase = MUSIC_STATUS[status];
     return phrase
       ? `Traditional music, ${phrase.afterComposer}`

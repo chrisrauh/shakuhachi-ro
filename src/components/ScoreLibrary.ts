@@ -7,7 +7,7 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { buildSpinnerSVG } from './LoadingSpinner';
-import { SCHOOLS } from '../utils/school';
+import { SCHOOLS, composerLine } from '../utils/school';
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -333,11 +333,7 @@ export class ScoreLibrary {
 
         <div class="score-card-body">
           <p class="score-composer">
-            ${
-              score.composer
-                ? this.escapeHtml(score.composer)
-                : 'Unknown composer'
-            }${score.school ? ` · ${SCHOOLS[score.school]}` : ''}
+            ${this.escapeHtml(composerLine(score.composer, score.school))}
           </p>
 
           ${
