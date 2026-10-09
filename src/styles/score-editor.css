@@ -33,6 +33,7 @@
 .save-status {
   font-size: var(--font-size-small);
   color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 /* ---- Status line ----
@@ -149,9 +150,28 @@
     transition-timing-function: var(--ease-snap);
   }
 
-  /* Set once the cursor has rested for a moment */
+  /* Each fades in as it appears from the other, done a third of the way into
+     the move. Runs whenever it is shown, as being hidden takes it out of
+     the layout */
+  .score-highlight,
+  .score-cursor {
+    animation: score-selection-appear calc(var(--transition-fast) / 3)
+      var(--ease-out);
+  }
+
+  /* Set once the cursor has rested for a moment. The fade is kept in the
+     list, so that dropping the blink when the cursor moves doesn't start the
+     fade again */
   .score-cursor[data-idle] {
-    animation: score-cursor-blink var(--transition-x-slow) ease-in-out infinite;
+    animation:
+      score-selection-appear calc(var(--transition-fast) / 3) var(--ease-out),
+      score-cursor-blink var(--transition-x-slow) ease-in-out infinite;
+  }
+}
+
+@keyframes score-selection-appear {
+  from {
+    opacity: 0;
   }
 }
 

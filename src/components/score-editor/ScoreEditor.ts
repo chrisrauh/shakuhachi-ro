@@ -23,6 +23,12 @@ import { PalettePanel } from './PalettePanel';
 import { SelectionView } from './SelectionView';
 
 /**
+ * The save status when there are changes to save. One word, so it fits on one
+ * line between ⇄ and Save on a phone.
+ */
+const UNSAVED = 'Unsaved';
+
+/**
  * The score edit page (/score/[slug]/edit). Holds the score being edited — its
  * source text and format, and its details — and saves it. The markup is
  * rendered by edit.astro; the details and the source have their own views.
@@ -207,7 +213,7 @@ export class ScoreEditor {
     this.sourceView.setSource(this.source, this.format);
     if (!this.renderScore()) this.showSource(true);
     this.hasUnsavedChanges = true;
-    this.showSaveStatus('Unsaved changes');
+    this.showSaveStatus(UNSAVED);
   }
 
   private markChanged(): void {
@@ -217,7 +223,7 @@ export class ScoreEditor {
       dataFormat: this.format,
       metadata: this.metadata,
     });
-    this.showSaveStatus('Unsaved changes');
+    this.showSaveStatus(UNSAVED);
   }
 
   private showSaveStatus(text: string): void {

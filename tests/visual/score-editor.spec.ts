@@ -84,6 +84,9 @@ async function tapNote(page: Page, index: number) {
 async function emptyScore(page: Page) {
   await openSource(page);
   await page.click('input[type="radio"][value="json"]');
+  // The conversion loads the converter first. Filling before it is done would
+  // have it overwrite the empty score with the converted one
+  await expect(page.locator('#score-data-input')).toHaveValue(/"notes"/);
   await page
     .locator('#score-data-input')
     .fill('{"title": "", "style": "kinko", "notes": []}');
