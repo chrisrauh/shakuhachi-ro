@@ -67,6 +67,7 @@ export class ScoreEditor {
     this.metadata = {
       title: score.title,
       composer: score.composer ?? '',
+      school: score.school,
       description: score.description ?? '',
       license: score.license,
     };
@@ -262,6 +263,7 @@ export class ScoreEditor {
         ...content,
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
+        school: this.metadata.school,
         description: this.metadata.description || undefined,
       };
       // Only when changed. Naming the column at all fires the fork-licence

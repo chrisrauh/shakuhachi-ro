@@ -1,5 +1,6 @@
 import type { ScoreMetadata } from '../../utils/editor-autosave';
 import type { ScoreLicense } from '../../utils/license';
+import type { School } from '../../utils/school';
 import { licenseDescriptionHTML } from './license-description';
 
 type MetadataChange = <K extends keyof ScoreMetadata>(
@@ -15,6 +16,7 @@ export class DetailsDialog {
   private dialog: HTMLDialogElement;
   private title: HTMLInputElement;
   private composer: HTMLInputElement;
+  private school: HTMLSelectElement;
   private description: HTMLTextAreaElement;
   private licenseSelect: HTMLSelectElement | null;
 
@@ -22,6 +24,7 @@ export class DetailsDialog {
     this.dialog = byId<HTMLDialogElement>('details-dialog');
     this.title = byId<HTMLInputElement>('title-input');
     this.composer = byId<HTMLInputElement>('composer-input');
+    this.school = byId<HTMLSelectElement>('school-select');
     this.description = byId<HTMLTextAreaElement>('description-input');
     // Absent when the licence is fixed by the score this was forked from
     this.licenseSelect = document.getElementById(
@@ -33,6 +36,9 @@ export class DetailsDialog {
     );
     this.composer.addEventListener('input', () =>
       onChange('composer', this.composer.value),
+    );
+    this.school.addEventListener('change', () =>
+      onChange('school', (this.school.value as School) || null),
     );
     this.description.addEventListener('input', () =>
       onChange('description', this.description.value),
@@ -58,6 +64,7 @@ export class DetailsDialog {
   setMetadata(metadata: ScoreMetadata): void {
     this.title.value = metadata.title;
     this.composer.value = metadata.composer;
+    this.school.value = metadata.school ?? '';
     this.description.value = metadata.description;
     if (this.licenseSelect && this.licenseSelect.value !== metadata.license) {
       this.licenseSelect.value = metadata.license;

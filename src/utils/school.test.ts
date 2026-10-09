@@ -1,0 +1,17 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { SCHOOLS } from './school';
+
+describe('SCHOOLS', () => {
+  // A key the enum lacks is rejected on save; a value the map lacks has no name.
+  it('has exactly the keys of the database enum', () => {
+    const migration = readFileSync(
+      'database/migrations/add_school_to_scores.sql',
+      'utf8',
+    );
+    const enumBody = migration.match(/create type school as enum \(([^)]*)\)/);
+    const keys = [...enumBody![1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]);
+
+    expect(Object.keys(SCHOOLS).sort()).toEqual(keys.sort());
+  });
+});
