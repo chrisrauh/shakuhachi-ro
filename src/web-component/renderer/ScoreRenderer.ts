@@ -24,7 +24,6 @@ import {
 } from './RenderOptions';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
-import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import {
   meriKariReachLeft,
   octaveMarkReachRight,
@@ -192,31 +191,20 @@ export class ScoreRenderer {
         const x = columnInfo.xPosition;
         const y = notePosition.y;
 
-        // Set note styling and position
+        // Set note styling
         note.setFontSize(this.options.noteFontSize);
         note.setFontWeight(this.options.noteFontWeight);
         note.setFontFamily(this.options.noteFontFamily);
-        note.setPosition(x, y);
-        this.fitDurationLines(note, notePosition.nextY - y);
-        note.render(renderer);
+        note.render(renderer, x, y, {
+          distanceToNext: notePosition.nextY - y,
+          noteFontSize: this.options.noteFontSize,
+        });
 
         // Render debug label if enabled
         if (this.options.showDebugLabels) {
           this.renderDebugLabel(renderer, note, notePosition.noteIndex, x, y);
         }
       });
-    });
-  }
-
-  /**
-   * Sizes a note's duration lines from its layout position so consecutive
-   * segments meet, whatever the spacing (dotted notes, custom options)
-   */
-  private fitDurationLines(note: ShakuNote, distanceToNext: number): void {
-    note.getModifiers().forEach((mod) => {
-      if (mod instanceof DurationLineModifier) {
-        mod.fitToLayout(distanceToNext, this.options.noteFontSize);
-      }
     });
   }
 

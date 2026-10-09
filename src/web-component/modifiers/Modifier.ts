@@ -16,6 +16,21 @@ import type { RenderingBackend } from '../renderer/RenderingBackend';
 export type ModifierPosition = 'above' | 'below' | 'left' | 'right';
 
 /**
+ * Where a note sits in the laid-out score, for modifiers whose size depends
+ * on it (a duration line runs to the next note). Known only once the notes
+ * are placed, so it's passed when drawing rather than stored on the modifier.
+ */
+export interface ModifierLayout {
+  /**
+   * Distance from this note's baseline to the next note's, including any
+   * extra spacing after a dotted note
+   */
+  distanceToNext: number;
+  /** Font size of the note glyph */
+  noteFontSize: number;
+}
+
+/**
  * Abstract base class for all modifiers
  *
  * Following VexFlow's pattern:
@@ -47,11 +62,13 @@ export abstract class Modifier {
    * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note
    * @param noteY - Y coordinate of the note (baseline)
+   * @param layout - Where the note sits in the score
    */
   abstract render(
     renderer: RenderingBackend,
     noteX: number,
     noteY: number,
+    layout: ModifierLayout,
   ): void;
 
   /**
@@ -96,10 +113,9 @@ export abstract class Modifier {
   }
 
   /**
-   * Optional: Calculate height needed by this modifier
-   * Can be used for layout calculations
+   * Height needed by this modifier, for the note's bounding box
+   *
+   * @param layout - Where the note sits in the score
    */
-  getHeight(): number {
-    return 0;
-  }
+  abstract getHeight(layout: ModifierLayout): number;
 }

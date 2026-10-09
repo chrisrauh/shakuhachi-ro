@@ -9,7 +9,7 @@
  */
 
 import type { RenderingBackend } from '../renderer/RenderingBackend';
-import type { Modifier } from '../modifiers/Modifier';
+import type { Modifier, ModifierLayout } from '../modifiers/Modifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import {
   getSymbolByRomaji,
@@ -61,12 +61,6 @@ export interface ShakuNoteOptions {
   /** Symbol identifier (romaji like 'ro', 'tsu') or kana ('ロ', 'ツ') */
   symbol: string;
 
-  /** X coordinate for rendering */
-  x?: number;
-
-  /** Y coordinate for rendering (baseline) */
-  y?: number;
-
   /** Duration for spacing (default: 'q' = quarter note) */
   duration?: NoteDuration;
 
@@ -106,10 +100,10 @@ export class ShakuNote {
   /** Symbol metadata from kinkoMap */
   private symbolInfo: KinkoSymbol | undefined;
 
-  /** X position */
+  /** X position where the note was last drawn, (0, 0) until then */
   private x: number = 0;
 
-  /** Y position (baseline) */
+  /** Y position (baseline) where the note was last drawn */
   private y: number = 0;
 
   /** Duration for spacing */
@@ -130,6 +124,13 @@ export class ShakuNote {
   /** Attached modifiers */
   private modifiers: Modifier[] = [];
 
+  /**
+   * Where the note sat in the score when last drawn, which sizes some of its
+   * modifiers in the bounding box. Default spacing until then, as the
+   * position is (0, 0) until set.
+   */
+  private layout: ModifierLayout;
+
   /** Cached bounding box */
   private bbox: BoundingBox | null = null;
 
@@ -146,8 +147,6 @@ export class ShakuNote {
     // Use kana from symbol info if available, otherwise use provided symbol
     this.kana = this.symbolInfo?.kana || options.symbol;
 
-    this.x = options.x ?? 0;
-    this.y = options.y ?? 0;
     this.duration = options.duration ?? 'q';
     this.fontSize = options.fontSize ?? 32;
     this.fontWeight = options.fontWeight ?? 400;
@@ -155,6 +154,10 @@ export class ShakuNote {
       options.fontFamily ?? DEFAULT_RENDER_OPTIONS.noteFontFamily;
     this.color = options.color ?? '#000';
     this.isRest = options.isRest ?? false;
+    this.layout = {
+      distanceToNext: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+      noteFontSize: this.fontSize,
+    };
 
     if (options.modifiers) {
       this.modifiers = [...options.modifiers];
@@ -165,8 +168,20 @@ export class ShakuNote {
    * Renders the note and all its modifiers
    *
    * @param renderer - Backend to draw with
+   * @param x - X coordinate of the note centre
+   * @param y - Y coordinate of the note baseline
+   * @param layout - Where the note sits in the score, for its modifiers
    */
-  render(renderer: RenderingBackend): void {
+  render(
+    renderer: RenderingBackend,
+    x: number,
+    y: number,
+    layout: ModifierLayout,
+  ): void {
+    // Kept for getPosition() and getBBox() after drawing
+    this.x = x;
+    this.y = y;
+    this.layout = layout;
     if (this.isRest) {
       // Draw rest as a small hollow circle
       // Radius is about 1/8 of fontSize (for fontSize 32, radius ~4px)
@@ -201,7 +216,7 @@ export class ShakuNote {
 
     // Render all modifiers
     this.modifiers.forEach((modifier) => {
-      modifier.render(renderer, this.x, this.y);
+      modifier.render(renderer, this.x, this.y, layout);
     });
 
     // Invalidate cached bbox after rendering
@@ -274,18 +289,7 @@ export class ShakuNote {
   }
 
   /**
-   * Sets the position of this note
-   * @returns this for chaining
-   */
-  setPosition(x: number, y: number): this {
-    this.x = x;
-    this.y = y;
-    this.bbox = null;
-    return this;
-  }
-
-  /**
-   * Gets the current position
+   * Where the note was last drawn
    */
   getPosition(): { x: number; y: number } {
     return { x: this.x, y: this.y };
@@ -346,7 +350,7 @@ export class ShakuNote {
     this.modifiers.forEach((modifier) => {
       const modOffset = modifier.getOffset();
       const modWidth = modifier.getWidth();
-      const modHeight = modifier.getHeight();
+      const modHeight = modifier.getHeight(this.layout);
 
       const modX = this.x + modOffset.x;
       const modY = this.y + modOffset.y;

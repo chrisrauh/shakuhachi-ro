@@ -92,7 +92,7 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 2. Parse    ScoreParser.parse() → ShakuNote[]
 3. Configure ModifierConfigurator.configureModifiers()
 4. Layout   ColumnLayoutCalculator.calculateLayout()
-5. Render   For each note: note.setPosition() → note.render(svgRenderer)
+5. Render   For each note: note.render(svgRenderer, x, y, layout)
 ```
 
 ## Core Principles

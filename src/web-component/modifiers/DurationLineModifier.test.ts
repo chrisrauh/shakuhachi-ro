@@ -4,13 +4,23 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { DurationLineModifier } from './DurationLineModifier';
-import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
+import type { ModifierLayout } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 
+const DEFAULT_LAYOUT: ModifierLayout = { distanceToNext: 44, noteFontSize: 36 };
+
 /** Renders the modifier at (100, 200) and returns each drawLine call */
-function drawnLines(modifier: DurationLineModifier) {
+function drawnLines(
+  modifier: DurationLineModifier,
+  layout: ModifierLayout = DEFAULT_LAYOUT,
+) {
   const drawLine = vi.fn();
-  modifier.render({ drawLine } as unknown as RenderingBackend, 100, 200);
+  modifier.render(
+    { drawLine } as unknown as RenderingBackend,
+    100,
+    200,
+    layout,
+  );
   return drawLine.mock.calls.map(([x1, y1, x2, y2, , width]) => ({
     x1,
     y1,
@@ -41,10 +51,13 @@ describe('DurationLineModifier', () => {
     expect(modifier.getWidth()).toBe(0);
   });
 
-  it('runs a non-last segment exactly to the next note once fitted to the layout', () => {
-    const modifier = new DurationLineModifier(1).fitToLayout(57, 36);
+  it('runs a non-last segment exactly to the next note', () => {
+    const modifier = new DurationLineModifier(1);
 
-    const [line] = drawnLines(modifier);
+    const [line] = drawnLines(modifier, {
+      distanceToNext: 57,
+      noteFontSize: 36,
+    });
 
     // The next note's segment starts 57 lower, so the two meet without a gap
     // or an overlap.
@@ -52,11 +65,16 @@ describe('DurationLineModifier', () => {
   });
 
   it('ends the last segment in a sequence at the note, whatever the distance to the next', () => {
-    const near = new DurationLineModifier(1, true).fitToLayout(40, 36);
-    const far = new DurationLineModifier(1, true).fitToLayout(90, 36);
+    const last = new DurationLineModifier(1, true);
 
-    const [nearLine] = drawnLines(near);
-    const [farLine] = drawnLines(far);
+    const [nearLine] = drawnLines(last, {
+      distanceToNext: 40,
+      noteFontSize: 36,
+    });
+    const [farLine] = drawnLines(last, {
+      distanceToNext: 90,
+      noteFontSize: 36,
+    });
 
     expect(nearLine.y2).toBe(farLine.y2);
     // Ends above the baseline, inside the note glyph
@@ -64,14 +82,15 @@ describe('DurationLineModifier', () => {
     expect(nearLine.y2).toBeGreaterThan(200 - 36);
   });
 
-  it('assumes the default note spacing when fitToLayout() was never called', () => {
-    const unfitted = new DurationLineModifier(1);
-    const fitted = new DurationLineModifier(1).fitToLayout(
-      DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
-      DEFAULT_RENDER_OPTIONS.noteFontSize,
-    );
+  // Its height in the note's bounding box is the line it draws, so the box
+  // follows the layout too (a dotted note's line runs further)
+  it('takes the height of the line it draws for the layout', () => {
+    const modifier = new DurationLineModifier(1);
+    const layout = { distanceToNext: 57, noteFontSize: 36 };
 
-    expect(drawnLines(unfitted)).toEqual(drawnLines(fitted));
+    const [line] = drawnLines(modifier, layout);
+
+    expect(modifier.getHeight(layout)).toBe(line.y2 - line.y1);
   });
 
   it('draws with the line width and spacing set on it', () => {

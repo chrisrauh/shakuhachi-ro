@@ -13,9 +13,8 @@
  * Following VexFlow's Modifier pattern - positions itself relative to note.
  */
 
-import { Modifier } from './Modifier';
+import { Modifier, type ModifierLayout } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
-import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 
 /**
  * Where a duration line meets a note, as a fraction of the font size above the
@@ -33,14 +32,6 @@ export class DurationLineModifier extends Modifier {
 
   /** Whether this is the last note in a continuous duration line sequence */
   private lastInSequence: boolean;
-
-  /**
-   * Length of line extending downward.
-   * - For last note in sequence: ends at middle of current note
-   * - For non-last notes: extends to the start of the next note's segment
-   *   to create a continuous line
-   */
-  private lineLength: number;
 
   /** Horizontal spacing between multiple lines (when lineCount > 1) */
   private lineSpacing: number = 8;
@@ -68,37 +59,18 @@ export class DurationLineModifier extends Modifier {
 
     this.lastInSequence = isLastInSequence;
     this.setDefaultOffsets();
-
-    // Default length assumes the default note spacing; fitToLayout() replaces
-    // it with the actual distance once note positions are known.
-    this.lineLength = this.computeLineLength(
-      DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
-      DEFAULT_RENDER_OPTIONS.noteFontSize,
-    );
   }
 
   /**
-   * Sizes the line from the actual layout.
+   * Length of the line extending downward, from the layout.
    *
-   * A non-last segment runs exactly the distance to the next note, where the
-   * next segment starts (both share the same offsetY), so consecutive
-   * segments meet without a gap. They must not overlap either: overlapping
-   * segments cause anti-aliasing artifacts (visible as two colors on the line
-   * in dark mode).
-   *
-   * @param distanceToNext - Distance from this note's baseline to the next
-   *   note's baseline, including any extra spacing after a dotted note
-   * @param noteFontSize - Font size of the note glyph
+   * The last segment in a sequence ends at the middle of its note. Any other
+   * runs exactly the distance to the next note, where the next segment starts
+   * (both share the same offsetY), so consecutive segments meet without a
+   * gap. They must not overlap either: overlapping segments cause
+   * anti-aliasing artifacts (visible as two colors on the line in dark mode).
    */
-  fitToLayout(distanceToNext: number, noteFontSize: number): this {
-    this.lineLength = this.computeLineLength(distanceToNext, noteFontSize);
-    return this;
-  }
-
-  private computeLineLength(
-    distanceToNext: number,
-    noteFontSize: number,
-  ): number {
+  private lineLength({ distanceToNext, noteFontSize }: ModifierLayout): number {
     if (this.lastInSequence) {
       // Last note: line ends at the vertical middle of the current note
       const verticalMiddleOfCurrentNote =
@@ -133,10 +105,17 @@ export class DurationLineModifier extends Modifier {
    * @param renderer - Backend to draw with
    * @param noteX - X coordinate of the note center
    * @param noteY - Y coordinate of the note baseline
+   * @param layout - Where the note sits in the score, which sets the length
    */
-  render(renderer: RenderingBackend, noteX: number, noteY: number): void {
+  render(
+    renderer: RenderingBackend,
+    noteX: number,
+    noteY: number,
+    layout: ModifierLayout,
+  ): void {
     const startX = noteX + this.offsetX;
     const startY = noteY + this.offsetY;
+    const lineLength = this.lineLength(layout);
 
     // Draw each line (multiple lines side-by-side for eighth notes, etc.)
     for (let i = 0; i < this.lineCount; i++) {
@@ -148,19 +127,11 @@ export class DurationLineModifier extends Modifier {
         startX + lineXOffset,
         startY,
         startX + lineXOffset,
-        startY + this.lineLength,
+        startY + lineLength,
         this.color,
         this.lineWidth,
       );
     }
-  }
-
-  /**
-   * Sets the length of the line extending downward
-   */
-  setLineLength(length: number): this {
-    this.lineLength = length;
-    return this;
   }
 
   /**
@@ -198,8 +169,8 @@ export class DurationLineModifier extends Modifier {
   /**
    * Gets the height occupied by this modifier (length of vertical line)
    */
-  getHeight(): number {
-    return this.lineLength;
+  getHeight(layout: ModifierLayout): number {
+    return this.lineLength(layout);
   }
 
   /**

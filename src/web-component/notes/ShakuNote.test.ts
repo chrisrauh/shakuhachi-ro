@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { ShakuNote } from './ShakuNote';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import { DurationLineModifier } from '../modifiers/DurationLineModifier';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 
@@ -33,9 +34,12 @@ describe('ShakuNote', () => {
   describe('render', () => {
     function drawnText(symbol: string) {
       const drawText = vi.fn();
-      new ShakuNote({ symbol, x: 100, y: 200 }).render({
-        drawText,
-      } as unknown as RenderingBackend);
+      new ShakuNote({ symbol }).render(
+        { drawText } as unknown as RenderingBackend,
+        100,
+        200,
+        { distanceToNext: 44, noteFontSize: 32 },
+      );
       return drawText.mock.calls.map(([text, x, y, size]) => ({
         text,
         x,
@@ -61,6 +65,40 @@ describe('ShakuNote', () => {
       expect(numerals[2].y).toBe(200);
       expect(numerals[0].y).toBeLessThan(numerals[1].y);
       expect(numerals[1].y).toBeLessThan(numerals[2].y);
+    });
+  });
+
+  describe('getBBox', () => {
+    const backend = {
+      drawText: vi.fn(),
+      drawLine: vi.fn(),
+    } as unknown as RenderingBackend;
+
+    it('is where the note was last drawn', () => {
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.render(backend, 100, 200, { distanceToNext: 44, noteFontSize: 32 });
+      note.render(backend, 300, 400, { distanceToNext: 44, noteFontSize: 32 });
+
+      const box = note.getBBox();
+
+      expect(note.getPosition()).toEqual({ x: 300, y: 400 });
+      expect(box.x + box.width / 2).toBe(300);
+      expect(box.y + box.height).toBe(400);
+    });
+
+    // A duration line runs to the next note, so the box spans the line drawn
+    // in the layout the note was last rendered in
+    it('sizes its duration line from the layout it was last rendered in', () => {
+      const boxHeight = (distanceToNext: number) => {
+        const note = new ShakuNote({
+          symbol: 'ro',
+          modifiers: [new DurationLineModifier(1)],
+        });
+        note.render(backend, 100, 200, { distanceToNext, noteFontSize: 32 });
+        return note.getBBox().height;
+      };
+
+      expect(boxHeight(80)).toBeGreaterThan(boxHeight(44));
     });
   });
 });
