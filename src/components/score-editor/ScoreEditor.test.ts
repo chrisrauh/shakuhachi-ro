@@ -189,7 +189,7 @@ describe('ScoreEditor score and source', () => {
     expect(renderedScore()).toEqual(TWO_NOTES);
     expect($('score-empty-hint').hidden).toBe(true);
     expect($('palette-panel').hidden).toBe(false);
-    expect($('save-status').textContent).toBe('Unsaved changes');
+    expect($('save-status').textContent).toBe('Unsaved');
   });
 
   it('keeps the last readable score, and says why, when the source is invalid', () => {
@@ -279,6 +279,22 @@ describe('ScoreEditor selection', () => {
     press('ArrowUp');
     press('ArrowUp');
     expect(status()).toBe('Inserting at the start · of 2');
+  });
+
+  it('keeps whichever is hidden on the same note, so switching on one note does not move it', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+
+    // The cursor is after the second note: the hidden highlight is around it
+    expect($('score-highlight').style.top).toBe('49px');
+    press('ArrowUp');
+    expect($('score-highlight').style.top).toBe('5px');
+
+    // The highlight is on the first note: the hidden cursor is on its bottom
+    // edge, where Esc puts it
+    tap(70, 20);
+    expect($('score-cursor').style.top).toBe('47px');
+    press('Escape');
+    expect($('score-cursor').style.top).toBe('47px');
   });
 
   it('leaves keys typed in a text field alone', () => {
@@ -384,7 +400,7 @@ describe('ScoreEditor.save', () => {
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining('DB fail'),
     );
-    expect($('save-status').textContent).toBe('Unsaved changes');
+    expect($('save-status').textContent).toBe('Unsaved');
     expect($('save-btn').querySelector('.btn-text')?.textContent).toBe('Save');
   });
 });
@@ -449,6 +465,6 @@ describe('ScoreEditor draft restore', () => {
     expect($<HTMLInputElement>('title-input').value).toBe('Draft title');
     expect($<HTMLSelectElement>('license-select').value).toBe('CC0-1.0');
     expect(renderedScore()).toEqual(TWO_NOTES);
-    expect($('save-status').textContent).toBe('Unsaved changes');
+    expect($('save-status').textContent).toBe('Unsaved');
   });
 });

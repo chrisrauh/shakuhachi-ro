@@ -14,9 +14,6 @@ interface ScoreElement extends HTMLElement {
   getNoteBoxes(): NoteBox[];
 }
 
-/** Where an empty score's cursor goes, unused when there are notes. */
-const NO_NOTES = { x: 0, y: 0 };
-
 /** The cursor starts blinking this long after it last moved. */
 const CURSOR_IDLE_DELAY = 700;
 
@@ -93,34 +90,43 @@ export class SelectionView {
 
     this.highlight.hidden = selection.type !== 'highlight';
     this.cursor.hidden = selection.type !== 'cursor';
+    // Reading a size has the browser style whichever was just shown where it
+    // was parked while hidden, so that it moves from there to its new place
+    const empty = {
+      x: this.canvas.offsetWidth / 2,
+      y: this.canvas.offsetHeight / 2,
+    };
+
+    // Each parks the other where it would be on the same note: the cursor on
+    // the highlight's bottom edge, the highlight around the note the cursor
+    // is after (or before, at the start). Switching between them on one note
+    // then doesn't move, and to another note moves from this one.
     if (selection.type === 'highlight') {
-      // The renderer sizes the cell, the same for every note
-      const { x, y, width, height } = boxes[selection.index].cell;
-      place(this.highlight, { left: x, top: y, width });
-      this.highlight.style.height = `${height}px`;
-      top = y;
-      bottom = y + height;
-      // Park the hidden cursor where it goes after this note, on the
-      // highlight's bottom edge, so that it moves from there when it replaces
-      // the highlight, and doesn't move at all when it's after this note
-      place(this.cursor, cursorLine(boxes, selection.index + 1, NO_NOTES));
+      const { cell } = boxes[selection.index];
+      this.placeHighlight(cell);
+      top = cell.y;
+      bottom = cell.y + cell.height;
+      place(this.cursor, cursorLine(boxes, selection.index + 1, empty));
     } else {
-      // Reading the size has the browser style the cursor, now shown, where it
-      // was parked, so that it moves to the line from there
-      const line = cursorLine(boxes, selection.position, {
-        x: this.canvas.offsetWidth / 2,
-        y: this.canvas.offsetHeight / 2,
-      });
+      const line = cursorLine(boxes, selection.position, empty);
       place(this.cursor, line);
       this.restartBlink();
       top = line.top;
       bottom = line.top;
+      const note = boxes[selection.position - 1] ?? boxes[selection.position];
+      if (note) this.placeHighlight(note.cell);
     }
 
     const { mode, detail } = describeSelection(this.notes, selection);
     this.statusMode.textContent = mode;
     this.statusDetail.textContent = detail;
     this.keepInView(top, bottom);
+  }
+
+  /** Puts the highlight on a note's cell, which the renderer sizes. */
+  private placeHighlight(cell: NoteBox['cell']): void {
+    place(this.highlight, { left: cell.x, top: cell.y, width: cell.width });
+    this.highlight.style.height = `${cell.height}px`;
   }
 
   /** The cursor stays solid while it moves, and blinks once it rests. */
