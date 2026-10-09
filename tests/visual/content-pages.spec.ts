@@ -12,15 +12,29 @@
 
 import { test, expect, type Page } from '@playwright/test';
 
-import { setTheme } from './helpers';
+import { setTheme, waitForScoreRendered } from './helpers';
 
 async function waitForStaticPage(page: Page) {
   await page.waitForLoadState('load');
   await page.waitForSelector('main');
 }
 
+/**
+ * The about page's live score, and the handwriting its annotation is written
+ * in. Caveat swaps in once it arrives, and a screenshot taken before then
+ * shows a fallback font, two pixels shorter. Loading it by name waits for it;
+ * it resolves with no faces if Caveat isn't declared, rather than passing.
+ */
+async function waitForAboutPage(page: Page) {
+  await waitForScoreRendered(page);
+  const loaded = await page.evaluate(
+    async () => (await document.fonts.load('28px Caveat')).length,
+  );
+  expect(loaded, 'Caveat, the annotation font, loaded').toBeGreaterThan(0);
+}
+
 const pages = [
-  { name: 'about', path: '/about' },
+  { name: 'about', path: '/about', waitFor: waitForAboutPage },
   { name: 'ai', path: '/ai' },
 ];
 
@@ -46,6 +60,7 @@ test.describe('Content Pages Visual Regression', () => {
 
           await page.goto(pageConfig.path);
           await waitForStaticPage(page);
+          await pageConfig.waitFor?.(page);
           await setTheme(page, theme);
 
           await expect(page).toHaveScreenshot(screenshotName, {
