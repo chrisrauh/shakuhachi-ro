@@ -1,93 +1,105 @@
 /**
- * Loading spinner utility for button/link elements
+ * Loading spinners: dots struck like notes, each snapping bright and growing
+ * a little, then fading. They are timed the way a person plays, not like a
+ * metronome: every hit lands a little early or late.
+ *
+ * - Standard (`buildSpinnerSVG`): three dots struck left to right, then a
+ *   beat's rest. For a page or section that is loading.
+ * - Compact (`buildCompactSpinnerSVG`): one dot struck every two beats. For
+ *   buttons, through `ButtonLoadingState`.
+ *
+ * The SVG fixes only the proportions. Its size comes from CSS (`.spinner` in
+ * components.css), so it can differ between desktop and mobile.
  *
  * Usage:
  *   const loadingState = new ButtonLoadingState(button);
- *   loadingState.show();   // Replace content with spinner
- *   loadingState.hide();   // Restore original content
+ *   loadingState.show();   // Lay the compact spinner over the content
+ *   loadingState.hide();   // Restore the content
  */
 
-export interface SpinnerParams {
-  r?: number;
-  gap?: number;
-  strokeWidth?: number;
-  stepDuration?: number; // duration of each of the 8 fingering positions (seconds)
-  fadeIn?: number; // hole-closing transition duration (seconds)
-  fadeOut?: number; // hole-opening transition duration (seconds)
+const BEAT = 0.36; // seconds from one hit to the next
+const ATTACK = 0.06; // seconds a hit takes to reach full strength
+const DECAY = 0.7; // seconds a hit takes to fade
+const LOOSENESS = 0.1; // how far a hit may land early or late, in beats
+const PASSES = 4; // passes written out, each timed differently, before the animation repeats
+const REST_OPACITY = 0.2;
+const SWELL = 1.25; // how much a dot grows when it is hit
+
+// Each spinner's SVG styles are global to the page, and every spinner is timed
+// differently, so each one names its classes and keyframes uniquely
+let nextId = 0;
+
+/**
+ * When each dot is hit, in beats: the dots in turn from left to right, then a
+ * beat's rest, played PASSES times. Every hit, and the length of every rest,
+ * is nudged by up to LOOSENESS.
+ */
+export function humanHits(
+  dots: number,
+  random: () => number,
+): { hits: number[][]; length: number } {
+  const nudge = () => (random() * 2 - 1) * LOOSENESS;
+  const hits: number[][] = Array.from({ length: dots }, () => []);
+  let t = 0;
+  for (let pass = 0; pass < PASSES; pass++) {
+    for (let dot = 0; dot < dots; dot++) {
+      hits[dot].push(Math.max(0, t + dot + nudge()));
+    }
+    t += dots + 1 + nudge();
+  }
+  return { hits, length: t };
 }
 
-// Animation: Ri→Chi→Re→Tsu→Ro→Tsu→Re→Chi→Ri (8 equal steps, no pauses)
-// H5 (thumb): always closed, static. H4–H1: animated via fill-opacity.
-// Fingerings (top→bottom H5,H4,H3,H2,H1): ●=closed, ○=open
-//   Ri:  ●○○●●
-//   Chi: ●●○○○
-//   Re:  ●●●○○
-//   Tsu: ●●●●○
-//   Ro:  ●●●●●
-export function buildSpinnerSVG({
-  r = 8,
-  gap = 8,
-  strokeWidth = 0,
-  stepDuration = 0.5,
-  fadeIn = 0.5,
-  fadeOut = 0.5,
-}: SpinnerParams = {}): string {
-  const d = r * 2;
-  const step = d + gap;
-  const h = d + step * 4;
-  const total = stepDuration * 8;
-  const fi = fadeIn / total;
-  const fo = fadeOut / total;
-  const p = (v: number) => `${+(v * 100).toFixed(3)}%`;
-  const [t1, t2, t3, t4, t5, t6, t7] = [1, 2, 3, 4, 5, 6, 7].map((n) => n / 8);
-  const dur = `${total}s`;
-  const cy = (i: number) => r + step * i;
+const pct = (seconds: number, cycle: number) =>
+  `${+((seconds / cycle) * 100).toFixed(3)}%`;
 
-  // fi = fade-in fraction (hole closing: fill-opacity 0→1)
-  // fo = fade-out fraction (hole opening: fill-opacity 1→0)
-  const style =
-    `@keyframes sh-h4{0%,${p(t1)}{fill-opacity:0}${p(t1 + fi)}{fill-opacity:1}${p(1 - fo)}{fill-opacity:1}100%{fill-opacity:0}}` +
-    `@keyframes sh-h3{0%,${p(t2)}{fill-opacity:0}${p(t2 + fi)}{fill-opacity:1}${p(t7)}{fill-opacity:1}${p(t7 + fo)},100%{fill-opacity:0}}` +
-    `@keyframes sh-h2{0%,${p(t1)}{fill-opacity:1}${p(t1 + fo)},${p(t3)}{fill-opacity:0}${p(t3 + fi)},${p(t6)}{fill-opacity:1}${p(t6 + fo)},${p(1 - fi)}{fill-opacity:0}100%{fill-opacity:1}}` +
-    `@keyframes sh-h1{0%,${p(t1)}{fill-opacity:1}${p(t1 + fo)},${p(t4)}{fill-opacity:0}${p(t4 + fi)},${p(t5)}{fill-opacity:1}${p(t5 + fo)},${p(1 - fi)}{fill-opacity:0}100%{fill-opacity:1}}` +
-    `.sh-hole{fill:currentColor;stroke:var(--color-border);stroke-width:${strokeWidth}}` +
-    `.sh-h4{fill-opacity:0;animation:sh-h4 ${dur} linear infinite}` +
-    `.sh-h3{fill-opacity:0;animation:sh-h3 ${dur} linear infinite}` +
-    `.sh-h2{animation:sh-h2 ${dur} linear infinite}` +
-    `.sh-h1{animation:sh-h1 ${dur} linear infinite}`;
+/** Keyframes for one dot: each hit snaps up, then fades before the next one */
+function dotKeyframes(name: string, hits: number[], cycle: number): string {
+  const rest = `opacity:${REST_OPACITY};transform:scale(1)`;
+  let frames = hits[0] > 0 ? `0%{${rest}}` : '';
+  hits.forEach((hit, i) => {
+    const next = i + 1 < hits.length ? hits[i + 1] : cycle + hits[0];
+    const fade = Math.min(DECAY, next - hit - ATTACK - 0.02);
+    frames +=
+      `${pct(hit, cycle)}{${rest};animation-timing-function:cubic-bezier(.2,0,.4,1)}` +
+      `${pct(hit + ATTACK, cycle)}{opacity:1;transform:scale(${SWELL});animation-timing-function:cubic-bezier(0,0,.25,1)}` +
+      `${pct(hit + ATTACK + fade, cycle)}{${rest}}`;
+  });
+  return `@keyframes ${name}{${frames}100%{${rest}}}`;
+}
 
+function buildDotsSVG(dots: number, className: string, random: () => number) {
+  const id = `spinner-${nextId++}`;
+  const { hits, length } = humanHits(dots, random);
+  const cycle = length * BEAT;
+  // Dots have a diameter of 2 and a gap of three quarters of a dot
+  const pitch = 3.5;
+  const width = 2 + pitch * (dots - 1);
+
+  let style = `.${id}{fill:currentColor;opacity:${REST_OPACITY};transform-box:fill-box;transform-origin:center}`;
+  let circles = '';
+  for (let dot = 0; dot < dots; dot++) {
+    const seconds = hits[dot].map((beats) => beats * BEAT);
+    style += dotKeyframes(`${id}-${dot}`, seconds, cycle);
+    style += `.${id}-${dot}{animation:${id}-${dot} ${+cycle.toFixed(3)}s linear infinite}`;
+    circles += `<circle class="${id} ${id}-${dot}" cx="${1 + pitch * dot}" cy="1" r="1"/>`;
+  }
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${d}" height="${h}" viewBox="0 0 ${d} ${h}" overflow="visible">` +
-    `<style>${style}</style>` +
-    `<circle class="sh-hole" cx="${r}" cy="${cy(0)}" r="${r}"/>` +
-    `<circle class="sh-hole sh-h4" cx="${r}" cy="${cy(1)}" r="${r}"/>` +
-    `<circle class="sh-hole sh-h3" cx="${r}" cy="${cy(2)}" r="${r}"/>` +
-    `<circle class="sh-hole sh-h2" cx="${r}" cy="${cy(3)}" r="${r}"/>` +
-    `<circle class="sh-hole sh-h1" cx="${r}" cy="${cy(4)}" r="${r}"/>` +
-    `</svg>`
+    `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" viewBox="0 0 ${width} 2" overflow="visible" aria-hidden="true">` +
+    `<style>${style}</style>${circles}</svg>`
   );
 }
 
-export function buildButtonSpinnerSVG({
-  r = 6,
-  strokeWidth = 0,
-  stepDuration = 0.65,
-}: SpinnerParams = {}): string {
-  const d = r * 2;
-  const dur = `${stepDuration * 2}s`;
-  const style =
-    `@keyframes sh-pulse{0%,100%{opacity:0.15}50%{opacity:1}}` +
-    `.sh-pulse{fill:currentColor;stroke:var(--color-border);stroke-width:${strokeWidth};animation:sh-pulse ${dur} ease-in-out infinite}`;
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${d}" height="${d}" viewBox="0 0 ${d} ${d}">` +
-    `<style>${style}</style>` +
-    `<circle class="sh-pulse" cx="${r}" cy="${r}" r="${r}"/>` +
-    `</svg>`
-  );
+/** The standard spinner: three dots, for a page or section that is loading */
+export function buildSpinnerSVG(random: () => number = Math.random): string {
+  return buildDotsSVG(3, 'spinner', random);
 }
 
-export function createSpinnerSVG(): string {
-  return buildButtonSpinnerSVG();
+/** The compact spinner: one dot, for buttons */
+export function buildCompactSpinnerSVG(
+  random: () => number = Math.random,
+): string {
+  return buildDotsSVG(1, 'spinner spinner-compact', random);
 }
 
 /**
@@ -119,7 +131,7 @@ export class ButtonLoadingState {
       this.spinner = document.createElement('span');
       this.spinner.className = 'btn-spinner';
       this.spinner.setAttribute('aria-hidden', 'true');
-      this.spinner.innerHTML = createSpinnerSVG();
+      this.spinner.innerHTML = buildCompactSpinnerSVG();
       // First child, so the `.btn-spinner ~ *` rule hides everything after it
       this.button.prepend(this.spinner);
     }

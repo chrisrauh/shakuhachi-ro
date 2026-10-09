@@ -709,6 +709,8 @@
   --size-editor-cursor: 0.125rem; /* 2px - thickness of the score editor's cursor line */
   --size-dialog-max-width: 400px;
   --size-dialog-button-min-width: 80px;
+  --size-spinner-dot: 0.625rem; /* 10px - dot of the standard spinner, shown while a page or section loads */
+  --size-spinner-compact-dot: 0.5rem; /* 8px - dot of the compact spinner, shown in buttons */
 
   /* ============================================
      LOGO
@@ -898,6 +900,12 @@
   --z-index-dropdown: 900;
   --z-index-toast: 950;
   --z-index-tooltip: 1000;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --size-spinner-dot: 0.5rem; /* 8px */
+  }
 }
 
 /* ============================================
