@@ -13,7 +13,11 @@
  * - Broken rhythm: A>B dots A and halves B; A<B halves A and dots B
  * - Rests: z (with duration modifiers)
  * - Key: K: sets the accidentals of notes written without one. Without K:,
- *   notes read as written
+ *   notes read as written. A K: line or inline [K:…] in the body changes the
+ *   key from there on
+ * - A unit length change (L:) in the body fails, as lengths after it would
+ *   read wrong. Other fields in the body (w: lyrics, N:, P:, M:, inline
+ *   [P:…]) are skipped
  * - Bar lines: | ends the accidentals written in a bar; not kept in output
  * - Decorations: !name! before a note. One naming a fingering (as our export
  *   writes, e.g. !ri-meri!) chooses it; others are ignored
@@ -86,6 +90,16 @@ export class ABCParser {
           key = trimmed.substring(2).trim();
           inBody = true; // K: field marks end of header
         }
+      } else if (/^[A-Za-z+]:/.test(trimmed)) {
+        // A field in the body. K: changes the key from here on, so it's
+        // kept as the inline field it is equivalent to. L: would change the
+        // length of the notes after it, which isn't read yet. The rest
+        // (lyrics, notes, parts, meter) don't change the notes read
+        if (trimmed.startsWith('K:')) {
+          noteLines.push(`[${trimmed}]`);
+        } else if (trimmed.startsWith('L:')) {
+          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
+        }
       } else {
         noteLines.push(trimmed);
       }
@@ -133,8 +147,10 @@ export class ABCParser {
     // Tokenize: split into note tokens (pitch + optional duration + optional dotted marker)
     // Regex matches: optional accidental + ANY letter (we'll validate later) + optional octave marks + optional duration + optional dotted
     // Examples: "D", "^D2", "d'", "_a/2", "G>", "X", "Q", "z"
+    // Inline fields such as [K:G] come before notes, so their letter isn't
+    // read as one
     const tokenRegex =
-      /(\|)|!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
+      /(\|)|\[([A-Za-z]):([^\]]*)\]|!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
     // Decorations seen since the last note
     let decorations: string[] = [];
     let match: RegExpExecArray | null;
@@ -162,6 +178,8 @@ export class ABCParser {
       const [
         fullMatch,
         barLine,
+        fieldName,
+        fieldValue,
         decoration,
         accidental,
         pitch,
@@ -177,6 +195,24 @@ export class ABCParser {
 
       if (barLine) {
         accidentals.barLine();
+        continue;
+      }
+
+      // Of the inline fields, a key change affects the notes and a unit
+      // length change isn't read yet; the rest are skipped
+      if (fieldName !== undefined) {
+        if (fieldName === 'L') {
+          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
+        }
+        if (fieldName === 'K') {
+          const signature = keySignature(fieldValue);
+          if (!signature) {
+            throw new Error(
+              PARSER_STRINGS.ERRORS.ABCParser.unknownKey(fieldValue.trim()),
+            );
+          }
+          accidentals = new ABCAccidentals(signature);
+        }
         continue;
       }
 
