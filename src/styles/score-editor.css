@@ -35,6 +35,24 @@
   color: var(--color-text-secondary);
 }
 
+/* ---- Status line ----
+   The mode, and where the cursor or highlight is */
+
+.editor-status:not([hidden]) {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-x-small);
+  margin: 0;
+  font-size: var(--font-size-small);
+  color: var(--color-text-tertiary);
+}
+
+.editor-status-mode {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-heading);
+}
+
 /* ---- Workspace ---- */
 
 .editor-workspace {
@@ -77,10 +95,70 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* A tap anywhere in it selects, so all of it is clickable. The score's
+     glyphs are text, which would otherwise show the text cursor, and a tap
+     on one would select it */
+  cursor: pointer;
+  user-select: none;
 }
 
-#score-renderer {
+/* The score, with the cursor and highlight placed over it in its own pixels */
+.editor-score-canvas {
+  position: relative;
   flex: none;
+}
+
+/* Positioned, so it paints over the highlight before it */
+#score-renderer {
+  position: relative;
+}
+
+/* ---- Cursor and highlight ----
+   Placed by SelectionView, which sets their position and size */
+
+.score-highlight:not([hidden]),
+.score-cursor:not([hidden]) {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.score-highlight {
+  border: var(--input-border-width) solid var(--color-input-border-focus);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-bg-primary-brand);
+}
+
+/* A line across the column, as wide as the highlight; its top is the line's
+   centre. The transparent borders keep the line to the straight part of the
+   highlight's edge, clear of its rounded corners, as if it were that edge */
+.score-cursor {
+  height: var(--size-editor-cursor);
+  translate: 0 -50%;
+  border-inline: var(--border-radius-medium) solid transparent;
+  border-radius: var(--border-radius-pill);
+  background: var(--color-input-border-focus);
+  background-clip: padding-box;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .score-highlight,
+  .score-cursor {
+    transition-property: left, top, width, height;
+    transition-duration: var(--transition-fast);
+    transition-timing-function: var(--ease-snap);
+  }
+
+  /* Set once the cursor has rested for a moment */
+  .score-cursor[data-idle] {
+    animation: score-cursor-blink var(--transition-x-slow) ease-in-out infinite;
+  }
+}
+
+@keyframes score-cursor-blink {
+  50% {
+    opacity: 0.2;
+  }
 }
 
 .editor-empty-hint:not([hidden]) {

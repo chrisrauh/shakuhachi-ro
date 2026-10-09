@@ -2,8 +2,9 @@
  * Visual Regression Tests for the Score Editor (/score/[slug]/edit)
  *
  * Coverage:
- * - The score with the palette panel on either side, the source view and the
- *   details dialog
+ * - The score with the palette panel on either side, the cursor (in every
+ *   score screenshot), a highlighted note, an empty score, the source view
+ *   and the details dialog
  * - Desktop (1280x720) and mobile (375x667) viewports, light and dark themes
  * - Validation and format conversion in the source view
  *
@@ -61,6 +62,35 @@ async function movePalettesLeft(page: Page) {
   );
 }
 
+/** Taps a note, the way a viewer does, which highlights it. */
+async function tapNote(page: Page, index: number) {
+  const renderer = page.locator('#score-renderer');
+  const box = await renderer.evaluate(
+    (el, i) =>
+      (
+        el as HTMLElement & {
+          getNoteBoxes(): { centerX: number; y: number; height: number }[];
+        }
+      ).getNoteBoxes()[i],
+    index,
+  );
+  await renderer.click({
+    position: { x: box.centerX, y: box.y + box.height / 2 },
+  });
+  await expect(page.locator('#score-highlight')).toBeVisible();
+}
+
+/** Empties the score through the source view, without saving. */
+async function emptyScore(page: Page) {
+  await openSource(page);
+  await page.click('input[type="radio"][value="json"]');
+  await page
+    .locator('#score-data-input')
+    .fill('{"title": "", "style": "kinko", "notes": []}');
+  await page.click('#source-toggle');
+  await expect(page.locator('#score-empty-hint')).toBeVisible();
+}
+
 async function openDetails(page: Page) {
   await page.click('#details-btn');
   await expect(page.locator('#details-dialog')).toBeVisible();
@@ -89,6 +119,13 @@ test.describe('Score Editor Visual Regression', () => {
       await openEditor(page, 'light');
       await movePalettesLeft(page);
       await expect(page).toHaveScreenshot('desktop-palettes-left-light.png');
+    });
+
+    test('Highlight - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await tapNote(page, 1);
+      await expect(page.locator('#status-mode')).toHaveText('Changing');
+      await expect(page).toHaveScreenshot('desktop-highlight-light.png');
     });
 
     test('Source - light', async ({ page }) => {
@@ -148,6 +185,19 @@ test.describe('Score Editor Visual Regression', () => {
       await openEditor(page, 'dark');
       await movePalettesLeft(page);
       await expect(page).toHaveScreenshot('mobile-palettes-left-dark.png');
+    });
+
+    test('Highlight - dark', async ({ page }) => {
+      await openEditor(page, 'dark');
+      await tapNote(page, 1);
+      await expect(page).toHaveScreenshot('mobile-highlight-dark.png');
+    });
+
+    test('Empty score - light', async ({ page }) => {
+      await openEditor(page, 'light');
+      await emptyScore(page);
+      await expect(page.locator('#status-detail')).toHaveText('empty score');
+      await expect(page).toHaveScreenshot('mobile-empty-light.png');
     });
 
     test('Source - dark', async ({ page }) => {

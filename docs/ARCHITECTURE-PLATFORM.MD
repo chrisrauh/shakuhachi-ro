@@ -37,9 +37,9 @@ SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client in
 
 ### Score Edit Page (`/score/[slug]/edit`)
 
-Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). The page fills the viewport on every screen size (`fullHeightOnMobile`): a toolbar (Details, Source, save status, Save) over the score, rendered in one column, which scrolls inside the page. The source view replaces the score and holds the notation as stored — ABC, JSON or MusicXML — with automatic conversion when switching formats; an unreadable source keeps the last readable render. Title, composer, description and licence live in the details dialog. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Save writes to Supabase and stays on the page. The visual editor (#437) is being built on this page in parts.
+Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). The page fills the viewport on every screen size (`fullHeightOnMobile`): a toolbar (Details, Source, save status, Save) and a status line over the score, rendered in one column, which scrolls inside the page. A cursor between notes or a highlighted note is drawn over the score, moved by taps and the arrow keys; the page places them from where the renderer reports drawing each note (`getNoteBoxes()`). The source view replaces the score and holds the notation as stored — ABC, JSON or MusicXML — with automatic conversion when switching formats; an unreadable source keeps the last readable render. Title, composer, description and licence live in the details dialog. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Save writes to Supabase and stays on the page. The visual editor (#437) is being built on this page in parts.
 
-**Components** (`src/components/score-editor/`): `ScoreEditor.ts` (controller: state, render, save), `SourceView.ts` (source text and format), `DetailsDialog.astro` / `DetailsDialog.ts` (metadata and licence), `PalettePanel.astro` / `PalettePanel.ts` (the palette keys, and ⇄ moving them to either side; the keys' contents are in `palette.ts`), `<shakuhachi-score columns="1">` (the score)
+**Components** (`src/components/score-editor/`): `ScoreEditor.ts` (controller: state, render, save), `SourceView.ts` (source text and format), `DetailsDialog.astro` / `DetailsDialog.ts` (metadata and licence), `PalettePanel.astro` / `PalettePanel.ts` (the palette keys, and ⇄ moving them to either side; the keys' contents are in `palette.ts`), `SelectionView.ts` (the cursor, highlight and status line, and the taps and keys that move them; the rules are plain functions in `selection.ts`), `<shakuhachi-score columns="1">` (the score)
 
 ## Header Architecture
 
@@ -198,7 +198,7 @@ Vanilla TypeScript classes with a simple `constructor(containerId) → render() 
 - `MobileMenu.ts` — mobile navigation (type-aware via `data-menu-type`)
 - `ScoreLibrary.ts` — browse page grid (fetches and renders all scores client-side)
 - `ScoreDetailClient.ts` — score page interactions (fork, delete)
-- `score-editor/` — the edit page: `ScoreEditor.ts`, `SourceView.ts`, `DetailsDialog.ts`, `PalettePanel.ts` (edit-only, per-slug localStorage autosave)
+- `score-editor/` — the edit page: `ScoreEditor.ts`, `SourceView.ts`, `DetailsDialog.ts`, `PalettePanel.ts`, `SelectionView.ts` (edit-only, per-slug localStorage autosave)
 - `Toast.ts` — toast notifications
 - `ConfirmDialog.ts` — confirmation dialogs
 - `LoadingSpinner.ts` — loading state
