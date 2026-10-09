@@ -18,6 +18,7 @@ import { Modifier, type ModifierPosition } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
 import type { MeriKari } from '../types/ScoreData';
+import { MARK_WIDTH_RATIO, MERI_KARI_SIDE_OFFSET } from './mark-geometry';
 
 export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
@@ -62,10 +63,10 @@ export class MeriKariModifier extends Modifier {
    */
   private setDefaultOffsets(): void {
     if (this.position === 'left') {
-      this.offsetX = -22; // To the left of note
+      this.offsetX = -MERI_KARI_SIDE_OFFSET; // To the left of note
       this.offsetY = 0; // Centered vertically with note
     } else if (this.position === 'right') {
-      this.offsetX = 22; // To the right of note
+      this.offsetX = MERI_KARI_SIDE_OFFSET; // To the right of note
       this.offsetY = 0;
     } else {
       // Above or below
@@ -145,7 +146,7 @@ export class MeriKariModifier extends Modifier {
    * Approximate based on font size
    */
   getWidth(): number {
-    return this.fontSize * 0.8;
+    return this.fontSize * MARK_WIDTH_RATIO;
   }
 
   /**

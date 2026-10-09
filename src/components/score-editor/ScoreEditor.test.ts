@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ScoreEditor } from './ScoreEditor';
 import type { Score } from '../../api/scores';
+import type { ScoreData } from '../../web-component/types/ScoreData';
 
 vi.mock('../../api/scores');
 vi.mock('../../api/auth');
@@ -19,7 +20,7 @@ vi.mock('../../utils/editor-autosave', () => ({
 
 const OWNER = 'user-1';
 const JSON_DATA = { title: '', style: 'kinko', notes: [] };
-const TWO_NOTES = {
+const TWO_NOTES: ScoreData = {
   title: '',
   style: 'kinko',
   notes: [
@@ -52,8 +53,13 @@ function renderPage(): void {
     <button id="source-toggle"><span class="btn-text">Source</span></button>
     <span id="save-status"></span>
     <button id="save-btn"><span class="btn-text">Save</span></button>
+    <p id="editor-status"><strong id="status-mode"></strong><span id="status-detail"></span></p>
     <div id="score-area">
-      <shakuhachi-score id="score-renderer"></shakuhachi-score>
+      <div id="score-canvas">
+        <div id="score-highlight" hidden></div>
+        <shakuhachi-score id="score-renderer"></shakuhachi-score>
+        <div id="score-cursor" hidden></div>
+      </div>
       <p id="score-empty-hint" hidden></p>
     </div>
     <section id="source-view" hidden>
@@ -92,6 +98,29 @@ function renderPage(): void {
     </dialog>
   `;
 }
+
+/**
+ * Stands in for the embed script's element: each note drawn 30 × 32 on a
+ * column line at x 70, 44px apart from the top. (jsdom lays nothing out, so
+ * the score's pixels are the page's.)
+ */
+customElements.define(
+  'shakuhachi-score',
+  class extends HTMLElement {
+    getNoteBoxes() {
+      const { notes } = JSON.parse(this.getAttribute('data-score')!);
+      return notes.map((_: unknown, i: number) => ({
+        x: 55,
+        y: 10 + 44 * i,
+        width: 30,
+        height: 32,
+        centerX: 70,
+        centerY: 26 + 44 * i,
+        cell: { x: 38, y: 5 + 44 * i, width: 64, height: 42 },
+      }));
+    }
+  },
+);
 
 const $ = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -137,6 +166,7 @@ describe('ScoreEditor score and source', () => {
 
     expect(renderedScore()).toEqual(JSON_DATA);
     expect($('score-empty-hint').hidden).toBe(false);
+    expect($('status-detail').textContent).toBe('empty score');
     expect($('source-view').hidden).toBe(true);
   });
 
@@ -147,6 +177,7 @@ describe('ScoreEditor score and source', () => {
     expect($('source-view').hidden).toBe(false);
     expect($('score-area').hidden).toBe(true);
     expect($('palette-panel').hidden).toBe(true);
+    expect($('editor-status').hidden).toBe(true);
     expect($('source-toggle').textContent).toBe('Score');
     expect($<HTMLTextAreaElement>('score-data-input').value).toBe(
       JSON.stringify(JSON_DATA, null, 2),
@@ -208,6 +239,67 @@ describe('ScoreEditor score and source', () => {
     expect(
       document.querySelector<HTMLInputElement>('input[value="json"]')!.checked,
     ).toBe(true);
+  });
+});
+
+describe('ScoreEditor selection', () => {
+  const status = () =>
+    `${$('status-mode').textContent} ${$('status-detail').textContent}`;
+  const press = (key: string, target: HTMLElement = document.body) =>
+    target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  const tap = (clientX: number, clientY: number) =>
+    $('score-area').dispatchEvent(
+      new MouseEvent('click', { clientX, clientY, bubbles: true }),
+    );
+
+  it('opens with the cursor after the last note', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+
+    expect($('score-cursor').hidden).toBe(false);
+    expect($('score-highlight').hidden).toBe(true);
+    // On the bottom edge of the second note's cell, which ends at 49 + 42
+    expect($('score-cursor').style.top).toBe('91px');
+    expect(status()).toBe('Inserting after ツ tsu, otsu · 2 of 2');
+  });
+
+  it('highlights a tapped note, and moves with Up, Down and Esc', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+
+    tap(70, 20);
+    expect($('score-highlight').hidden).toBe(false);
+    expect($('score-cursor').hidden).toBe(true);
+    expect(status()).toBe('Changing ロ ro, otsu · 1 of 2');
+
+    press('ArrowDown');
+    expect(status()).toBe('Changing ツ tsu, otsu · 2 of 2');
+
+    press('Escape');
+    expect(status()).toBe('Inserting after ツ tsu, otsu · 2 of 2');
+
+    press('ArrowUp');
+    press('ArrowUp');
+    expect(status()).toBe('Inserting at the start · of 2');
+  });
+
+  it('leaves keys typed in a text field alone', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+
+    press('ArrowUp', $('title-input'));
+    expect(status()).toBe('Inserting after ツ tsu, otsu · 2 of 2');
+  });
+
+  it('keeps the selection inside a score shortened in the source', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    tap(70, 60);
+    expect(status()).toBe('Changing ツ tsu, otsu · 2 of 2');
+
+    $('source-toggle').click();
+    typeSource(
+      JSON.stringify({ ...TWO_NOTES, notes: TWO_NOTES.notes.slice(1) }),
+    );
+    $('source-toggle').click();
+
+    expect(status()).toBe('Inserting after ツ tsu, otsu · 1 of 1');
   });
 });
 
