@@ -7,9 +7,8 @@ import {
   forkScore,
 } from './scores';
 
-vi.mock('./supabase', () => ({
-  supabase: { from: vi.fn() },
-}));
+const supabase = vi.hoisted(() => ({ from: vi.fn() }));
+vi.mock('./supabase', () => ({ getSupabase: async () => supabase }));
 vi.mock('./auth');
 vi.mock('../utils/slug');
 
@@ -74,7 +73,6 @@ describe('createScore', () => {
 
   it('returns error when user is not authenticated', async () => {
     const { getCurrentUser } = await import('./auth');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({ user: null, error: null });
 
     const result = await createScore({
@@ -116,7 +114,6 @@ describe('createScore', () => {
   it('returns error when DB insert fails', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -143,7 +140,6 @@ describe('createScore', () => {
   it('returns score on success with correct insert shape', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -167,7 +163,6 @@ describe('createScore', () => {
   it('reports fork_count 0 for a score nothing has forked yet', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -196,7 +191,6 @@ describe('getScoreBySlug', () => {
   });
 
   it('returns score when found, with the fork embed collapsed into fork_count', async () => {
-    const { supabase } = await import('./supabase');
     vi.mocked(supabase.from).mockReturnValueOnce(
       makeChain({ data: scoreRow, error: null }) as any,
     );
@@ -212,7 +206,6 @@ describe('getScoreBySlug', () => {
   // issuing a second query for the parent — which would cost another
   // transatlantic round trip in production. See #386.
   it('surfaces the embedded parent for a forked score', async () => {
-    const { supabase } = await import('./supabase');
     const forkRow = {
       ...scoreRow,
       forked_from: 'parent-123',
@@ -238,7 +231,6 @@ describe('getScoreBySlug', () => {
   });
 
   it('returns error when score not found (PGRST116)', async () => {
-    const { supabase } = await import('./supabase');
     vi.mocked(supabase.from).mockReturnValueOnce(
       makeChain({ data: null, error: { code: 'PGRST116' } }) as any,
     );
@@ -250,7 +242,6 @@ describe('getScoreBySlug', () => {
   });
 
   it('returns error on other DB failure', async () => {
-    const { supabase } = await import('./supabase');
     vi.mocked(supabase.from).mockReturnValueOnce(
       makeChain({ data: null, error: { message: 'conn fail' } }) as any,
     );
@@ -279,7 +270,6 @@ describe('updateScore', () => {
 
   it('returns error when DB update fails', async () => {
     const { getCurrentUser } = await import('./auth');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -296,7 +286,6 @@ describe('updateScore', () => {
 
   it('returns updated score on success', async () => {
     const { getCurrentUser } = await import('./auth');
-    const { supabase } = await import('./supabase');
     const updated = { ...scoreRow, title: 'New Title' };
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
@@ -329,7 +318,6 @@ describe('deleteScore', () => {
 
   it('returns null error on success', async () => {
     const { getCurrentUser } = await import('./auth');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -362,7 +350,6 @@ describe('forkScore', () => {
 
   it('returns error when source score is not found', async () => {
     const { getCurrentUser } = await import('./auth');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -380,7 +367,6 @@ describe('forkScore', () => {
   it('returns error when fork insert fails', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     vi.mocked(getCurrentUser).mockResolvedValue({
       user: userFixture as any,
       error: null,
@@ -403,7 +389,6 @@ describe('forkScore', () => {
   it('returns the fork without writing any counter to the parent', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     const forkedRow = {
       ...scoreRow,
       id: 'fork-456',
@@ -434,7 +419,6 @@ describe('forkScore', () => {
   it('carries attribution and both rights layers over to the fork', async () => {
     const { getCurrentUser } = await import('./auth');
     const { generateSlug, ensureUniqueSlug } = await import('../utils/slug');
-    const { supabase } = await import('./supabase');
     const parentRow = {
       ...scoreRow,
       source_url: 'https://example.com/source',
