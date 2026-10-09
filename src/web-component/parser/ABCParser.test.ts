@@ -444,8 +444,16 @@ G
 
     it('skips lyrics and other fields that do not change the notes', () => {
       expect(
-        fingerings('X:1\nK:C\nD F\nw: la la\nN:a note\nL:1/4\n[P:A] G'),
+        fingerings('X:1\nK:C\nD F\nw: la la\nN:a note\nM:3/4\n[P:A] G'),
       ).toEqual(['ro', 'tsu', 're']);
+    });
+
+    // Lengths are read relative to one unit, so the notes after a change
+    // would come out the wrong length
+    it('fails on a unit length change, as a line or inline', () => {
+      const error = "Changing the unit length (L:) after the tune's notes";
+      expect(() => ABCParser.parse('X:1\nK:C\nD F\nL:1/4\nG')).toThrow(error);
+      expect(() => ABCParser.parse('X:1\nK:C\nD [L:1/4] F')).toThrow(error);
     });
 
     it('fails on a key change it cannot read', () => {

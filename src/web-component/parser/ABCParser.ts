@@ -15,8 +15,9 @@
  * - Key: K: sets the accidentals of notes written without one. Without K:,
  *   notes read as written. A K: line or inline [K:…] in the body changes the
  *   key from there on
- * - Other fields in the body (w: lyrics, N:, P:, L:, M:, inline [P:…]) are
- *   skipped
+ * - A unit length change (L:) in the body fails, as lengths after it would
+ *   read wrong. Other fields in the body (w: lyrics, N:, P:, M:, inline
+ *   [P:…]) are skipped
  * - Bar lines: | ends the accidentals written in a bar; not kept in output
  * - Decorations: !name! before a note. One naming a fingering (as our export
  *   writes, e.g. !ri-meri!) chooses it; others are ignored
@@ -91,10 +92,13 @@ export class ABCParser {
         }
       } else if (/^[A-Za-z+]:/.test(trimmed)) {
         // A field in the body. K: changes the key from here on, so it's
-        // kept as the inline field it is equivalent to; the rest (lyrics,
-        // notes, parts, unit length and meter) don't change the notes read
+        // kept as the inline field it is equivalent to. L: would change the
+        // length of the notes after it, which isn't read yet. The rest
+        // (lyrics, notes, parts, meter) don't change the notes read
         if (trimmed.startsWith('K:')) {
           noteLines.push(`[${trimmed}]`);
+        } else if (trimmed.startsWith('L:')) {
+          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
         }
       } else {
         noteLines.push(trimmed);
@@ -194,8 +198,12 @@ export class ABCParser {
         continue;
       }
 
-      // Only a key change affects the notes; other inline fields are skipped
+      // Of the inline fields, a key change affects the notes and a unit
+      // length change isn't read yet; the rest are skipped
       if (fieldName !== undefined) {
+        if (fieldName === 'L') {
+          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
+        }
         if (fieldName === 'K') {
           const signature = keySignature(fieldValue);
           if (!signature) {

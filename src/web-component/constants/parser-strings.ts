@@ -76,6 +76,8 @@ export const PARSER_STRINGS = {
       contentRequired: 'ABC notation content is required',
       unknownKey: (key: string) =>
         `The K: field's key, "${key}", isn't one ABC defines. Use a key such as D, Dm, D dorian or none.`,
+      unitLengthChange:
+        "Changing the unit length (L:) after the tune's notes start isn't supported yet. Write the notes in one unit length, set in the header.",
       noNotesFound:
         'No notes found in ABC notation. Write the notes after the header fields, e.g. D F G A d.',
       unknownPitch: (pitch: string) =>
