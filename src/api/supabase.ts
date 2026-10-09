@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -24,15 +24,12 @@ const loaded = new Promise<SupabaseClient>((resolve) => {
 /**
  * The Supabase client, loaded on first use. supabase-js is the largest script
  * on the site (~45 KB gzipped), and a signed-out visitor reading a score
- * never needs it, so no page downloads it until something calls this.
+ * never needs it, so pages download it when something calls this. The
+ * library page, which always needs it, imports supabase-client directly.
  */
 export function getSupabase(): Promise<SupabaseClient> {
   if (!client) {
-    client = import('@supabase/supabase-js').then(({ createClient }) =>
-      createClient(supabaseUrl, supabaseAnonKey, {
-        auth: { storageKey: SESSION_STORAGE_KEY },
-      }),
-    );
+    client = import('./supabase-client').then(({ supabase }) => supabase);
     client.then(resolveLoaded);
   }
   return client;

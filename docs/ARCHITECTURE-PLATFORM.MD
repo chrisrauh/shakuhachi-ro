@@ -138,7 +138,7 @@ session to the shared Supabase client; see AUTH-SESSION-STORAGE.md.
 **Key files:**
 
 - `src/api/auth.ts` — auth API wrapper
-- `src/api/supabase.ts` — Supabase client, loaded on first use through `getSupabase()`. supabase-js is ~41 KB gzipped, the largest script on the site, so no page downloads it up front. `onAuthReady()` reads the stored session key in `localStorage` first: a visitor with no session is reported signed out without loading the client, so a signed-out reader of a score or content page never downloads it. The library page loads it to fetch scores. Never import `@supabase/supabase-js` for anything but types outside `supabase.ts`: a static import puts it back on every page
+- `src/api/supabase.ts` — Supabase client, loaded on first use through `getSupabase()`. supabase-js is ~41 KB gzipped, the largest script on the site, so pages download it only when they need it. `onAuthReady()` reads the stored session key in `localStorage` first: a visitor with no session is reported signed out without loading the client, so a signed-out reader of a score or content page never downloads it. The library page always fetches scores, so it imports `src/api/supabase-client.ts` (which creates the client) directly, and supabase-js downloads with the page instead of after it. Never import `@supabase/supabase-js` for anything but types outside `supabase-client.ts`, and import `supabase-client.ts` only from a page that always needs it: a static import from shared code puts it back on every page
 - `src/pages/api/purge-score.ts` — the only endpoint that reads an `Authorization` header
 - `src/components/AuthComponents.ts` — login/signup UI (base auth components)
 

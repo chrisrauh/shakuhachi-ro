@@ -54,6 +54,9 @@ export const prerender = true;
     }
   </script>
   <script>
+    // The library always fetches scores, so it loads supabase-js with the
+    // page instead of on first use; getSupabase() then finds it loaded
+    import '../api/supabase-client';
     import { ScoreLibrary } from '../components/ScoreLibrary';
     new ScoreLibrary('score-library');
   </script>
