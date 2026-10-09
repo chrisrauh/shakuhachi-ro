@@ -427,6 +427,34 @@ G
     });
   });
 
+  describe('parse() - fields in the tune body', () => {
+    const fingerings = (abc: string) =>
+      ABCParser.parse(abc).notes.map((n) =>
+        [n.pitch?.step, n.pitch?.octave, n.meriKari].filter(Boolean).join(' '),
+      );
+
+    it('changes the key from a K: line in the body', () => {
+      // D major has C♯, G major doesn't
+      expect(fingerings('X:1\nK:D\nc\nK:G\nc')).toEqual(['ro 1 meri', 'ri']);
+    });
+
+    it('changes the key from an inline [K:] mid-line', () => {
+      expect(fingerings('X:1\nK:D\nc [K:G] c')).toEqual(['ro 1 meri', 'ri']);
+    });
+
+    it('skips lyrics and other fields that do not change the notes', () => {
+      expect(
+        fingerings('X:1\nK:C\nD F\nw: la la\nN:a note\nL:1/4\n[P:A] G'),
+      ).toEqual(['ro', 'tsu', 're']);
+    });
+
+    it('fails on a key change it cannot read', () => {
+      expect(() => ABCParser.parse('X:1\nK:D\nD [K:Q] F')).toThrow(
+        'The K: field\'s key, "Q", isn\'t one ABC defines',
+      );
+    });
+  });
+
   describe('parse() - error handling', () => {
     it('should keep a fingering named in a decoration, and ignore other decorations', () => {
       const abc = 'X:1\nK:C\n!san-no-u!_b !trill!_b\n';
