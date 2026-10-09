@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { purgeCache } from '@netlify/functions';
-import { supabase } from '../../api/supabase';
+import { getSupabase } from '../../api/supabase';
 import { getScoreBySlug } from '../../api/scores';
 import { cacheTagForScore } from '../../utils/cache-tags';
 
@@ -44,6 +44,7 @@ async function mayPurge(slug: string, userId: string): Promise<boolean> {
   if (!score) return true;
   if (score.user_id === userId) return true;
 
+  const supabase = await getSupabase();
   const { data } = await supabase
     .from('scores')
     .select('id')
@@ -58,6 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('Authorization')?.replace(/^Bearer /, '');
   if (!token) return json({ error: 'Not signed in' }, 401);
 
+  const supabase = await getSupabase();
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user) return json({ error: 'Not signed in' }, 401);
 

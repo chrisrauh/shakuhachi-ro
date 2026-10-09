@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './purge-score';
 
 vi.mock('@netlify/functions', () => ({ purgeCache: vi.fn() }));
-vi.mock('../../api/supabase', () => ({
-  supabase: { auth: { getUser: vi.fn() }, from: vi.fn() },
+const supabase = vi.hoisted(() => ({
+  auth: { getUser: vi.fn() },
+  from: vi.fn(),
 }));
+vi.mock('../../api/supabase', () => ({ getSupabase: async () => supabase }));
 vi.mock('../../api/scores');
 
 // DEV is true under vitest, which would short-circuit before purgeCache. These
@@ -44,7 +46,6 @@ function forksByCaller(rows: unknown[]) {
 }
 
 async function signedInAs(userId: string | null) {
-  const { supabase } = await import('../../api/supabase');
   vi.mocked(supabase.auth.getUser).mockResolvedValue({
     data: { user: userId ? { id: userId } : null },
     error: userId ? null : { message: 'bad token' },

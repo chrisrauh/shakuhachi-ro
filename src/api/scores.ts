@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { getSupabase } from './supabase';
 import { getCurrentUser } from './auth';
 import {
   generateSlug,
@@ -165,6 +165,7 @@ export async function createScore(
     }
 
     // Get existing slugs to ensure uniqueness
+    const supabase = await getSupabase();
     const { data: existingScores, error: slugQueryError } = await supabase
       .from('scores')
       .select('slug')
@@ -241,6 +242,7 @@ export async function updateScore(
       };
     }
 
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .update(updates)
@@ -288,6 +290,7 @@ export async function deleteScore(
       };
     }
 
+    const supabase = await getSupabase();
     const { error } = await supabase
       .from('scores')
       .delete()
@@ -313,6 +316,7 @@ export async function deleteScore(
  */
 export async function getScore(id: string): Promise<ScoreResult> {
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .select(SCORE_SELECT)
@@ -346,6 +350,7 @@ export async function getScore(id: string): Promise<ScoreResult> {
  */
 export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .select(SCORE_SELECT)
@@ -379,6 +384,7 @@ export async function getScoreBySlug(slug: string): Promise<ScoreResult> {
  */
 export async function getUserScores(userId: string): Promise<ScoresResult> {
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .select(SCORE_SELECT)
@@ -406,6 +412,7 @@ export async function getUserScores(userId: string): Promise<ScoresResult> {
  */
 export async function getAllScores(): Promise<ScoresResult> {
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .select(SCORE_SELECT)
@@ -438,6 +445,7 @@ export async function searchScores(query: string): Promise<ScoresResult> {
 
     const searchTerm = `%${query}%`;
 
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('scores')
       .select(SCORE_SELECT)
@@ -475,6 +483,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     }
 
     // Get the original score
+    const supabase = await getSupabase();
     const { data: originalScore, error: fetchError } = await supabase
       .from('scores')
       .select('*')

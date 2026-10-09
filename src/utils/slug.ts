@@ -1,4 +1,4 @@
-import { supabase } from '../api/supabase';
+import { getSupabase } from '../api/supabase';
 
 /**
  * Generates a URL-friendly slug from a string
@@ -191,6 +191,7 @@ export async function generateUniqueRandomSlug(): Promise<{
 }> {
   const maxAttempts = 3;
 
+  const supabase = await getSupabase();
   for (let i = 0; i < maxAttempts; i++) {
     const slug = generateRandomSlug();
 
