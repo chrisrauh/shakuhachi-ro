@@ -25,6 +25,13 @@ describe('humanHits', () => {
     });
   });
 
+  it('stretches the rest after each pass to the given length', () => {
+    expect(humanHits(1, () => 0.5, 2.5)).toEqual({
+      hits: [[0, 3.5, 7, 10.5]],
+      length: 14,
+    });
+  });
+
   it('nudges hits slightly but keeps each pass moving forward', () => {
     let seed = 1;
     const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;

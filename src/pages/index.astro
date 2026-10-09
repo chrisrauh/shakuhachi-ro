@@ -58,10 +58,15 @@ export const prerender = true;
     // page instead of on first use; getSupabase() then finds it loaded
     import '../api/supabase-client';
     import { ScoreLibrary } from '../components/ScoreLibrary';
-    // ?loading holds the page in its loading state, to check the spinner
-    new ScoreLibrary('score-library', {
-      holdLoading: new URLSearchParams(location.search).has('loading'),
-    });
+    // ?loading holds the page in its loading state, with a panel for tuning
+    // the spinner. The panel loads only then, so the library doesn't carry it.
+    const holdLoading = new URLSearchParams(location.search).has('loading');
+    new ScoreLibrary('score-library', { holdLoading });
+    if (holdLoading) {
+      import('../components/SpinnerTuner').then(({ showSpinnerTuner }) =>
+        showSpinnerTuner(document.getElementById('score-library')!),
+      );
+    }
   </script>
   <style>
     .delete-banner {

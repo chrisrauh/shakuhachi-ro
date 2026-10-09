@@ -4,9 +4,9 @@
  * metronome: every hit lands a little early or late.
  *
  * - Standard (`buildSpinnerSVG`): three dots struck left to right, then a
- *   beat's rest. For a page or section that is loading.
- * - Compact (`buildCompactSpinnerSVG`): one dot struck every two beats. For
- *   buttons, through `ButtonLoadingState`.
+ *   pause. For a page or section that is loading.
+ * - Compact (`buildCompactSpinnerSVG`): one dot struck, then the same pause.
+ *   For buttons, through `ButtonLoadingState`.
  *
  * The SVG fixes only the proportions. Its size comes from CSS (`.spinner` in
  * components.css), so it can differ between desktop and mobile.
@@ -17,7 +17,8 @@
  *   loadingState.hide();   // Restore the content
  */
 
-const BEAT = 0.36; // seconds from one hit to the next
+export const BEAT = 0.36; // seconds from one hit to the next
+export const PAUSE = 0.36; // seconds of rest after the last dot, before the next pass
 const ATTACK = 0.06; // seconds a hit takes to reach full strength
 const DECAY = 0.7; // seconds a hit takes to fade
 const LOOSENESS = 0.1; // how far a hit may land early or late, in beats
@@ -29,14 +30,23 @@ const SWELL = 1.25; // how much a dot grows when it is hit
 // differently, so each one names its classes and keyframes uniquely
 let nextId = 0;
 
+export interface SpinnerTiming {
+  /** Seconds from one hit to the next */
+  beat?: number;
+  /** Seconds of rest after the last dot, before the next pass */
+  pause?: number;
+  random?: () => number;
+}
+
 /**
- * When each dot is hit, in beats: the dots in turn from left to right, then a
- * beat's rest, played PASSES times. Every hit, and the length of every rest,
- * is nudged by up to LOOSENESS.
+ * When each dot is hit, in beats: the dots in turn from left to right, then
+ * `rest` beats of rest, played PASSES times. Every hit, and the length of
+ * every rest, is nudged by up to LOOSENESS.
  */
 export function humanHits(
   dots: number,
   random: () => number,
+  rest = 1,
 ): { hits: number[][]; length: number } {
   const nudge = () => (random() * 2 - 1) * LOOSENESS;
   const hits: number[][] = Array.from({ length: dots }, () => []);
@@ -45,7 +55,7 @@ export function humanHits(
     for (let dot = 0; dot < dots; dot++) {
       hits[dot].push(Math.max(0, t + dot + nudge()));
     }
-    t += dots + 1 + nudge();
+    t += dots + rest + nudge();
   }
   return { hits, length: t };
 }
@@ -68,10 +78,14 @@ function dotKeyframes(name: string, hits: number[], cycle: number): string {
   return `@keyframes ${name}{${frames}100%{${rest}}}`;
 }
 
-function buildDotsSVG(dots: number, className: string, random: () => number) {
+function buildDotsSVG(
+  dots: number,
+  className: string,
+  { beat = BEAT, pause = PAUSE, random = Math.random }: SpinnerTiming,
+) {
   const id = `spinner-${nextId++}`;
-  const { hits, length } = humanHits(dots, random);
-  const cycle = length * BEAT;
+  const { hits, length } = humanHits(dots, random, pause / beat);
+  const cycle = length * beat;
   // Dots have a diameter of 2 and a gap of three quarters of a dot
   const pitch = 3.5;
   const width = 2 + pitch * (dots - 1);
@@ -79,7 +93,7 @@ function buildDotsSVG(dots: number, className: string, random: () => number) {
   let style = `.${id}{fill:currentColor;opacity:${REST_OPACITY};transform-box:fill-box;transform-origin:center}`;
   let circles = '';
   for (let dot = 0; dot < dots; dot++) {
-    const seconds = hits[dot].map((beats) => beats * BEAT);
+    const seconds = hits[dot].map((beats) => beats * beat);
     style += dotKeyframes(`${id}-${dot}`, seconds, cycle);
     style += `.${id}-${dot}{animation:${id}-${dot} ${+cycle.toFixed(3)}s linear infinite}`;
     circles += `<circle class="${id} ${id}-${dot}" cx="${1 + pitch * dot}" cy="1" r="1"/>`;
@@ -91,15 +105,13 @@ function buildDotsSVG(dots: number, className: string, random: () => number) {
 }
 
 /** The standard spinner: three dots, for a page or section that is loading */
-export function buildSpinnerSVG(random: () => number = Math.random): string {
-  return buildDotsSVG(3, 'spinner', random);
+export function buildSpinnerSVG(timing: SpinnerTiming = {}): string {
+  return buildDotsSVG(3, 'spinner', timing);
 }
 
 /** The compact spinner: one dot, for buttons */
-export function buildCompactSpinnerSVG(
-  random: () => number = Math.random,
-): string {
-  return buildDotsSVG(1, 'spinner spinner-compact', random);
+export function buildCompactSpinnerSVG(timing: SpinnerTiming = {}): string {
+  return buildDotsSVG(1, 'spinner spinner-compact', timing);
 }
 
 /**
