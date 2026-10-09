@@ -224,10 +224,15 @@ describe('ScoreEditor score and source', () => {
         data: {
           title: '',
           style: 'kinko',
-          notes: [{ pitch: { step: 'go', octave: 0 }, duration: 1 } as any],
+          notes: [
+            { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+            { pitch: { step: 'go', octave: 0 }, duration: 1 } as any,
+          ],
         },
       }),
     );
+    // The validation line and the dialog number the same note the same way
+    expect($('validation-error').textContent).toContain('Note 2 ');
 
     const musicxml = document.querySelector<HTMLInputElement>(
       'input[value="musicxml"]',
@@ -237,8 +242,9 @@ describe('ScoreEditor score and source', () => {
 
     await vi.waitFor(() => expect(confirmDialog.show).toHaveBeenCalled());
     const options = vi.mocked(confirmDialog.show).mock.calls[0][0];
+    expect(options.message).toContain('Could not convert JSON to MusicXML.');
     expect(options.message).toContain(
-      "Note 1 has a step, octave or meri/kari mark that isn't valid",
+      "Note 2 has a step, octave or meri/kari mark that isn't valid",
     );
     options.onCancel!();
     expect(

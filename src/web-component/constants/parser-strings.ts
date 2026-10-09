@@ -7,17 +7,18 @@
 
 import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
 
-// Shared string factory functions for parser validation
+// Shared string factory functions for parser validation. Notes are numbered
+// from 1, as people count them; callers pass the 0-based array index.
 export const PARSER_STRING_FACTORIES = {
   invalidDuration: (duration: string) => `Invalid duration: ${duration}`,
   noteIndexError: (index: number, field: string) =>
-    `Note at index ${index} is missing ${field}`,
+    `Note ${index + 1} is missing ${field}`,
   noteIndexInvalid: (
     index: number,
     field: string,
     value: any,
     constraint: string,
-  ) => `Note at index ${index} has invalid ${field}: ${value}. ${constraint}`,
+  ) => `Note ${index + 1} has invalid ${field}: ${value}. ${constraint}`,
 };
 
 export const PARSER_STRINGS = {
@@ -28,7 +29,7 @@ export const PARSER_STRINGS = {
       noteIndexPitchRequired: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch'),
       noteIndexPitchWhenNotRest: (index: number) =>
-        `Note at index ${index} must have pitch when rest is not set`,
+        `Note ${index + 1} must have pitch when rest is not set`,
       noteIndexPitchStep: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.step'),
       noteIndexStepInvalid: (index: number, step: unknown) =>
@@ -64,7 +65,7 @@ export const PARSER_STRINGS = {
           `Must be one of: ${MERI_KARI.join(', ')}.`,
         ),
       restIndexDuration: (index: number) =>
-        `Rest at index ${index} is missing duration`,
+        `Note ${index + 1} is a rest and is missing duration`,
       invalidJSON: (message: string) => `Invalid JSON: ${message}`,
       loadFailed: (message: string) => `Failed to load score: ${message}`,
       loadFailedFromURL: (message: string) =>

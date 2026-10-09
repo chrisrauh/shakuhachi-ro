@@ -5,6 +5,15 @@
  * Includes error messages, success messages, warnings, and informational text.
  */
 
+import type { ScoreDataFormat } from '../api/scores';
+
+/** Each score format's name, as the editor shows it */
+export const FORMAT_NAMES: Record<ScoreDataFormat, string> = {
+  json: 'JSON',
+  musicxml: 'MusicXML',
+  abc: 'ABC',
+};
+
 // Shared string factory functions for common patterns
 export const STRING_FACTORIES = {
   /**
@@ -67,8 +76,12 @@ export const STRINGS = {
     ScoreEditor: {
       formatConversionFailed: {
         title: 'Format Conversion Failed',
-        message: (fromFormat: string, toFormat: string, reason: string) =>
-          `Could not convert ${fromFormat} to ${toFormat}. ${reason ? `${reason.replace(/\.?$/, '.')} ` : ''}Clear content and switch format?`,
+        message: (
+          fromFormat: ScoreDataFormat,
+          toFormat: ScoreDataFormat,
+          reason: string,
+        ) =>
+          `Could not convert ${FORMAT_NAMES[fromFormat]} to ${FORMAT_NAMES[toFormat]}. ${reason ? `${reason.replace(/\.?$/, '.')} ` : ''}Clear content and switch format?`,
         confirmText: 'Clear and Switch',
         cancelText: 'Keep Current Format',
       },
