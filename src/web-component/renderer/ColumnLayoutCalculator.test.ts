@@ -47,8 +47,8 @@ describe('ColumnLayoutCalculator', () => {
 
     it('should calculate layout for multiple columns with height-based breaking', () => {
       // Create 25 notes
-      // With topMargin=34, spacing=44, bottomPadding=20, height=600:
-      // Available: 546px (600 - 34 - 20), fits 13 notes per column
+      // With topMargin=32, spacing=44, bottomPadding=20, height=600:
+      // Available: 548px (600 - 32 - 20), fits 13 notes per column
       // Expected: 2 columns (13 + 12)
       const notes = Array.from(
         { length: 25 },
@@ -80,7 +80,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should position columns right-to-left', () => {
-      // With 15 notes, defaults (topMargin=34, spacing=44, bottomPadding=20, height=600):
+      // With 15 notes, defaults (topMargin=32, spacing=44, bottomPadding=20, height=600):
       // Should create 2 columns (13 + 2)
       const notes = Array.from(
         { length: 15 },
@@ -207,7 +207,7 @@ describe('ColumnLayoutCalculator', () => {
     });
 
     it('should handle notes that exactly fill columns', () => {
-      // With defaults (topMargin=34, spacing=44, bottomPadding=20, height=600), 13 notes fit per column
+      // With defaults (topMargin=32, spacing=44, bottomPadding=20, height=600), 13 notes fit per column
       // Create exactly 26 notes (2 full columns)
       const notes = Array.from(
         { length: 26 },

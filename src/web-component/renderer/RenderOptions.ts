@@ -12,6 +12,7 @@ import {
   NOTATION_FONTS,
   DEFAULT_NOTATION_FONT,
 } from '../constants/notation-fonts';
+import { octaveMarkReachAbove } from '../modifiers/mark-geometry';
 
 /**
  * SVG viewport dimensions. Kept separate from the other options because they
@@ -78,9 +79,9 @@ export interface RenderOptions extends ViewportOptions {
 
   /**
    * Top margin in pixels to prevent octave mark clipping
-   * Must clear the octave mark, which OctaveMarksModifier positions at
-   * offsetY -22 and draws at octaveMarkFontSize
-   * @default 34
+   * Must clear the octave mark, so unless set it is derived from where the
+   * octave mark is drawn and octaveMarkFontSize (see mark-geometry)
+   * @default 34, at the default octaveMarkFontSize
    */
   topMargin?: number;
 
@@ -219,6 +220,8 @@ export type ResolvedRenderOptions = Required<
 > &
   ViewportOptions;
 
+const DEFAULT_OCTAVE_MARK_FONT_SIZE = 12;
+
 /**
  * Default values for all render options
  */
@@ -231,9 +234,7 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   notesPerColumn: 10,
   columnSpacing: 35,
   columnWidth: 100,
-  // Math.abs(-22) + 12 — the octave mark's offsetY, set in
-  // OctaveMarksModifier.setDefaultOffsets(), plus octaveMarkFontSize below.
-  topMargin: 34,
+  topMargin: octaveMarkReachAbove(DEFAULT_OCTAVE_MARK_FONT_SIZE),
 
   // Note typography
   noteFontSize: 32,
@@ -243,7 +244,7 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   noteColor: '#000',
 
   // Octave mark configuration
-  octaveMarkFontSize: 12,
+  octaveMarkFontSize: DEFAULT_OCTAVE_MARK_FONT_SIZE,
   octaveMarkFontWeight: 500,
 
   // Meri/Kari mark configuration
@@ -267,14 +268,20 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
 /**
  * Merges user-provided options with defaults
  *
+ * A top margin that isn't given follows the octave mark's font size, so the
+ * first note's octave mark stays clear of the top whatever its size.
+ *
  * @param options - User-provided options (partial)
  * @returns Options with all values defined except width/height
  */
 export function mergeWithDefaults(
   options: RenderOptions = {},
 ): ResolvedRenderOptions {
-  return {
+  const merged = {
     ...DEFAULT_RENDER_OPTIONS,
     ...options,
   };
+  return options.topMargin === undefined
+    ? { ...merged, topMargin: octaveMarkReachAbove(merged.octaveMarkFontSize) }
+    : merged;
 }

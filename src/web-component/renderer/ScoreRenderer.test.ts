@@ -4,6 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ScoreRenderer } from './ScoreRenderer';
+import type { RenderOptions } from './RenderOptions';
 import { SVGRenderer } from './SVGRenderer';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
@@ -404,6 +405,69 @@ describe('ScoreRenderer', () => {
       const retrievedNotes = renderer.getNotes();
       expect(retrievedNotes).toEqual(notes);
       expect(retrievedNotes).not.toBe(notes);
+    });
+
+    it('should report where each note is drawn, in score order', () => {
+      const renderer = new ScoreRenderer(container);
+      renderer.renderFromScoreData(createTestScoreData());
+
+      const boxes = renderer.getNoteBoxes();
+      expect(boxes).toHaveLength(3);
+      // Down one column, each note's box around its column line
+      expect(boxes[1].centerX).toBe(boxes[0].centerX);
+      expect(boxes[1].y).toBeGreaterThan(boxes[0].y);
+      expect(boxes[2].y).toBeGreaterThan(boxes[1].y);
+      expect(boxes[0].x).toBeLessThan(boxes[0].centerX);
+      expect(boxes[0].x + boxes[0].width).toBeGreaterThan(boxes[0].centerX);
+    });
+
+    it('should keep the note cell clear of other notes, and around side marks', () => {
+      const renderer = new ScoreRenderer(container);
+      renderer.renderFromScoreData({
+        title: '',
+        style: 'kinko',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 2 },
+          {
+            pitch: { step: 'ro', octave: 2 },
+            duration: 2,
+            meriKari: 'dai-meri',
+          },
+        ],
+      });
+
+      const [first, marked] = renderer.getNoteBoxes();
+      // Every note's cell is the same size, centred on its glyph
+      expect(marked.cell.width).toBe(first.cell.width);
+      expect(marked.cell.height).toBe(first.cell.height);
+      expect(marked.cell.x + marked.cell.width / 2).toBe(marked.centerX);
+      expect(marked.cell.y + marked.cell.height / 2).toBe(marked.centerY);
+      // The cell is shorter than the distance between notes
+      expect(first.cell.height).toBeLessThan(marked.centerY - first.centerY);
+      // The meri mark on the left and the octave mark on the right are inside
+      expect(marked.x).toBeGreaterThanOrEqual(marked.cell.x);
+      expect(marked.x + marked.width).toBeLessThanOrEqual(
+        marked.cell.x + marked.cell.width,
+      );
+    });
+
+    it('should size the note cell from the note spacing and the marks', () => {
+      const score: ScoreData = {
+        title: '',
+        style: 'kinko',
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 2 }],
+      };
+      const cellWith = (options: RenderOptions) => {
+        const renderer = new ScoreRenderer(container, options);
+        renderer.renderFromScoreData(score);
+        return renderer.getNoteBoxes()[0].cell;
+      };
+
+      // At the defaults: 44px between notes less a 2px gap
+      expect(cellWith({})).toMatchObject({ width: 64, height: 42 });
+      // Wider spacing makes it taller; bigger marks make it wider
+      expect(cellWith({ noteVerticalSpacing: 60 }).height).toBe(58);
+      expect(cellWith({ meriKariFontSize: 28 }).width).toBeGreaterThan(64);
     });
 
     it('should return null score data when rendering notes directly', () => {

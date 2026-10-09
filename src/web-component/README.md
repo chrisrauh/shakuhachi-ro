@@ -115,7 +115,10 @@ The element accepts the JSON format only. MusicXML and ABC are converted before 
 const el = document.querySelector('shakuhachi-score');
 el.setAttribute('data-score', JSON.stringify(scoreData)); // re-renders
 el.forceRender(); // force one, e.g. after a theme change
+el.getNoteBoxes(); // where each note is drawn, for drawing over the score
 ```
+
+`getNoteBoxes()` returns one `{ x, y, width, height, centerX, centerY, cell }` per note, in the order of `notes`, in pixels from the element's top-left corner: the bounding box of the note and its marks, the x of the column line it sits on, the middle of its glyph, and `cell`, a box for highlighting it. The cell is the same size for every note, centred on the glyph, and sized from the note spacing and the marks, so it follows them if they change. It is empty until the score has rendered. Setting `data-score` on an element in the page renders synchronously, so the boxes are current straight after. The score editor uses it to draw its cursor and highlight over the score.
 
 The element cleans up its renderer on disconnect.
 

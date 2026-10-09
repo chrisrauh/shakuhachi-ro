@@ -14,7 +14,7 @@
  * observed attribute instead, the way `notation-font` does.
  */
 
-import { ScoreRenderer } from './renderer/ScoreRenderer';
+import { ScoreRenderer, type NoteBox } from './renderer/ScoreRenderer';
 import { ScoreParser } from './parser/ScoreParser';
 import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
 import type { ScoreData } from './types/ScoreData';
@@ -91,6 +91,14 @@ class ShakuhachiScore extends HTMLElement {
    */
   public forceRender() {
     this.render();
+  }
+
+  /**
+   * Where each note is drawn, in pixels from the element's top-left corner,
+   * in the order of the score's notes. Empty until the score has rendered.
+   */
+  public getNoteBoxes(): NoteBox[] {
+    return this.renderer?.getNoteBoxes() ?? [];
   }
 
   /**
@@ -207,7 +215,7 @@ class ShakuhachiScore extends HTMLElement {
     columnCount: number,
   ): number {
     const notesPerColumn = Math.ceil(notes.length / columnCount);
-    const topMargin = DEFAULT_RENDER_OPTIONS.topMargin; // 34px
+    const topMargin = DEFAULT_RENDER_OPTIONS.topMargin;
     const verticalSpacing = DEFAULT_RENDER_OPTIONS.noteVerticalSpacing; // 44px
     const durationDotExtraSpacing =
       DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing; // 12px

@@ -706,6 +706,7 @@
 
   --size-toolbar-item: 2rem; /* 32px - height of icon buttons, small buttons, logo, and other header row items */
   --size-palette-key: 2.875rem; /* 46px - square keys in the score editor's palette, sized for a thumb */
+  --size-editor-cursor: 0.125rem; /* 2px - thickness of the score editor's cursor line */
   --size-dialog-max-width: 400px;
   --size-dialog-button-min-width: 80px;
 
@@ -1098,6 +1099,10 @@
   --color-bg-success: var(--color-green-950);
   --color-bg-success-subtle: var(--color-green-975);
   --color-border-success: var(--color-green-800);
+
+  /* BRAND - blue isn't inverted, so the light value, a pale tint, would glare
+     on dark surfaces too. Dark, as green-950 is for success */
+  --color-bg-primary-brand: var(--color-blue-950);
 
   /* SPECIAL - gray-800 auto-adapts via inverted grays, no override needed */
 }

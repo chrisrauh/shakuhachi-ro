@@ -25,6 +25,10 @@ import {
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
+import {
+  meriKariReachLeft,
+  octaveMarkReachRight,
+} from '../modifiers/mark-geometry';
 
 /**
  * Viewport used when the container measures zero, which happens while it is
@@ -33,6 +37,63 @@ import { DurationLineModifier } from '../modifiers/DurationLineModifier';
  * once the container is laid out.
  */
 const DEFAULT_VIEWPORT = { width: 800, height: 600 } as const;
+
+/**
+ * Where a note is drawn, in the SVG's units, which are CSS pixels from its
+ * top-left corner: the bounding box of the note and its marks, and the x of
+ * the column's centre line it is drawn on.
+ */
+export interface NoteBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** The column line the note is drawn on. */
+  centerX: number;
+  /** The middle of the note's glyph ink, which marks are drawn around. */
+  centerY: number;
+  /**
+   * A cell around the note for a highlight: centred on the glyph's ink and
+   * the same size for every note, whatever its marks. See `noteCellSize`.
+   */
+  cell: { x: number; y: number; width: number; height: number };
+}
+
+/**
+ * Where the middle of a kana's ink sits above its baseline, as a fraction of
+ * the font size, measured on the notation fonts. Not the 0.4 the rest circle
+ * uses, which is where it looks aligned to the characters beside it.
+ */
+const GLYPH_INK_CENTER_RATIO = 0.35;
+
+/**
+ * The gap kept between a note's cell and the next note's, and the room
+ * around the marks inside it, as fractions of the font size (2px and 4px at
+ * the default 32).
+ */
+const CELL_GAP_RATIO = 1 / 16;
+const CELL_PADDING_RATIO = 1 / 8;
+
+/**
+ * The size of a note's cell. It's as tall as the distance between notes less
+ * a gap, the most it can be without touching the next note's cell. It's wide
+ * enough, with padding, for a meri mark on the left and an octave mark on the
+ * right, whichever the note has. An octave mark, which reaches above the cell,
+ * can rise past its top edge, as a dot can below.
+ */
+function noteCellSize(options: ResolvedRenderOptions): {
+  width: number;
+  height: number;
+} {
+  const reach = Math.max(
+    meriKariReachLeft(options.meriKariFontSize),
+    octaveMarkReachRight(options.octaveMarkFontSize),
+  );
+  return {
+    width: Math.ceil(2 * (reach + options.noteFontSize * CELL_PADDING_RATIO)),
+    height: options.noteVerticalSpacing - options.noteFontSize * CELL_GAP_RATIO,
+  };
+}
 
 /**
  * ScoreRenderer - Main class for rendering shakuhachi notation
@@ -45,6 +106,8 @@ const DEFAULT_VIEWPORT = { width: 800, height: 600 } as const;
  */
 export class ScoreRenderer {
   private container: HTMLElement;
+  /** The options as given, so ones left unset can follow those they derive from */
+  private givenOptions: RenderOptions;
   private options: ResolvedRenderOptions;
   private currentNotes: ShakuNote[] = [];
   private currentScoreData: ScoreData | null = null;
@@ -58,6 +121,7 @@ export class ScoreRenderer {
    */
   constructor(container: HTMLElement, options: RenderOptions = {}) {
     this.container = container;
+    this.givenOptions = options;
     this.options = mergeWithDefaults(options);
 
     // Set up ResizeObserver if autoResize is enabled
@@ -248,10 +312,8 @@ export class ScoreRenderer {
    * @param autoRefresh - Whether to automatically re-render (default: true)
    */
   setOptions(options: RenderOptions, autoRefresh: boolean = true): void {
-    this.options = mergeWithDefaults({
-      ...this.options,
-      ...options,
-    });
+    this.givenOptions = { ...this.givenOptions, ...options };
+    this.options = mergeWithDefaults(this.givenOptions);
 
     if (autoRefresh) {
       this.refresh();
@@ -284,6 +346,25 @@ export class ScoreRenderer {
    */
   getNotes(): ShakuNote[] {
     return [...this.currentNotes];
+  }
+
+  /**
+   * Where each note of the last render was drawn, in the order of the notes
+   *
+   * @returns One NoteBox per note; index i is the score's note i
+   */
+  getNoteBoxes(): NoteBox[] {
+    const { width, height } = noteCellSize(this.options);
+    return this.currentNotes.map((note) => {
+      const { x, y } = note.getPosition();
+      const centerY = y - this.options.noteFontSize * GLYPH_INK_CENTER_RATIO;
+      return {
+        ...note.getBBox(),
+        centerX: x,
+        centerY,
+        cell: { x: x - width / 2, y: centerY - height / 2, width, height },
+      };
+    });
   }
 
   /**

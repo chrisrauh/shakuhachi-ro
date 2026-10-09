@@ -60,13 +60,22 @@ const formats = [
       </button>
     </div>
 
+    <p class="editor-status" id="editor-status" aria-live="polite">
+      <strong class="editor-status-mode" id="status-mode"></strong>
+      <span id="status-detail"></span>
+    </p>
+
     <div
       class="editor-workspace"
       id="editor-workspace"
       data-palette-side="right"
     >
       <div class="editor-score-area" id="score-area">
-        <shakuhachi-score id="score-renderer" columns="1"></shakuhachi-score>
+        <div class="editor-score-canvas" id="score-canvas">
+          <div class="score-highlight" id="score-highlight" hidden></div>
+          <shakuhachi-score id="score-renderer" columns="1"></shakuhachi-score>
+          <div class="score-cursor" id="score-cursor" hidden></div>
+        </div>
         <p class="editor-empty-hint" id="score-empty-hint" hidden>
           An empty score. Choose a note to start.
         </p>

@@ -668,7 +668,7 @@ interface RenderOptions {
   notesPerColumn?: number; // default: 10
   columnSpacing?: number; // default: 35
   columnWidth?: number; // default: 100
-  topMargin?: number; // default: 34
+  topMargin?: number; // default: derived from the octave mark (32)
 
   // Note Typography
   noteFontSize?: number; // default: 28

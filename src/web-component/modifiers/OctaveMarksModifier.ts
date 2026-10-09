@@ -19,6 +19,7 @@
 import { Modifier } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
+import { MARK_WIDTH_RATIO, OCTAVE_MARK_OFFSET } from './mark-geometry';
 
 export type OctaveRegister = 'otsu' | 'kan' | 'daikan';
 
@@ -62,10 +63,10 @@ export class OctaveMarksModifier extends Modifier {
    */
   private setDefaultOffsets(): void {
     // Offsets belong to the modifier, not to render options — MeriKariModifier
-    // works the same way. DEFAULT_RENDER_OPTIONS.topMargin is derived from
-    // these two values, so changing them means changing that as well.
-    this.offsetX = 18; // To the right of note
-    this.offsetY = -22; // Above the note
+    // works the same way. They live in mark-geometry, which the top margin
+    // and the note cell are derived from.
+    this.offsetX = OCTAVE_MARK_OFFSET.x; // To the right of note
+    this.offsetY = OCTAVE_MARK_OFFSET.y; // Above the note
   }
 
   /**
@@ -82,7 +83,7 @@ export class OctaveMarksModifier extends Modifier {
 
     // The first character takes the single-character position and the rest
     // stack below it, so 大甲 reads top to bottom and reaches no higher than
-    // 乙 or 甲 (DEFAULT_RENDER_OPTIONS.topMargin only clears one character)
+    // 乙 or 甲 (the top margin only clears one character)
     chars.forEach((char, i) => {
       renderer.drawText(
         char,
@@ -141,7 +142,7 @@ export class OctaveMarksModifier extends Modifier {
    * Approximate based on font size
    */
   getWidth(): number {
-    return this.fontSize * 0.8;
+    return this.fontSize * MARK_WIDTH_RATIO;
   }
 
   /**

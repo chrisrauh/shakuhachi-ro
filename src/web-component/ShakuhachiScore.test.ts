@@ -58,7 +58,7 @@ describe('ShakuhachiScore Web Component - Columns Attribute', () => {
     const svg = component.shadowRoot?.querySelector('svg');
     expect(svg).toBeTruthy();
     // In single column mode, height should be intrinsic (based on number of notes)
-    // 6 notes: 34px top + (5 × 44px spacing) + 20px bottom = 274px
+    // 6 notes: 32px top + (5 × 44px spacing) + 20px bottom = 272px
     const height = svg?.getAttribute('height');
     expect(parseInt(height || '0')).toBeGreaterThan(250);
   });
@@ -322,7 +322,7 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     const svg = component.shadowRoot?.querySelector('svg');
     expect(svg).toBeTruthy();
     // Height is calculated from note count, not container
-    // 3 notes: 34px top + (2 × 44px spacing) + 20px bottom = 142px
+    // 3 notes: 32px top + (2 × 44px spacing) + 20px bottom = 140px
     expect(parseInt(svg?.getAttribute('height') || '0')).toBeGreaterThan(130);
   });
 
@@ -390,7 +390,7 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     expect(svg?.getAttribute('width')).toBe('410');
 
     // Height for 2 notes per column (6 ÷ 3)
-    // 34 + (1 × 44) + 20 = 98px
+    // 32 + (1 × 44) + 20 = 96px
     const height = parseInt(svg?.getAttribute('height') || '0');
     expect(height).toBeCloseTo(98, -1); // Allow ~10px tolerance
   });
@@ -444,7 +444,7 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     expect(svg?.getAttribute('width')).toBe('140');
 
     // Height for 6 notes in single column
-    // 34 + (5 × 44) + 20 = 274px
+    // 32 + (5 × 44) + 20 = 272px
     const height = parseInt(svg?.getAttribute('height') || '0');
     expect(height).toBeCloseTo(274, -1); // Allow ~10px tolerance
   });

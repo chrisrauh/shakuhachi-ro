@@ -20,7 +20,11 @@ import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
 /** Register for each `pitch.octave` value validate() accepts: 0, 1, 2 */
-const OCTAVE_REGISTERS: readonly OctaveRegister[] = ['otsu', 'kan', 'daikan'];
+export const OCTAVE_REGISTERS: readonly OctaveRegister[] = [
+  'otsu',
+  'kan',
+  'daikan',
+];
 
 /**
  * Maps numeric duration to NoteDuration

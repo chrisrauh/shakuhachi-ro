@@ -192,6 +192,16 @@ describe('RenderOptions', () => {
       expect(result.autoResize).toBe(false);
     });
 
+    it('should derive the top margin from the octave mark unless it is given', () => {
+      // 20px above the baseline, plus the 12px mark
+      expect(DEFAULT_RENDER_OPTIONS.topMargin).toBe(32);
+      expect(mergeWithDefaults({}).topMargin).toBe(32);
+      expect(mergeWithDefaults({ octaveMarkFontSize: 20 }).topMargin).toBe(40);
+      expect(
+        mergeWithDefaults({ octaveMarkFontSize: 20, topMargin: 50 }).topMargin,
+      ).toBe(50);
+    });
+
     it('should leave width and height unset unless provided', () => {
       expect('width' in DEFAULT_RENDER_OPTIONS).toBe(false);
       expect('height' in DEFAULT_RENDER_OPTIONS).toBe(false);

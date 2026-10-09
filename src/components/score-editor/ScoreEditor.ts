@@ -20,6 +20,7 @@ import { STRINGS } from '../../constants/strings';
 import { DetailsDialog } from './DetailsDialog';
 import { SourceView } from './SourceView';
 import { PalettePanel } from './PalettePanel';
+import { SelectionView } from './SelectionView';
 
 /**
  * The score edit page (/score/[slug]/edit). Holds the score being edited — its
@@ -41,6 +42,7 @@ export class ScoreEditor {
   private readonly details: DetailsDialog;
   private readonly sourceView: SourceView;
   private readonly palettes: PalettePanel;
+  private readonly selection: SelectionView;
   private readonly scoreArea: HTMLElement;
   private readonly renderer: HTMLElement;
   private readonly emptyHint: HTMLElement;
@@ -82,6 +84,7 @@ export class ScoreEditor {
     });
     this.sourceView.setSource(this.source, this.format);
     this.palettes = new PalettePanel();
+    this.selection = new SelectionView();
 
     byId('details-btn').addEventListener('click', () => this.details.open());
     this.sourceToggle.addEventListener('click', () =>
@@ -119,6 +122,7 @@ export class ScoreEditor {
 
     this.renderer.setAttribute('data-score', JSON.stringify(data));
     this.emptyHint.hidden = data.notes.length > 0;
+    this.selection.show(data.notes);
     return true;
   }
 
@@ -142,6 +146,7 @@ export class ScoreEditor {
     this.sourceView.visible = visible;
     this.scoreArea.hidden = visible;
     this.palettes.visible = !visible;
+    this.selection.visible = !visible;
     this.sourceToggle.querySelector('.btn-text')!.textContent = visible
       ? 'Score'
       : 'Source';
