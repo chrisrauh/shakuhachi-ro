@@ -20,13 +20,20 @@ export class ScoreLibrary {
   private isLoading: boolean = false;
   private error: Error | null = null;
   private authSubscription?: { unsubscribe: () => void };
+  private holdLoading: boolean;
 
-  constructor(containerId: string) {
+  /**
+   * @param options.holdLoading - Show the loading state and never load
+   *   scores, to check the spinner in place (index.astro sets it from
+   *   `?loading` in the URL)
+   */
+  constructor(containerId: string, { holdLoading = false } = {}) {
     const container = document.getElementById(containerId);
     if (!container) {
       throw new Error(STRING_FACTORIES.containerNotFound(containerId));
     }
     this.container = container;
+    this.holdLoading = holdLoading;
 
     // Subscribe to auth state changes using onAuthReady
     // Handles Supabase's quirky event ordering automatically
@@ -45,6 +52,7 @@ export class ScoreLibrary {
     this.isLoading = true;
     this.error = null;
     this.render();
+    if (this.holdLoading) return;
 
     // Fetch user's scores if logged in
     if (this.currentUser) {

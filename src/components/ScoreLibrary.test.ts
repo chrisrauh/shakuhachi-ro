@@ -373,3 +373,31 @@ describe('ScoreLibrary error state', () => {
     expect(container.querySelector('#retry-btn')).not.toBeNull();
   });
 });
+
+// --- Held loading state ---
+
+describe('ScoreLibrary held loading state', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    document.body.innerHTML = '<div id="score-library"></div>';
+
+    const { onAuthReady } = await import('../api/auth');
+    vi.mocked(onAuthReady).mockImplementation((cb) => {
+      cb(null);
+      return { unsubscribe: vi.fn() } as any;
+    });
+  });
+
+  it('keeps showing the spinner and never fetches scores', async () => {
+    const { getAllScores } = await import('../api/scores');
+
+    new ScoreLibrary('score-library', { holdLoading: true });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const container = document.getElementById('score-library')!;
+    expect(
+      container.querySelector('.score-library-loading .spinner'),
+    ).not.toBeNull();
+    expect(getAllScores).not.toHaveBeenCalled();
+  });
+});
