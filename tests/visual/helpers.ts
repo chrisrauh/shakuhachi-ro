@@ -17,6 +17,31 @@ export async function setTheme(page: Page, theme: 'light' | 'dark') {
   }, theme);
 }
 
+/** The clock, and every score's last update, as fixDates sets them. */
+const FIXED_NOW = new Date('2026-06-15T12:00:00Z');
+const FIXED_UPDATED_AT = '2026-02-14T12:00:00Z';
+
+/**
+ * Fixes the "Updated on Feb 14" dates on score cards and score pages, which
+ * would otherwise change with the passing days and whenever a fixture is
+ * saved. Both halves are needed: the page's clock, and each date's
+ * `datetime`, which comes from the score in the database. The dates are
+ * rewritten as their elements appear, so this covers server-rendered pages
+ * and cards fetched after load. Call before `page.goto`.
+ */
+export async function fixDates(page: Page) {
+  await page.clock.setFixedTime(FIXED_NOW);
+  await page.addInitScript((datetime: string) => {
+    new MutationObserver(() => {
+      for (const el of document.querySelectorAll(
+        `relative-time:not([datetime="${datetime}"])`,
+      )) {
+        el.setAttribute('datetime', datetime);
+      }
+    }).observe(document, { childList: true, subtree: true });
+  }, FIXED_UPDATED_AT);
+}
+
 /**
  * Wait for every shakuhachi-score on the page to finish rendering its SVG.
  *
