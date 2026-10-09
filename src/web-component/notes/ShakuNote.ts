@@ -9,7 +9,7 @@
  */
 
 import type { RenderingBackend } from '../renderer/RenderingBackend';
-import type { Modifier } from '../modifiers/Modifier';
+import type { Modifier, ModifierLayout } from '../modifiers/Modifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import {
   getSymbolByRomaji,
@@ -130,6 +130,13 @@ export class ShakuNote {
   /** Attached modifiers */
   private modifiers: Modifier[] = [];
 
+  /**
+   * Where the note sat in the score when last drawn, which sizes some of its
+   * modifiers in the bounding box. Default spacing until then, as the
+   * position is (0, 0) until set.
+   */
+  private layout: ModifierLayout;
+
   /** Cached bounding box */
   private bbox: BoundingBox | null = null;
 
@@ -155,6 +162,10 @@ export class ShakuNote {
       options.fontFamily ?? DEFAULT_RENDER_OPTIONS.noteFontFamily;
     this.color = options.color ?? '#000';
     this.isRest = options.isRest ?? false;
+    this.layout = {
+      distanceToNext: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+      noteFontSize: this.fontSize,
+    };
 
     if (options.modifiers) {
       this.modifiers = [...options.modifiers];
@@ -165,8 +176,10 @@ export class ShakuNote {
    * Renders the note and all its modifiers
    *
    * @param renderer - Backend to draw with
+   * @param layout - Where the note sits in the score, for its modifiers
    */
-  render(renderer: RenderingBackend): void {
+  render(renderer: RenderingBackend, layout: ModifierLayout): void {
+    this.layout = layout;
     if (this.isRest) {
       // Draw rest as a small hollow circle
       // Radius is about 1/8 of fontSize (for fontSize 32, radius ~4px)
@@ -201,7 +214,7 @@ export class ShakuNote {
 
     // Render all modifiers
     this.modifiers.forEach((modifier) => {
-      modifier.render(renderer, this.x, this.y);
+      modifier.render(renderer, this.x, this.y, layout);
     });
 
     // Invalidate cached bbox after rendering
@@ -346,7 +359,7 @@ export class ShakuNote {
     this.modifiers.forEach((modifier) => {
       const modOffset = modifier.getOffset();
       const modWidth = modifier.getWidth();
-      const modHeight = modifier.getHeight();
+      const modHeight = modifier.getHeight(this.layout);
 
       const modX = this.x + modOffset.x;
       const modY = this.y + modOffset.y;
