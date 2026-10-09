@@ -22,7 +22,7 @@ test.describe('Shakuhachi Score Web Component - Columns Attribute', () => {
   // Astro 7 runs on rejects cross-origin requests with 403, so the embed script
   // must be fetched from a page already on the dev server's own origin.
   test.beforeEach(async ({ page }) => {
-    await page.goto('/test/spinner');
+    await page.goto('/test/buttons');
   });
 
   // Sample score data with enough notes to test multi-column layout

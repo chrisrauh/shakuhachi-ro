@@ -39,12 +39,6 @@
   position: relative;
 }
 
-/* Spinner shown inline next to text (static markup). Not for ButtonLoadingState,
-   whose overlay spinner must not change the spacing of the hidden content. */
-.btn.loading:not(:has(> .btn-spinner)) {
-  gap: 8px;
-}
-
 /* ButtonLoadingState: the spinner is laid over the button's content, and the
    content is hidden but kept in place, so the button keeps the width its own
    label gives it instead of shrinking to the spinner. */
@@ -58,6 +52,17 @@
 
 .btn-spinner ~ * {
   visibility: hidden;
+}
+
+/* Loading spinners (LoadingSpinner.ts). The SVG fixes the proportions; the
+   height sets the dot size, and the width follows. */
+.spinner {
+  height: var(--size-spinner-dot);
+  overflow: visible;
+}
+
+.spinner-compact {
+  height: var(--size-spinner-compact-dot);
 }
 
 /* Owner-only buttons (score detail page) — hidden by default, shown via JS class toggle */

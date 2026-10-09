@@ -282,6 +282,7 @@
 
 .score-library-loading {
   text-align: center;
+  color: var(--color-text-tertiary);
   padding: var(--spacing-3x-large) var(--spacing-large);
 }
 
