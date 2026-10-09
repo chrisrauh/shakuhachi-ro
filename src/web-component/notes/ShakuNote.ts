@@ -61,12 +61,6 @@ export interface ShakuNoteOptions {
   /** Symbol identifier (romaji like 'ro', 'tsu') or kana ('ロ', 'ツ') */
   symbol: string;
 
-  /** X coordinate for rendering */
-  x?: number;
-
-  /** Y coordinate for rendering (baseline) */
-  y?: number;
-
   /** Duration for spacing (default: 'q' = quarter note) */
   duration?: NoteDuration;
 
@@ -106,10 +100,10 @@ export class ShakuNote {
   /** Symbol metadata from kinkoMap */
   private symbolInfo: KinkoSymbol | undefined;
 
-  /** X position */
+  /** X position where the note was last drawn, (0, 0) until then */
   private x: number = 0;
 
-  /** Y position (baseline) */
+  /** Y position (baseline) where the note was last drawn */
   private y: number = 0;
 
   /** Duration for spacing */
@@ -153,8 +147,6 @@ export class ShakuNote {
     // Use kana from symbol info if available, otherwise use provided symbol
     this.kana = this.symbolInfo?.kana || options.symbol;
 
-    this.x = options.x ?? 0;
-    this.y = options.y ?? 0;
     this.duration = options.duration ?? 'q';
     this.fontSize = options.fontSize ?? 32;
     this.fontWeight = options.fontWeight ?? 400;
@@ -176,9 +168,19 @@ export class ShakuNote {
    * Renders the note and all its modifiers
    *
    * @param renderer - Backend to draw with
+   * @param x - X coordinate of the note centre
+   * @param y - Y coordinate of the note baseline
    * @param layout - Where the note sits in the score, for its modifiers
    */
-  render(renderer: RenderingBackend, layout: ModifierLayout): void {
+  render(
+    renderer: RenderingBackend,
+    x: number,
+    y: number,
+    layout: ModifierLayout,
+  ): void {
+    // Kept for getPosition() and getBBox() after drawing
+    this.x = x;
+    this.y = y;
     this.layout = layout;
     if (this.isRest) {
       // Draw rest as a small hollow circle
@@ -287,18 +289,7 @@ export class ShakuNote {
   }
 
   /**
-   * Sets the position of this note
-   * @returns this for chaining
-   */
-  setPosition(x: number, y: number): this {
-    this.x = x;
-    this.y = y;
-    this.bbox = null;
-    return this;
-  }
-
-  /**
-   * Gets the current position
+   * Where the note was last drawn
    */
   getPosition(): { x: number; y: number } {
     return { x: this.x, y: this.y };

@@ -191,12 +191,11 @@ export class ScoreRenderer {
         const x = columnInfo.xPosition;
         const y = notePosition.y;
 
-        // Set note styling and position
+        // Set note styling
         note.setFontSize(this.options.noteFontSize);
         note.setFontWeight(this.options.noteFontWeight);
         note.setFontFamily(this.options.noteFontFamily);
-        note.setPosition(x, y);
-        note.render(renderer, {
+        note.render(renderer, x, y, {
           distanceToNext: notePosition.nextY - y,
           noteFontSize: this.options.noteFontSize,
         });

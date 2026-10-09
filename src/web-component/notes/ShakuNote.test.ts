@@ -34,8 +34,10 @@ describe('ShakuNote', () => {
   describe('render', () => {
     function drawnText(symbol: string) {
       const drawText = vi.fn();
-      new ShakuNote({ symbol, x: 100, y: 200 }).render(
+      new ShakuNote({ symbol }).render(
         { drawText } as unknown as RenderingBackend,
+        100,
+        200,
         { distanceToNext: 44, noteFontSize: 32 },
       );
       return drawText.mock.calls.map(([text, x, y, size]) => ({
@@ -67,23 +69,32 @@ describe('ShakuNote', () => {
   });
 
   describe('getBBox', () => {
+    const backend = {
+      drawText: vi.fn(),
+      drawLine: vi.fn(),
+    } as unknown as RenderingBackend;
+
+    it('is where the note was last drawn', () => {
+      const note = new ShakuNote({ symbol: 'ro' });
+      note.render(backend, 100, 200, { distanceToNext: 44, noteFontSize: 32 });
+      note.render(backend, 300, 400, { distanceToNext: 44, noteFontSize: 32 });
+
+      const box = note.getBBox();
+
+      expect(note.getPosition()).toEqual({ x: 300, y: 400 });
+      expect(box.x + box.width / 2).toBe(300);
+      expect(box.y + box.height).toBe(400);
+    });
+
     // A duration line runs to the next note, so the box spans the line drawn
     // in the layout the note was last rendered in
     it('sizes its duration line from the layout it was last rendered in', () => {
       const boxHeight = (distanceToNext: number) => {
         const note = new ShakuNote({
           symbol: 'ro',
-          x: 100,
-          y: 200,
           modifiers: [new DurationLineModifier(1)],
         });
-        note.render(
-          {
-            drawText: vi.fn(),
-            drawLine: vi.fn(),
-          } as unknown as RenderingBackend,
-          { distanceToNext, noteFontSize: 32 },
-        );
+        note.render(backend, 100, 200, { distanceToNext, noteFontSize: 32 });
         return note.getBBox().height;
       };
 
