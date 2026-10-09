@@ -175,7 +175,7 @@ gh pr list --base <branch>
 
 `state` must be `MERGED` with a non-null `mergedAt`, and both list commands must come back empty — a non-empty `--base` result means a stacked PR targets this branch.
 
-Only when all three pass:
+Only when all three pass (in the cloud, skip both deletes; see your environment guide):
 
 ```bash
 git branch -d <branch>
