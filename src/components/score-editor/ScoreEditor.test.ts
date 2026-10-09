@@ -74,14 +74,26 @@ function renderPage(): void {
     <div id="editor-workspace">
       <div id="palette-panel">
         <div id="palette-columns">
-          <div data-column="marks"></div>
-          <div data-column="length"></div>
-          <div data-column="notes"></div>
+          <div data-column="marks">
+            <button class="palette-key" data-mark="meri" aria-label="meri"></button>
+            <button class="palette-key" data-key="octave-up" aria-label="octave up"></button>
+          </div>
+          <div data-column="length">
+            <button class="palette-key" data-duration="1" aria-label="half"></button>
+            <button class="palette-key" data-duration="2" aria-label="beat"></button>
+            <button class="palette-key" data-key="dot" aria-label="dot"></button>
+          </div>
+          <div data-column="notes">
+            <div class="palette-keys">
+              <button class="palette-key" data-step="re" aria-label="re"></button>
+              <button class="palette-key" data-step="rest" aria-label="rest"></button>
+            </div>
+          </div>
         </div>
         <div id="palette-edit-row">
-          <button data-key="undo"></button>
-          <button data-key="redo"></button>
-          <button data-key="delete"></button>
+          <button class="palette-key" data-key="undo" aria-label="undo" disabled></button>
+          <button class="palette-key" data-key="redo" aria-label="redo" disabled></button>
+          <button class="palette-key" data-key="delete" aria-label="delete"></button>
         </div>
       </div>
     </div>
@@ -321,6 +333,132 @@ describe('ScoreEditor selection', () => {
     $('source-toggle').click();
 
     expect(status()).toBe('Inserting after ツ tsu, otsu · 1 of 1');
+  });
+});
+
+describe('ScoreEditor editing', () => {
+  const key = (selector: string) =>
+    document.querySelector<HTMLButtonElement>(`.palette-key[${selector}]`)!;
+  const press = (init: KeyboardEventInit) =>
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, ...init }),
+    );
+  const source = () =>
+    JSON.parse($<HTMLTextAreaElement>('score-data-input').value) as ScoreData;
+  const status = () => $('status-detail').textContent;
+
+  it('inserts a note at the cursor into the source, and undo takes it out', () => {
+    new ScoreEditor(makeScore({ data: { ...TWO_NOTES, title: 'Kept' } }));
+
+    key('data-step="re"').click();
+    expect(source()).toEqual({
+      ...TWO_NOTES,
+      title: 'Kept',
+      notes: [
+        ...TWO_NOTES.notes,
+        { pitch: { step: 're', octave: 0 }, duration: 2 },
+      ],
+    });
+    expect(renderedScore()).toEqual(source());
+    expect(status()).toBe('after レ re, otsu · 3 of 3');
+    expect($('save-status').textContent).toBe('Unsaved');
+
+    key('data-key="undo"').click();
+    expect(source().notes).toEqual(TWO_NOTES.notes);
+    expect(status()).toBe('after ツ tsu, otsu · 2 of 2');
+    expect(key('data-key="redo"').disabled).toBe(false);
+  });
+
+  it('deletes with Backspace and undoes with Ctrl+Z, putting the highlight back', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    press({ key: 'ArrowUp' });
+    press({ key: 'Enter' });
+    expect($('status-mode').textContent).toBe('Changing');
+
+    press({ key: 'Backspace' });
+    expect(source().notes).toEqual(TWO_NOTES.notes.slice(1));
+    expect($('status-mode').textContent).toBe('Inserting');
+
+    press({ key: 'z', ctrlKey: true });
+    expect(source().notes).toEqual(TWO_NOTES.notes);
+    expect($('status-mode').textContent).toBe('Changing');
+
+    press({ key: 'z', metaKey: true, shiftKey: true });
+    expect(source().notes).toEqual(TWO_NOTES.notes.slice(1));
+  });
+
+  it('presses the keys the target note matches, and disables those that do not apply', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+
+    expect(key('data-duration="2"').getAttribute('aria-pressed')).toBe('true');
+    expect(key('data-duration="1"').getAttribute('aria-pressed')).toBe('false');
+    expect(key('data-step="re"').title).toBe('Insert re');
+
+    key('data-step="rest"').click();
+    expect(key('data-mark="meri"').disabled).toBe(true);
+    expect(key('data-key="octave-up"').disabled).toBe(true);
+    expect(key('data-key="dot"').disabled).toBe(false);
+
+    press({ key: 'ArrowUp' });
+    press({ key: 'ArrowUp' });
+    press({ key: 'ArrowUp' });
+    expect(key('data-key="delete"').disabled).toBe(true);
+    expect(key('data-duration="2"').disabled).toBe(true);
+  });
+
+  it('presses the highlighted note’s key, and scrolls its column just enough to show it, once', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    const re = key('data-step="re"');
+    const column = re.closest<HTMLElement>('.palette-keys')!;
+    // jsdom lays nothing out: the column shows 0–100, and re is drawn at 120–166
+    vi.spyOn(column, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      bottom: 100,
+    } as DOMRect);
+    vi.spyOn(re, 'getBoundingClientRect').mockReturnValue({
+      top: 120,
+      bottom: 166,
+    } as DOMRect);
+
+    // At the cursor, note keys insert: none is pressed
+    re.click();
+    expect(re.hasAttribute('aria-pressed')).toBe(false);
+    expect(column.scrollTop).toBe(0);
+
+    press({ key: 'Enter' });
+    expect(re.getAttribute('aria-pressed')).toBe('true');
+    expect(key('data-step="rest"').getAttribute('aria-pressed')).toBe('false');
+    expect(column.scrollTop).toBe(66);
+
+    // Editing the same note leaves a column scrolled by hand where it is
+    column.scrollTop = 0;
+    key('data-key="dot"').click();
+    expect(column.scrollTop).toBe(0);
+  });
+
+  it('leaves the editing keys off for a MusicXML score', () => {
+    const musicxml = `<?xml version="1.0"?>
+<score-partwise><part id="P1"><measure number="1">
+<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+</measure></part></score-partwise>`;
+    new ScoreEditor(makeScore({ data_format: 'musicxml', data: musicxml }));
+
+    expect(key('data-step="re"').disabled).toBe(true);
+    expect(key('data-key="delete"').disabled).toBe(true);
+    press({ key: 'Backspace' });
+    expect($<HTMLTextAreaElement>('score-data-input').value).toBe(musicxml);
+  });
+
+  it('forgets what could be undone after an edit to the source', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    key('data-step="re"').click();
+    expect(key('data-key="undo"').disabled).toBe(false);
+
+    $('source-toggle').click();
+    typeSource(JSON.stringify(TWO_NOTES));
+    $('source-toggle').click();
+
+    expect(key('data-key="undo"').disabled).toBe(true);
   });
 });
 

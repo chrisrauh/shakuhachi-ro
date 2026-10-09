@@ -8,7 +8,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { setTheme, waitForScoreRendered } from './helpers';
+import { fixDates, setTheme, waitForScoreRendered } from './helpers';
 
 const colorSchemes = ['light', 'dark'] as const;
 const viewports = [
@@ -25,6 +25,7 @@ test.describe('Score Detail Page Visual Regression', () => {
           height: viewport.height,
         });
         await page.emulateMedia({ colorScheme });
+        await fixDates(page);
         await page.goto('/score/akatombo');
         await waitForScoreRendered(page);
         await setTheme(page, colorScheme);

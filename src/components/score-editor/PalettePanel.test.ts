@@ -23,6 +23,8 @@ function renderPage(): void {
 }
 
 const $ = (id: string) => document.getElementById(id)!;
+/** Its keys pass on commands, which these tests don't press. */
+const panel = () => new PalettePanel(() => {});
 const columnOrder = () =>
   [...document.querySelectorAll<HTMLElement>('[data-column]')].map(
     (column) => column.dataset.column,
@@ -44,7 +46,7 @@ afterEach(() => {
 
 describe('PalettePanel', () => {
   it('starts on the right, with the notes column and delete on the outer edge', () => {
-    new PalettePanel();
+    panel();
 
     expect($('editor-workspace').dataset.paletteSide).toBe('right');
     expect(columnOrder()).toEqual(['marks', 'length', 'notes']);
@@ -55,7 +57,7 @@ describe('PalettePanel', () => {
   });
 
   it('moves to the other side, keeping the notes column and delete outermost', () => {
-    new PalettePanel();
+    panel();
     $('palette-side-toggle').click();
 
     expect($('editor-workspace').dataset.paletteSide).toBe('left');
@@ -70,11 +72,11 @@ describe('PalettePanel', () => {
   });
 
   it('opens on the side chosen last time', () => {
-    new PalettePanel();
+    panel();
     $('palette-side-toggle').click();
 
     renderPage();
-    new PalettePanel();
+    panel();
 
     expect($('editor-workspace').dataset.paletteSide).toBe('left');
     expect(columnOrder()).toEqual(['notes', 'length', 'marks']);
@@ -88,7 +90,7 @@ describe('PalettePanel', () => {
       throw new Error('blocked');
     });
 
-    new PalettePanel();
+    panel();
     expect($('editor-workspace').dataset.paletteSide).toBe('right');
 
     $('palette-side-toggle').click();

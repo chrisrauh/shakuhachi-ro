@@ -1,5 +1,6 @@
 import type { NoteBox } from '../../web-component/renderer/ScoreRenderer';
 import type { ScoreNote } from '../../web-component/types/ScoreData';
+import type { EditorCommand } from './editing';
 import {
   cursorLine,
   describeSelection,
@@ -27,11 +28,12 @@ const VIEW_MARGIN = { top: 24, bottom: 32 };
  * The cursor and highlight over the score on the edit page. Draws them as
  * elements over the score, from where the renderer reports drawing each note,
  * moves them on taps and keys, and says where they are in the status line.
+ * Passes on the keyboard's delete, undo and redo, which act on the selection.
  */
 export class SelectionView {
   private notes: ScoreNote[] = [];
   /** Null until the first score is shown. */
-  private selection: Selection | null = null;
+  private current: Selection | null = null;
   private idleTimer: number | undefined;
 
   private readonly scoreArea: HTMLElement;
@@ -43,7 +45,13 @@ export class SelectionView {
   private readonly statusMode: HTMLElement;
   private readonly statusDetail: HTMLElement;
 
-  constructor() {
+  constructor(
+    private readonly handlers: {
+      /** After every change of selection, including by an edit. */
+      onChange: () => void;
+      onCommand: (command: EditorCommand) => void;
+    },
+  ) {
     this.scoreArea = byId('score-area');
     this.canvas = byId('score-canvas');
     this.renderer = byId<ScoreElement>('score-renderer');
@@ -63,27 +71,34 @@ export class SelectionView {
     this.status.hidden = !visible;
   }
 
+  /** Where the cursor or highlight is. Read only once a score is shown. */
+  get selection(): Selection {
+    return this.current!;
+  }
+
   /**
-   * Draws the selection over a newly rendered score. Entering the editor puts
-   * the cursor after the last note; after that, the selection is kept, inside
-   * the score's new length.
+   * Draws a selection over a newly rendered score: the one an edit leaves, or
+   * without one, the one before, kept inside the score's new length. Entering
+   * the editor puts the cursor after the last note.
    */
-  show(notes: ScoreNote[]): void {
+  show(notes: ScoreNote[], selection?: Selection): void {
     this.notes = notes;
     this.select(
-      this.selection
-        ? fitSelection(this.selection, notes.length)
-        : { type: 'cursor', position: notes.length },
+      selection ??
+        (this.current
+          ? fitSelection(this.current, notes.length)
+          : { type: 'cursor', position: notes.length }),
     );
   }
 
   private select(selection: Selection): void {
-    this.selection = selection;
+    this.current = selection;
     this.draw();
+    this.handlers.onChange();
   }
 
   private draw(): void {
-    const selection = this.selection!;
+    const selection = this.current!;
     const boxes = this.renderer.getNoteBoxes();
     let top: number;
     let bottom: number;
@@ -159,7 +174,7 @@ export class SelectionView {
         this.renderer.getNoteBoxes(),
         e.clientX - canvas.left,
         e.clientY - canvas.top,
-        this.selection!,
+        this.selection,
       ),
     );
   }
@@ -169,15 +184,25 @@ export class SelectionView {
     if (
       this.scoreArea.hidden ||
       e.altKey ||
-      e.ctrlKey ||
-      e.metaKey ||
       target.closest('input, textarea, select, dialog, [contenteditable]')
     ) {
       return;
     }
-    const selection = this.selection!;
+    const selection = this.selection;
 
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    // Ctrl or ⌘ is only for undo and redo
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        this.handlers.onCommand({ type: e.shiftKey ? 'redo' : 'undo' });
+      }
+      return;
+    }
+
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      e.preventDefault();
+      this.handlers.onCommand({ type: 'delete' });
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
       const step = e.key === 'ArrowUp' ? -1 : 1;
       this.select(moveSelection(selection, step, this.notes.length));

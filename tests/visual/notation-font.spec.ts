@@ -13,7 +13,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { setTheme, waitForScoreRendered } from './helpers';
+import { fixDates, setTheme, waitForScoreRendered } from './helpers';
 
 const colorSchemes = ['light', 'dark'] as const;
 
@@ -28,6 +28,7 @@ test.describe('Notation Font Visual Regression', () => {
     test(`serif notation - ${colorScheme}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 780 });
       await page.emulateMedia({ colorScheme });
+      await fixDates(page);
       await page.goto('/score/akatombo');
       await waitForScoreRendered(page);
       await setTheme(page, colorScheme);

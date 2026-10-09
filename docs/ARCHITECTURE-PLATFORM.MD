@@ -236,6 +236,11 @@ Measured on 27 Sep 2026: all 16 files in `dist/_astro/` pass
 within the embed floor above. So the gap is theoretical today. Re-run that check after
 dependency or Astro upgrades. It checks syntax only, not browser APIs.
 
+Browser APIs are held to the same floor through `lib` in `tsconfig.json`, which is
+`ES2023`: type-checking rejects anything newer. The score editor relies on its array
+methods (`toSpliced`, `with`, `findLast`), all within the embed floor. Raise `lib`
+only to what that floor covers.
+
 **Region:** functions run in IAD (N. Virginia); the database is in Paris. Region
 selection needs a paid plan, which is why score pages are edge-cached instead (#385).
 

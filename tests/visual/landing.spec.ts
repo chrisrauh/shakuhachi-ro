@@ -5,13 +5,13 @@
  * We wait for `.score-library` (the loaded grid state) rather than `main`,
  * because `main` appears before the async API call settles.
  *
- * Note: score cards show relative timestamps ("2 weeks ago") that drift over
- * time. Baselines will need updating periodically as scores are added/renamed.
+ * Score cards' "Updated" dates are fixed (fixDates). Baselines still need
+ * updating when scores are added or renamed.
  */
 
 import { test, expect, type Page } from '@playwright/test';
 
-import { setTheme } from './helpers';
+import { fixDates, setTheme } from './helpers';
 
 const colorSchemes = ['light', 'dark'] as const;
 const viewports = [
@@ -26,9 +26,7 @@ async function waitForLanding(page: Page) {
 
 test.describe('Landing Page Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      Date.now = () => 1609459200000; // 2021-01-01 — freeze timestamps
-    });
+    await fixDates(page);
   });
 
   for (const colorScheme of colorSchemes) {
