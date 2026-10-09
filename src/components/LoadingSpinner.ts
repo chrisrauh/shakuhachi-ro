@@ -17,8 +17,8 @@
  *   loadingState.hide();   // Restore the content
  */
 
-export const BEAT = 0.36; // seconds from one hit to the next
-export const PAUSE = 0.36; // seconds of rest after the last dot, before the next pass
+const BEAT = 0.36; // seconds from one hit to the next
+const PAUSE = 0.18; // seconds of rest after the last dot, before the next pass
 const ATTACK = 0.06; // seconds a hit takes to reach full strength
 const DECAY = 0.7; // seconds a hit takes to fade
 const LOOSENESS = 0.1; // how far a hit may land early or late, in beats
@@ -29,14 +29,6 @@ const SWELL = 1.25; // how much a dot grows when it is hit
 // Each spinner's SVG styles are global to the page, and every spinner is timed
 // differently, so each one names its classes and keyframes uniquely
 let nextId = 0;
-
-export interface SpinnerTiming {
-  /** Seconds from one hit to the next */
-  beat?: number;
-  /** Seconds of rest after the last dot, before the next pass */
-  pause?: number;
-  random?: () => number;
-}
 
 /**
  * When each dot is hit, in beats: the dots in turn from left to right, then
@@ -78,14 +70,10 @@ function dotKeyframes(name: string, hits: number[], cycle: number): string {
   return `@keyframes ${name}{${frames}100%{${rest}}}`;
 }
 
-function buildDotsSVG(
-  dots: number,
-  className: string,
-  { beat = BEAT, pause = PAUSE, random = Math.random }: SpinnerTiming,
-) {
+function buildDotsSVG(dots: number, className: string) {
   const id = `spinner-${nextId++}`;
-  const { hits, length } = humanHits(dots, random, pause / beat);
-  const cycle = length * beat;
+  const { hits, length } = humanHits(dots, Math.random, PAUSE / BEAT);
+  const cycle = length * BEAT;
   // Dots have a diameter of 2 and a gap of three quarters of a dot
   const pitch = 3.5;
   const width = 2 + pitch * (dots - 1);
@@ -93,7 +81,7 @@ function buildDotsSVG(
   let style = `.${id}{fill:currentColor;opacity:${REST_OPACITY};transform-box:fill-box;transform-origin:center}`;
   let circles = '';
   for (let dot = 0; dot < dots; dot++) {
-    const seconds = hits[dot].map((beats) => beats * beat);
+    const seconds = hits[dot].map((beats) => beats * BEAT);
     style += dotKeyframes(`${id}-${dot}`, seconds, cycle);
     style += `.${id}-${dot}{animation:${id}-${dot} ${+cycle.toFixed(3)}s linear infinite}`;
     circles += `<circle class="${id} ${id}-${dot}" cx="${1 + pitch * dot}" cy="1" r="1"/>`;
@@ -105,13 +93,13 @@ function buildDotsSVG(
 }
 
 /** The standard spinner: three dots, for a page or section that is loading */
-export function buildSpinnerSVG(timing: SpinnerTiming = {}): string {
-  return buildDotsSVG(3, 'spinner', timing);
+export function buildSpinnerSVG(): string {
+  return buildDotsSVG(3, 'spinner');
 }
 
 /** The compact spinner: one dot, for buttons */
-export function buildCompactSpinnerSVG(timing: SpinnerTiming = {}): string {
-  return buildDotsSVG(1, 'spinner spinner-compact', timing);
+export function buildCompactSpinnerSVG(): string {
+  return buildDotsSVG(1, 'spinner spinner-compact');
 }
 
 /**
