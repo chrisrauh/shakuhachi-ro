@@ -1100,6 +1100,12 @@
   --color-bg-success-subtle: var(--color-green-975);
   --color-border-success: var(--color-green-800);
 
+  /* DANGER - the same, at the red steps nearest the success ones in lightness */
+  --color-text-danger: var(--color-red-450);
+  --color-bg-danger: var(--color-red-950);
+  --color-bg-danger-subtle: var(--color-red-975);
+  --color-border-danger: var(--color-red-800);
+
   /* BRAND - blue isn't inverted, so the light value, a pale tint, would glare
      on dark surfaces too. Dark, as green-950 is for success */
   --color-bg-primary-brand: var(--color-blue-950);

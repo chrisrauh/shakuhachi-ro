@@ -110,7 +110,7 @@ export class ABCSerializer {
         const written = pitchForFingering(fingering);
         if (!written) {
           throw new Error(
-            PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'ABC'),
+            PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index),
           );
         }
         // A fingering import wouldn't choose for its pitch is named in a

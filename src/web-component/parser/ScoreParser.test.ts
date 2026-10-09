@@ -240,7 +240,7 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 is missing pitch',
+        'Note 1 is missing pitch',
       );
     });
 
@@ -250,7 +250,7 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 is missing pitch.step',
+        'Note 1 is missing pitch.step',
       );
     });
 
@@ -260,7 +260,7 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 is missing pitch.octave',
+        'Note 1 is missing pitch.octave',
       );
     });
 
@@ -270,7 +270,7 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 is missing duration',
+        'Note 1 is missing duration',
       );
     });
 
@@ -282,7 +282,7 @@ describe('ScoreParser', () => {
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid octave: -1',
+        'Note 1 has invalid octave: -1',
       );
     });
 
@@ -294,7 +294,7 @@ describe('ScoreParser', () => {
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid octave: 3',
+        'Note 1 has invalid octave: 3',
       );
     });
 
@@ -306,17 +306,20 @@ describe('ScoreParser', () => {
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid meriKari: merri',
+        'Note 1 has invalid meriKari: merri',
       );
     });
 
-    it('should throw error if step is not a known value', () => {
+    it('should throw error if step is not a known value, numbering notes from 1', () => {
       const scoreData = {
-        notes: [{ pitch: { step: 'go', octave: 0 }, duration: 1 }],
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
+          { pitch: { step: 'go', octave: 0 }, duration: 1 },
+        ],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid pitch.step: go. Must be one of: ro, tsu,',
+        'Note 2 has invalid pitch.step: go. Must be one of: ro, tsu,',
       );
     });
 
@@ -328,7 +331,7 @@ describe('ScoreParser', () => {
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid duration: 0',
+        'Note 1 has invalid duration: 0',
       );
     });
 
@@ -340,7 +343,7 @@ describe('ScoreParser', () => {
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note at index 0 has invalid duration: -1',
+        'Note 1 has invalid duration: -1',
       );
     });
 
@@ -350,7 +353,7 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Rest at index 0 is missing duration',
+        'Note 1 is a rest and is missing duration',
       );
     });
 

@@ -5,6 +5,7 @@ import DetailsDialog from '../../../components/score-editor/DetailsDialog.astro'
 import PalettePanel from '../../../components/score-editor/PalettePanel.astro';
 import { getScoreBySlug } from '../../../api/scores';
 import { embedJson } from '../../../utils/embed-json';
+import { FORMAT_NAMES } from '../../../constants/strings';
 import { ArrowRightLeft, CircleAlert, CircleQuestionMark } from '@lucide/astro';
 import '../../../styles/score-editor.css';
 
@@ -17,11 +18,10 @@ const { score } = scoreResult;
 // 404 if score not found (no more create mode via this route)
 if (!score) return new Response(null, { status: 404 });
 
-const formats = [
-  { value: 'json', label: 'JSON' },
-  { value: 'musicxml', label: 'MusicXML' },
-  { value: 'abc', label: 'ABC' },
-];
+const formats = Object.entries(FORMAT_NAMES).map(([value, label]) => ({
+  value,
+  label,
+}));
 ---
 
 <Layout
