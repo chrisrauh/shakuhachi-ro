@@ -6,6 +6,7 @@ import { getScoreBySlug } from '../../api/scores';
 import { cacheTagForScore } from '../../utils/cache-tags';
 import { embedJson } from '../../utils/embed-json';
 import { LICENSES, musicCredit } from '../../utils/license';
+import { SCHOOLS } from '../../utils/school';
 import { GitFork, SquarePen, Trash } from '@lucide/astro';
 
 // In server mode, this page SSRs all routes dynamically
@@ -70,6 +71,7 @@ const license =
   >
     <!-- Score metadata in header -->
     <PageHeader slot="header-metadata" title={score.title}>
+      {score.school && <span>{SCHOOLS[score.school]}</span>}
       {parentScore ? (
         <span>
           forked from{' '}

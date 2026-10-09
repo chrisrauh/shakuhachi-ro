@@ -1,10 +1,12 @@
 ---
 /**
- * The score editor's details: title, composer, description and licence, in a
- * dialog so the score keeps the screen. DetailsDialog.ts wires it up.
+ * The score editor's details: title, composer, school, description and
+ * licence, in a dialog so the score keeps the screen. DetailsDialog.ts wires
+ * it up.
  */
 import type { Score } from '../../api/scores';
 import { LICENSES, licenseChoices } from '../../utils/license';
+import { SCHOOLS } from '../../utils/school';
 import { licenseDescriptionHTML } from './license-description';
 
 interface Props {
@@ -52,6 +54,20 @@ const parentHref = parent ? `/score/${encodeURIComponent(parent.slug)}` : '';
           value={score.composer ?? ''}
           placeholder="Composer name"
         />
+      </div>
+
+      <div class="details-field">
+        <label for="school-select">School</label>
+        <select id="school-select">
+          <option value="" selected={!score.school}>
+            None
+          </option>
+          {Object.entries(SCHOOLS).map(([key, name]) => (
+            <option value={key} selected={key === score.school}>
+              {name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div class="details-field">

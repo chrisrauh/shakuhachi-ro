@@ -11,6 +11,7 @@ import type {
   CopyrightStatus,
   ScoreLicense,
 } from '../utils/license';
+import type { School } from '../utils/school';
 
 export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
@@ -41,6 +42,7 @@ export type Score = ScoreContent & {
   title: string;
   slug: string;
   composer: string | null;
+  school: School | null;
   description: string | null;
   forked_from: string | null;
   parent: ScoreParent | null;
@@ -61,6 +63,7 @@ export type Score = ScoreContent & {
 export type CreateScoreData = ScoreContent & {
   title: string;
   composer?: string;
+  school?: School | null;
   description?: string;
   forked_from?: string;
   source_url?: string;
@@ -81,6 +84,7 @@ export type UpdateScoreData = (
 ) & {
   title?: string;
   composer?: string;
+  school?: School | null;
   description?: string;
   source_url?: string;
   source_description?: string;
@@ -185,6 +189,7 @@ export async function createScore(
         title: scoreData.title,
         slug: uniqueSlug,
         composer: scoreData.composer || null,
+        school: scoreData.school ?? null,
         description: scoreData.description || null,
         data_format: scoreData.data_format,
         data: scoreData.data,
@@ -491,6 +496,7 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
     const forkResult = await createScore({
       title: originalScore.title,
       composer: originalScore.composer || undefined,
+      school: originalScore.school,
       description: originalScore.description || undefined,
       ...(originalScore.data_format === 'json'
         ? { data_format: 'json', data: originalScore.data }

@@ -38,6 +38,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },
@@ -56,6 +57,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },
@@ -66,6 +68,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },
@@ -84,6 +87,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },
@@ -114,6 +118,7 @@ describe('EditorAutosave', () => {
         metadata: {
           title: '',
           composer: '',
+          school: null,
           description: '',
           license: 'CC-BY-SA-4.0',
         },
@@ -135,6 +140,7 @@ describe('EditorAutosave', () => {
         metadata: {
           title: '',
           composer: '',
+          school: null,
           description: '',
           license: 'CC-BY-SA-4.0',
         },
@@ -155,6 +161,7 @@ describe('EditorAutosave', () => {
         metadata: {
           title: '',
           composer: '',
+          school: null,
           description: '',
           license: 'CC-BY-SA-4.0',
         },
@@ -177,6 +184,7 @@ describe('EditorAutosave', () => {
         metadata: {
           title: '',
           composer: '',
+          school: null,
           description: '',
           license: 'CC-BY-SA-4.0',
         },
@@ -198,6 +206,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },
@@ -226,6 +235,7 @@ describe('EditorAutosave', () => {
         metadata: {
           title: '',
           composer: '',
+          school: null,
           description: '',
           license: 'CC-BY-SA-4.0',
         },
@@ -269,6 +279,7 @@ describe('EditorAutosave', () => {
       metadata: {
         title: 'T',
         composer: '',
+        school: null,
         description: '',
         license: 'CC-BY-SA-4.0',
       },

@@ -60,6 +60,7 @@ function makeScore(content: ScoreContent): Score {
     updated_at: '',
     fork_count: 0,
     composer: null,
+    school: null,
     description: null,
     forked_from: null,
     parent: null,

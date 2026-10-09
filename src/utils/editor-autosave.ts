@@ -2,6 +2,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { debounce } from './debounce';
 import type { ScoreDataFormat } from '../api/scores';
 import type { ScoreLicense } from './license';
+import type { School } from './school';
 
 const DEBOUNCE_MS = 2_000;
 const MAX_WAIT_MS = 60_000;
@@ -9,6 +10,7 @@ const MAX_WAIT_MS = 60_000;
 export interface ScoreMetadata {
   title: string;
   composer: string;
+  school: School | null;
   description: string;
   license: ScoreLicense;
 }
