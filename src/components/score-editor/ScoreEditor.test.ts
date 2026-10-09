@@ -7,9 +7,6 @@ vi.mock('../../api/scores');
 vi.mock('../../api/auth');
 vi.mock('../../api/purge');
 vi.mock('../Toast');
-vi.mock('../../utils/init-header', () => ({
-  confirmDialog: { show: vi.fn() },
-}));
 // Class mocks must use `function` (not an arrow) so they remain constructible
 // with `new` — Vitest 5 rejects arrow-function implementations there.
 vi.mock('../../utils/editor-autosave', () => ({
@@ -217,8 +214,7 @@ describe('ScoreEditor score and source', () => {
     expect($('validation-error').hidden).toBe(false);
   });
 
-  it('says why a format switch failed, and keeps the radio on the old format', async () => {
-    const { confirmDialog } = await import('../../utils/init-header');
+  it('says why a format switch failed in the validation line, and keeps the source and its format', async () => {
     new ScoreEditor(
       makeScore({
         data: {
@@ -231,8 +227,10 @@ describe('ScoreEditor score and source', () => {
         },
       }),
     );
-    // The validation line and the dialog number the same note the same way
-    expect($('validation-error').textContent).toContain('Note 2 ');
+    const source = $<HTMLTextAreaElement>('score-data-input');
+    const before = source.value;
+    // Validation and conversion number the same note the same way
+    expect($('validation-message').textContent).toMatch(/^Note 2 /);
 
     const musicxml = document.querySelector<HTMLInputElement>(
       'input[value="musicxml"]',
@@ -240,16 +238,33 @@ describe('ScoreEditor score and source', () => {
     musicxml.checked = true;
     musicxml.dispatchEvent(new Event('change'));
 
-    await vi.waitFor(() => expect(confirmDialog.show).toHaveBeenCalled());
-    const options = vi.mocked(confirmDialog.show).mock.calls[0][0];
-    expect(options.message).toContain('Could not convert JSON to MusicXML.');
-    expect(options.message).toContain(
-      "Note 2 has a step, octave or meri/kari mark that isn't valid",
+    await vi.waitFor(() =>
+      expect($('validation-message').textContent).toBe(
+        "Can't switch to MusicXML. Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to MusicXML. Fix that note, or keep the score in its current format.",
+      ),
     );
-    options.onCancel!();
     expect(
       document.querySelector<HTMLInputElement>('input[value="json"]')!.checked,
     ).toBe(true);
+    expect(source.value).toBe(before);
+
+    // Editing shows the source's own state again
+    source.dispatchEvent(new Event('input'));
+    expect($('validation-message').textContent).toMatch(/^Note 2 has invalid/);
+  });
+
+  it('says why a readable score cannot switch format', async () => {
+    new ScoreEditor(makeScore({ data: { ...TWO_NOTES, key: 'H' } }));
+    expect($('validation-error').hidden).toBe(true);
+
+    const abc = document.querySelector<HTMLInputElement>('input[value="abc"]')!;
+    abc.checked = true;
+    abc.dispatchEvent(new Event('change'));
+
+    await vi.waitFor(() => expect($('validation-error').hidden).toBe(false));
+    expect($('validation-message').textContent).toMatch(
+      /^Can't switch to ABC\. The score's key, "H", isn't one ABC defines/,
+    );
   });
 });
 

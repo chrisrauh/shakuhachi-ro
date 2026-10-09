@@ -62,6 +62,8 @@ export const STRINGS = {
     scoreInput: {
       invalidMusicXML: 'Invalid MusicXML format',
       invalidFormat: 'Invalid format',
+      formatSwitchFailed: (format: ScoreDataFormat, reason: string) =>
+        `Can't switch to ${FORMAT_NAMES[format]}. ${reason}`.trim(),
     },
   },
 
@@ -73,20 +75,6 @@ export const STRINGS = {
   },
 
   DIALOGS: {
-    ScoreEditor: {
-      formatConversionFailed: {
-        title: 'Format Conversion Failed',
-        message: (
-          fromFormat: ScoreDataFormat,
-          toFormat: ScoreDataFormat,
-          reason: string,
-        ) =>
-          `Could not convert ${FORMAT_NAMES[fromFormat]} to ${FORMAT_NAMES[toFormat]}. ${reason ? `${reason.replace(/\.?$/, '.')} ` : ''}Clear content and switch format?`,
-        confirmText: 'Clear and Switch',
-        cancelText: 'Keep Current Format',
-      },
-    },
-
     ScoreDetailClient: {
       deleteScore: {
         title: 'Delete score',
