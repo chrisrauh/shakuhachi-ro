@@ -177,9 +177,7 @@ export class MusicXMLSerializer {
   ): WrittenPitch {
     const written = pitchForFingering(fingering);
     if (!written) {
-      throw new Error(
-        PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index, 'MusicXML'),
-      );
+      throw new Error(PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index));
     }
     return written;
   }

@@ -240,7 +240,7 @@ describe('ScoreEditor score and source', () => {
 
     await vi.waitFor(() =>
       expect($('validation-message').textContent).toBe(
-        "Can't switch to MusicXML. Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to MusicXML. Fix that note, or keep the score in its current format.",
+        "Can't switch to MusicXML. Note 2 has a step, octave or meri/kari mark that isn't valid. Fix that note, or keep the score in its current format.",
       ),
     );
     expect(

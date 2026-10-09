@@ -635,7 +635,7 @@ Q
         } as unknown as ScoreData;
 
         expect(() => ABCSerializer.serialize(scoreData)).toThrow(
-          "Note 2 has a step, octave or meri/kari mark that isn't valid, so the score can't be converted to ABC",
+          "Note 2 has a step, octave or meri/kari mark that isn't valid.",
         );
       });
 
