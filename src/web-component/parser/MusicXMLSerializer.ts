@@ -6,7 +6,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { legacyDuration } from '../types/Duration';
+import { formatBeats, noteBeats, writtenLength } from '../types/Duration';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
   fingeringName,
@@ -17,16 +17,23 @@ import {
 } from '../constants/kinko-fingerings';
 
 /**
- * Divisions per quarter note.
+ * Divisions per quarter note, which is one beat.
  *
  * MusicXML defines no standard value; exporters derive one per score from the
- * shortest note present. 8 is that value for this format — the shortest
- * duration is a sixteenth (0.25) and dotting it gives 0.375, so divisions must
- * be a multiple of 8 for every duration to stay a whole number. Being a power
- * of two also keeps a parse/serialize round trip exact in binary floating
- * point. Well under the 16383 ceiling the spec names for MIDI compatibility.
+ * shortest note present. The shortest length notation shows is a quarter of a
+ * beat, so 4 keeps every supported length a whole number of divisions. Well
+ * under the 16383 ceiling the spec names for MIDI compatibility.
  */
-const DIVISIONS_PER_QUARTER = 8;
+const DIVISIONS_PER_QUARTER = 4;
+
+/** The MusicXML note type for each written length in beats */
+const NOTE_TYPES: Record<string, string> = {
+  '4': 'whole',
+  '2': 'half',
+  '1': 'quarter',
+  '1/2': 'eighth',
+  '1/4': '16th',
+};
 
 export class MusicXMLSerializer {
   /**
@@ -131,20 +138,20 @@ export class MusicXMLSerializer {
       parts.push('        </pitch>');
     }
 
-    // <duration> is the sounding length, so it includes the dot. ScoreNote
-    // keeps the two apart: `duration` is the base value and `dotted` extends
-    // it by half. Every supported value lands on a whole number of divisions,
-    // so there is nothing to round.
-    const base = legacyDuration(note);
-    const sounding = base * (note.dotted ? 1.5 : 1);
+    // <duration> is the sounding length, so it includes the dot, as
+    // `duration` does. One beat is a quarter note.
+    const beats = noteBeats(note);
     parts.push(
-      `        <duration>${sounding * DIVISIONS_PER_QUARTER}</duration>`,
+      `        <duration>${(beats.num * DIVISIONS_PER_QUARTER) / beats.den}</duration>`,
     );
 
-    // <type> is the base note value; the dot is carried by <dot/> beside it.
-    // The DTD orders these children `type?, dot*`, so type must come first.
-    const type = this.getDurationType(base);
-    parts.push(`        <type>${type}</type>`);
+    // <type> is the written note value; the dot is carried by <dot/> beside
+    // it. A length no single note value shows, such as 3 beats, has no type,
+    // which MusicXML allows. The DTD orders these children `type?, dot*`.
+    const type = NOTE_TYPES[formatBeats(writtenLength(beats, note.dotted))];
+    if (type) {
+      parts.push(`        <type>${type}</type>`);
+    }
 
     if (note.dotted) {
       parts.push('        <dot/>');
@@ -182,25 +189,6 @@ export class MusicXMLSerializer {
       throw new Error(PARSER_STRINGS.ERRORS.Serializer.invalidFingering(index));
     }
     return written;
-  }
-
-  /**
-   * Get MusicXML note type from duration
-   */
-  private static getDurationType(duration: number): string {
-    if (duration >= 4) {
-      return 'whole';
-    }
-    if (duration >= 2) {
-      return 'half';
-    }
-    if (duration >= 1) {
-      return 'quarter';
-    }
-    if (duration >= 0.5) {
-      return 'eighth';
-    }
-    return 'sixteenth';
   }
 
   /**

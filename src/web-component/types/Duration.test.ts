@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   dottedLength,
   formatBeats,
-  legacyDuration,
+  noteBeats,
   parseBeats,
   writtenLength,
 } from './Duration';
@@ -34,16 +34,20 @@ describe('Duration', () => {
     expect(writtenLength(parseBeats('3/2')!)).toEqual({ num: 3, den: 2 });
   });
 
-  it('gives the legacy number for a length in beats', () => {
-    expect(legacyDuration({ duration: '1' })).toBe(2);
-    expect(legacyDuration({ duration: '1/4' })).toBe(0.5);
-    expect(legacyDuration({ duration: '3/2', dotted: true })).toBe(2);
-    expect(legacyDuration({ duration: '3/4', dotted: true })).toBe(1);
-    expect(legacyDuration({ duration: 4, dotted: true })).toBe(4);
+  it("gives a note's length in beats, reading legacy numbers", () => {
+    expect(noteBeats({ duration: '3/2', dotted: true })).toEqual({
+      num: 3,
+      den: 2,
+    });
+    expect(noteBeats({ duration: 4 })).toEqual({ num: 2, den: 1 });
+    expect(noteBeats({ duration: 1, dotted: true })).toEqual({
+      num: 3,
+      den: 4,
+    });
   });
 
   it('fails on a duration it cannot read', () => {
-    expect(() => legacyDuration({ duration: '0.5' })).toThrow(
+    expect(() => noteBeats({ duration: '0.5' })).toThrow(
       'Invalid duration: 0.5',
     );
   });

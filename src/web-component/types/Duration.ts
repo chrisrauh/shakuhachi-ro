@@ -124,18 +124,26 @@ export function beatsFromLegacy(
 }
 
 /**
- * A note's duration in the legacy numeric form, where 2 is one beat and a
- * dot adds half. The importers and exporters still work in that form; they
- * move to beats and this goes in the next steps of #438.
+ * Reduces a whole number of beats over a whole number to lowest terms: the
+ * length of `num` divisions when there are `den` to the beat
  */
-export function legacyDuration(note: {
+export function beatsOf(num: number, den: number): Beats {
+  return scale({ num, den: 1 }, 1, den);
+}
+
+/**
+ * A note's length in beats, reading a legacy numeric duration as
+ * beatsFromLegacy does. Fails on a duration it can't read.
+ */
+export function noteBeats(note: {
   duration: string | number;
   dotted?: boolean;
-}): number {
-  if (typeof note.duration === 'number') return note.duration;
-
-  const beats = parseBeats(note.duration);
+}): Beats {
+  const text =
+    typeof note.duration === 'number'
+      ? beatsFromLegacy(note.duration, note.dotted)
+      : note.duration;
+  const beats = text === null ? null : parseBeats(text);
   if (!beats) throw new Error(`Invalid duration: ${note.duration}`);
-  const value = (2 * beats.num) / beats.den;
-  return note.dotted ? (value * 2) / 3 : value;
+  return beats;
 }
