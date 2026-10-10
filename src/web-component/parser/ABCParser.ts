@@ -69,6 +69,12 @@ type Token =
 type PlayedToken = Exclude<Token, { type: 'ending' }>;
 
 /**
+ * A note as the parser builds it, with the duration still a number in L:
+ * units. It moves to beats in a later step of #438.
+ */
+type ParsedNote = ScoreNote & { duration: number };
+
+/**
  * One reader per kind of token, tried in order at each position. Whatever
  * matches none of them fails, so nothing in a tune is skipped unread.
  */
@@ -409,13 +415,13 @@ export class ABCParser {
       barLength: number | undefined;
       voices: Set<string>;
     },
-  ): ScoreNote[] {
+  ): ParsedNote[] {
     let { accidentals, barLength } = context;
     const { voices } = context;
     // Lengths are counted in the first unit length, so a change scales those
     // after it
     let lengthScale = 1;
-    const notes: ScoreNote[] = [];
+    const notes: ParsedNote[] = [];
     // By note index: the ABC it was read from, its broken-rhythm marker
     // (> or <), and whether it is tied to the next note
     const sources: string[] = [];
@@ -427,7 +433,7 @@ export class ABCParser {
     // many notes it has left
     let tuplet = { scale: 1, notesLeft: 0 };
 
-    const push = (note: ScoreNote, source: string, broken = '') => {
+    const push = (note: ParsedNote, source: string, broken = '') => {
       if (tuplet.notesLeft > 0) {
         note.duration *= tuplet.scale;
         tuplet.notesLeft--;
@@ -536,7 +542,7 @@ export class ABCParser {
       }
 
       // Sounding length for now; toBaseAndDot() splits out the dot below
-      const note: ScoreNote = {
+      const note: ParsedNote = {
         pitch: {
           step: shakuPitch.step,
           octave: shakuPitch.octave,
@@ -593,11 +599,11 @@ export class ABCParser {
    * of different pitches doesn't hold either, so it leaves them as they are.
    */
   private static mergeTies(
-    notes: ScoreNote[],
+    notes: ParsedNote[],
     sources: string[],
     tied: boolean[],
-  ): { note: ScoreNote; source: string }[] {
-    const merged: { note: ScoreNote; source: string }[] = [];
+  ): { note: ParsedNote; source: string }[] {
+    const merged: { note: ParsedNote; source: string }[] = [];
     notes.forEach((note, i) => {
       const previous = merged[merged.length - 1];
       if (tied[i - 1] && previous && this.samePitch(previous.note, note)) {
@@ -610,7 +616,7 @@ export class ABCParser {
     return merged;
   }
 
-  private static samePitch(a: ScoreNote, b: ScoreNote): boolean {
+  private static samePitch(a: ParsedNote, b: ParsedNote): boolean {
     return (
       !a.rest &&
       !b.rest &&
@@ -627,7 +633,7 @@ export class ABCParser {
    * that note, which keeps older ABC written with a trailing > readable.
    */
   private static applyBrokenRhythm(
-    notes: ScoreNote[],
+    notes: ParsedNote[],
     markers: string[],
   ): void {
     notes.forEach((note, i) => {
@@ -649,7 +655,7 @@ export class ABCParser {
    * stores it (as MusicXMLParser does): 3/2 becomes a dotted 1, 3 a dotted 2.
    * Lengths that aren't one and a half times a power of two stay as they are.
    */
-  private static toBaseAndDot(note: ScoreNote): void {
+  private static toBaseAndDot(note: ParsedNote): void {
     const base = note.duration / 1.5;
     if (Number.isInteger(Math.log2(base))) {
       note.duration = base;

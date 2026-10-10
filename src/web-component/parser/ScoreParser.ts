@@ -7,7 +7,7 @@
  * Following KISS principle - simple, focused parser without over-engineering.
  */
 
-import { ShakuNote, type NoteDuration } from '../notes/ShakuNote';
+import { ShakuNote } from '../notes/ShakuNote';
 import {
   OctaveMarksModifier,
   type OctaveRegister,
@@ -15,7 +15,13 @@ import {
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
 import { DurationDotModifier } from '../modifiers/DurationDotModifier';
 import { DurationLineModifier } from '../modifiers/DurationLineModifier';
-import { MERI_KARI, PITCH_STEPS, type ScoreData } from '../types/ScoreData';
+import {
+  MERI_KARI,
+  PITCH_STEPS,
+  type ScoreData,
+  type ScoreNote,
+} from '../types/ScoreData';
+import { hasHalf, isSupported, parseBeats } from '../types/Duration';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
@@ -50,40 +56,33 @@ export function closestOctave(romaji: string, referenceMidi: number): number {
 }
 
 /**
- * Maps numeric duration to NoteDuration
+ * Number of duration lines to the right of a note: one halves its length,
+ * two halve it again. A dotted note draws the lines of its length before the
+ * dot, so a dotted 3/4 draws the one line of 1/2.
  *
- * Simple mapping for now:
- * - 1 = quarter note (q)
- * - 2 = half note (h)
- * - 4 = whole note (w)
+ * Expects a validated note.
  */
-function mapDuration(duration: number): NoteDuration {
-  switch (duration) {
-    case 1:
-      return 'q';
-    case 2:
-      return 'h';
-    case 4:
-      return 'w';
-    default:
-      return 'q'; // Default to quarter note
+function durationLineCount(note: ScoreNote): number {
+  if (typeof note.duration === 'number') {
+    return legacyDurationLineCount(note.duration);
   }
+
+  const { num, den } = parseBeats(note.duration)!;
+  const written = note.dotted ? { num: 2 * num, den: 3 * den } : { num, den };
+  let lines = 0;
+  while (written.num * 2 ** lines < written.den) lines++;
+  return lines;
 }
 
 /**
- * Maps numeric duration to number of horizontal duration lines
- *
- * In shakuhachi notation:
- * - Whole note (4): 0 lines
- * - Half note (2): 0 lines
- * - Quarter note (1): 1 line
- * - Eighth note (0.5): 2 lines
+ * Line count for the legacy numeric duration, where 2 is one beat. Goes once
+ * stored scores are migrated to beats (#438).
  */
-function getDurationLineCount(duration: number): number {
-  if (duration >= 2) return 0; // Half note or longer (no lines)
-  if (duration >= 1) return 1; // Quarter note (1 line)
-  if (duration >= 0.5) return 2; // Eighth note (2 lines)
-  return 3; // Sixteenth or shorter (very rare)
+function legacyDurationLineCount(duration: number): number {
+  if (duration >= 2) return 0;
+  if (duration >= 1) return 1;
+  if (duration >= 0.5) return 2;
+  return 3;
 }
 
 /**
@@ -117,18 +116,17 @@ export class ScoreParser {
       if (note.rest) {
         const restNote = new ShakuNote({
           symbol: 'rest',
-          duration: mapDuration(note.duration),
           isRest: true,
           color: noteColor,
         });
 
         // Add duration lines to rests as well
-        const lineCount = getDurationLineCount(note.duration);
+        const lineCount = durationLineCount(note);
         if (lineCount > 0) {
           // Check if this is the last note in a continuous duration line sequence
           const isLastInSequence =
             i === scoreData.notes.length - 1 ||
-            getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+            durationLineCount(scoreData.notes[i + 1]) === 0;
           const durationLines = new DurationLineModifier(
             lineCount,
             isLastInSequence,
@@ -160,7 +158,6 @@ export class ScoreParser {
       // Create the base note
       const shakuNote = new ShakuNote({
         symbol: note.pitch.step,
-        duration: mapDuration(note.duration),
         color: noteColor,
       });
 
@@ -183,13 +180,13 @@ export class ScoreParser {
       }
 
       // Add duration lines based on note duration
-      const lineCount = getDurationLineCount(note.duration);
+      const lineCount = durationLineCount(note);
       if (lineCount > 0) {
         // Check if this is the last note in a continuous duration line sequence
         // by checking if the next note also has a duration line
         const isLastInSequence =
           i === scoreData.notes.length - 1 ||
-          getDurationLineCount(scoreData.notes[i + 1].duration) === 0;
+          durationLineCount(scoreData.notes[i + 1]) === 0;
         const durationLines = new DurationLineModifier(
           lineCount,
           isLastInSequence,
@@ -259,6 +256,7 @@ export class ScoreParser {
         if (!note.duration) {
           throw new Error(S.restIndexDuration(index));
         }
+        this.validateDuration(note, index);
         return;
       }
 
@@ -288,10 +286,7 @@ export class ScoreParser {
         throw new Error(S.noteIndexOctaveInvalid(index, note.pitch.octave));
       }
 
-      // Validate duration is positive
-      if (note.duration <= 0) {
-        throw new Error(S.noteIndexDurationInvalid(index, note.duration));
-      }
+      this.validateDuration(note, index);
 
       if (
         note.meriKari !== undefined &&
@@ -300,6 +295,33 @@ export class ScoreParser {
         throw new Error(S.noteIndexMeriKariInvalid(index, note.meriKari));
       }
     });
+  }
+
+  /**
+   * Checks a note's duration and dot: a supported length in beats, dotted
+   * only if it has a half. A legacy number need only be positive.
+   */
+  private static validateDuration(note: ScoreNote, index: number): void {
+    const S = PARSER_STRINGS.ERRORS.ScoreParser;
+    const { duration } = note;
+
+    if (typeof duration === 'number') {
+      if (!(duration > 0)) {
+        throw new Error(S.noteIndexDurationInvalid(index, duration));
+      }
+      return;
+    }
+
+    const beats = typeof duration === 'string' ? parseBeats(duration) : null;
+    if (!beats) {
+      throw new Error(S.noteIndexDurationInvalid(index, duration));
+    }
+    if (!isSupported(beats)) {
+      throw new Error(S.noteIndexDurationUnsupported(index, duration));
+    }
+    if (note.dotted && !hasHalf(beats)) {
+      throw new Error(S.noteIndexDottedWithoutHalf(index, duration));
+    }
   }
 
   /**

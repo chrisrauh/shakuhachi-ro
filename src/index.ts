@@ -42,7 +42,6 @@ export { MusicXMLParser } from './web-component/parser/MusicXMLParser';
 export { ShakuNote } from './web-component/notes/ShakuNote';
 export type {
   ShakuNoteOptions,
-  NoteDuration,
   BoundingBox,
 } from './web-component/notes/ShakuNote';
 
