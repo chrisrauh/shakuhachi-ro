@@ -88,6 +88,7 @@ CREATE TABLE scores (
 | `allow_abc_data_format.sql`         | Allows `data_format` `abc`, so ABC is stored as typed (#262)                |
 | `meri_kari_field.sql`               | Replaces the `meri`/`chu_meri`/`dai_meri` note flags with `meriKari` (#288) |
 | `add_school_to_scores.sql`          | Adds `school`, and moves the schools out of `composer` (#405)               |
+| `duration_beats.sql`                | Rewrites JSON scores' note durations in beats, as fraction strings (#438)   |
 | `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                              |
 
 ## Seeded Songs
