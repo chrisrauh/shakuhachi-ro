@@ -5,8 +5,8 @@
  * stroke under it for each extra beat, then a dot or a stroke for a half.
  * Lines to the right of a slot halve it (one line) or quarter it (two), and
  * run on into the lines of the next slot or note, so a line marks the notes
- * that share a beat. A dot fills a slot of the beat it falls in, as a note
- * would: in Akatombo, レ with no line, then [・ チ] under one line (#438).
+ * that share a beat. A dot after whole beats is half a beat with no line, as
+ * in Koga's Dawn in the Forest: ロ・ リ, the line starting at リ (#438).
  *
  * The layout gives each stroke a note's height and each dot a smaller one,
  * which it reads from extraHeight().
@@ -85,8 +85,8 @@ export function durationSlots(beats: Beats, dotted = false): DurationSlot[] {
   }
 
   if (dotted) {
-    // Half a beat after whole beats, a quarter after half a beat
-    slots.push({ kind: 'dot', lines: whole > 0 ? 1 : 2 });
+    // Half a beat after whole beats, with no line; a quarter after half a beat
+    slots.push({ kind: 'dot', lines: whole > 0 ? 0 : 2 });
   }
   return slots;
 }

@@ -159,7 +159,7 @@ describe('ScoreParser', () => {
 
       expect(notes).toHaveLength(2);
 
-      expect(durationMarks(scoreData.notes)).toEqual(['note dot|', 'note']);
+      expect(durationMarks(scoreData.notes)).toEqual(['note dot', 'note']);
     });
 
     it('should parse rest notes correctly', () => {
@@ -386,7 +386,7 @@ describe('ScoreParser', () => {
     it('writes a dotted half as a dot, in its own slot of the beat', () => {
       expect(
         durationMarks([ro('3/2', true), ro('5/2', true), ro('3/4', true)]),
-      ).toEqual(['note dot|', 'note stroke dot|', 'note| dot||']);
+      ).toEqual(['note dot', 'note stroke dot', 'note| dot||']);
     });
 
     it('draws duration marks on rests too', () => {

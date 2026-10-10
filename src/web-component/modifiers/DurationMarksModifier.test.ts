@@ -69,15 +69,13 @@ describe('DurationMarksModifier', () => {
     expect(strokes[0].y2).toBeLessThan(200 + distanceToNext - 32);
   });
 
-  it('draws a dot below the note, its line starting just above the dot', () => {
-    const { dots, lines } = draw('3/2', true);
+  it('draws the dot after whole beats below the note, with no line', () => {
+    // Dawn in the Forest: ロ・ リ, the line starting at リ
+    const { dots, lines } = draw('3/2', true, true);
 
     expect(dots).toEqual([{ x: 100, y: expect.any(Number) }]);
     expect(dots[0].y).toBeGreaterThan(200 - 32 * 0.4);
-    expect(lines).toHaveLength(1);
-    expect(lines[0].y1).toBeLessThan(dots[0].y);
-    expect(lines[0].y1).toBeGreaterThan(200);
-    expect(lines[0].y2).toBeGreaterThan(dots[0].y);
+    expect(lines).toHaveLength(0);
   });
 
   it('draws two lines beside the dot of a dotted 3/4', () => {
