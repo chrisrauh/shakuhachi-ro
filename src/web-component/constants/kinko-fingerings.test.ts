@@ -36,7 +36,7 @@ const RANGE = Array.from({ length: 39 }, (_, i) => {
 
 const toNote = ({ step, octave, meriKari }: WrittenFingering): ScoreNote => ({
   pitch: { step, octave },
-  duration: 1,
+  duration: '1',
   ...(meriKari && { meriKari }),
 });
 

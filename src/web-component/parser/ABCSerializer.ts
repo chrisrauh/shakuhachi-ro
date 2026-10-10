@@ -6,7 +6,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { legacyDuration } from '../types/Duration';
+import { noteBeats, type Beats } from '../types/Duration';
 import {
   ABCAccidentals,
   keySignature,
@@ -67,9 +67,8 @@ export class ABCSerializer {
     // M: field (meter, optional) - default to 4/4
     lines.push('M:4/4');
 
-    // L: field (unit note length) - determine from notes
-    const unitLength = this.determineUnitLength();
-    lines.push(`L:${unitLength}`);
+    // L: field (unit note length): one beat, a quarter note in 4/4
+    lines.push('L:1/4');
 
     // Q: field (tempo, optional)
     if (scoreData.tempo) {
@@ -79,15 +78,6 @@ export class ABCSerializer {
     lines.push(`K:${key}`);
 
     return lines.join('\n');
-  }
-
-  /**
-   * Determine optimal unit note length based on most common duration
-   * For now, just use 1/8 as default
-   */
-  private static determineUnitLength(): string {
-    // Simple default - could be enhanced to analyze note durations
-    return '1/8';
   }
 
   /**
@@ -104,8 +94,7 @@ export class ABCSerializer {
     notes.forEach((note, index) => {
       if (note.rest) {
         // Rest: "z" + duration
-        const durationStr = this.formatDuration(legacyDuration(note));
-        abcNotes.push(`z${durationStr}`);
+        abcNotes.push(`z${this.formatDuration(noteBeats(note))}`);
       } else if (note.pitch) {
         const fingering = { ...note.pitch, meriKari: note.meriKari };
         const written = pitchForFingering(fingering);
@@ -122,11 +111,10 @@ export class ABCSerializer {
           : `!${fingeringName(fingering)}!`;
         const abcPitch = decoration + toABCPitch(written, accidentals);
 
-        // A dot is written as the sounding length (a dotted 1 is 3/2), not as
-        // >, which in ABC is broken rhythm and would also halve the next note
-        const base = legacyDuration(note);
-        const sounding = note.dotted ? base * 1.5 : base;
-        abcNotes.push(`${abcPitch}${this.formatDuration(sounding)}`);
+        // The length is written as it sounds, dot included (a dotted beat is
+        // 3/2), not as >, which in ABC is broken rhythm and would also halve
+        // the next note
+        abcNotes.push(`${abcPitch}${this.formatDuration(noteBeats(note))}`);
       }
     });
 
@@ -135,72 +123,11 @@ export class ABCSerializer {
   }
 
   /**
-   * Format duration value as ABC duration suffix
-   *
-   * @param duration - Duration value from ScoreNote
-   * @returns ABC duration string (e.g., "", "2", "/2", "3/2")
+   * The ABC length suffix for a length in beats, with one beat the unit
+   * length: "" for 1, "2", "/2", "3/2"
    */
-  private static formatDuration(duration: number): string {
-    // Default duration (1 unit) = no suffix
-    if (duration === 1) {
-      return '';
-    }
-
-    // Check if it's an integer
-    if (Number.isInteger(duration)) {
-      return duration.toString();
-    }
-
-    // Check if it's a simple fraction
-    // Common cases: 0.5 = /2, 1.5 = 3/2, 0.25 = /4, etc.
-    if (duration === 0.5) {
-      return '/2';
-    }
-    if (duration === 0.25) {
-      return '/4';
-    }
-    if (duration === 1.5) {
-      return '3/2';
-    }
-    if (duration === 0.75) {
-      return '3/4';
-    }
-
-    // For other fractions, try to find simple numerator/denominator
-    // This is a simplified approach - could be enhanced
-    const denominator = 8; // Common denominator for most durations
-    const numerator = Math.round(duration * denominator);
-
-    if (numerator === denominator) {
-      return ''; // 1 unit
-    }
-    if (numerator < denominator) {
-      // Fraction less than 1: try to simplify
-      const gcd = this.gcd(numerator, denominator);
-      const simpleNum = numerator / gcd;
-      const simpleDenom = denominator / gcd;
-
-      if (simpleNum === 1) {
-        return `/${simpleDenom}`;
-      }
-      return `${simpleNum}/${simpleDenom}`;
-    }
-
-    // Fraction greater than 1
-    const gcd = this.gcd(numerator, denominator);
-    const simpleNum = numerator / gcd;
-    const simpleDenom = denominator / gcd;
-
-    if (simpleDenom === 1) {
-      return simpleNum.toString();
-    }
-    return `${simpleNum}/${simpleDenom}`;
-  }
-
-  /**
-   * Calculate greatest common divisor
-   */
-  private static gcd(a: number, b: number): number {
-    return b === 0 ? a : this.gcd(b, a % b);
+  private static formatDuration({ num, den }: Beats): string {
+    if (den === 1) return num === 1 ? '' : String(num);
+    return num === 1 ? `/${den}` : `${num}/${den}`;
   }
 }

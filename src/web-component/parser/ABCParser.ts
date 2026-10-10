@@ -30,11 +30,19 @@
  *   writes, e.g. !ri-meri!) chooses it; others are ignored
  * - Chord symbols and annotations ("Am") and slurs ( ) are dropped
  * - Grace notes, chords, a second voice and anything else fail
- * - Lengths must be ones JSON can show: a power of two units, or one and a
- *   half times one. When ScoreData gains lengths (#357), this changes too
+ * - Lengths are stored in beats, and the meter's denominator is the beat: a
+ *   quarter note in 4/4 and without M:, an eighth in 6/8. They must be ones
+ *   notation can show (see types/Duration.ts); a length with a half is
+ *   written with a dot
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import {
+  formatBeats,
+  hasHalf,
+  isSupported,
+  type Beats,
+} from '../types/Duration';
 import {
   ABCAccidentals,
   keySignature,
@@ -69,10 +77,10 @@ type Token =
 type PlayedToken = Exclude<Token, { type: 'ending' }>;
 
 /**
- * A note as the parser builds it, with the duration still a number in L:
- * units. It moves to beats in a later step of #438.
+ * A note as the parser builds it, with the duration a number of units (the
+ * tune's first unit length) until it is read in beats at the end
  */
-type ParsedNote = ScoreNote & { duration: number };
+type ParsedNote = Omit<ScoreNote, 'duration'> & { duration: number };
 
 /**
  * One reader per kind of token, tried in order at each position. Whatever
@@ -188,19 +196,38 @@ function defaultUnitLength(meter: number | undefined): number {
 const NOTE_FIELDS = new Set(['K', 'L', 'M', 'V']);
 
 /**
- * The lengths JSON shows: a power of two units, or one and a half times one
- * (a dotted note). The length snapped to that value, as ties and tuplets add
- * floating point error, or undefined when it is neither.
+ * The beat of an M: field in whole notes, its denominator: 1/4 in 3/4, 1/8 in
+ * 6/8, 1/4 for C and 1/2 for C|. Undefined for M:none, or a meter that can't
+ * be read.
  */
-function renderableLength(length: number): number | undefined {
-  const powerOfTwo = (x: number) => {
-    const power = 2 ** Math.round(Math.log2(x));
-    return Math.abs(x - power) < 1e-9 ? power : undefined;
-  };
-  const plain = powerOfTwo(length);
-  if (plain !== undefined) return plain;
-  const base = powerOfTwo(length / 1.5);
-  return base === undefined ? undefined : base * 1.5;
+function meterBeat(value: string): number | undefined {
+  const meter = value.trim();
+  if (meter === 'C') return 1 / 4;
+  if (meter === 'C|') return 1 / 2;
+  const match = meter.match(/^\d+(?:\+\d+)*\/(\d+)$/);
+  return match ? 1 / Number(match[1]) : undefined;
+}
+
+/** The beat without a meter: a quarter note */
+const DEFAULT_BEAT = 1 / 4;
+
+/**
+ * A length in beats as an exact fraction with a power of two below it, or
+ * undefined when it has none, such as a triplet's third of a beat. Ties and
+ * tuplets add floating point error, which this rounds away.
+ */
+function toBeats(length: number): Beats | undefined {
+  for (let den = 1; den <= 64; den *= 2) {
+    const num = Math.round(length * den);
+    if (num > 0 && Math.abs(num / den - length) < 1e-9) {
+      let reduced = { num, den };
+      while (reduced.num % 2 === 0 && reduced.den > 1) {
+        reduced = { num: reduced.num / 2, den: reduced.den / 2 };
+      }
+      return reduced;
+    }
+  }
+  return undefined;
 }
 
 export class ABCParser {
@@ -288,6 +315,8 @@ export class ABCParser {
     }
 
     const barLength = meter === undefined ? undefined : parseMeter(meter);
+    const beat =
+      (meter === undefined ? undefined : meterBeat(meter)) ?? DEFAULT_BEAT;
     const unit =
       unitLength === undefined
         ? defaultUnitLength(barLength)
@@ -299,6 +328,7 @@ export class ABCParser {
       accidentals: new ABCAccidentals(signature),
       unit,
       barLength,
+      beat,
       voices,
     });
 
@@ -403,8 +433,8 @@ export class ABCParser {
    *
    * @param tokens - The tune body, with repeats played out
    * @param context - What is in force at the start of the tune: the key,
-   *   the unit length and bar length in whole notes, and the voices declared
-   *   in the header
+   *   the unit length, bar length and beat in whole notes, and the voices
+   *   declared in the header
    * @returns Array of ScoreNote objects
    */
   private static readNotes(
@@ -413,10 +443,11 @@ export class ABCParser {
       accidentals: ABCAccidentals;
       unit: number;
       barLength: number | undefined;
+      beat: number;
       voices: Set<string>;
     },
-  ): ParsedNote[] {
-    let { accidentals, barLength } = context;
+  ): ScoreNote[] {
+    let { accidentals, barLength, beat } = context;
     const { voices } = context;
     // Lengths are counted in the first unit length, so a change scales those
     // after it
@@ -427,6 +458,8 @@ export class ABCParser {
     const sources: string[] = [];
     const brokenRhythm: string[] = [];
     const tied: boolean[] = [];
+    // By note index: the beat in force where it was written, in units
+    const beatUnits: number[] = [];
     // Decorations seen since the last note
     let decorations: string[] = [];
     // The tuplet the next notes are in: how much each is scaled, and how
@@ -440,6 +473,7 @@ export class ABCParser {
       }
       sources.push(source);
       brokenRhythm.push(broken);
+      beatUnits.push(beat / context.unit);
       notes.push(note);
     };
 
@@ -462,6 +496,7 @@ export class ABCParser {
             lengthScale = this.readUnitLength(token.value) / context.unit;
           } else if (token.name === 'M') {
             barLength = parseMeter(token.value);
+            beat = meterBeat(token.value) ?? DEFAULT_BEAT;
           } else if (token.name === 'V') {
             voices.add(this.voiceId(token.value));
             if (voices.size > 1) {
@@ -560,23 +595,25 @@ export class ABCParser {
     }
 
     this.applyBrokenRhythm(notes, brokenRhythm);
-    const merged = this.mergeTies(notes, sources, tied);
-    merged.forEach(({ note, source }, i) => {
-      const length = renderableLength(note.duration);
-      if (length === undefined) {
+    const merged = this.mergeTies(notes, sources, tied, beatUnits);
+    return merged.map(({ note, source, beat }, i) => {
+      const length = note.duration / beat;
+      const beats = toBeats(length);
+      if (!beats || !isSupported(beats)) {
         throw new Error(
-          PARSER_STRINGS.ERRORS.ABCParser.unrenderableLength(
+          PARSER_STRINGS.ERRORS.ABCParser.unsupportedLength(
             i,
             source,
-            note.duration,
+            beats ? formatBeats(beats) : String(Number(length.toFixed(3))),
           ),
         );
       }
-      note.duration = length;
-      if (!note.rest) this.toBaseAndDot(note);
+      // ABC writes the length, not how it is written. A length with a half
+      // is written with a dot, as the editor does by default.
+      const scoreNote: ScoreNote = { ...note, duration: formatBeats(beats) };
+      if (hasHalf(beats)) scoreNote.dotted = true;
+      return scoreNote;
     });
-
-    return merged.map(({ note }) => note);
   }
 
   /**
@@ -597,20 +634,22 @@ export class ABCParser {
   /**
    * Joins tied notes into one with their lengths added. A tie between notes
    * of different pitches doesn't hold either, so it leaves them as they are.
+   * Each keeps the beat of its first note.
    */
   private static mergeTies(
     notes: ParsedNote[],
     sources: string[],
     tied: boolean[],
-  ): { note: ParsedNote; source: string }[] {
-    const merged: { note: ParsedNote; source: string }[] = [];
+    beatUnits: number[],
+  ): { note: ParsedNote; source: string; beat: number }[] {
+    const merged: { note: ParsedNote; source: string; beat: number }[] = [];
     notes.forEach((note, i) => {
       const previous = merged[merged.length - 1];
       if (tied[i - 1] && previous && this.samePitch(previous.note, note)) {
         previous.note.duration += note.duration;
         previous.source += `-${sources[i]}`;
       } else {
-        merged.push({ note, source: sources[i] });
+        merged.push({ note, source: sources[i], beat: beatUnits[i] });
       }
     });
     return merged;
@@ -648,19 +687,6 @@ export class ABCParser {
       first.duration *= 1.5;
       second.duration *= 0.5;
     });
-  }
-
-  /**
-   * Splits a sounding length into a base length plus a dot, the way ScoreNote
-   * stores it (as MusicXMLParser does): 3/2 becomes a dotted 1, 3 a dotted 2.
-   * Lengths that aren't one and a half times a power of two stay as they are.
-   */
-  private static toBaseAndDot(note: ParsedNote): void {
-    const base = note.duration / 1.5;
-    if (Number.isInteger(Math.log2(base))) {
-      note.duration = base;
-      note.dotted = true;
-    }
   }
 
   /**
