@@ -6,6 +6,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import { legacyDuration } from '../types/Duration';
 import {
   ABCAccidentals,
   keySignature,
@@ -103,7 +104,7 @@ export class ABCSerializer {
     notes.forEach((note, index) => {
       if (note.rest) {
         // Rest: "z" + duration
-        const durationStr = this.formatDuration(note.duration);
+        const durationStr = this.formatDuration(legacyDuration(note));
         abcNotes.push(`z${durationStr}`);
       } else if (note.pitch) {
         const fingering = { ...note.pitch, meriKari: note.meriKari };
@@ -123,7 +124,8 @@ export class ABCSerializer {
 
         // A dot is written as the sounding length (a dotted 1 is 3/2), not as
         // >, which in ABC is broken rhythm and would also halve the next note
-        const sounding = note.dotted ? note.duration * 1.5 : note.duration;
+        const base = legacyDuration(note);
+        const sounding = note.dotted ? base * 1.5 : base;
         abcNotes.push(`${abcPitch}${this.formatDuration(sounding)}`);
       }
     });

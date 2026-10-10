@@ -86,8 +86,16 @@ export interface ScoreNote {
   /** Pitch information (undefined for rests) */
   pitch?: Pitch;
 
-  /** Duration (relative timing units) */
-  duration: number;
+  /**
+   * Length in beats, as an exact fraction: "1" is one beat, "1/2" half a
+   * beat, "3" three beats. See types/Duration.ts for the lengths notation can
+   * show.
+   *
+   * A number is the legacy form, where 2 is one beat. It is still read so
+   * that scores stored before the change keep drawing as they did, and goes
+   * once they have been migrated (#438).
+   */
+  duration: string | number;
 
   /** Rest indicator (mutually exclusive with pitch) */
   rest?: boolean;
@@ -95,7 +103,11 @@ export interface ScoreNote {
   /** Meri or kari, if the note is played with one */
   meriKari?: MeriKari;
 
-  /** Dotted duration indicator (extends duration by half) */
+  /**
+   * The half of the length is written as a dot, rather than as a stroke.
+   * Only a length with a half ("3/2", "3/4") can be dotted. In the legacy
+   * numeric form, the dot adds half to the length.
+   */
   dotted?: boolean;
 }
 
