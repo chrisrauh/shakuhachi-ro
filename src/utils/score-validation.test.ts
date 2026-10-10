@@ -19,7 +19,7 @@ describe('validateScoreInput', () => {
     ['an array', '[]'],
     ['a number', '42'],
     ['notes that are not an array', '{"notes":"x"}'],
-    ['a note without a pitch', '{"notes":[{"duration":1}]}'],
+    ['a note without a pitch', '{"notes":[{"duration":"1/2"}]}'],
   ])('rejects JSON that is not a score: %s', (_, json) => {
     const result = validateScoreInput(json, 'json');
     expect(result.valid).toBe(false);
@@ -28,7 +28,7 @@ describe('validateScoreInput', () => {
   it('accepts a score with notes', () => {
     expect(
       validateScoreInput(
-        '{"notes":[{"pitch":{"step":"ro","octave":0},"duration":1}]}',
+        '{"notes":[{"pitch":{"step":"ro","octave":0},"duration":"1/2"}]}',
         'json',
       ),
     ).toEqual({ valid: true });

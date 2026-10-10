@@ -16,8 +16,8 @@ vi.mock('../parser/MusicXMLParser', () => ({
       composer: 'Test Composer',
       style: 'kinko' as const,
       notes: [
-        { pitch: { step: 'ro' as const, octave: 0 }, duration: 1 },
-        { pitch: { step: 'tsu' as const, octave: 0 }, duration: 1 },
+        { pitch: { step: 'ro' as const, octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'tsu' as const, octave: 0 }, duration: '1/2' },
       ],
     })),
   },
@@ -43,9 +43,9 @@ function createTestScoreData(): ScoreData {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
     ],
   };
 }
@@ -227,7 +227,7 @@ describe('Convenience Functions', () => {
       const scoreData: ScoreData = {
         title: 'Single Note',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1/2' }],
       };
 
       const renderer = renderScore(container, scoreData);

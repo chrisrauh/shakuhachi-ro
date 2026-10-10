@@ -17,7 +17,7 @@ describe('embedJson', () => {
       composer: 'Traditional',
       description: 'A folk song about red dragonflies (赤とんぼ)',
       data_format: 'json',
-      data: { notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }] },
+      data: { notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1/2' }] },
     };
 
     expect(JSON.parse(embedJson(score))).toEqual(score);

@@ -65,8 +65,8 @@ export async function renderScoreFromURL(
  *   title: 'My Score',
  *   style: 'kinko',
  *   notes: [
- *     { pitch: { step: 'ro', octave: 0 }, duration: 1 },
- *     { pitch: { step: 'tsu', octave: 0 }, duration: 1 }
+ *     { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+ *     { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' }
  *   ]
  * };
  *

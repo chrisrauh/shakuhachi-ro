@@ -21,12 +21,12 @@ describe('ShakuhachiScore Web Component - Columns Attribute', () => {
     title: 'Test Score',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-      { pitch: { step: 're', octave: 0 }, duration: 1 },
-      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
-      { pitch: { step: 'ri', octave: 0 }, duration: 1 },
-      { pitch: { step: 'u', octave: 0 }, duration: 1 },
+      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 're', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'ri', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'u', octave: 0 }, duration: '1/2' },
     ],
   };
 
@@ -188,9 +188,9 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
   it('renders with minimal data (only notes)', async () => {
     const minimalData = {
       notes: [
-        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-        { pitch: { step: 're', octave: 0 }, duration: 1 },
+        { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 're', octave: 0 }, duration: '1/2' },
       ],
     };
 
@@ -234,7 +234,7 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     component.setAttribute(
       'data-score',
       JSON.stringify({
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1/2' }],
       }),
     );
     component.setAttribute('columns', '1');
@@ -252,7 +252,7 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     const fullData = {
       title: 'Test Score',
       style: 'kinko' as const,
-      notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 1 }],
+      notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1/2' }],
       composer: 'Test Composer',
       tempo: '120 BPM',
     };
@@ -285,9 +285,9 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
 
   const minimalScoreData = {
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-      { pitch: { step: 're', octave: 0 }, duration: 1 },
+      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 're', octave: 0 }, duration: '1/2' },
     ],
   };
 
@@ -368,12 +368,12 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     // 6 notes divided by 3 columns = 2 notes per column
     const scoreDataSixNotes = {
       notes: [
-        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-        { pitch: { step: 're', octave: 0 }, duration: 1 },
-        { pitch: { step: 'chi', octave: 0 }, duration: 1 },
-        { pitch: { step: 'ri', octave: 0 }, duration: 1 },
-        { pitch: { step: 'u', octave: 0 }, duration: 1 },
+        { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 're', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'ri', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'u', octave: 0 }, duration: '1/2' },
       ],
     };
 
@@ -422,12 +422,12 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     // 6 notes in single column
     const scoreDataSixNotes = {
       notes: [
-        { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-        { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-        { pitch: { step: 're', octave: 0 }, duration: 1 },
-        { pitch: { step: 'chi', octave: 0 }, duration: 1 },
-        { pitch: { step: 'ri', octave: 0 }, duration: 1 },
-        { pitch: { step: 'u', octave: 0 }, duration: 1 },
+        { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 're', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'ri', octave: 0 }, duration: '1/2' },
+        { pitch: { step: 'u', octave: 0 }, duration: '1/2' },
       ],
     };
 

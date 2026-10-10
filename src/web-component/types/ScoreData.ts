@@ -90,12 +90,8 @@ export interface ScoreNote {
    * Length in beats, as an exact fraction: "1" is one beat, "1/2" half a
    * beat, "3" three beats. See types/Duration.ts for the lengths notation can
    * show.
-   *
-   * A number is the legacy form, where 2 is one beat. It is still read so
-   * that scores stored before the change keep drawing as they did, and goes
-   * once they have been migrated (#438).
    */
-  duration: string | number;
+  duration: string;
 
   /** Rest indicator (mutually exclusive with pitch) */
   rest?: boolean;
@@ -106,8 +102,7 @@ export interface ScoreNote {
   /**
    * The last part of the length is written as a dot, rather than as a
    * stroke: half a beat after a note of a beat or more, a quarter after half
-   * a beat. Only "3/2" and "3/4" can be dotted for now. In the legacy numeric
-   * form, the dot adds half to the length.
+   * a beat. Only "3/2" and "3/4" can be dotted for now.
    */
   dotted?: boolean;
 }

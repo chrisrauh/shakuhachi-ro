@@ -34,19 +34,8 @@ describe('Duration', () => {
     expect(writtenLength(parseBeats('3/2')!)).toEqual({ num: 3, den: 2 });
   });
 
-  it("gives a note's length in beats, reading legacy numbers", () => {
-    expect(noteBeats({ duration: '3/2', dotted: true })).toEqual({
-      num: 3,
-      den: 2,
-    });
-    expect(noteBeats({ duration: 4 })).toEqual({ num: 2, den: 1 });
-    expect(noteBeats({ duration: 1, dotted: true })).toEqual({
-      num: 3,
-      den: 4,
-    });
-  });
-
-  it('fails on a duration it cannot read', () => {
+  it("gives a note's length in beats, and fails on one it cannot read", () => {
+    expect(noteBeats({ duration: '3/2' })).toEqual({ num: 3, den: 2 });
     expect(() => noteBeats({ duration: '0.5' })).toThrow(
       'Invalid duration: 0.5',
     );

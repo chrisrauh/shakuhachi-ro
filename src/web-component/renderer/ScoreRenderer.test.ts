@@ -32,9 +32,9 @@ function createTestScoreData(): ScoreData {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-      { pitch: { step: 'chi', octave: 0 }, duration: 1 },
+      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
     ],
   };
 }
@@ -427,10 +427,10 @@ describe('ScoreRenderer', () => {
         title: '',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: 2 },
+          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
           {
             pitch: { step: 'ro', octave: 2 },
-            duration: 2,
+            duration: '1',
             meriKari: 'dai-meri',
           },
         ],
@@ -455,7 +455,7 @@ describe('ScoreRenderer', () => {
       const score: ScoreData = {
         title: '',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 2 }],
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
       };
       const cellWith = (options: RenderOptions) => {
         const renderer = new ScoreRenderer(container, options);
@@ -574,7 +574,7 @@ describe('ScoreRenderer', () => {
   });
 
   describe('duration lines', () => {
-    /** Three quarter notes, each with one duration line */
+    /** Three half-beat notes, each with one duration line */
     function quarterNotes(firstDotted = false): ScoreData {
       return {
         title: 'Duration lines',
@@ -582,11 +582,11 @@ describe('ScoreRenderer', () => {
         notes: [
           {
             pitch: { step: 'ro', octave: 0 },
-            duration: 1,
+            duration: firstDotted ? '3/4' : '1/2',
             dotted: firstDotted,
           },
-          { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-          { pitch: { step: 're', octave: 0 }, duration: 1 },
+          { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+          { pitch: { step: 're', octave: 0 }, duration: '1/2' },
         ],
       };
     }

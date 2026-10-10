@@ -807,19 +807,6 @@ Q
         expect(back.notes).toEqual(notes);
       });
 
-      it('writes a legacy number in beats', () => {
-        const abc = ABCSerializer.serialize({
-          title: 'T',
-          notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: 2 },
-            { pitch: { step: 'ro', octave: 0 }, duration: 1, dotted: true },
-          ],
-        });
-
-        expect(abc).toContain('L:1/4');
-        expect(abc).toContain('D D3/4');
-      });
-
       // ABC has no way to say how a length is written, so a length with a
       // half comes back dotted however it was written
       it('brings back a length with a half dotted', () => {

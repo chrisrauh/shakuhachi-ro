@@ -3,7 +3,6 @@ import type { ScoreNote } from '../../web-component/types/ScoreData';
 import {
   chooseNote,
   deleteNote,
-  inBeats,
   setDuration,
   setMark,
   shiftOctave,
@@ -161,27 +160,6 @@ describe('length, dot, mark and octave', () => {
     expect(shiftOctave(highlight([ro], 0), -1)).toBeNull();
     expect(setMark(highlight([rest], 0), 'meri')).toBeNull();
     expect(shiftOctave(highlight([rest], 0), 1)).toBeNull();
-  });
-});
-
-describe('inBeats', () => {
-  it('rewrites a legacy duration in beats, keeping the dot', () => {
-    expect(inBeats({ ...ro, duration: 2 })).toEqual(ro);
-    expect(inBeats({ ...ro, duration: 1, dotted: true })).toEqual({
-      ...ro,
-      duration: '3/4',
-      dotted: true,
-    });
-    expect(inBeats({ rest: true, duration: 12 })).toEqual({
-      rest: true,
-      duration: '6',
-    });
-  });
-
-  it('leaves a length beats cannot show, and a note already in beats', () => {
-    const sixteenth = { ...ro, duration: 0.25 };
-    expect(inBeats(sixteenth)).toBe(sixteenth);
-    expect(inBeats(ro)).toBe(ro);
   });
 });
 
