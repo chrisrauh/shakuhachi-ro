@@ -76,8 +76,22 @@ export const PARSER_STRINGS = {
       contentRequired: 'ABC notation content is required',
       unknownKey: (key: string) =>
         `The K: field's key, "${key}", isn't one ABC defines. Use a key such as D, Dm, D dorian or none.`,
-      unitLengthChange:
-        "Changing the unit length (L:) after the tune's notes start isn't supported yet. Write the notes in one unit length, set in the header.",
+      invalidUnitLength: (value: string) =>
+        `The unit length (L:), "${value}", isn't a length such as 1/8.`,
+      unknownCharacter: (character: string) =>
+        `"${character}" isn't ABC that can be imported. Remove it from the notes and import again.`,
+      graceNotes: (text: string) =>
+        `Grace notes (${text}) can't be imported yet. Remove them, or write them as notes, and import again.`,
+      chord: (text: string) =>
+        `Chords (${text}) can't be imported, as the shakuhachi plays one note at a time. Keep one note of each chord and import again.`,
+      multipleVoices:
+        'The tune has more than one voice (V:), and the shakuhachi plays one note at a time. Delete the other voices and import again.',
+      laterEnding: (number: string) =>
+        `Only first and second endings can be imported, and the tune has ending ${number}. Write the repeat out and import again.`,
+      multiRestNeedsMeter: (text: string) =>
+        `A rest of whole bars (${text}) needs the meter, to know how long a bar is. Add an M: field, such as M:4/4, to the header.`,
+      unrenderableLength: (index: number, text: string, length: number) =>
+        `Note ${index + 1} (${text}) is ${Number(length.toFixed(3))} units long, a length shakuhachi notation can't show yet. Lengths must be a power of two units (1, 2, 1/2…), or one and a half times one. Tuplets such as triplets usually come out this way.`,
       noNotesFound:
         'No notes found in ABC notation. Write the notes after the header fields, e.g. D F G A d.',
       unknownPitch: (pitch: string) =>

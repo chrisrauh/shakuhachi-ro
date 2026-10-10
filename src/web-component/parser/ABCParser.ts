@@ -4,23 +4,34 @@
  * Parses ABC notation and maps pitches to shakuhachi notation.
  * For D shakuhachi (1.8 shaku) in Kinko style.
  *
+ * What is saved is the JSON, so the parser imports what JSON can hold, drops
+ * only what leaves the music unchanged, and fails on anything else (#464).
+ *
  * ABC Notation Reference:
  * - Header fields: X: (index), T: (title), C: (composer), M: (meter), L: (unit length), K: (key)
  *   All are optional; a tune can be just its notes
  * - Notes: A-G (uppercase = octave 4), a-g (lowercase = octave 5), ' (upper octave), , (lower octave)
  * - Accidentals: ^ (sharp), ^^ (double sharp), _ (flat), __ (double flat), = (natural)
- * - Duration: 2 (double), /2 (half), 3/2 (dotted), default is L: value
+ * - Duration: 2 (double), /2 (half), 3/2 (dotted), default is L: value.
+ *   Lengths are counted in the tune's first unit length, so 1 is one unit
  * - Broken rhythm: A>B dots A and halves B; A<B halves A and dots B
- * - Rests: z (with duration modifiers)
+ * - Rests: z and x (with duration modifiers); Z and X are whole bars of rest,
+ *   from M:
  * - Key: K: sets the accidentals of notes written without one. Without K:,
  *   notes read as written. A K: line or inline [K:…] in the body changes the
  *   key from there on
- * - A unit length change (L:) in the body fails, as lengths after it would
- *   read wrong. Other fields in the body (w: lyrics, N:, P:, M:, inline
- *   [P:…]) are skipped
+ * - L: and M: in the body change the unit length and the meter from there on.
+ *   Other fields in the body (w: lyrics, N:, P:, inline [P:…]) are skipped
  * - Bar lines: | ends the accidentals written in a bar; not kept in output
+ * - Repeats (|: :| ::) and first and second endings (|1 :|2 [1 [2) are
+ *   played out, as JSON has no repeats
+ * - Ties (D2-D2) become one note; tuplets ((3, (p:q:r) scale their notes
  * - Decorations: !name! before a note. One naming a fingering (as our export
  *   writes, e.g. !ri-meri!) chooses it; others are ignored
+ * - Chord symbols and annotations ("Am") and slurs ( ) are dropped
+ * - Grace notes, chords, a second voice and anything else fail
+ * - Lengths must be ones JSON can show: a power of two units, or one and a
+ *   half times one. When ScoreData gains lengths (#357), this changes too
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
@@ -34,6 +45,157 @@ import {
   namedFingering,
 } from '../constants/kinko-fingerings';
 import { PARSER_STRINGS } from '../constants/parser-strings';
+
+/** A piece of the tune body, as the tokenizer reads it */
+type Token =
+  | { type: 'bar'; startRepeat: boolean; endRepeat: boolean }
+  | { type: 'ending'; number: number }
+  | { type: 'field'; name: string; value: string }
+  | { type: 'decoration'; name: string }
+  | { type: 'tuplet'; p: number; q?: number; r?: number }
+  | { type: 'tie' }
+  | {
+      type: 'note';
+      text: string;
+      accidental: string;
+      letter: string;
+      octaveMarks: string;
+      length: string;
+      broken: string;
+    }
+  | { type: 'multiRest'; text: string; bars: number };
+
+/** The tokens left once repeats are played out, which drops the endings */
+type PlayedToken = Exclude<Token, { type: 'ending' }>;
+
+/**
+ * One reader per kind of token, tried in order at each position. Whatever
+ * matches none of them fails, so nothing in a tune is skipped unread.
+ */
+const TOKEN_READERS: [RegExp, (m: RegExpExecArray) => Token[]][] = [
+  // Spaces, and ` and \, which ABC uses to group notes and join lines
+  [/[\s`\\]+/y, () => []],
+  // Chord symbols and annotations are accompaniment, not the melody
+  [/"[^"]*"/y, () => []],
+  [
+    /(:*)(\[\||\|\]|\|\||\|)(:*)(\d*)/y,
+    (m) => [
+      { type: 'bar', endRepeat: m[1] !== '', startRepeat: m[3] !== '' },
+      ...(m[4] ? [ending(m[4])] : []),
+    ],
+  ],
+  [/::/y, () => [{ type: 'bar', endRepeat: true, startRepeat: true }]],
+  [/\[(\d+)/y, (m) => [ending(m[1])]],
+  [/\[([A-Za-z]):([^\]]*)\]/y, (m) => [field(m[1], m[2])]],
+  [/!([^!]*)!/y, (m) => [{ type: 'decoration', name: m[1] }]],
+  [
+    /\{[^}]*\}?/y,
+    (m) => {
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.graceNotes(m[0]));
+    },
+  ],
+  [
+    /\[[^\]]*\]?/y,
+    (m) => {
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.chord(m[0]));
+    },
+  ],
+  [
+    /\((\d+)(?::(\d*))?(?::(\d*))?/y,
+    (m) => [
+      {
+        type: 'tuplet',
+        p: Number(m[1]),
+        q: m[2] ? Number(m[2]) : undefined,
+        r: m[3] ? Number(m[3]) : undefined,
+      },
+    ],
+  ],
+  // Slurs don't change which notes are played
+  [/[()]/y, () => []],
+  [/-/y, () => [{ type: 'tie' }]],
+  [
+    /([ZX])(\d*)/y,
+    (m) => [{ type: 'multiRest', text: m[0], bars: Number(m[2] || 1) }],
+  ],
+  // Any letter, so one that isn't a note fails as an unknown pitch
+  [
+    /([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/y,
+    (m) => [
+      {
+        type: 'note',
+        text: m[0],
+        accidental: m[1] ?? '',
+        letter: m[2],
+        octaveMarks: m[3],
+        length: m[4],
+        broken: m[5],
+      },
+    ],
+  ],
+];
+
+function ending(number: string): Token {
+  const n = Number(number);
+  // Only two passes are played out; see expandRepeats()
+  if (n !== 1 && n !== 2) {
+    throw new Error(PARSER_STRINGS.ERRORS.ABCParser.laterEnding(number));
+  }
+  return { type: 'ending', number: n };
+}
+
+function field(name: string, value: string): Token {
+  return { type: 'field', name, value: value.trim() };
+}
+
+/** A fraction such as 1/8 or 3, or undefined when it isn't one */
+function parseFraction(value: string): number | undefined {
+  const match = value.trim().match(/^(\d+)(?:\/(\d+))?$/);
+  if (!match) return undefined;
+  const fraction = Number(match[1]) / Number(match[2] ?? 1);
+  return fraction > 0 ? fraction : undefined;
+}
+
+/**
+ * The length of a bar in whole notes, from an M: field: 3/4, 2+3/8, C (4/4)
+ * or C| (2/2). Undefined for M:none, or a meter that can't be read.
+ */
+function parseMeter(value: string): number | undefined {
+  const meter = value.trim();
+  if (meter === 'C') return 1;
+  if (meter === 'C|') return 1;
+  const match = meter.match(/^(\d+(?:\+\d+)*)\/(\d+)$/);
+  if (!match) return undefined;
+  const beats = match[1].split('+').reduce((sum, n) => sum + Number(n), 0);
+  return beats / Number(match[2]);
+}
+
+/**
+ * The unit length a tune gets without L:, from its meter: 1/16 below 3/4,
+ * 1/8 otherwise and without M:
+ */
+function defaultUnitLength(meter: number | undefined): number {
+  return meter !== undefined && meter < 0.75 ? 1 / 16 : 1 / 8;
+}
+
+/** Whether a field (from the header, a body line or inline) changes the notes */
+const NOTE_FIELDS = new Set(['K', 'L', 'M', 'V']);
+
+/**
+ * The lengths JSON shows: a power of two units, or one and a half times one
+ * (a dotted note). The length snapped to that value, as ties and tuplets add
+ * floating point error, or undefined when it is neither.
+ */
+function renderableLength(length: number): number | undefined {
+  const powerOfTwo = (x: number) => {
+    const power = 2 ** Math.round(Math.log2(x));
+    return Math.abs(x - power) < 1e-9 ? power : undefined;
+  };
+  const plain = powerOfTwo(length);
+  if (plain !== undefined) return plain;
+  const base = powerOfTwo(length / 1.5);
+  return base === undefined ? undefined : base * 1.5;
+}
 
 export class ABCParser {
   /**
@@ -52,6 +214,9 @@ export class ABCParser {
     let composer: string | undefined;
     let tempo: string | undefined;
     let key: string | undefined;
+    let meter: string | undefined;
+    let unitLength: string | undefined;
+    const voices = new Set<string>();
     let inBody = false;
     const noteLines: string[] = [];
 
@@ -79,30 +244,35 @@ export class ABCParser {
         } else if (trimmed.startsWith('C:')) {
           composer = trimmed.substring(2).trim() || undefined;
         } else if (trimmed.startsWith('M:')) {
-          // Meter field (currently not used in ScoreData)
-          continue;
+          meter = trimmed.substring(2);
         } else if (trimmed.startsWith('L:')) {
-          // Unit length field (currently not used - durations are relative)
-          continue;
+          unitLength = trimmed.substring(2);
+        } else if (trimmed.startsWith('V:')) {
+          voices.add(this.voiceId(trimmed.substring(2)));
         } else if (trimmed.startsWith('Q:')) {
           tempo = trimmed.substring(2).trim();
         } else if (trimmed.startsWith('K:')) {
           key = trimmed.substring(2).trim();
           inBody = true; // K: field marks end of header
         }
-      } else if (/^[A-Za-z+]:/.test(trimmed)) {
-        // A field in the body. K: changes the key from here on, so it's
-        // kept as the inline field it is equivalent to. L: would change the
-        // length of the notes after it, which isn't read yet. The rest
-        // (lyrics, notes, parts, meter) don't change the notes read
-        if (trimmed.startsWith('K:')) {
-          noteLines.push(`[${trimmed}]`);
-        } else if (trimmed.startsWith('L:')) {
-          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
-        }
       } else {
-        noteLines.push(trimmed);
+        // A comment can end any line of the body
+        const content = trimmed.replace(/%.*$/, '').trim();
+        if (/^[A-Za-z+]:/.test(content)) {
+          // A field in the body. Those that change the notes after them are
+          // kept as the inline fields they are equivalent to. The rest
+          // (lyrics, notes, parts) don't change the notes read
+          if (NOTE_FIELDS.has(content[0])) {
+            noteLines.push(`[${content}]`);
+          }
+        } else if (content) {
+          noteLines.push(content);
+        }
       }
+    }
+
+    if (voices.size > 1) {
+      throw new Error(PARSER_STRINGS.ERRORS.ABCParser.multipleVoices);
     }
 
     // Without K:, notes read as written
@@ -111,11 +281,20 @@ export class ABCParser {
       throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownKey(key ?? ''));
     }
 
+    const barLength = meter === undefined ? undefined : parseMeter(meter);
+    const unit =
+      unitLength === undefined
+        ? defaultUnitLength(barLength)
+        : this.readUnitLength(unitLength);
+
     // Parse notes from body
-    const notes = this.parseNotes(
-      noteLines.join(' '),
-      new ABCAccidentals(signature),
-    );
+    const tokens = this.expandRepeats(this.tokenize(noteLines.join(' ')));
+    const notes = this.readNotes(tokens, {
+      accidentals: new ABCAccidentals(signature),
+      unit,
+      barLength,
+      voices,
+    });
 
     return {
       title,
@@ -127,126 +306,218 @@ export class ABCParser {
     };
   }
 
+  /** A voice's ID, the first word of its V: field */
+  private static voiceId(value: string): string {
+    return value.trim().split(/\s+/)[0];
+  }
+
+  /** The unit length of an L: field, in whole notes */
+  private static readUnitLength(value: string): number {
+    const unit = parseFraction(value);
+    if (unit === undefined) {
+      throw new Error(
+        PARSER_STRINGS.ERRORS.ABCParser.invalidUnitLength(value.trim()),
+      );
+    }
+    return unit;
+  }
+
   /**
-   * Parse note sequence from ABC body
+   * Splits the tune body into tokens, failing on anything that isn't one
    *
-   * @param noteString - ABC note sequence (e.g., "D2 F G3/2 z/2 A>B c")
-   * @param accidentals - The key signature, and accidentals as they're written
+   * @param body - The note lines of the tune, joined
+   */
+  private static tokenize(body: string): Token[] {
+    const tokens: Token[] = [];
+    let position = 0;
+    while (position < body.length) {
+      const reader = TOKEN_READERS.find(([regex]) => {
+        regex.lastIndex = position;
+        return regex.test(body);
+      });
+      if (!reader) {
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ABCParser.unknownCharacter(body[position]),
+        );
+      }
+      const [regex, read] = reader;
+      regex.lastIndex = position;
+      const match = regex.exec(body)!;
+      tokens.push(...read(match));
+      position = regex.lastIndex;
+    }
+    return tokens;
+  }
+
+  /**
+   * Plays out repeats and first and second endings, as JSON has no repeats:
+   * |: A :| becomes A A, and |: A |1 B :|2 C | becomes A B A C. A repeat
+   * without |: goes back to the start of the tune, or to the end of the last
+   * repeat. Bar lines are kept, as they end accidentals.
+   */
+  private static expandRepeats(tokens: Token[]): PlayedToken[] {
+    const played: PlayedToken[] = [];
+    let sectionStart = 0;
+    let pass = 1;
+    // Passing over an ending that isn't this pass's
+    let skipping = false;
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (skipping) {
+        skipping = !(token.type === 'ending' && token.number === pass);
+        continue;
+      }
+      if (token.type === 'ending') {
+        skipping = token.number !== pass;
+        continue;
+      }
+      played.push(token);
+      if (token.type !== 'bar') continue;
+
+      if (token.endRepeat) {
+        if (pass === 1) {
+          pass = 2;
+          i = sectionStart - 1;
+          continue;
+        }
+        pass = 1;
+        sectionStart = i + 1;
+      }
+      if (token.startRepeat) {
+        pass = 1;
+        sectionStart = i + 1;
+      }
+    }
+    return played;
+  }
+
+  /**
+   * Reads the notes from the played-out tokens
+   *
+   * @param tokens - The tune body, with repeats played out
+   * @param context - What is in force at the start of the tune: the key,
+   *   the unit length and bar length in whole notes, and the voices declared
+   *   in the header
    * @returns Array of ScoreNote objects
    */
-  private static parseNotes(
-    noteString: string,
-    accidentals: ABCAccidentals,
+  private static readNotes(
+    tokens: PlayedToken[],
+    context: {
+      accidentals: ABCAccidentals;
+      unit: number;
+      barLength: number | undefined;
+      voices: Set<string>;
+    },
   ): ScoreNote[] {
+    let { accidentals, barLength } = context;
+    const { voices } = context;
+    // Lengths are counted in the first unit length, so a change scales those
+    // after it
+    let lengthScale = 1;
     const notes: ScoreNote[] = [];
-    // The broken-rhythm marker (> or <) after each note, by note index
+    // By note index: the ABC it was read from, its broken-rhythm marker
+    // (> or <), and whether it is tied to the next note
+    const sources: string[] = [];
     const brokenRhythm: string[] = [];
-
-    const cleaned = noteString.replace(/\s+/g, ' ').trim();
-
-    // Tokenize: split into note tokens (pitch + optional duration + optional dotted marker)
-    // Regex matches: optional accidental + ANY letter (we'll validate later) + optional octave marks + optional duration + optional dotted
-    // Examples: "D", "^D2", "d'", "_a/2", "G>", "X", "Q", "z"
-    // Inline fields such as [K:G] come before notes, so their letter isn't
-    // read as one
-    const tokenRegex =
-      /(\|)|\[([A-Za-z]):([^\]]*)\]|!([^!]*)!|([_=^]{1,2})?([A-Za-z])([',]*)(\/?\d*\/?\d*)([><]?)/g;
+    const tied: boolean[] = [];
     // Decorations seen since the last note
     let decorations: string[] = [];
-    let match: RegExpExecArray | null;
+    // The tuplet the next notes are in: how much each is scaled, and how
+    // many notes it has left
+    let tuplet = { scale: 1, notesLeft: 0 };
 
-    // Valid ABC note letters and rest
-    const validLetters = new Set([
-      'A',
-      'B',
-      'C',
-      'D',
-      'E',
-      'F',
-      'G',
-      'a',
-      'b',
-      'c',
-      'd',
-      'e',
-      'f',
-      'g',
-      'z',
-    ]);
-
-    while ((match = tokenRegex.exec(cleaned)) !== null) {
-      const [
-        fullMatch,
-        barLine,
-        fieldName,
-        fieldValue,
-        decoration,
-        accidental,
-        pitch,
-        octaveMarks,
-        durationSuffix,
-        dottedMarker,
-      ] = match;
-
-      // Skip if empty match or whitespace
-      if (!fullMatch.trim()) {
-        continue;
+    const push = (note: ScoreNote, source: string, broken = '') => {
+      if (tuplet.notesLeft > 0) {
+        note.duration *= tuplet.scale;
+        tuplet.notesLeft--;
       }
+      sources.push(source);
+      brokenRhythm.push(broken);
+      notes.push(note);
+    };
 
-      if (barLine) {
-        accidentals.barLine();
-        continue;
-      }
+    for (const token of tokens) {
+      switch (token.type) {
+        case 'bar':
+          accidentals.barLine();
+          continue;
 
-      // Of the inline fields, a key change affects the notes and a unit
-      // length change isn't read yet; the rest are skipped
-      if (fieldName !== undefined) {
-        if (fieldName === 'L') {
-          throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unitLengthChange);
-        }
-        if (fieldName === 'K') {
-          const signature = keySignature(fieldValue);
-          if (!signature) {
+        case 'field':
+          if (token.name === 'K') {
+            const signature = keySignature(token.value);
+            if (!signature) {
+              throw new Error(
+                PARSER_STRINGS.ERRORS.ABCParser.unknownKey(token.value),
+              );
+            }
+            accidentals = new ABCAccidentals(signature);
+          } else if (token.name === 'L') {
+            lengthScale = this.readUnitLength(token.value) / context.unit;
+          } else if (token.name === 'M') {
+            barLength = parseMeter(token.value);
+          } else if (token.name === 'V') {
+            voices.add(this.voiceId(token.value));
+            if (voices.size > 1) {
+              throw new Error(PARSER_STRINGS.ERRORS.ABCParser.multipleVoices);
+            }
+          }
+          // The rest (such as [P:A]) don't change the notes
+          continue;
+
+        case 'decoration':
+          decorations.push(token.name);
+          continue;
+
+        case 'tuplet':
+          tuplet = {
+            scale: (token.q ?? this.tupletTime(token.p, barLength)) / token.p,
+            notesLeft: token.r ?? token.p,
+          };
+          continue;
+
+        case 'tie':
+          if (notes.length === 0) {
             throw new Error(
-              PARSER_STRINGS.ERRORS.ABCParser.unknownKey(fieldValue.trim()),
+              PARSER_STRINGS.ERRORS.ABCParser.unknownCharacter('-'),
             );
           }
-          accidentals = new ABCAccidentals(signature);
-        }
-        continue;
+          tied[notes.length - 1] = true;
+          continue;
+
+        case 'multiRest':
+          if (barLength === undefined) {
+            throw new Error(
+              PARSER_STRINGS.ERRORS.ABCParser.multiRestNeedsMeter(token.text),
+            );
+          }
+          push(
+            { rest: true, duration: (token.bars * barLength) / context.unit },
+            token.text,
+          );
+          continue;
+
+        case 'note':
+          break;
       }
 
-      if (decoration !== undefined) {
-        decorations.push(decoration);
-        continue;
-      }
       const noteDecorations = decorations;
       decorations = [];
+      const { letter, accidental, octaveMarks } = token;
+      const duration = this.calculateDuration(token.length) * lengthScale;
 
-      // Validate letter first
-      if (!validLetters.has(pitch)) {
-        throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(pitch));
-      }
-
-      brokenRhythm[notes.length] = dottedMarker;
-
-      // Handle rest
-      if (pitch === 'z') {
-        const duration = this.calculateDuration(durationSuffix);
-        notes.push({
-          rest: true,
-          duration,
-        });
+      if (letter === 'z' || letter === 'x') {
+        push({ rest: true, duration }, token.text, token.broken);
         continue;
       }
-
-      // Build ABC pitch notation (with accidental and octave marks)
-      const abcPitch = `${accidental || ''}${pitch}${octaveMarks}`;
+      if (!/^[A-Ga-g]$/.test(letter)) {
+        throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(letter));
+      }
 
       // Map to shakuhachi
       const written = parseABCPitch(
-        accidental || '',
-        pitch,
+        accidental,
+        letter,
         octaveMarks,
         accidentals,
       );
@@ -257,13 +528,14 @@ export class ABCParser {
           .find(Boolean) ??
           defaultFingering(written));
       if (!shakuPitch) {
-        throw new Error(PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(abcPitch));
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ABCParser.unknownPitch(
+            `${accidental}${letter}${octaveMarks}`,
+          ),
+        );
       }
 
       // Sounding length for now; toBaseAndDot() splits out the dot below
-      const duration = this.calculateDuration(durationSuffix);
-
-      // Create note
       const note: ScoreNote = {
         pitch: {
           step: shakuPitch.step,
@@ -271,24 +543,81 @@ export class ABCParser {
         },
         duration,
       };
-
       if (shakuPitch.meriKari) {
         note.meriKari = shakuPitch.meriKari;
       }
-
-      notes.push(note);
-    }
-
-    this.applyBrokenRhythm(notes, brokenRhythm);
-    for (const note of notes) {
-      if (!note.rest) this.toBaseAndDot(note);
+      push(note, token.text, token.broken);
     }
 
     if (notes.length === 0) {
       throw new Error(PARSER_STRINGS.ERRORS.ABCParser.noNotesFound);
     }
 
-    return notes;
+    this.applyBrokenRhythm(notes, brokenRhythm);
+    const merged = this.mergeTies(notes, sources, tied);
+    merged.forEach(({ note, source }, i) => {
+      const length = renderableLength(note.duration);
+      if (length === undefined) {
+        throw new Error(
+          PARSER_STRINGS.ERRORS.ABCParser.unrenderableLength(
+            i,
+            source,
+            note.duration,
+          ),
+        );
+      }
+      note.duration = length;
+      if (!note.rest) this.toBaseAndDot(note);
+    });
+
+    return merged.map(({ note }) => note);
+  }
+
+  /**
+   * How many notes' time a tuplet of p notes takes when (p:q doesn't say: 3
+   * in the time of 2, 2 or 4 in the time of 3, and 5, 7 or 9 in the time of
+   * 3 in compound meters such as 6/8, or of 2 otherwise
+   */
+  private static tupletTime(p: number, barLength: number | undefined): number {
+    const times: Record<number, number> = { 2: 3, 3: 2, 4: 3, 6: 2, 8: 3 };
+    if (times[p] !== undefined) return times[p];
+    // 6/8, 9/8 and 12/8 are compound: bars of three eighths, at least two
+    const eighths = (barLength ?? 0) * 8;
+    return Number.isInteger(eighths) && eighths % 3 === 0 && eighths > 3
+      ? 3
+      : 2;
+  }
+
+  /**
+   * Joins tied notes into one with their lengths added. A tie between notes
+   * of different pitches doesn't hold either, so it leaves them as they are.
+   */
+  private static mergeTies(
+    notes: ScoreNote[],
+    sources: string[],
+    tied: boolean[],
+  ): { note: ScoreNote; source: string }[] {
+    const merged: { note: ScoreNote; source: string }[] = [];
+    notes.forEach((note, i) => {
+      const previous = merged[merged.length - 1];
+      if (tied[i - 1] && previous && this.samePitch(previous.note, note)) {
+        previous.note.duration += note.duration;
+        previous.source += `-${sources[i]}`;
+      } else {
+        merged.push({ note, source: sources[i] });
+      }
+    });
+    return merged;
+  }
+
+  private static samePitch(a: ScoreNote, b: ScoreNote): boolean {
+    return (
+      !a.rest &&
+      !b.rest &&
+      a.pitch?.step === b.pitch?.step &&
+      a.pitch?.octave === b.pitch?.octave &&
+      a.meriKari === b.meriKari
+    );
   }
 
   /**
