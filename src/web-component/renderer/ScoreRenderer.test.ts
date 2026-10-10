@@ -568,10 +568,7 @@ describe('ScoreRenderer', () => {
       note.addModifier(new OctaveMarksModifier('kan'));
       note.addModifier(new MeriKariModifier('chu-meri'));
       note.addModifier(
-        new DurationMarksModifier(
-          durationSlots({ num: 3, den: 2 }, true),
-          false,
-        ),
+        new DurationMarksModifier(durationSlots({ num: 3, den: 2 }), false),
       );
 
       const renderer = new ScoreRenderer(container);

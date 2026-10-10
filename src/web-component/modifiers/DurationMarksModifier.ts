@@ -2,11 +2,12 @@
  * DurationMarksModifier - How long a note is, in Kinko notation
  *
  * A note's length is written down the column as slots: the note itself, a
- * stroke under it for each extra beat, then a dot or a stroke for a half.
- * Lines to the right of a slot halve it (one line) or quarter it (two), and
- * run on into the lines of the next slot or note, so a line marks the notes
- * that share a beat. A dot after whole beats is half a beat with no line, as
- * in Koga's Dawn in the Forest: ロ・ リ, the line starting at リ (#438).
+ * stroke under it for each extra beat, then a dot for a half. Lines to the
+ * right of a slot halve it (one line) or quarter it (two), and run on into the
+ * lines of the next slot or note, so a line marks the notes that share a beat.
+ * A dot after whole beats is half a beat with no line, as in Koga's Dawn in the
+ * Forest: ロ・ リ, the line starting at リ. A dot after half a beat is a
+ * quarter, inside the note's line, as in Gyoson: リ レ・ under one line (#438).
  *
  * The layout gives each stroke a note's height and each dot a smaller one,
  * which it reads from extraHeight().
@@ -15,7 +16,7 @@
 import { Modifier, type ModifierLayout } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Beats } from '../types/Duration';
-import { writtenLength } from '../types/Duration';
+import { hasHalf, writtenLength } from '../types/Duration';
 
 /** One slot of a note's length in the column, and the lines beside it */
 export interface DurationSlot {
@@ -58,35 +59,31 @@ function linesFor(num: number, den: number): number {
 }
 
 /**
- * The slots a note of `beats` takes, dotted or not. Whole beats come first,
- * the note and a stroke for each extra one, then the half: a dot, or a stroke
- * with its line. A note that starts off the beat is written the same way, as
- * the score doesn't know where its beats fall until it has bars (#465).
+ * The slots a note of `beats` takes. Whole beats come first, the note and a
+ * stroke for each extra one, then a half as a dot. Kinko scores write a half
+ * as a dot; no example of a stroke for it has been found (#438). A note that
+ * starts off the beat is written the same way, as the score doesn't know
+ * where its beats fall until it has bars (#465).
  *
- * Expects a supported length (isSupported), and a dot only with a half.
+ * Expects a supported length (isSupported).
  */
-export function durationSlots(beats: Beats, dotted = false): DurationSlot[] {
+export function durationSlots(beats: Beats): DurationSlot[] {
+  const dotted = hasHalf(beats);
   const written = writtenLength(beats, dotted);
   const whole = Math.floor(written.num / written.den);
-  const part = written.num - whole * written.den;
   const slots: DurationSlot[] = [];
 
   if (whole > 0) {
     slots.push({ kind: 'note', lines: 0 });
     for (let i = 1; i < whole; i++) slots.push({ kind: 'stroke', lines: 0 });
-    if (part > 0) {
-      slots.push({ kind: 'stroke', lines: linesFor(part, written.den) });
-    }
-  } else if (written.num === 3) {
-    // Three quarters with no dot: half a beat, then a quarter
-    slots.push({ kind: 'note', lines: 1 }, { kind: 'stroke', lines: 2 });
   } else {
-    slots.push({ kind: 'note', lines: linesFor(part, written.den) });
+    slots.push({ kind: 'note', lines: linesFor(written.num, written.den) });
   }
 
   if (dotted) {
-    // Half a beat after whole beats, with no line; a quarter after half a beat
-    slots.push({ kind: 'dot', lines: whole > 0 ? 0 : 2 });
+    // Half a beat after whole beats, with no line; a quarter after half a
+    // beat, the note's line running on beside it
+    slots.push({ kind: 'dot', lines: whole > 0 ? 0 : 1 });
   }
   return slots;
 }

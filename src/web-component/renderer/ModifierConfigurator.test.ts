@@ -14,7 +14,7 @@ import {
 
 /** Marks of a dotted 3/2: the note, then a dot */
 const dottedMarks = () =>
-  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }, true), false);
+  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }), false);
 import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
 import type { RenderingBackend } from './RenderingBackend';
 

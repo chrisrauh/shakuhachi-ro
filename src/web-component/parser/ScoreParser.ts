@@ -69,7 +69,7 @@ function durationMarks(
   i: number,
 ): DurationMarksModifier | null {
   const slotsOf = (note: ScoreNote) =>
-    durationSlots(parseBeats(note.duration)!, note.dotted);
+    durationSlots(parseBeats(note.duration)!);
   const slots = slotsOf(notes[i]);
   if (!DurationMarksModifier.marksAnything(slots)) return null;
   const next = notes[i + 1];

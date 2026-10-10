@@ -372,21 +372,22 @@ describe('ScoreParser', () => {
       ]);
     });
 
-    it('writes a half after whole beats as a stroke with a line', () => {
-      expect(durationMarks([ro('3/2'), ro('5/2')])).toEqual([
-        'note stroke|',
-        'note stroke stroke|',
-      ]);
-    });
-
-    it('writes three quarters as half a beat then a quarter', () => {
-      expect(durationMarks([ro('3/4')])).toEqual(['note| stroke||']);
-    });
-
-    it('writes a dotted half as a dot, in its own slot of the beat', () => {
+    it('writes a half as a dot, dotted or not', () => {
       expect(
-        durationMarks([ro('3/2', true), ro('5/2', true), ro('3/4', true)]),
-      ).toEqual(['note dot', 'note stroke dot', 'note| dot||']);
+        durationMarks([
+          ro('3/2', true),
+          ro('5/2', true),
+          ro('3/4', true),
+          ro('3/2'),
+          ro('3/4'),
+        ]),
+      ).toEqual([
+        'note dot',
+        'note stroke dot',
+        'note| dot|',
+        'note dot',
+        'note| dot|',
+      ]);
     });
 
     it('draws duration marks on rests too', () => {

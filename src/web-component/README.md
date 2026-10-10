@@ -31,7 +31,7 @@ interface ScoreNote {
   pitch?: { step: PitchStep; octave: number }; // omit for a rest
   rest?: boolean;
   meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
-  dotted?: boolean; // a length with a half ("3/2", "5/2"…, "3/4") whose half is written as a dot, not a stroke
+  dotted?: boolean; // a length with a half ("3/2", "5/2"…, "3/4") whose half is written as a dot; it is drawn as one either way
 }
 
 type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';

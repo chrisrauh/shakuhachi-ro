@@ -335,9 +335,9 @@
             }, // 大カ
           ],
         },
-        // 6. Strokes for beats after the first, the half after them as a
-        // stroke with a line or as a dot. A dot after whole beats has no
-        // line (#438)
+        // 6. Strokes for beats after the first, then a half as a dot. A dot
+        // after whole beats has no line; after half a beat, the note's line
+        // runs on beside it (#438)
         {
           title: 'Long Notes',
           style: 'kinko',
@@ -347,11 +347,7 @@
             { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
             { pitch: { step: 're', octave: 0 }, dotted: true, duration: '3/2' }, // dot, no line
             { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
-            { pitch: { step: 'ri', octave: 0 }, duration: '3/2' }, // stroke with a line
-            { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
-            { pitch: { step: 're', octave: 0 }, dotted: true, duration: '3/4' }, // dot with two lines
-            { pitch: { step: 'tsu', octave: 0 }, duration: '1/4' },
-            { pitch: { step: 'ro', octave: 0 }, duration: '3/4' }, // line, then stroke with two
+            { pitch: { step: 're', octave: 0 }, dotted: true, duration: '3/4' }, // its line runs on beside the dot
             { pitch: { step: 'tsu', octave: 0 }, duration: '1/4' },
             { pitch: { step: 're', octave: 0 }, dotted: true, duration: '5/2' }, // stroke, then dot
             { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },

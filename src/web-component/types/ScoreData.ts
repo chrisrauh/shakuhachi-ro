@@ -100,9 +100,11 @@ export interface ScoreNote {
   meriKari?: MeriKari;
 
   /**
-   * The last part of the length is written as a dot, rather than as a
-   * stroke: half a beat after a note of a beat or more, a quarter after half
-   * a beat. Only a length with a half can be dotted: "3/2", "5/2"…, "3/4".
+   * The last part of the length is written as a dot: half a beat after a
+   * note of a beat or more, a quarter after half a beat. Only a length with a
+   * half can be dotted: "3/2", "5/2"…, "3/4". The renderer draws that half as
+   * a dot whether or not this is set; no score writing it as a stroke has
+   * been found (#438).
    */
   dotted?: boolean;
 }

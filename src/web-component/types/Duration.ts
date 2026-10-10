@@ -17,7 +17,7 @@ export interface Beats {
  * Notation shows whole beats (the note and a stroke for each extra beat), one
  * line for half a beat, two for a quarter, and a half after any of these:
  * 3/2, 5/2 and up after whole beats, 3/4 after half a beat. The half is
- * written as a dot or as a stroke.
+ * written as a dot.
  */
 
 const FRACTION = /^([1-9]\d*)(?:\/([1-9]\d*))?$/;

@@ -15,9 +15,9 @@ const layout = {
 };
 
 /** Renders the marks of a note at (100, 200) and returns what was drawn */
-function draw(duration: string, dotted = false, linesContinue = false) {
+function draw(duration: string, linesContinue = false) {
   const marks = new DurationMarksModifier(
-    durationSlots(parseBeats(duration)!, dotted),
+    durationSlots(parseBeats(duration)!),
     linesContinue,
   );
   const drawLine = vi.fn();
@@ -50,12 +50,12 @@ describe('durationSlots', () => {
     ).toBe(false);
   });
 
-  it('writes whole beats before the half', () => {
+  it('writes whole beats before the half, and the half as a dot', () => {
     expect(durationSlots(parseBeats('7/2')!)).toEqual([
       { kind: 'note', lines: 0 },
       { kind: 'stroke', lines: 0 },
       { kind: 'stroke', lines: 0 },
-      { kind: 'stroke', lines: 1 },
+      { kind: 'dot', lines: 0 },
     ]);
   });
 });
@@ -71,42 +71,38 @@ describe('DurationMarksModifier', () => {
 
   it('draws the dot after whole beats below the note, with no line', () => {
     // Dawn in the Forest: ロ・ リ, the line starting at リ
-    const { dots, lines } = draw('3/2', true, true);
+    const { dots, lines } = draw('3/2', true);
 
     expect(dots).toEqual([{ x: 100, y: expect.any(Number) }]);
     expect(dots[0].y).toBeGreaterThan(200 - 32 * 0.4);
     expect(lines).toHaveLength(0);
   });
 
-  it('draws two lines beside the dot of a dotted 3/4', () => {
-    const { lines } = draw('3/4', true);
-    const besideDot = lines.filter((l) => l.y1 > 200);
+  it("runs a half-beat note's line on beside its dot, as one line", () => {
+    // Gyoson: リ レ・ under one line
+    const { dots, lines } = draw('3/4');
+    const [noteLine, dotLine] = lines;
 
-    expect(besideDot).toHaveLength(2);
-  });
-
-  it('joins the line of a slot to the lines of the next', () => {
-    // 3/4 undotted: the note's line runs into the stroke's two lines
-    const { lines } = draw('3/4');
-    const [noteLine, strokeLine] = lines.filter((l) => l.x1 === lines[0].x1);
-
-    expect(strokeLine.y1).toBe(noteLine.y2);
+    expect(lines).toHaveLength(2);
+    expect(dotLine.x1).toBe(noteLine.x1);
+    expect(dotLine.y1).toBe(noteLine.y2);
+    expect(dotLine.y2).toBeGreaterThan(dots[0].y);
   });
 
   it('runs the last lines on to the next note when it has lines', () => {
-    const { lines, distanceToNext } = draw('3/2', false, true);
+    const { lines, distanceToNext } = draw('3/4', true);
 
     expect(lines.at(-1)!.y2).toBe(200 + distanceToNext - 22);
   });
 
   it('is as wide as its most lines', () => {
-    const width = (duration: string, dotted = false) =>
+    const width = (duration: string) =>
       new DurationMarksModifier(
-        durationSlots(parseBeats(duration)!, dotted),
+        durationSlots(parseBeats(duration)!),
         false,
       ).getWidth();
 
     expect(width('2')).toBe(0);
-    expect(width('3/4', true)).toBeGreaterThan(width('3/2'));
+    expect(width('1/4')).toBeGreaterThan(width('3/4'));
   });
 });

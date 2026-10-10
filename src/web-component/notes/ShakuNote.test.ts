@@ -33,10 +33,7 @@ describe('ShakuNote', () => {
     it('adds a note slot per stroke and a dot slot per dot', () => {
       const note = new ShakuNote({ symbol: 'ro' }).addModifiers([
         new OctaveMarksModifier('kan'),
-        new DurationMarksModifier(
-          durationSlots({ num: 5, den: 2 }, true),
-          false,
-        ),
+        new DurationMarksModifier(durationSlots({ num: 5, den: 2 }), false),
       ]);
       expect(note.extraHeight(spacing)).toBe(44 + 22);
     });

@@ -12,7 +12,7 @@ import {
 
 /** A dotted 3/2: the note, then a dot slot */
 const dotted = () =>
-  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }, true), false);
+  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }), false);
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { mergeWithDefaults } from './RenderOptions';
 

@@ -29,7 +29,6 @@ export type EditAction =
   | { type: 'note'; step: PitchStep | 'rest' }
   | { type: 'duration'; duration: string }
   | { type: 'dot' }
-  | { type: 'stroke' }
   | { type: 'mark'; mark: MeriKari }
   | { type: 'octave'; step: -1 | 1 }
   | { type: 'delete' };
@@ -57,8 +56,6 @@ export function applyEdit(
       return setDuration(state, action.duration);
     case 'dot':
       return toggleDot(state);
-    case 'stroke':
-      return toggleStroke(state);
     case 'mark':
       return setMark(state, action.mark);
     case 'octave':
@@ -158,8 +155,8 @@ export function setDuration(
 /**
  * The Dot key: adds a dot after the note, half a beat after one beat and a
  * quarter after half a beat, or takes the dot away with its length. A length
- * that already has a half (written with a stroke) keeps its length and is
- * written with a dot instead. A quarter beat can't be dotted.
+ * that already has a half but isn't marked dotted, as an import can write,
+ * keeps its length and is marked dotted. A quarter beat can't be dotted.
  */
 export function toggleDot(state: EditorState): EditorState | null {
   const note = target(state);
@@ -182,17 +179,6 @@ export function toggleDot(state: EditorState): EditorState | null {
     duration: formatBeats(withDot),
     dotted: true,
   });
-}
-
-/**
- * The Stroke key: writes the half of a length that has one (3/2, 5/2, 3/4) as a
- * stroke or as a dot, switching between them and keeping the length.
- */
-export function toggleStroke(state: EditorState): EditorState | null {
-  const note = target(state);
-  if (!note || !hasHalf(parseBeats(note.duration)!)) return null;
-  const { dotted, ...undotted } = note;
-  return withTarget(state, dotted ? undotted : { ...note, dotted: true });
 }
 
 /** Marks exclude each other: choosing one replaces another, or removes itself. */
