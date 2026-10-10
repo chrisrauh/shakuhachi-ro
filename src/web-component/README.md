@@ -6,7 +6,7 @@ Renders shakuhachi notation as SVG. One custom element, no framework, no build s
 <script src="/embed/shakuhachi-score.js"></script>
 
 <shakuhachi-score
-  data-score='{"notes":[{"pitch":{"step":"ro","octave":0},"duration":1}]}'
+  data-score='{"notes":[{"pitch":{"step":"ro","octave":0},"duration":"1"}]}'
 ></shakuhachi-score>
 ```
 
@@ -27,11 +27,11 @@ interface ScoreData {
 }
 
 interface ScoreNote {
-  duration: number; // 4 = whole, 2 = half, 1 = quarter, 0.5 = eighth
+  duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "3/4"
   pitch?: { step: PitchStep; octave: number }; // omit for a rest
   rest?: boolean;
   meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
-  dotted?: boolean; // extends duration by half
+  dotted?: boolean; // "3/2" or "3/4" with its last part written as a dot
 }
 
 type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';

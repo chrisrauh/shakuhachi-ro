@@ -98,9 +98,9 @@ import { renderScore } from 'shakuhachi-ro';
 // Minimal - just notes
 const minimalScore = {
   notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-    { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
-    { pitch: { step: 'chi', octave: 1 }, duration: 2 },
+    { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+    { pitch: { step: 'tsu', octave: 0 }, duration: '1/2', meri: true },
+    { pitch: { step: 'chi', octave: 1 }, duration: '1' },
   ],
 };
 
@@ -112,9 +112,9 @@ const fullScore = {
   style: 'kinko',
   composer: 'Traditional',
   notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-    { pitch: { step: 'tsu', octave: 0 }, duration: 1, meri: true },
-    { pitch: { step: 'chi', octave: 1 }, duration: 2 },
+    { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+    { pitch: { step: 'tsu', octave: 0 }, duration: '1/2', meri: true },
+    { pitch: { step: 'chi', octave: 1 }, duration: '1' },
   ],
 };
 
@@ -133,9 +133,9 @@ The easiest way to embed shakuhachi notation on any website:
 <shakuhachi-score
   data-score='{
   "notes": [
-    { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
-    { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 }
+    { "pitch": { "step": "ro", "octave": 0 }, "duration": "1/2" },
+    { "pitch": { "step": "tsu", "octave": 0 }, "duration": "1/2" },
+    { "pitch": { "step": "chi", "octave": 1 }, "duration": "1" }
   ]
 }'
 ></shakuhachi-score>
