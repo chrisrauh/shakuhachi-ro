@@ -68,25 +68,10 @@ export function closestOctave(romaji: string, referenceMidi: number): number {
  * Expects a validated note.
  */
 function durationLineCount(note: ScoreNote): number {
-  if (typeof note.duration === 'number') {
-    return legacyDurationLineCount(note.duration);
-  }
-
   const written = writtenLength(parseBeats(note.duration)!, note.dotted);
   let lines = 0;
   while (written.num * 2 ** lines < written.den) lines++;
   return lines;
-}
-
-/**
- * Line count for the legacy numeric duration, where 2 is one beat. Goes once
- * stored scores are migrated to beats (#438).
- */
-function legacyDurationLineCount(duration: number): number {
-  if (duration >= 2) return 0;
-  if (duration >= 1) return 1;
-  if (duration >= 0.5) return 2;
-  return 3;
 }
 
 /**
@@ -303,18 +288,11 @@ export class ScoreParser {
 
   /**
    * Checks a note's duration and dot: a supported length in beats, dotted
-   * only if it has a half. A legacy number need only be positive.
+   * only if it has a half. A number is not a duration, though it once was.
    */
   private static validateDuration(note: ScoreNote, index: number): void {
     const S = PARSER_STRINGS.ERRORS.ScoreParser;
     const { duration } = note;
-
-    if (typeof duration === 'number') {
-      if (!(duration > 0)) {
-        throw new Error(S.noteIndexDurationInvalid(index, duration));
-      }
-      return;
-    }
 
     const beats = typeof duration === 'string' ? parseBeats(duration) : null;
     if (!beats) {

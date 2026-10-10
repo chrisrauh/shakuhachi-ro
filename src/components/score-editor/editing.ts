@@ -6,7 +6,6 @@ import type {
 import { getNoteMidi } from '../../web-component/constants/kinko-symbols';
 import { closestOctave } from '../../web-component/parser/ScoreParser';
 import {
-  beatsFromLegacy,
   dottedLength,
   formatBeats,
   hasHalf,
@@ -40,17 +39,6 @@ const FIRST_NOTE_DURATION = '1';
 
 /** Daikan, the highest octave the score data has. */
 const HIGHEST_OCTAVE = 2;
-
-/**
- * A note with a legacy numeric duration (2 is one beat) rewritten in beats,
- * so the keys read and write beats, and the first edit saves the score in
- * beats. A note that has no supported length in beats stays as it is.
- */
-export function inBeats(note: ScoreNote): ScoreNote {
-  if (typeof note.duration !== 'number') return note;
-  const duration = beatsFromLegacy(note.duration, note.dotted);
-  return duration ? { ...note, duration } : note;
-}
 
 /*
  * Each edit returns the new state, or null where it doesn't apply, which is
@@ -102,9 +90,7 @@ export function chooseNote(
   if (selection.type === 'cursor') {
     const { position } = selection;
     const previous = notes[position - 1];
-    const duration = previous
-      ? (writtenDuration(previous) ?? previous.duration)
-      : FIRST_NOTE_DURATION;
+    const duration = previous ? writtenDuration(previous) : FIRST_NOTE_DURATION;
     const note: ScoreNote =
       step === 'rest'
         ? { rest: true, duration }
@@ -137,10 +123,9 @@ export function chooseNote(
 
 /**
  * The length a note is written with before any dot, as a Length key's value:
- * "1" for a dotted 3/2. Undefined for a legacy number.
+ * "1" for a dotted 3/2.
  */
-export function writtenDuration(note: ScoreNote): string | undefined {
-  if (typeof note.duration !== 'string') return undefined;
+export function writtenDuration(note: ScoreNote): string {
   return formatBeats(writtenLength(parseBeats(note.duration)!, note.dotted));
 }
 
@@ -176,7 +161,7 @@ export function setDuration(
  */
 export function toggleDot(state: EditorState): EditorState | null {
   const note = target(state);
-  if (!note || typeof note.duration !== 'string') return null;
+  if (!note) return null;
   const { dotted, ...undotted } = note;
   const beats = parseBeats(note.duration)!;
 
