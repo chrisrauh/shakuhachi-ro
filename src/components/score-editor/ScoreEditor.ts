@@ -20,12 +20,7 @@ import { DetailsDialog } from './DetailsDialog';
 import { SourceView } from './SourceView';
 import { PalettePanel } from './PalettePanel';
 import { SelectionView } from './SelectionView';
-import {
-  applyEdit,
-  inBeats,
-  type EditorCommand,
-  type EditorState,
-} from './editing';
+import { applyEdit, type EditorCommand, type EditorState } from './editing';
 import { EditHistory } from './history';
 import type { Selection } from './selection';
 
@@ -145,7 +140,7 @@ export class ScoreEditor {
 
     this.renderer.setAttribute('data-score', JSON.stringify(data));
     this.emptyHint.hidden = data.notes.length > 0;
-    this.notes = data.notes.map(inBeats);
+    this.notes = data.notes;
     this.selection.show(data.notes, selection);
     return true;
   }

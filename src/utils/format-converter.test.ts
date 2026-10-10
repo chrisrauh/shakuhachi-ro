@@ -16,10 +16,10 @@ describe('format-converter', () => {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: 2 },
-      { pitch: { step: 'tsu', octave: 0 }, duration: 1 },
-      { rest: true, duration: 1 },
-      { pitch: { step: 're', octave: 0 }, duration: 1, dotted: true },
+      { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { rest: true, duration: '1/2' },
+      { pitch: { step: 're', octave: 0 }, duration: '3/4', dotted: true },
     ],
   };
 

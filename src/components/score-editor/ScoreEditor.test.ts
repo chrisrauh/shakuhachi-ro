@@ -226,6 +226,23 @@ describe('ScoreEditor score and source', () => {
     expect($('validation-error').hidden).toBe(false);
   });
 
+  // Durations were numbers before they were beats. A score or draft saved
+  // then is shown as it is, to be fixed by hand.
+  it('opens on the source, saying why, when durations are numbers', () => {
+    new ScoreEditor(
+      makeScore({
+        data: {
+          notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 2 }],
+        } as unknown as ScoreData,
+      }),
+    );
+
+    expect($('source-view').hidden).toBe(false);
+    expect($('validation-message').textContent).toContain(
+      'Note 1 has invalid duration: 2',
+    );
+  });
+
   it('says why a format switch failed in the validation line, and keeps the source and its format', async () => {
     new ScoreEditor(
       makeScore({
@@ -233,8 +250,8 @@ describe('ScoreEditor score and source', () => {
           title: '',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-            { pitch: { step: 'go', octave: 0 }, duration: 1 } as any,
+            { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+            { pitch: { step: 'go', octave: 0 }, duration: '1/2' } as any,
           ],
         },
       }),
@@ -406,31 +423,6 @@ describe('ScoreEditor editing', () => {
 
     press({ key: 'z', metaKey: true, shiftKey: true });
     expect(source().notes).toEqual(TWO_NOTES.notes.slice(1));
-  });
-
-  it('reads a score with legacy durations in beats, and the first edit writes it in beats', () => {
-    new ScoreEditor(
-      makeScore({
-        data: {
-          ...TWO_NOTES,
-          notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: 2 },
-            { pitch: { step: 'tsu', octave: 0 }, duration: 1, dotted: true },
-          ],
-        },
-      }),
-    );
-    expect(key('data-duration="1/2"').getAttribute('aria-pressed')).toBe(
-      'true',
-    );
-    expect(key('data-key="dot"').getAttribute('aria-pressed')).toBe('true');
-
-    key('data-step="re"').click();
-    expect(source().notes).toEqual([
-      { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-      { pitch: { step: 'tsu', octave: 0 }, duration: '3/4', dotted: true },
-      { pitch: { step: 're', octave: 0 }, duration: '1/2' },
-    ]);
   });
 
   it('presses the keys the target note matches, and disables those that do not apply', () => {
