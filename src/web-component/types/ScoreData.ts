@@ -102,7 +102,7 @@ export interface ScoreNote {
   /**
    * The last part of the length is written as a dot, rather than as a
    * stroke: half a beat after a note of a beat or more, a quarter after half
-   * a beat. Only "3/2" and "3/4" can be dotted for now.
+   * a beat. Only a length with a half can be dotted: "3/2", "5/2"…, "3/4".
    */
   dotted?: boolean;
 }

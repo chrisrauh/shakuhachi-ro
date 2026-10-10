@@ -27,11 +27,11 @@ interface ScoreData {
 }
 
 interface ScoreNote {
-  duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "3/4"
+  duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "5/2"…, "3/4"
   pitch?: { step: PitchStep; octave: number }; // omit for a rest
   rest?: boolean;
   meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
-  dotted?: boolean; // "3/2" or "3/4" with its last part written as a dot
+  dotted?: boolean; // a length with a half ("3/2", "5/2"…, "3/4") whose half is written as a dot, not a stroke
 }
 
 type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';

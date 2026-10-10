@@ -7,6 +7,7 @@ import {
   setMark,
   shiftOctave,
   toggleDot,
+  toggleStroke,
   type EditorState,
 } from './editing';
 
@@ -125,14 +126,16 @@ describe('length, dot, mark and octave', () => {
     expect(setDuration(highlight([ro], 0), '1')).toBeNull();
   });
 
-  it('dot only one beat and half a beat, and switch a stroke to a dot', () => {
+  it('dot whole beats and half a beat, and switch a stroke to a dot', () => {
     const half = { ...ro, duration: '1/2' };
     expect(toggleDot(highlight([half], 0))!.notes[0]).toEqual({
       ...half,
       duration: '3/4',
       dotted: true,
     });
-    expect(toggleDot(highlight([{ ...ro, duration: '2' }], 0))).toBeNull();
+    expect(
+      toggleDot(highlight([{ ...ro, duration: '2' }], 0))!.notes[0],
+    ).toEqual({ ...ro, duration: '5/2', dotted: true });
     expect(toggleDot(highlight([{ ...ro, duration: '1/4' }], 0))).toBeNull();
 
     const stroke = { ...ro, duration: '3/2' };
@@ -142,6 +145,16 @@ describe('length, dot, mark and octave', () => {
     });
   });
 
+  it('switch the half between stroke and dot, keeping the length', () => {
+    const dotted = { ...ro, duration: '5/2', dotted: true };
+    const stroked = toggleStroke(highlight([dotted], 0))!;
+    expect(stroked.notes[0]).toEqual({ ...ro, duration: '5/2' });
+    expect(toggleStroke(stroked)!.notes[0]).toEqual(dotted);
+
+    expect(toggleStroke(highlight([ro], 0))).toBeNull();
+    expect(toggleStroke(highlight([{ ...ro, duration: '2' }], 0))).toBeNull();
+  });
+
   it('set the length before the dot, dropping a dot it cannot take', () => {
     const dotted = { ...ro, duration: '3/2', dotted: true };
     expect(setDuration(highlight([dotted], 0), '1/2')!.notes[0]).toEqual({
@@ -149,8 +162,12 @@ describe('length, dot, mark and octave', () => {
       duration: '3/4',
     });
     expect(setDuration(highlight([dotted], 0), '2')!.notes[0]).toEqual({
+      ...dotted,
+      duration: '5/2',
+    });
+    expect(setDuration(highlight([dotted], 0), '1/4')!.notes[0]).toEqual({
       ...ro,
-      duration: '2',
+      duration: '1/4',
     });
     expect(setDuration(highlight([dotted], 0), '1')).toBeNull();
   });

@@ -7,7 +7,14 @@ import { ModifierConfigurator } from './ModifierConfigurator';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import {
+  DurationMarksModifier,
+  durationSlots,
+} from '../modifiers/DurationMarksModifier';
+
+/** Marks of a dotted 3/2: the note, then a dot */
+const dottedMarks = () =>
+  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }, true), false);
 import { mergeWithDefaults, type RenderOptions } from './RenderOptions';
 import type { RenderingBackend } from './RenderingBackend';
 
@@ -100,7 +107,7 @@ describe('ModifierConfigurator', () => {
       // Create a note with octave, meri, and duration dot modifiers
       const octaveMod = new OctaveMarksModifier('kan');
       const meriMod = new MeriKariModifier('chu-meri');
-      const dotMod = new DurationDotModifier();
+      const dotMod = dottedMarks();
       const note = new ShakuNote({ symbol: 'ro' });
       note.addModifier(octaveMod);
       note.addModifier(meriMod);
@@ -119,7 +126,7 @@ describe('ModifierConfigurator', () => {
         false,
       );
       expect(modifiers.some((m) => m instanceof MeriKariModifier)).toBe(true);
-      expect(modifiers.some((m) => m instanceof DurationDotModifier)).toBe(
+      expect(modifiers.some((m) => m instanceof DurationMarksModifier)).toBe(
         true,
       );
     });
@@ -276,7 +283,7 @@ describe('ModifierConfigurator', () => {
     it('should still configure meri/kari and duration marks when octave marks are hidden', () => {
       const octaveMod = new OctaveMarksModifier('kan');
       const meriMod = new MeriKariModifier('meri');
-      const dotMod = new DurationDotModifier();
+      const dotMod = dottedMarks();
       const note = new ShakuNote({ symbol: 'ro' });
       note.addModifier(octaveMod);
       note.addModifier(meriMod);
@@ -306,7 +313,17 @@ describe('ModifierConfigurator', () => {
       );
 
       const drawCircle = vi.fn();
-      dotMod.render({ drawCircle } as unknown as RenderingBackend, 0, 0);
+      dotMod.render(
+        { drawCircle, drawLine: vi.fn() } as unknown as RenderingBackend,
+        0,
+        0,
+        {
+          distanceToNext: 66,
+          noteFontSize: 32,
+          noteSpacing: 44,
+          dotSpacing: 22,
+        },
+      );
       expect(drawCircle).toHaveBeenCalledWith(
         expect.any(Number),
         expect.any(Number),

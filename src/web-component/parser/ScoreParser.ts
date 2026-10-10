@@ -13,20 +13,17 @@ import {
   type OctaveRegister,
 } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
-import { DurationLineModifier } from '../modifiers/DurationLineModifier';
+import {
+  DurationMarksModifier,
+  durationSlots,
+} from '../modifiers/DurationMarksModifier';
 import {
   MERI_KARI,
   PITCH_STEPS,
   type ScoreData,
   type ScoreNote,
 } from '../types/ScoreData';
-import {
-  hasHalf,
-  isSupported,
-  parseBeats,
-  writtenLength,
-} from '../types/Duration';
+import { hasHalf, isSupported, parseBeats } from '../types/Duration';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
@@ -61,17 +58,25 @@ export function closestOctave(romaji: string, referenceMidi: number): number {
 }
 
 /**
- * Number of duration lines to the right of a note: one halves its length,
- * two halve it again. A dotted note draws the lines of its length before the
- * dot, so a dotted 3/4 draws the one line of 1/2.
+ * The strokes, dot and lines that show a note's length, or none for a note of
+ * one beat, which is the note alone. The lines run on into the next note's
+ * when it starts with lines too.
  *
- * Expects a validated note.
+ * Expects validated notes.
  */
-function durationLineCount(note: ScoreNote): number {
-  const written = writtenLength(parseBeats(note.duration)!, note.dotted);
-  let lines = 0;
-  while (written.num * 2 ** lines < written.den) lines++;
-  return lines;
+function durationMarks(
+  notes: ScoreNote[],
+  i: number,
+): DurationMarksModifier | null {
+  const slotsOf = (note: ScoreNote) =>
+    durationSlots(parseBeats(note.duration)!, note.dotted);
+  const slots = slotsOf(notes[i]);
+  if (!DurationMarksModifier.marksAnything(slots)) return null;
+  const next = notes[i + 1];
+  return new DurationMarksModifier(
+    slots,
+    next !== undefined && slotsOf(next)[0].lines > 0,
+  );
 }
 
 /**
@@ -109,20 +114,9 @@ export class ScoreParser {
           color: noteColor,
         });
 
-        // Add duration lines to rests as well
-        const lineCount = durationLineCount(note);
-        if (lineCount > 0) {
-          // Check if this is the last note in a continuous duration line sequence
-          const isLastInSequence =
-            i === scoreData.notes.length - 1 ||
-            durationLineCount(scoreData.notes[i + 1]) === 0;
-          const durationLines = new DurationLineModifier(
-            lineCount,
-            isLastInSequence,
-            'right',
-          );
-          restNote.addModifier(durationLines);
-        }
+        // Rests show their length as notes do
+        const marks = durationMarks(scoreData.notes, i);
+        if (marks) restNote.addModifier(marks);
 
         shakuNotes.push(restNote);
         // Don't update previousNoteMidi - rests carry context through
@@ -162,27 +156,8 @@ export class ScoreParser {
         shakuNote.addModifier(new MeriKariModifier(note.meriKari));
       }
 
-      // Add duration dot if needed
-      if (note.dotted) {
-        const durationDot = new DurationDotModifier('below');
-        shakuNote.addModifier(durationDot);
-      }
-
-      // Add duration lines based on note duration
-      const lineCount = durationLineCount(note);
-      if (lineCount > 0) {
-        // Check if this is the last note in a continuous duration line sequence
-        // by checking if the next note also has a duration line
-        const isLastInSequence =
-          i === scoreData.notes.length - 1 ||
-          durationLineCount(scoreData.notes[i + 1]) === 0;
-        const durationLines = new DurationLineModifier(
-          lineCount,
-          isLastInSequence,
-          'right',
-        );
-        shakuNote.addModifier(durationLines);
-      }
+      const marks = durationMarks(scoreData.notes, i);
+      if (marks) shakuNote.addModifier(marks);
 
       shakuNotes.push(shakuNote);
 

@@ -13,14 +13,12 @@ export interface Beats {
   readonly den: number;
 }
 
-/**
- * Lengths other than whole beats that notation can show: one line (1/2), two
- * lines (1/4), and a half added to one beat or to half a beat (3/2, 3/4).
+/*
+ * Notation shows whole beats (the note and a stroke for each extra beat), one
+ * line for half a beat, two for a quarter, and a half after any of these:
+ * 3/2, 5/2 and up after whole beats, 3/4 after half a beat. The half is
+ * written as a dot or as a stroke.
  */
-const SUPPORTED_FRACTIONS = ['1/2', '1/4', '3/2', '3/4'];
-
-/** Lengths with a half, which can be written with a dot */
-const WITH_HALF = ['3/2', '3/4'];
 
 const FRACTION = /^([1-9]\d*)(?:\/([1-9]\d*))?$/;
 
@@ -49,14 +47,17 @@ export function formatBeats({ num, den }: Beats): string {
   return den === 1 ? String(num) : `${num}/${den}`;
 }
 
-/** Whether notation can show the length (see SUPPORTED_FRACTIONS) */
-export function isSupported(beats: Beats): boolean {
-  return beats.den === 1 || SUPPORTED_FRACTIONS.includes(formatBeats(beats));
+/** Whether notation can show the length: whole beats, halves, 1/4 or 3/4 */
+export function isSupported({ num, den }: Beats): boolean {
+  return den === 1 || den === 2 || (den === 4 && num < 4);
 }
 
-/** Whether the length has a half that can be written as a dot: 3/2 or 3/4 */
-export function hasHalf(beats: Beats): boolean {
-  return WITH_HALF.includes(formatBeats(beats));
+/**
+ * Whether the length has a half that can be written as a dot: 3/2, 5/2 and up,
+ * or 3/4
+ */
+export function hasHalf({ num, den }: Beats): boolean {
+  return (den === 2 && num > 1) || (den === 4 && num === 3);
 }
 
 /** Multiplies a length by n/d, in lowest terms */

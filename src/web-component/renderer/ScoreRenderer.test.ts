@@ -9,7 +9,10 @@ import { SVGRenderer } from './SVGRenderer';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import {
+  DurationMarksModifier,
+  durationSlots,
+} from '../modifiers/DurationMarksModifier';
 import type { ScoreData } from '../types/ScoreData';
 
 /**
@@ -564,7 +567,12 @@ describe('ScoreRenderer', () => {
       const note = new ShakuNote({ symbol: 'ro' });
       note.addModifier(new OctaveMarksModifier('kan'));
       note.addModifier(new MeriKariModifier('chu-meri'));
-      note.addModifier(new DurationDotModifier());
+      note.addModifier(
+        new DurationMarksModifier(
+          durationSlots({ num: 3, den: 2 }, true),
+          false,
+        ),
+      );
 
       const renderer = new ScoreRenderer(container);
       renderer.renderNotes([note]);
@@ -591,10 +599,15 @@ describe('ScoreRenderer', () => {
       };
     }
 
-    /** Gaps between consecutive line segments (next y1 minus this y2) */
-    function segmentGaps(): number[] {
-      const lines = Array.from(container.querySelectorAll('line'));
-      expect(lines).toHaveLength(3);
+    /**
+     * Gaps between consecutive segments of the first line beside the notes
+     * (next y1 minus this y2)
+     */
+    function segmentGaps(segments = 3): number[] {
+      const all = Array.from(container.querySelectorAll('line'));
+      const x = all[0].getAttribute('x1');
+      const lines = all.filter((line) => line.getAttribute('x1') === x);
+      expect(lines).toHaveLength(segments);
       return lines
         .slice(1)
         .map(
@@ -617,9 +630,10 @@ describe('ScoreRenderer', () => {
       expect(segmentGaps()).toEqual([0, 0]);
     });
 
+    // ro, its dot and the two notes after it: four segments that meet
     it('should continue the line past a dotted note', async () => {
       new ScoreRenderer(container).renderFromScoreData(quarterNotes(true));
-      expect(segmentGaps()).toEqual([0, 0]);
+      expect(segmentGaps(4)).toEqual([0, 0, 0]);
     });
 
     it('should end the last segment at the middle of its note', async () => {

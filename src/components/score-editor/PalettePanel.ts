@@ -2,6 +2,7 @@ import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
 import {
   targetIndex,
   toggleDot,
+  toggleStroke,
   writtenDuration,
   type EditorCommand,
   type EditorState,
@@ -72,7 +73,8 @@ export class PalettePanel {
   }
 
   /**
-   * Shows which keys apply: lengths and the dot need a note to act on, marks
+   * Shows which keys apply: lengths and the dot need a note to act on, the
+   * stroke a note with a half, marks
    * and octave a pitched one, and delete a note to remove. A key whose value
    * that note already has is pressed. Note and delete titles follow the mode.
    *
@@ -111,6 +113,13 @@ export class PalettePanel {
           applies &&= toggleDot({ notes, selection }) !== null;
           pressed = !!note?.dotted;
           break;
+        case 'stroke': {
+          // Pressed where the half is written as a stroke
+          const hasHalf = toggleStroke({ notes, selection }) !== null;
+          applies &&= hasHalf;
+          pressed = hasHalf && !note.dotted;
+          break;
+        }
         case 'mark':
           applies &&= !!pitch;
           pressed = !!pitch && note.meriKari === command.mark;
@@ -195,7 +204,8 @@ function commandFor(key: HTMLButtonElement): EditorCommand {
   if (mark) return { type: 'mark', mark: mark as MeriKari };
   switch (name) {
     case 'dot':
-      return { type: 'dot' };
+    case 'stroke':
+      return { type: name };
     case 'octave-up':
       return { type: 'octave', step: 1 };
     case 'octave-down':

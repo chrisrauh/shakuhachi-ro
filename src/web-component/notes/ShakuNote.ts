@@ -10,7 +10,10 @@
 
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Modifier, ModifierLayout } from '../modifiers/Modifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import {
+  DurationMarksModifier,
+  type SlotSpacing,
+} from '../modifiers/DurationMarksModifier';
 import {
   getSymbolByRomaji,
   type KinkoSymbol,
@@ -144,6 +147,8 @@ export class ShakuNote {
     this.layout = {
       distanceToNext: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       noteFontSize: this.fontSize,
+      noteSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+      dotSpacing: DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing,
     };
 
     if (options.modifiers) {
@@ -259,11 +264,14 @@ export class ShakuNote {
   }
 
   /**
-   * Whether this note needs extra vertical space below it in a column.
-   * True when it carries a duration dot, which sits below the note.
+   * Space this note needs below it in a column, past its own: the strokes and
+   * dot of its length
    */
-  needsExtraSpacing(): boolean {
-    return this.modifiers.some((mod) => mod instanceof DurationDotModifier);
+  extraHeight(spacing: SlotSpacing): number {
+    const marks = this.modifiers.find(
+      (mod) => mod instanceof DurationMarksModifier,
+    );
+    return marks ? marks.extraHeight(spacing) : 0;
   }
 
   /**

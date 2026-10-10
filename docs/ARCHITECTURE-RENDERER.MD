@@ -28,8 +28,7 @@ src/web-component/
 ├── modifiers/              # Visual decorations
 │   ├── Modifier.ts         # Base class
 │   ├── AtariModifier.ts
-│   ├── DurationDotModifier.ts
-│   ├── DurationLineModifier.ts
+│   ├── DurationMarksModifier.ts
 │   ├── MeriKariModifier.ts
 │   ├── OctaveMarksModifier.ts
 │   └── TestModifier.ts     # Testing helper

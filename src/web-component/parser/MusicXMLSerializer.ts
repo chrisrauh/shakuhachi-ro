@@ -148,13 +148,18 @@ export class MusicXMLSerializer {
     // <type> is the written note value; the dot is carried by <dot/> beside
     // it. A length no single note value shows, such as 3 beats, has no type,
     // which MusicXML allows. The DTD orders these children `type?, dot*`.
-    const type = NOTE_TYPES[formatBeats(writtenLength(beats, note.dotted))];
-    if (type) {
-      parts.push(`        <type>${type}</type>`);
-    }
-
-    if (note.dotted) {
-      parts.push('        <dot/>');
+    // A Western dot adds half the written value, and the Kinko dot half a
+    // beat, or a quarter after half a beat. They agree up to one beat, so a
+    // note dotted after two beats or more, such as 5/2, has no type or dot.
+    const written = writtenLength(beats, note.dotted);
+    if (!note.dotted || written.num <= written.den) {
+      const type = NOTE_TYPES[formatBeats(written)];
+      if (type) {
+        parts.push(`        <type>${type}</type>`);
+      }
+      if (note.dotted) {
+        parts.push('        <dot/>');
+      }
     }
 
     // Several fingerings can share a pitch. One that import wouldn't choose
