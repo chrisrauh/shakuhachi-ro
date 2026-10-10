@@ -448,18 +448,93 @@ G
       ).toEqual(['ro', 'tsu', 're']);
     });
 
-    // Lengths are read relative to one unit, so the notes after a change
-    // would come out the wrong length
-    it('fails on a unit length change, as a line or inline', () => {
-      const error = "Changing the unit length (L:) after the tune's notes";
-      expect(() => ABCParser.parse('X:1\nK:C\nD F\nL:1/4\nG')).toThrow(error);
-      expect(() => ABCParser.parse('X:1\nK:C\nD [L:1/4] F')).toThrow(error);
+    // Lengths are counted in the first unit length
+    it('scales the lengths after a unit length change, as a line or inline', () => {
+      const lengths = (abc: string) =>
+        ABCParser.parse(abc).notes.map((n) => n.duration);
+      expect(lengths('X:1\nL:1/8\nK:C\nD F\nL:1/4\nG')).toEqual([1, 1, 2]);
+      expect(lengths('X:1\nL:1/8\nK:C\nD [L:1/16] F')).toEqual([1, 0.5]);
+      // Without L:, a 2/4 tune counts in sixteenths
+      expect(lengths('X:1\nM:2/4\nK:C\nD [L:1/8] F')).toEqual([1, 2]);
     });
 
     it('fails on a key change it cannot read', () => {
       expect(() => ABCParser.parse('X:1\nK:D\nD [K:Q] F')).toThrow(
         'The K: field\'s key, "Q", isn\'t one ABC defines',
       );
+    });
+  });
+
+  // Import what JSON can hold, drop only what leaves the music unchanged,
+  // fail on anything else (#464)
+  describe('parse() - constructs JSON has no field for', () => {
+    // Each note as "step length", with a dot for a dotted note
+    const played = (abc: string) =>
+      ABCParser.parse(`X:1\nL:1/8\nK:C\n${abc}`).notes.map(
+        (n) =>
+          `${n.rest ? 'rest' : n.pitch?.step} ${n.duration}${n.dotted ? '.' : ''}`,
+      );
+
+    it('plays out repeats and first and second endings', () => {
+      expect(played('|: D F :| G')).toEqual(played('D F D F G'));
+      expect(played('|: D |1 F :|2 G |]')).toEqual(played('D F D G'));
+      expect(played('[1 D :| [2 F |')).toEqual(played('D F'));
+      expect(played('|: D :: F :|')).toEqual(played('D D F F'));
+    });
+
+    it('keeps the accidentals of each pass to its own bars', () => {
+      // ^F in the first ending must not carry into the repeated bar
+      expect(
+        ABCParser.parse('X:1\nK:C\n|: F |1 ^F :|2 G |').notes.map(
+          (n) => n.meriKari ?? '',
+        ),
+      ).toEqual(['', 'meri', '', '']);
+    });
+
+    it('joins tied notes into one, and fails when the sum cannot be shown', () => {
+      expect(played('D2-D2 F')).toEqual(['ro 4', 'tsu 1']);
+      expect(played('D-D-D F')).toEqual(['ro 2.', 'tsu 1']);
+      expect(() => played('D4-D F')).toThrow('Note 1 (D4-D) is 5 units long');
+    });
+
+    it('scales the notes of a tuplet, and fails when they cannot be shown', () => {
+      // Two notes in the time of three
+      expect(played('(2DF G')).toEqual(['ro 1.', 'tsu 1.', 're 1']);
+      expect(() => played('(3DFG A')).toThrow('Note 1 (D) is 0.667 units long');
+    });
+
+    it('reads a rest of whole bars from the meter, and fails without it', () => {
+      expect(played('M:4/4\nZ2 D')).toEqual(['rest 16', 'ro 1']);
+      expect(played('M:3/4\nZ D')).toEqual(['rest 6', 'ro 1']);
+      expect(() => played('Z4 D')).toThrow(
+        'A rest of whole bars (Z4) needs the meter',
+      );
+    });
+
+    it('drops chord symbols, annotations and slurs', () => {
+      expect(played('"Am" (D F) "^loud" G')).toEqual(played('D F G'));
+    });
+
+    it('fails on grace notes and chords', () => {
+      expect(() => played('{F}D G')).toThrow(
+        "Grace notes ({F}) can't be imported yet",
+      );
+      expect(() => played('[DF] G')).toThrow("Chords ([DF]) can't be imported");
+    });
+
+    it('fails on a second voice, and imports a tune with one', () => {
+      const error = 'The tune has more than one voice';
+      expect(() => ABCParser.parse('X:1\nV:1\nV:2\nK:C\nD')).toThrow(error);
+      expect(() => played('V:1\nD F\nV:2\nG')).toThrow(error);
+      expect(() => played('[V:1] D [V:2] F')).toThrow(error);
+      expect(played('V:1\nD F')).toEqual(played('D F'));
+    });
+
+    it('fails on characters it does not read, and drops comments', () => {
+      expect(() => played('D ~F G')).toThrow(
+        '"~" isn\'t ABC that can be imported',
+      );
+      expect(played('D F % a comment')).toEqual(played('D F'));
     });
   });
 
@@ -491,7 +566,7 @@ X:1
 T:Invalid Pitch
 K:C
 
-X Y Z
+H Y
 `;
 
       expect(() => ABCParser.parse(abc)).toThrow(/Unknown ABC pitch/);
