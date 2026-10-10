@@ -6,6 +6,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import { legacyDuration } from '../types/Duration';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
   fingeringName,
@@ -134,14 +135,15 @@ export class MusicXMLSerializer {
     // keeps the two apart: `duration` is the base value and `dotted` extends
     // it by half. Every supported value lands on a whole number of divisions,
     // so there is nothing to round.
-    const sounding = note.duration * (note.dotted ? 1.5 : 1);
+    const base = legacyDuration(note);
+    const sounding = base * (note.dotted ? 1.5 : 1);
     parts.push(
       `        <duration>${sounding * DIVISIONS_PER_QUARTER}</duration>`,
     );
 
     // <type> is the base note value; the dot is carried by <dot/> beside it.
     // The DTD orders these children `type?, dot*`, so type must come first.
-    const type = this.getDurationType(note.duration);
+    const type = this.getDurationType(base);
     parts.push(`        <type>${type}</type>`);
 
     if (note.dotted) {

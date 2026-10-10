@@ -50,13 +50,22 @@ export const PARSER_STRINGS = {
           octave,
           'Must be 0-2.',
         ),
-      noteIndexDurationInvalid: (index: number, duration: number) =>
+      noteIndexDurationInvalid: (index: number, duration: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
           'duration',
-          duration,
-          'Must be > 0.',
+          JSON.stringify(duration),
+          'Must be a length in beats: a whole number, or a fraction in lowest terms, such as "1", "1/2" or "3/2".',
         ),
+      noteIndexDurationUnsupported: (index: number, duration: string) =>
+        PARSER_STRING_FACTORIES.noteIndexInvalid(
+          index,
+          'duration',
+          JSON.stringify(duration),
+          'Shakuhachi notation can show whole beats ("1", "2", "3"…), "1/2", "1/4", "3/2" and "3/4".',
+        ),
+      noteIndexDottedWithoutHalf: (index: number, duration: string) =>
+        `Note ${index + 1} is dotted, but its duration, "${duration}", has no half to write as a dot. Only "3/2" and "3/4" can be dotted.`,
       noteIndexMeriKariInvalid: (index: number, meriKari: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,

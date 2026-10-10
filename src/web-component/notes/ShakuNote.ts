@@ -49,20 +49,11 @@ const NUMERAL_OFFSET_RATIO: Record<string, { x: number; y: number }> = {
 };
 
 /**
- * Duration for spacing calculations
- * Mirrors VexFlow's duration notation
- */
-export type NoteDuration = 'w' | 'h' | 'q' | '8' | '16' | '32';
-
-/**
  * ShakuNote properties
  */
 export interface ShakuNoteOptions {
   /** Symbol identifier (romaji like 'ro', 'tsu') or kana ('ロ', 'ツ') */
   symbol: string;
-
-  /** Duration for spacing (default: 'q' = quarter note) */
-  duration?: NoteDuration;
 
   /** Font size in pixels (default: 32) */
   fontSize?: number;
@@ -106,9 +97,6 @@ export class ShakuNote {
   /** Y position (baseline) where the note was last drawn */
   private y: number = 0;
 
-  /** Duration for spacing */
-  private duration: NoteDuration;
-
   /** Font size */
   private fontSize: number;
 
@@ -147,7 +135,6 @@ export class ShakuNote {
     // Use kana from symbol info if available, otherwise use provided symbol
     this.kana = this.symbolInfo?.kana || options.symbol;
 
-    this.duration = options.duration ?? 'q';
     this.fontSize = options.fontSize ?? 32;
     this.fontWeight = options.fontWeight ?? 400;
     this.fontFamily =
@@ -307,22 +294,6 @@ export class ShakuNote {
    */
   getSymbolInfo(): KinkoSymbol | undefined {
     return this.symbolInfo;
-  }
-
-  /**
-   * Gets the duration
-   */
-  getDuration(): NoteDuration {
-    return this.duration;
-  }
-
-  /**
-   * Sets the duration
-   * @returns this for chaining
-   */
-  setDuration(duration: NoteDuration): this {
-    this.duration = duration;
-    return this;
   }
 
   /**

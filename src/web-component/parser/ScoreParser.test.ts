@@ -5,7 +5,28 @@
 import { describe, it, expect } from 'vitest';
 import { ScoreParser } from './ScoreParser';
 import type { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
-import type { ScoreData } from '../types/ScoreData';
+import type { ScoreData, ScoreNote } from '../types/ScoreData';
+import type { ShakuNote } from '../notes/ShakuNote';
+import { DurationLineModifier } from '../modifiers/DurationLineModifier';
+import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+
+/** Duration lines and dot each note draws, as [lines, dotted] */
+function durationMarks(notes: ScoreNote[]): [number, boolean][] {
+  return ScoreParser.parse({ notes }).map((note: ShakuNote) => {
+    const modifiers = note.getModifiers();
+    const lines = modifiers.find((m) => m instanceof DurationLineModifier);
+    return [
+      lines ? (lines as DurationLineModifier)['lineCount'] : 0,
+      modifiers.some((m) => m instanceof DurationDotModifier),
+    ];
+  });
+}
+
+const ro = (duration: string | number, dotted?: boolean): ScoreNote => ({
+  pitch: { step: 'ro', octave: 0 },
+  duration,
+  ...(dotted && { dotted }),
+});
 
 describe('ScoreParser', () => {
   describe('parse()', () => {
@@ -25,7 +46,6 @@ describe('ScoreParser', () => {
 
       expect(notes).toHaveLength(1);
       expect(notes[0].getKana()).toBe('ロ');
-      expect(notes[0].getDuration()).toBe('q');
     });
 
     it('should parse notes with octave modifiers', () => {
@@ -88,24 +108,6 @@ describe('ScoreParser', () => {
       expect(notes).toHaveLength(1);
       // Should have both octave and meri modifiers
       expect(notes[0].getModifiers()).toHaveLength(2);
-    });
-
-    it('should map durations correctly', () => {
-      const scoreData: ScoreData = {
-        title: 'Test Score',
-        style: 'kinko',
-        notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: 1 },
-          { pitch: { step: 'tsu', octave: 0 }, duration: 2 },
-          { pitch: { step: 're', octave: 0 }, duration: 4 },
-        ],
-      };
-
-      const notes = ScoreParser.parse(scoreData);
-
-      expect(notes[0].getDuration()).toBe('q'); // quarter
-      expect(notes[1].getDuration()).toBe('h'); // half
-      expect(notes[2].getDuration()).toBe('w'); // whole
     });
 
     it('should parse all valid pitch steps', () => {
@@ -433,6 +435,77 @@ describe('ScoreParser', () => {
         (m) => m.constructor.name === 'DurationLineModifier',
       );
       expect(quarterDurationLines).toHaveLength(1);
+    });
+  });
+
+  describe('durations in beats', () => {
+    it('draws one line for half a beat and two for a quarter', () => {
+      expect(durationMarks([ro('1/2'), ro('1/4')])).toEqual([
+        [1, false],
+        [2, false],
+      ]);
+    });
+
+    it('draws no line for one beat or more', () => {
+      expect(durationMarks([ro('1'), ro('2'), ro('3'), ro('4')])).toEqual([
+        [0, false],
+        [0, false],
+        [0, false],
+        [0, false],
+      ]);
+    });
+
+    it('draws a dotted length as the lines before the dot, and the dot', () => {
+      expect(durationMarks([ro('3/2', true), ro('3/4', true)])).toEqual([
+        [0, true],
+        [1, true],
+      ]);
+    });
+
+    it('draws a legacy score the same as the score in beats', () => {
+      const legacy = [ro(4), ro(2), ro(1), ro(0.5), ro(2, true), ro(1, true)];
+      const beats = [
+        ro('2'),
+        ro('1'),
+        ro('1/2'),
+        ro('1/4'),
+        ro('3/2', true),
+        ro('3/4', true),
+      ];
+      expect(durationMarks(beats)).toEqual(durationMarks(legacy));
+    });
+
+    it('accepts every supported length', () => {
+      const lengths = ['1/4', '1/2', '3/4', '1', '3/2', '2', '3', '4', '6'];
+      expect(() =>
+        ScoreParser.validate({ notes: lengths.map((d) => ro(d)) }),
+      ).not.toThrow();
+    });
+
+    it('rejects a duration that is not a fraction in lowest terms', () => {
+      for (const duration of ['0.5', '2/4', '2/1', '0', '1/0', '', ' 1']) {
+        expect(() => ScoreParser.validate({ notes: [ro(duration)] })).toThrow(
+          `Note 1 has invalid duration: "${duration}"`,
+        );
+      }
+      expect(() =>
+        ScoreParser.validate({ notes: [{ rest: true, duration: true }] }),
+      ).toThrow('Note 1 has invalid duration: true');
+    });
+
+    it('rejects a length notation cannot show', () => {
+      expect(() => ScoreParser.validate({ notes: [ro('5/2')] })).toThrow(
+        'Note 1 has invalid duration: "5/2". Shakuhachi notation can show',
+      );
+      expect(() =>
+        ScoreParser.validate({ notes: [{ rest: true, duration: '1/8' }] }),
+      ).toThrow('Note 1 has invalid duration: "1/8"');
+    });
+
+    it('rejects a dot on a length without a half', () => {
+      expect(() => ScoreParser.validate({ notes: [ro('1', true)] })).toThrow(
+        'Note 1 is dotted, but its duration, "1", has no half',
+      );
     });
   });
 
