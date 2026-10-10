@@ -168,10 +168,11 @@ export function setDuration(
 }
 
 /**
- * The Dot key: adds half the length, written as a dot, or takes the dot away
- * with its half. A length that already has a half (written with a stroke)
- * keeps its length and is written with a dot instead. Only one beat and half
- * a beat can be dotted.
+ * The Dot key: adds a dot after the note, half a beat after one beat and a
+ * quarter after half a beat, or takes the dot away with its length. A length
+ * that already has a half (written with a stroke) keeps its length and is
+ * written with a dot instead. Only one beat and half a beat can be dotted
+ * for now.
  */
 export function toggleDot(state: EditorState): EditorState | null {
   const note = target(state);

@@ -65,18 +65,41 @@ function scale({ num, den }: Beats, n: number, d: number): Beats {
   return { num: (num * n) / divisor, den: (den * d) / divisor };
 }
 
+/** Adds two lengths, in lowest terms */
+function add(a: Beats, b: Beats): Beats {
+  return scale(
+    { num: a.num * b.den + b.num * a.den, den: a.den * b.den },
+    1,
+    1,
+  );
+}
+
+const HALF_BEAT: Beats = { num: 1, den: 2 };
+
+/*
+ * A dot fills a slot of the beat it falls in, as a note would: half a beat
+ * after a note of a beat or more (a dotted 1 is 3/2, a dotted 2 is 5/2), and a
+ * quarter after a half-beat note (3/4). It is not "half as long again": Kinko
+ * sources write two and a half beats as a note, a stroke and a dot (#470).
+ */
+
 /**
- * The length written before the dot: two thirds of a dotted length, so a
- * dotted 3/2 is written as one beat and its dot. An undotted length is
+ * The length written before the dot: a dotted 3/2 is written as one beat and
+ * its dot, a dotted 3/4 as half a beat and its dot. An undotted length is
  * written as itself.
  */
 export function writtenLength(beats: Beats, dotted?: boolean): Beats {
-  return dotted ? scale(beats, 2, 3) : beats;
+  if (!dotted) return beats;
+  return beats.num > beats.den
+    ? scale({ num: 2 * beats.num - beats.den, den: beats.den }, 1, 2)
+    : scale(beats, 2, 3);
 }
 
-/** The length of a written length with a dot added: half as long again */
+/** The length of a written length with a dot added after it */
 export function dottedLength(written: Beats): Beats {
-  return scale(written, 3, 2);
+  return written.num >= written.den
+    ? add(written, HALF_BEAT)
+    : scale(written, 3, 2);
 }
 
 /**
@@ -93,8 +116,9 @@ export function beatsFromLegacy(
   while (!Number.isInteger(duration * den) && den < 1024) den *= 2;
   if (!(duration > 0) || !Number.isInteger(duration * den)) return null;
 
+  // The legacy dot added half the written length
   const written = scale({ num: duration * den, den }, 1, 2);
-  const beats = dotted ? dottedLength(written) : written;
+  const beats = dotted ? scale(written, 3, 2) : written;
   if (!isSupported(beats) || (dotted && !hasHalf(beats))) return null;
   return formatBeats(beats);
 }

@@ -104,9 +104,10 @@ export interface ScoreNote {
   meriKari?: MeriKari;
 
   /**
-   * The half of the length is written as a dot, rather than as a stroke.
-   * Only a length with a half ("3/2", "3/4") can be dotted. In the legacy
-   * numeric form, the dot adds half to the length.
+   * The last part of the length is written as a dot, rather than as a
+   * stroke: half a beat after a note of a beat or more, a quarter after half
+   * a beat. Only "3/2" and "3/4" can be dotted for now. In the legacy numeric
+   * form, the dot adds half to the length.
    */
   dotted?: boolean;
 }
