@@ -37,7 +37,7 @@ The live example below shows it in action:
 <div class="score-example">
   <shakuhachi-score
     columns="1"
-    data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":1},{"pitch":{"step":"tsu","octave":0},"duration":2,"dotted":true},{"pitch":{"step":"chi","octave":0},"duration":1},{"pitch":{"step":"ri","octave":0},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":1},{"pitch":{"step":"u","octave":1},"duration":1},{"pitch":{"step":"hi","octave":1},"duration":1},{"pitch":{"step":"ro","octave":1},"duration":2}]}'
+    data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"pitch":{"step":"ro","octave":0},"duration":"1/2"},{"pitch":{"step":"tsu","octave":0},"duration":"1/2"},{"pitch":{"step":"tsu","octave":0},"duration":"3/2","dotted":true},{"pitch":{"step":"chi","octave":0},"duration":"1/2"},{"pitch":{"step":"ri","octave":0},"duration":"1/2"},{"pitch":{"step":"ro","octave":1},"duration":"1/2"},{"pitch":{"step":"u","octave":1},"duration":"1/2"},{"pitch":{"step":"hi","octave":1},"duration":"1/2"},{"pitch":{"step":"ro","octave":1},"duration":"1"}]}'
   ></shakuhachi-score>
 
   <svg class="score-annotation-desktop"
@@ -106,15 +106,15 @@ Here's how you can embed it in your own site:
   data-score='{
     "title": "Akatombo (Opening Phrase)",
     "notes": [
-      { "pitch": { "step": "ro", "octave": 0 }, "duration": 1 },
-      { "pitch": { "step": "tsu", "octave": 0 }, "duration": 1 },
-      { "pitch": { "step": "tsu", "octave": 0 }, "duration": 2, "dotted": true },
-      { "pitch": { "step": "chi", "octave": 0 }, "duration": 1 },
-      { "pitch": { "step": "ri", "octave": 0 }, "duration": 1 },
-      { "pitch": { "step": "ro", "octave": 1 }, "duration": 1 },
-      { "pitch": { "step": "u", "octave": 1 }, "duration": 1 },
-      { "pitch": { "step": "hi", "octave": 1 }, "duration": 1 },
-      { "pitch": { "step": "ro", "octave": 1 }, "duration": 2 }
+      { "pitch": { "step": "ro", "octave": 0 }, "duration": "1/2" },
+      { "pitch": { "step": "tsu", "octave": 0 }, "duration": "1/2" },
+      { "pitch": { "step": "tsu", "octave": 0 }, "duration": "3/2", "dotted": true },
+      { "pitch": { "step": "chi", "octave": 0 }, "duration": "1/2" },
+      { "pitch": { "step": "ri", "octave": 0 }, "duration": "1/2" },
+      { "pitch": { "step": "ro", "octave": 1 }, "duration": "1/2" },
+      { "pitch": { "step": "u", "octave": 1 }, "duration": "1/2" },
+      { "pitch": { "step": "hi", "octave": 1 }, "duration": "1/2" },
+      { "pitch": { "step": "ro", "octave": 1 }, "duration": "1" }
     ]
   }'
 ></shakuhachi-score>
