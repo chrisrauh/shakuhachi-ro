@@ -5,6 +5,15 @@ import type {
 } from '../../web-component/types/ScoreData';
 import { getNoteMidi } from '../../web-component/constants/kinko-symbols';
 import { closestOctave } from '../../web-component/parser/ScoreParser';
+import {
+  beatsFromLegacy,
+  dottedLength,
+  formatBeats,
+  hasHalf,
+  isSupported,
+  parseBeats,
+  writtenLength,
+} from '../../web-component/types/Duration';
 import type { Selection } from './selection';
 
 /**
@@ -19,7 +28,7 @@ export interface EditorState {
 /** What a palette key or shortcut asks for: an edit, or undo or redo. */
 export type EditAction =
   | { type: 'note'; step: PitchStep | 'rest' }
-  | { type: 'duration'; duration: number }
+  | { type: 'duration'; duration: string }
   | { type: 'dot' }
   | { type: 'mark'; mark: MeriKari }
   | { type: 'octave'; step: -1 | 1 }
@@ -27,10 +36,21 @@ export type EditAction =
 export type EditorCommand = EditAction | { type: 'undo' } | { type: 'redo' };
 
 /** The duration of the first note in an empty score: one beat. */
-const FIRST_NOTE_DURATION = 2;
+const FIRST_NOTE_DURATION = '1';
 
 /** Daikan, the highest octave the score data has. */
 const HIGHEST_OCTAVE = 2;
+
+/**
+ * A note with a legacy numeric duration (2 is one beat) rewritten in beats,
+ * so the keys read and write beats, and the first edit saves the score in
+ * beats. A note that has no supported length in beats stays as it is.
+ */
+export function inBeats(note: ScoreNote): ScoreNote {
+  if (typeof note.duration !== 'number') return note;
+  const duration = beatsFromLegacy(note.duration, note.dotted);
+  return duration ? { ...note, duration } : note;
+}
 
 /*
  * Each edit returns the new state, or null where it doesn't apply, which is
@@ -69,10 +89,11 @@ export function targetIndex(selection: Selection): number {
 
 /**
  * A note key: inserts the note at the cursor, which moves after it, or changes
- * the highlighted note to it. An inserted note takes the length of the note
- * before it and the octave closest to the last pitched note. A changed note
- * keeps its length, dot, octave and mark; a rest has no mark to keep. Changing
- * a note to what it already is changes nothing.
+ * the highlighted note to it. An inserted note takes the length the note
+ * before it is written with, without its dot, and the octave closest to the
+ * last pitched note. A changed note keeps its length, dot, octave and mark; a
+ * rest has no mark to keep. Changing a note to what it already is changes
+ * nothing.
  */
 export function chooseNote(
   { notes, selection }: EditorState,
@@ -80,7 +101,10 @@ export function chooseNote(
 ): EditorState | null {
   if (selection.type === 'cursor') {
     const { position } = selection;
-    const duration = notes[position - 1]?.duration ?? FIRST_NOTE_DURATION;
+    const previous = notes[position - 1];
+    const duration = previous
+      ? (writtenDuration(previous) ?? previous.duration)
+      : FIRST_NOTE_DURATION;
     const note: ScoreNote =
       step === 'rest'
         ? { rest: true, duration }
@@ -111,20 +135,66 @@ export function chooseNote(
   return { notes: notes.with(index, note), selection };
 }
 
-export function setDuration(
-  state: EditorState,
-  duration: number,
-): EditorState | null {
-  const note = target(state);
-  if (!note || note.duration === duration) return null;
-  return withTarget(state, { ...note, duration });
+/**
+ * The length a note is written with before any dot, as a Length key's value:
+ * "1" for a dotted 3/2. Undefined for a legacy number.
+ */
+export function writtenDuration(note: ScoreNote): string | undefined {
+  if (typeof note.duration !== 'string') return undefined;
+  return formatBeats(writtenLength(parseBeats(note.duration)!, note.dotted));
 }
 
-export function toggleDot(state: EditorState): EditorState | null {
+/**
+ * A Length key: sets the length written before any dot, so a dotted note stays
+ * dotted. The dot goes where the dotted length isn't one notation can show,
+ * such as a dotted 2 beats.
+ */
+export function setDuration(
+  state: EditorState,
+  duration: string,
+): EditorState | null {
   const note = target(state);
   if (!note) return null;
   const { dotted, ...undotted } = note;
-  return withTarget(state, dotted ? undotted : { ...note, dotted: true });
+  const dottedBeats = dottedLength(parseBeats(duration)!);
+  const next: ScoreNote =
+    dotted && hasHalf(dottedBeats)
+      ? { ...note, duration: formatBeats(dottedBeats) }
+      : { ...undotted, duration };
+  if (next.duration === note.duration && !!next.dotted === !!dotted) {
+    return null;
+  }
+  return withTarget(state, next);
+}
+
+/**
+ * The Dot key: adds a dot after the note, half a beat after one beat and a
+ * quarter after half a beat, or takes the dot away with its length. A length
+ * that already has a half (written with a stroke) keeps its length and is
+ * written with a dot instead. Only one beat and half a beat can be dotted
+ * for now.
+ */
+export function toggleDot(state: EditorState): EditorState | null {
+  const note = target(state);
+  if (!note || typeof note.duration !== 'string') return null;
+  const { dotted, ...undotted } = note;
+  const beats = parseBeats(note.duration)!;
+
+  if (dotted) {
+    return withTarget(state, {
+      ...undotted,
+      duration: formatBeats(writtenLength(beats, true)),
+    });
+  }
+  if (hasHalf(beats)) return withTarget(state, { ...note, dotted: true });
+
+  const withDot = dottedLength(beats);
+  if (!isSupported(withDot) || !hasHalf(withDot)) return null;
+  return withTarget(state, {
+    ...note,
+    duration: formatBeats(withDot),
+    dotted: true,
+  });
 }
 
 /** Marks exclude each other: choosing one replaces another, or removes itself. */
