@@ -22,14 +22,14 @@ export const OTHER_NOTES: readonly PitchStep[] = PITCH_STEPS.filter(
 );
 
 /**
- * The Length keys: the stored duration, the duration lines the score draws for
- * it, and the key's caption. #438 may change the stored numbers, not the keys.
+ * The Length keys: the length in beats written before any dot, the duration
+ * lines the score draws for it, and the key's caption.
  */
 export const LENGTHS = [
-  { duration: 4, lines: 0, caption: '2 beats' },
-  { duration: 2, lines: 0, caption: '1 beat' },
-  { duration: 1, lines: 1, caption: '½ beat' },
-  { duration: 0.5, lines: 2, caption: '¼ beat' },
+  { duration: '2', lines: 0, caption: '2 beats' },
+  { duration: '1', lines: 0, caption: '1 beat' },
+  { duration: '1/2', lines: 1, caption: '½ beat' },
+  { duration: '1/4', lines: 2, caption: '¼ beat' },
 ] as const;
 
 /** The mark each meri and kari is written with, as the score draws it. */

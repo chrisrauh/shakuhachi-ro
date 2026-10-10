@@ -21,8 +21,8 @@ const TWO_NOTES: ScoreData = {
   title: '',
   style: 'kinko',
   notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: 2 },
-    { pitch: { step: 'tsu', octave: 0 }, duration: 2 },
+    { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+    { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
   ],
 };
 
@@ -76,8 +76,8 @@ function renderPage(): void {
             <button class="palette-key" data-key="octave-up" aria-label="octave up"></button>
           </div>
           <div data-column="length">
-            <button class="palette-key" data-duration="1" aria-label="half"></button>
-            <button class="palette-key" data-duration="2" aria-label="beat"></button>
+            <button class="palette-key" data-duration="1/2" aria-label="half"></button>
+            <button class="palette-key" data-duration="1" aria-label="beat"></button>
             <button class="palette-key" data-key="dot" aria-label="dot"></button>
           </div>
           <div data-column="notes">
@@ -377,7 +377,7 @@ describe('ScoreEditor editing', () => {
       title: 'Kept',
       notes: [
         ...TWO_NOTES.notes,
-        { pitch: { step: 're', octave: 0 }, duration: 2 },
+        { pitch: { step: 're', octave: 0 }, duration: '1' },
       ],
     });
     expect(renderedScore()).toEqual(source());
@@ -408,11 +408,38 @@ describe('ScoreEditor editing', () => {
     expect(source().notes).toEqual(TWO_NOTES.notes.slice(1));
   });
 
+  it('reads a score with legacy durations in beats, and the first edit writes it in beats', () => {
+    new ScoreEditor(
+      makeScore({
+        data: {
+          ...TWO_NOTES,
+          notes: [
+            { pitch: { step: 'ro', octave: 0 }, duration: 2 },
+            { pitch: { step: 'tsu', octave: 0 }, duration: 1, dotted: true },
+          ],
+        },
+      }),
+    );
+    expect(key('data-duration="1/2"').getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+    expect(key('data-key="dot"').getAttribute('aria-pressed')).toBe('true');
+
+    key('data-step="re"').click();
+    expect(source().notes).toEqual([
+      { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '3/4', dotted: true },
+      { pitch: { step: 're', octave: 0 }, duration: '1/2' },
+    ]);
+  });
+
   it('presses the keys the target note matches, and disables those that do not apply', () => {
     new ScoreEditor(makeScore({ data: TWO_NOTES }));
 
-    expect(key('data-duration="2"').getAttribute('aria-pressed')).toBe('true');
-    expect(key('data-duration="1"').getAttribute('aria-pressed')).toBe('false');
+    expect(key('data-duration="1"').getAttribute('aria-pressed')).toBe('true');
+    expect(key('data-duration="1/2"').getAttribute('aria-pressed')).toBe(
+      'false',
+    );
     expect(key('data-step="re"').title).toBe('Insert re');
 
     key('data-step="rest"').click();
@@ -424,7 +451,7 @@ describe('ScoreEditor editing', () => {
     press({ key: 'ArrowUp' });
     press({ key: 'ArrowUp' });
     expect(key('data-key="delete"').disabled).toBe(true);
-    expect(key('data-duration="2"').disabled).toBe(true);
+    expect(key('data-duration="1"').disabled).toBe(true);
   });
 
   it('presses the highlighted note’s key, and scrolls its column just enough to show it, once', () => {
