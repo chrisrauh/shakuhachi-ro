@@ -32,6 +32,39 @@ function toBeats(raw: number, divisions: number, beatType: number): Beats {
   return beatsOf(raw * beatType, 4 * divisions);
 }
 
+/** Each note type's length in quarter notes, as [numerator, denominator] */
+const TYPE_QUARTERS: Record<string, [number, number]> = {
+  breve: [8, 1],
+  whole: [4, 1],
+  half: [2, 1],
+  quarter: [1, 1],
+  eighth: [1, 2],
+  '16th': [1, 4],
+  '32nd': [1, 8],
+  '64th': [1, 16],
+};
+
+/**
+ * A note's length in beats as its <type> and <dot/>s write it, or undefined
+ * where they don't say: no type, or a tuplet, whose notes are shorter than
+ * they are written. Each dot adds half of what the one before it added.
+ */
+function writtenBeats(
+  noteElement: Element,
+  beatType: number,
+): Beats | undefined {
+  const quarters =
+    TYPE_QUARTERS[noteElement.querySelector('type')?.textContent?.trim() ?? ''];
+  if (!quarters || noteElement.querySelector('time-modification')) {
+    return undefined;
+  }
+  const dots = noteElement.querySelectorAll('dot').length;
+  return beatsOf(
+    quarters[0] * beatType * (2 ** (dots + 1) - 1),
+    quarters[1] * 4 * 2 ** dots,
+  );
+}
+
 const MESSAGES = PARSER_STRINGS.ERRORS.MusicXMLParser;
 
 /** Where a note is, as a reader of the source would find it */
@@ -176,6 +209,20 @@ export class MusicXMLParser {
         10,
       );
       const beats = toBeats(rawDuration, divisions, beatType);
+      // Where <duration> and the written note disagree, either may be the
+      // mistake, so the import fails rather than guess
+      const typed = noteElement.querySelector('duration')
+        ? writtenBeats(noteElement, beatType)
+        : undefined;
+      if (typed && formatBeats(typed) !== formatBeats(beats)) {
+        throw new Error(
+          MESSAGES.contradictoryLength(
+            locate(noteElement),
+            formatBeats(beats),
+            formatBeats(typed),
+          ),
+        );
+      }
       if (!isSupported(beats)) {
         throw new Error(
           MESSAGES.unsupportedLength(locate(noteElement), formatBeats(beats)),

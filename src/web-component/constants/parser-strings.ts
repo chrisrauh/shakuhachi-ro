@@ -138,6 +138,8 @@ export const PARSER_STRINGS = {
           : `The file has ${shakuhachiParts} parts named shakuhachi, so it isn't clear which one to import. Delete or rename all but one of them in the source and import again.`,
       multipleVoices: (measure: string) =>
         `Measure ${measure}: the part has more than one voice, and the shakuhachi plays one note at a time. Merge the voices into one, or delete the others, in the source and import again.`,
+      contradictoryLength: (where: string, beats: string, written: string) =>
+        `${where}: the note's duration is ${beats} beats, but its note type and dots make it ${written} beats, so it isn't clear which is meant. Export the file again from its source and import again.`,
       unsupportedLength: (where: string, beats: string) =>
         `${where}: the note is ${beats} beats long, a length that can't be shown yet. ${PARSER_STRING_FACTORIES.supportedLengths} The beat is the time signature's beat type (a quarter note in 4/4, an eighth in 6/8). Tuplets such as triplets usually come out this way.`,
       timewise:
