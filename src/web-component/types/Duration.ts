@@ -59,6 +59,46 @@ export function hasHalf(beats: Beats): boolean {
   return WITH_HALF.includes(formatBeats(beats));
 }
 
+/** Multiplies a length by n/d, in lowest terms */
+function scale({ num, den }: Beats, n: number, d: number): Beats {
+  const divisor = gcd(num * n, den * d);
+  return { num: (num * n) / divisor, den: (den * d) / divisor };
+}
+
+/**
+ * The length written before the dot: two thirds of a dotted length, so a
+ * dotted 3/2 is written as one beat and its dot. An undotted length is
+ * written as itself.
+ */
+export function writtenLength(beats: Beats, dotted?: boolean): Beats {
+  return dotted ? scale(beats, 2, 3) : beats;
+}
+
+/** The length of a written length with a dot added: half as long again */
+export function dottedLength(written: Beats): Beats {
+  return scale(written, 3, 2);
+}
+
+/**
+ * The `duration` string for a legacy numeric duration, where 2 is one beat
+ * and a dot adds half. Null when the result isn't a length notation can show,
+ * or is dotted without a half. Goes once stored scores are migrated (#438).
+ */
+export function beatsFromLegacy(
+  duration: number,
+  dotted?: boolean,
+): string | null {
+  // Legacy values are binary fractions (0.5, 0.25…) of the old unit
+  let den = 1;
+  while (!Number.isInteger(duration * den) && den < 1024) den *= 2;
+  if (!(duration > 0) || !Number.isInteger(duration * den)) return null;
+
+  const written = scale({ num: duration * den, den }, 1, 2);
+  const beats = dotted ? dottedLength(written) : written;
+  if (!isSupported(beats) || (dotted && !hasHalf(beats))) return null;
+  return formatBeats(beats);
+}
+
 /**
  * A note's duration in the legacy numeric form, where 2 is one beat and a
  * dot adds half. The importers and exporters still work in that form; they

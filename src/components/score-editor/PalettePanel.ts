@@ -1,5 +1,11 @@
 import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
-import { targetIndex, type EditorCommand, type EditorState } from './editing';
+import {
+  targetIndex,
+  toggleDot,
+  writtenDuration,
+  type EditorCommand,
+  type EditorState,
+} from './editing';
 
 export type PaletteSide = 'left' | 'right';
 
@@ -99,10 +105,10 @@ export class PalettePanel {
         }
         case 'duration':
           applies &&= !!note;
-          pressed = note?.duration === command.duration;
+          pressed = !!note && writtenDuration(note) === command.duration;
           break;
         case 'dot':
-          applies &&= !!note;
+          applies &&= toggleDot({ notes, selection }) !== null;
           pressed = !!note?.dotted;
           break;
         case 'mark':
@@ -185,7 +191,7 @@ function reveal(key: HTMLButtonElement): void {
 function commandFor(key: HTMLButtonElement): EditorCommand {
   const { step, duration, mark, key: name } = key.dataset;
   if (step) return { type: 'note', step: step as PitchStep | 'rest' };
-  if (duration) return { type: 'duration', duration: Number(duration) };
+  if (duration) return { type: 'duration', duration };
   if (mark) return { type: 'mark', mark: mark as MeriKari };
   switch (name) {
     case 'dot':

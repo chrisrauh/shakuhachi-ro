@@ -21,7 +21,12 @@ import {
   type ScoreData,
   type ScoreNote,
 } from '../types/ScoreData';
-import { hasHalf, isSupported, parseBeats } from '../types/Duration';
+import {
+  hasHalf,
+  isSupported,
+  parseBeats,
+  writtenLength,
+} from '../types/Duration';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
@@ -67,8 +72,7 @@ function durationLineCount(note: ScoreNote): number {
     return legacyDurationLineCount(note.duration);
   }
 
-  const { num, den } = parseBeats(note.duration)!;
-  const written = note.dotted ? { num: 2 * num, den: 3 * den } : { num, den };
+  const written = writtenLength(parseBeats(note.duration)!, note.dotted);
   let lines = 0;
   while (written.num * 2 ** lines < written.den) lines++;
   return lines;
