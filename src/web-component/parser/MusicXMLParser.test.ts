@@ -51,9 +51,12 @@ function makeRest(duration = 2, extras = ''): string {
   return `<note><rest/><duration>${duration}</duration>${extras}</note>`;
 }
 
-/** An <attributes> block declaring divisions-per-quarter-note. */
-function makeAttributes(divisions: number): string {
-  return `<attributes><divisions>${divisions}</divisions></attributes>`;
+/** An <attributes> block declaring divisions-per-quarter-note, and a time signature */
+function makeAttributes(divisions: number, time = ''): string {
+  const timeXML = time
+    ? `<time><beats>${time.split('/')[0]}</beats><beat-type>${time.split('/')[1]}</beat-type></time>`
+    : '';
+  return `<attributes><divisions>${divisions}</divisions>${timeXML}</attributes>`;
 }
 
 /** A score with one part per entry, each named and holding one measure. */
@@ -107,7 +110,7 @@ describe('MusicXMLParser', () => {
 
       expect(score.notes).toHaveLength(1);
       expect(score.notes[0].rest).toBe(true);
-      expect(score.notes[0].duration).toBe(4);
+      expect(score.notes[0].duration).toBe('4');
     });
 
     it('should scale duration by <divisions>', () => {
@@ -116,7 +119,7 @@ describe('MusicXMLParser', () => {
 
       const score = MusicXMLParser.parse(xml);
 
-      expect(score.notes[0].duration).toBe(1);
+      expect(score.notes[0].duration).toBe('1');
     });
 
     it('should default to 1 division per quarter when <divisions> is absent', () => {
@@ -124,28 +127,50 @@ describe('MusicXMLParser', () => {
 
       const score = MusicXMLParser.parse(xml);
 
-      expect(score.notes[0].duration).toBe(2);
+      expect(score.notes[0].duration).toBe('2');
     });
 
-    it('should split a dotted duration into base duration + dotted flag', () => {
+    it('should keep a dotted beat dotted, with the dot in its length', () => {
       // How other notation software writes a dotted quarter: <duration> is the
       // sounding length (3 half-quarters), with the dot carried separately.
       const xml = makeXML(makeAttributes(2) + makeNote('D', 4, 3, '<dot/>'));
 
       const score = MusicXMLParser.parse(xml);
 
-      expect(score.notes[0].duration).toBe(1);
+      expect(score.notes[0].duration).toBe('3/2');
       expect(score.notes[0].dotted).toBe(true);
     });
 
-    it('should apply divisions and the dot to rests as well as notes', () => {
+    it('should read a dotted half in 4/4 as 3 beats, which have no dot', () => {
       const xml = makeXML(makeAttributes(2) + makeRest(6, '<dot/>'));
 
       const score = MusicXMLParser.parse(xml);
 
       expect(score.notes[0].rest).toBe(true);
-      expect(score.notes[0].duration).toBe(2);
-      expect(score.notes[0].dotted).toBe(true);
+      expect(score.notes[0].duration).toBe('3');
+      expect(score.notes[0].dotted).toBeUndefined();
+    });
+
+    it("should take the beat from the time signature's beat type", () => {
+      // In 6/8 an eighth note is one beat, and a dotted quarter three
+      const xml = makeXML(
+        makeAttributes(2, '6/8') +
+          makeNote('D', 4, 1) +
+          makeNote('F', 4, 3, '<dot/>'),
+      );
+
+      const notes = MusicXMLParser.parse(xml).notes;
+
+      expect(notes.map((n) => n.duration)).toEqual(['1', '3']);
+      expect(notes[1].dotted).toBeUndefined();
+    });
+
+    it('should fail on a length notation cannot show, such as a triplet', () => {
+      const xml = makeXML(makeAttributes(3) + makeNote('D', 4, 1));
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        'Measure 1, note 1: the note is 1/3 beats long',
+      );
     });
 
     it('should apply a <divisions> change from the measure that makes it', () => {
@@ -159,7 +184,7 @@ describe('MusicXMLParser', () => {
 
       const durations = MusicXMLParser.parse(xml).notes.map((n) => n.duration);
 
-      expect(durations).toEqual([1, 1]);
+      expect(durations).toEqual(['1', '1']);
     });
 
     it('should import only the part named shakuhachi from a multi-part file', () => {
@@ -213,15 +238,6 @@ describe('MusicXMLParser', () => {
 </score-timewise>`;
 
       expect(() => MusicXMLParser.parse(xml)).toThrow('timewise MusicXML');
-    });
-
-    it('should produce dotted: true for note with <dot> element', () => {
-      const xml = makeXML(makeNote('D', 4, 2, '<dot/>'));
-
-      const score = MusicXMLParser.parse(xml);
-
-      expect(score.notes).toHaveLength(1);
-      expect(score.notes[0].dotted).toBe(true);
     });
 
     it('should fail on a note with no <pitch>, such as percussion', () => {

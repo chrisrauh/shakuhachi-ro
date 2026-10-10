@@ -15,22 +15,21 @@ import {
   type WrittenPitch,
 } from '../constants/kinko-fingerings';
 import { PARSER_STRINGS } from '../constants/parser-strings';
+import {
+  beatsOf,
+  formatBeats,
+  hasHalf,
+  isSupported,
+  type Beats,
+} from '../types/Duration';
 
 /**
- * Converts a MusicXML <duration> to a ScoreNote duration (1 = quarter note).
- *
- * <duration> is counted in divisions, and it is the *sounding* length, so it
- * already includes the dot. ScoreNote splits those apart: `duration` holds the
- * base value and `dotted` extends it by half. A dotted note therefore divides
- * back out by 1.5 to recover its base.
+ * A note's length in beats, from its <duration>: the sounding length, in
+ * divisions per quarter note. The time signature's beat type is the beat, so
+ * a quarter note is one beat in 4/4 and an eighth note one beat in 6/8.
  */
-function toBaseDuration(
-  raw: number,
-  divisions: number,
-  dotted: boolean,
-): number {
-  const sounding = raw / divisions;
-  return dotted ? sounding / 1.5 : sounding;
+function toBeats(raw: number, divisions: number, beatType: number): Beats {
+  return beatsOf(raw * beatType, 4 * divisions);
 }
 
 const MESSAGES = PARSER_STRINGS.ERRORS.MusicXMLParser;
@@ -118,6 +117,9 @@ export class MusicXMLParser {
     // <divisions> is divisions-per-quarter-note. Absent means 1. A score may
     // redefine it in any measure, and it applies from there on.
     let divisions = 1;
+    // The time signature's <beat-type>, which is the beat. Without one, a
+    // quarter note is the beat. It changes with the time signature.
+    let beatType = 4;
     // The voice of the part's first note. Shakuhachi plays one note at a
     // time, so a second voice fails the import rather than interleaving.
     // A note without <voice> is in voice 1.
@@ -143,6 +145,11 @@ export class MusicXMLParser {
           10,
         );
         if (Number.isFinite(value) && value > 0) divisions = value;
+        const beat = parseInt(
+          element.querySelector('time > beat-type')?.textContent ?? '',
+          10,
+        );
+        if (Number.isFinite(beat) && beat > 0) beatType = beat;
         return;
       }
       if (element.tagName !== 'note') return;
@@ -168,8 +175,17 @@ export class MusicXMLParser {
         noteElement.querySelector('duration')?.textContent || '1',
         10,
       );
-      const isDotted = noteElement.querySelector('dot') !== null;
-      const duration = toBaseDuration(rawDuration, divisions, isDotted);
+      const beats = toBeats(rawDuration, divisions, beatType);
+      if (!isSupported(beats)) {
+        throw new Error(
+          MESSAGES.unsupportedLength(locate(noteElement), formatBeats(beats)),
+        );
+      }
+      const duration = formatBeats(beats);
+      // A dot is kept where the length has a half to write as one. A dotted
+      // half note in 4/4 is three beats, which Kinko writes with strokes.
+      const isDotted =
+        noteElement.querySelector('dot') !== null && hasHalf(beats);
 
       // Check for rests
       const restElement = noteElement.querySelector('rest');

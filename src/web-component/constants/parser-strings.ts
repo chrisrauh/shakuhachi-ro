@@ -11,6 +11,8 @@ import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
 // from 1, as people count them; callers pass the 0-based array index.
 export const PARSER_STRING_FACTORIES = {
   invalidDuration: (duration: string) => `Invalid duration: ${duration}`,
+  supportedLengths:
+    'Shakuhachi notation can show whole beats (1, 2, 3…), 1/2, 1/4, 3/2 and 3/4.',
   noteIndexError: (index: number, field: string) =>
     `Note ${index + 1} is missing ${field}`,
   noteIndexInvalid: (
@@ -99,8 +101,8 @@ export const PARSER_STRINGS = {
         `Only first and second endings can be imported, and the tune has ending ${number}. Write the repeat out and import again.`,
       multiRestNeedsMeter: (text: string) =>
         `A rest of whole bars (${text}) needs the meter, to know how long a bar is. Add an M: field, such as M:4/4, to the header.`,
-      unrenderableLength: (index: number, text: string, length: number) =>
-        `Note ${index + 1} (${text}) is ${Number(length.toFixed(3))} units long, a length shakuhachi notation can't show yet. Lengths must be a power of two units (1, 2, 1/2…), or one and a half times one. Tuplets such as triplets usually come out this way.`,
+      unsupportedLength: (index: number, text: string, beats: string) =>
+        `Note ${index + 1} (${text}) is ${beats} beats long, a length that can't be shown yet. ${PARSER_STRING_FACTORIES.supportedLengths} The beat is the meter's denominator (a quarter note in 4/4, an eighth in 6/8). Tuplets such as triplets usually come out this way.`,
       noNotesFound:
         'No notes found in ABC notation. Write the notes after the header fields, e.g. D F G A d.',
       unknownPitch: (pitch: string) =>
@@ -136,6 +138,8 @@ export const PARSER_STRINGS = {
           : `The file has ${shakuhachiParts} parts named shakuhachi, so it isn't clear which one to import. Delete or rename all but one of them in the source and import again.`,
       multipleVoices: (measure: string) =>
         `Measure ${measure}: the part has more than one voice, and the shakuhachi plays one note at a time. Merge the voices into one, or delete the others, in the source and import again.`,
+      unsupportedLength: (where: string, beats: string) =>
+        `${where}: the note is ${beats} beats long, a length that can't be shown yet. ${PARSER_STRING_FACTORIES.supportedLengths} The beat is the time signature's beat type (a quarter note in 4/4, an eighth in 6/8). Tuplets such as triplets usually come out this way.`,
       timewise:
         "The file is timewise MusicXML, which can't be imported. Export it as partwise MusicXML (the usual kind) and import again.",
       unplayableNotes: (first: string, others: number) =>
