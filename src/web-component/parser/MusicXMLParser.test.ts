@@ -151,6 +151,30 @@ describe('MusicXMLParser', () => {
       expect(score.notes[0].dotted).toBeUndefined();
     });
 
+    it('should read a note whose type and dots match its duration', () => {
+      const xml = makeXML(
+        makeAttributes(4) +
+          makeNote('D', 4, 6, '<type>quarter</type><dot/>') +
+          makeNote('F', 4, 3, '<type>eighth</type><dot/>'),
+      );
+
+      const notes = MusicXMLParser.parse(xml).notes;
+
+      expect(notes.map((n) => n.duration)).toEqual(['3/2', '3/4']);
+    });
+
+    it('should fail where the duration contradicts the type and dots', () => {
+      // A dotted half written as two beats long, as in a stored score
+      const xml = makeXML(
+        makeAttributes(2, '4/4') +
+          makeNote('D', 4, 4, '<dot/><type>half</type>'),
+      );
+
+      expect(() => MusicXMLParser.parse(xml)).toThrow(
+        "Measure 1, note 1: the note's duration is 2 beats, but its note type and dots make it 3 beats",
+      );
+    });
+
     it("should take the beat from the time signature's beat type", () => {
       // In 6/8 an eighth note is one beat, and a dotted quarter three
       const xml = makeXML(
