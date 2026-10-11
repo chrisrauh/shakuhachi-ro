@@ -518,7 +518,10 @@ G
     it('joins tied notes into one, and fails when the sum cannot be shown', () => {
       expect(played('D2-D2 F')).toEqual(['ro 2', 'tsu 1/2']);
       expect(played('D-D-D F')).toEqual(['ro 3/2.', 'tsu 1/2']);
-      expect(() => played('D4-D F')).toThrow('Note 1 (D4-D) is 5/2 beats long');
+      expect(played('D4-D F')).toEqual(['ro 5/2.', 'tsu 1/2']);
+      expect(() => played('D4-D/2 F')).toThrow(
+        'Note 1 (D4-D/2) is 9/4 beats long',
+      );
     });
 
     it('scales the notes of a tuplet, and fails when they cannot be shown', () => {

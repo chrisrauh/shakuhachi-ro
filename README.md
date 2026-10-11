@@ -285,7 +285,7 @@ MusicXMLParser.parse(xml): ScoreData
 
 - **Octave marks** (乙, 甲) - Indicate register changes
 - **Meri/Kari** (メ, 中, 大) - Pitch alterations
-- **Duration dots** - Extended note duration
+- **Duration marks** - Strokes, dot and lines for a note's length
 - **Atari** - Technique marks
 
 ## Architecture
@@ -332,7 +332,7 @@ src/
   ├── modifiers/        # Modifier system
   │   ├── OctaveMarksModifier.ts     # Octave marks (乙甲)
   │   ├── MeriKariModifier.ts        # Meri/kari marks
-  │   ├── DurationDotModifier.ts     # Duration dots
+  │   ├── DurationMarksModifier.ts   # Strokes, dot and lines
   │   └── AtariModifier.ts           # Technique marks
   ├── data/             # Symbol mappings and constants
   └── types/            # TypeScript type definitions

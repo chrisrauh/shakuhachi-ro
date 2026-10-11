@@ -687,8 +687,8 @@ interface RenderOptions {
   meriKariFontSize?: number; // default: 14
   meriKariFontWeight?: number; // default: 500
 
-  // Duration Dot Configuration
-  durationDotExtraSpacing?: number; // default: 12
+  // Height of a duration dot's slot in the column
+  durationDotExtraSpacing?: number; // default: 22
 
   // Debug Label Configuration
   debugLabelFontSize?: number; // default: 7
@@ -918,7 +918,7 @@ new ShakuNote(options: ShakuNoteOptions)
 
 - `OctaveMarksModifier`: Octave marks (乙, 甲)
 - `MeriKariModifier`: Meri/kari marks (メ, 中, 大)
-- `DurationDotModifier`: Duration dots
+- `DurationMarksModifier`: How long a note is: strokes, dot and lines
 - `AtariModifier`: Atari marks
 
 ## Advanced APIs

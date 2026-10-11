@@ -52,8 +52,14 @@ export { OctaveMarksModifier } from './web-component/modifiers/OctaveMarksModifi
 export { MeriKariModifier } from './web-component/modifiers/MeriKariModifier';
 export { AtariModifier } from './web-component/modifiers/AtariModifier';
 export type { AtariStyle } from './web-component/modifiers/AtariModifier';
-export { DurationDotModifier } from './web-component/modifiers/DurationDotModifier';
-export { DurationLineModifier } from './web-component/modifiers/DurationLineModifier';
+export {
+  DurationMarksModifier,
+  durationSlots,
+} from './web-component/modifiers/DurationMarksModifier';
+export type {
+  DurationSlot,
+  SlotSpacing,
+} from './web-component/modifiers/DurationMarksModifier';
 
 // Data exports
 export {

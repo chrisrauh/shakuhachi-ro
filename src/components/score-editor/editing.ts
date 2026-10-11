@@ -132,7 +132,7 @@ export function writtenDuration(note: ScoreNote): string {
 /**
  * A Length key: sets the length written before any dot, so a dotted note stays
  * dotted. The dot goes where the dotted length isn't one notation can show,
- * such as a dotted 2 beats.
+ * such as a dotted quarter beat.
  */
 export function setDuration(
   state: EditorState,
@@ -155,9 +155,8 @@ export function setDuration(
 /**
  * The Dot key: adds a dot after the note, half a beat after one beat and a
  * quarter after half a beat, or takes the dot away with its length. A length
- * that already has a half (written with a stroke) keeps its length and is
- * written with a dot instead. Only one beat and half a beat can be dotted
- * for now.
+ * that already has a half but isn't marked dotted, as an import can write,
+ * keeps its length and is marked dotted. A quarter beat can't be dotted.
  */
 export function toggleDot(state: EditorState): EditorState | null {
   const note = target(state);

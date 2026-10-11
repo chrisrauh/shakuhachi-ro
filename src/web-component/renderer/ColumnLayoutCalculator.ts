@@ -8,6 +8,7 @@
 
 import type { ShakuNote } from '../notes/ShakuNote';
 import type { ResolvedRenderOptions } from './RenderOptions';
+import type { SlotSpacing } from '../modifiers/DurationMarksModifier';
 
 /**
  * Position of a note within a column
@@ -19,7 +20,7 @@ export interface NotePosition {
   y: number;
   /**
    * Y coordinate where the following note sits, or would sit if the column
-   * continued. Includes the extra spacing after a dotted note.
+   * continued. Includes the strokes and dot after the note.
    */
   nextY: number;
 }
@@ -68,6 +69,14 @@ interface ColumnBreak {
   endIndex: number;
 }
 
+/** The heights of a note's length slots, from the render options */
+function slotSpacing(options: ResolvedRenderOptions): SlotSpacing {
+  return {
+    noteSpacing: options.noteVerticalSpacing,
+    dotSpacing: options.durationDotExtraSpacing,
+  };
+}
+
 /**
  * ColumnLayoutCalculator handles column layout and note positioning
  * calculations based on render options.
@@ -84,7 +93,7 @@ export class ColumnLayoutCalculator {
    * 2. Calculates horizontal centering (startX)
    * 3. Calculates column positions (right-to-left layout)
    * 4. Calculates vertical positions for each note
-   * 5. Handles extra spacing for duration dots
+   * 5. Makes room for the strokes and dots of long notes
    *
    * Columns break automatically when vertical space runs out,
    * similar to how Japanese text flows top-to-bottom, right-to-left.
@@ -166,7 +175,7 @@ export class ColumnLayoutCalculator {
    * @param svgHeight - Available vertical space
    * @param startY - Starting Y position (top margin)
    * @param verticalSpacing - Base vertical spacing between notes
-   * @param options - Render options (for duration dot spacing)
+   * @param options - Render options (for stroke and dot spacing)
    * @returns Array of column break points
    */
   private static calculateColumnBreaks(
@@ -188,9 +197,7 @@ export class ColumnLayoutCalculator {
     for (let i = 0; i < notes.length; i++) {
       const note = notes[i];
 
-      const extraSpacing = note.needsExtraSpacing()
-        ? options.durationDotExtraSpacing
-        : 0;
+      const extraSpacing = note.extraHeight(slotSpacing(options));
       const noteHeight = verticalSpacing + extraSpacing;
 
       // Check if this note + bottom padding would exceed available height
@@ -298,9 +305,7 @@ export class ColumnLayoutCalculator {
       const note = notes[i];
 
       // Calculate spacing to next note
-      const extraSpacing = note.needsExtraSpacing()
-        ? options.durationDotExtraSpacing
-        : 0;
+      const extraSpacing = note.extraHeight(slotSpacing(options));
       const nextY = currentY + verticalSpacing + extraSpacing;
 
       positions.push({

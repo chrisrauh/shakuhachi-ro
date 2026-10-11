@@ -4,30 +4,38 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { ShakuNote } from './ShakuNote';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
-import { DurationLineModifier } from '../modifiers/DurationLineModifier';
+import {
+  DurationMarksModifier,
+  durationSlots,
+} from '../modifiers/DurationMarksModifier';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 
+function layout(distanceToNext: number) {
+  return { distanceToNext, noteFontSize: 32, noteSpacing: 44, dotSpacing: 22 };
+}
+
 describe('ShakuNote', () => {
-  describe('needsExtraSpacing', () => {
-    it('is false for a note without modifiers', () => {
-      expect(new ShakuNote({ symbol: 'ro' }).needsExtraSpacing()).toBe(false);
+  describe('extraHeight', () => {
+    const spacing = { noteSpacing: 44, dotSpacing: 22 };
+
+    it('is 0 for a note without modifiers', () => {
+      expect(new ShakuNote({ symbol: 'ro' }).extraHeight(spacing)).toBe(0);
     });
 
-    it('is false when no modifier needs extra space', () => {
+    it('is 0 when no modifier takes space in the column', () => {
       const note = new ShakuNote({ symbol: 'ro' }).addModifier(
         new OctaveMarksModifier('kan'),
       );
-      expect(note.needsExtraSpacing()).toBe(false);
+      expect(note.extraHeight(spacing)).toBe(0);
     });
 
-    it('is true when the note has a duration dot', () => {
+    it('adds a note slot per stroke and a dot slot per dot', () => {
       const note = new ShakuNote({ symbol: 'ro' }).addModifiers([
         new OctaveMarksModifier('kan'),
-        new DurationDotModifier(),
+        new DurationMarksModifier(durationSlots({ num: 5, den: 2 }), false),
       ]);
-      expect(note.needsExtraSpacing()).toBe(true);
+      expect(note.extraHeight(spacing)).toBe(44 + 22);
     });
   });
 
@@ -38,7 +46,7 @@ describe('ShakuNote', () => {
         { drawText } as unknown as RenderingBackend,
         100,
         200,
-        { distanceToNext: 44, noteFontSize: 32 },
+        layout(44),
       );
       return drawText.mock.calls.map(([text, x, y, size]) => ({
         text,
@@ -76,8 +84,8 @@ describe('ShakuNote', () => {
 
     it('is where the note was last drawn', () => {
       const note = new ShakuNote({ symbol: 'ro' });
-      note.render(backend, 100, 200, { distanceToNext: 44, noteFontSize: 32 });
-      note.render(backend, 300, 400, { distanceToNext: 44, noteFontSize: 32 });
+      note.render(backend, 100, 200, layout(44));
+      note.render(backend, 300, 400, layout(44));
 
       const box = note.getBBox();
 
@@ -92,9 +100,11 @@ describe('ShakuNote', () => {
       const boxHeight = (distanceToNext: number) => {
         const note = new ShakuNote({
           symbol: 'ro',
-          modifiers: [new DurationLineModifier(1)],
+          modifiers: [
+            new DurationMarksModifier([{ kind: 'note', lines: 1 }], true),
+          ],
         });
-        note.render(backend, 100, 200, { distanceToNext, noteFontSize: 32 });
+        note.render(backend, 100, 200, layout(distanceToNext));
         return note.getBBox().height;
       };
 

@@ -125,19 +125,21 @@ describe('length, dot, mark and octave', () => {
     expect(setDuration(highlight([ro], 0), '1')).toBeNull();
   });
 
-  it('dot only one beat and half a beat, and switch a stroke to a dot', () => {
+  it('dot whole beats and half a beat, and mark an undotted half dotted', () => {
     const half = { ...ro, duration: '1/2' };
     expect(toggleDot(highlight([half], 0))!.notes[0]).toEqual({
       ...half,
       duration: '3/4',
       dotted: true,
     });
-    expect(toggleDot(highlight([{ ...ro, duration: '2' }], 0))).toBeNull();
+    expect(
+      toggleDot(highlight([{ ...ro, duration: '2' }], 0))!.notes[0],
+    ).toEqual({ ...ro, duration: '5/2', dotted: true });
     expect(toggleDot(highlight([{ ...ro, duration: '1/4' }], 0))).toBeNull();
 
-    const stroke = { ...ro, duration: '3/2' };
-    expect(toggleDot(highlight([stroke], 0))!.notes[0]).toEqual({
-      ...stroke,
+    const undotted = { ...ro, duration: '3/2' };
+    expect(toggleDot(highlight([undotted], 0))!.notes[0]).toEqual({
+      ...undotted,
       dotted: true,
     });
   });
@@ -149,8 +151,12 @@ describe('length, dot, mark and octave', () => {
       duration: '3/4',
     });
     expect(setDuration(highlight([dotted], 0), '2')!.notes[0]).toEqual({
+      ...dotted,
+      duration: '5/2',
+    });
+    expect(setDuration(highlight([dotted], 0), '1/4')!.notes[0]).toEqual({
       ...ro,
-      duration: '2',
+      duration: '1/4',
     });
     expect(setDuration(highlight([dotted], 0), '1')).toBeNull();
   });

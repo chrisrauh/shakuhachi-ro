@@ -207,7 +207,7 @@ class ShakuhachiScore extends HTMLElement {
    * @returns Height in pixels needed for the TALLEST column
    *
    * Note: Different columns can have different heights if they contain
-   * different numbers of duration-dotted notes (which add extra spacing).
+   * different numbers of strokes and dots, which take space of their own.
    * We must calculate all columns and return the maximum height.
    */
   private calculateMultiColumnIntrinsicHeight(
@@ -217,8 +217,10 @@ class ShakuhachiScore extends HTMLElement {
     const notesPerColumn = Math.ceil(notes.length / columnCount);
     const topMargin = DEFAULT_RENDER_OPTIONS.topMargin;
     const verticalSpacing = DEFAULT_RENDER_OPTIONS.noteVerticalSpacing; // 44px
-    const durationDotExtraSpacing =
-      DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing; // 12px
+    const spacing = {
+      noteSpacing: verticalSpacing,
+      dotSpacing: DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing,
+    };
     const BOTTOM_PADDING = 20;
 
     let maxHeight = 0;
@@ -237,9 +239,7 @@ class ShakuhachiScore extends HTMLElement {
         if (i > startIdx) {
           columnHeight += verticalSpacing;
         }
-        if (note.needsExtraSpacing()) {
-          columnHeight += durationDotExtraSpacing;
-        }
+        columnHeight += note.extraHeight(spacing);
       }
 
       columnHeight += BOTTOM_PADDING;
