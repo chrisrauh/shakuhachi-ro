@@ -28,6 +28,7 @@ export interface EditorState {
 export type EditAction =
   | { type: 'note'; step: PitchStep | 'rest' }
   | { type: 'duration'; duration: string }
+  | { type: 'stroke' }
   | { type: 'dot' }
   | { type: 'mark'; mark: MeriKari }
   | { type: 'octave'; step: -1 | 1 }
@@ -54,6 +55,8 @@ export function applyEdit(
       return chooseNote(state, action.step);
     case 'duration':
       return setDuration(state, action.duration);
+    case 'stroke':
+      return addStroke(state);
     case 'dot':
       return toggleDot(state);
     case 'mark':
@@ -150,6 +153,23 @@ export function setDuration(
     return null;
   }
   return withTarget(state, next);
+}
+
+/**
+ * The Stroke key: adds a beat after the note's whole beats, keeping its dot,
+ * so 1 becomes 2 and a dotted 3/2 a dotted 5/2. A note under a beat has no
+ * whole beats to add to: half a beat and one more is 3/2, a note and a dot.
+ */
+export function addStroke(state: EditorState): EditorState | null {
+  const note = target(state);
+  if (!note) return null;
+  const beats = parseBeats(note.duration)!;
+  const written = writtenLength(beats, note.dotted);
+  if (written.num < written.den) return null;
+  return withTarget(state, {
+    ...note,
+    duration: formatBeats({ num: beats.num + beats.den, den: beats.den }),
+  });
 }
 
 /**

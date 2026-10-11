@@ -267,7 +267,8 @@
    Variants of the content: .palette-key-mark on the glyph for meri and kari
    marks, .palette-key-length for a length (a small ロ, followed by an
    svg.palette-key-lines with one <line> per duration line, as the score draws
-   them), a .palette-key-caption under the glyph, or an icon (sized 1em).
+   them, or an svg of the stroke alone), a .palette-key-caption under the
+   glyph, or an icon (sized 1em).
    ============================================ */
 
 .palette-key {
