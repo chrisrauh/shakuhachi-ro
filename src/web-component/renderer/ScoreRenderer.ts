@@ -198,6 +198,8 @@ export class ScoreRenderer {
         note.render(renderer, x, y, {
           distanceToNext: notePosition.nextY - y,
           noteFontSize: this.options.noteFontSize,
+          noteSpacing: this.options.noteVerticalSpacing,
+          dotSpacing: this.options.durationDotExtraSpacing,
         });
 
         // Render debug label if enabled

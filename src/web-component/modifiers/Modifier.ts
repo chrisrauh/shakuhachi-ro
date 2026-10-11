@@ -22,12 +22,16 @@ export type ModifierPosition = 'above' | 'below' | 'left' | 'right';
  */
 export interface ModifierLayout {
   /**
-   * Distance from this note's baseline to the next note's, including any
-   * extra spacing after a dotted note
+   * Distance from this note's baseline to the next note's, including the
+   * strokes and dot after it
    */
   distanceToNext: number;
   /** Font size of the note glyph */
   noteFontSize: number;
+  /** Height of a note in the column, which a stroke takes too */
+  noteSpacing: number;
+  /** Height of a duration dot in the column */
+  dotSpacing: number;
 }
 
 /**

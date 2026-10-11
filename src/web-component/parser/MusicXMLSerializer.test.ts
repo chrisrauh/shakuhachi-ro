@@ -283,5 +283,21 @@ describe('MusicXMLSerializer', () => {
         notes.map((n) => n.dotted ?? false),
       );
     });
+
+    // A Western dot would make a dotted half 3 beats, not 5/2
+    it('should export a note dotted after two beats by its length alone', () => {
+      const xml = MusicXMLSerializer.serialize({
+        title: 'Dotted 5/2',
+        notes: [
+          { pitch: { step: 'ro', octave: 0 }, duration: '5/2', dotted: true },
+        ],
+      });
+
+      expect(xml).not.toContain('<dot/>');
+      expect(xml).not.toContain('<type>');
+      expect(MusicXMLParser.parse(xml).notes[0]).toMatchObject({
+        duration: '5/2',
+      });
+    });
   });
 });

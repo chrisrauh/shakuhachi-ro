@@ -12,7 +12,7 @@ import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
 export const PARSER_STRING_FACTORIES = {
   invalidDuration: (duration: string) => `Invalid duration: ${duration}`,
   supportedLengths:
-    'Shakuhachi notation can show whole beats (1, 2, 3…), 1/2, 1/4, 3/2 and 3/4.',
+    'Shakuhachi notation can show whole beats (1, 2, 3…), 1/2, 1/4, and a half after these (3/2, 5/2…, 3/4).',
   noteIndexError: (index: number, field: string) =>
     `Note ${index + 1} is missing ${field}`,
   noteIndexInvalid: (
@@ -64,10 +64,10 @@ export const PARSER_STRINGS = {
           index,
           'duration',
           JSON.stringify(duration),
-          'Shakuhachi notation can show whole beats ("1", "2", "3"…), "1/2", "1/4", "3/2" and "3/4".',
+          'Shakuhachi notation can show whole beats ("1", "2", "3"…), "1/2", "1/4", and a half after these ("3/2", "5/2"…, "3/4").',
         ),
       noteIndexDottedWithoutHalf: (index: number, duration: string) =>
-        `Note ${index + 1} is dotted, but its duration, "${duration}", has no half to write as a dot. Only "3/2" and "3/4" can be dotted.`,
+        `Note ${index + 1} is dotted, but its duration, "${duration}", has no half to write as a dot. Only a length with a half, such as "3/2", "5/2" or "3/4", can be dotted.`,
       noteIndexMeriKariInvalid: (index: number, meriKari: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,

@@ -145,6 +145,18 @@
           <div class="score-container" id="score-dark-4"></div>
         </div>
       </div>
+
+      <!-- Example 6: Long notes, and the dot in its own slot -->
+      <div class="example-row">
+        <div class="example-column light">
+          <h3>6. Long notes: strokes, and the dot in its own slot</h3>
+          <div class="score-container" id="score-light-5"></div>
+        </div>
+        <div class="example-column dark">
+          <h3>6. Long notes: strokes, and the dot in its own slot</h3>
+          <div class="score-container" id="score-dark-5"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Load the built web component bundle -->
@@ -321,6 +333,28 @@
               duration: '1',
               meriKari: 'dai-kari',
             }, // 大カ
+          ],
+        },
+        // 6. Strokes for beats after the first, then a half as a dot. A dot
+        // after whole beats has no line; after half a beat, the note's line
+        // runs on beside it (#438)
+        {
+          title: 'Long Notes',
+          style: 'kinko',
+          notes: [
+            { pitch: { step: 'tsu', octave: 0 }, duration: '2' }, // one stroke
+            { pitch: { step: 're', octave: 0 }, duration: '3' }, // two strokes
+            { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+            { pitch: { step: 're', octave: 0 }, dotted: true, duration: '3/2' }, // dot, no line
+            { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+            { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+            { pitch: { step: 'ri', octave: 0 }, duration: '1/2' },
+            { pitch: { step: 're', octave: 0 }, dotted: true, duration: '3/4' }, // 3/4: its line runs on beside the dot
+            { pitch: { step: 'tsu', octave: 0 }, duration: '1/4' },
+            { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+            { pitch: { step: 're', octave: 0 }, dotted: true, duration: '5/2' }, // stroke, then dot
+            { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+            { pitch: { step: 'ro', octave: 0 }, duration: '1' },
           ],
         },
       ];

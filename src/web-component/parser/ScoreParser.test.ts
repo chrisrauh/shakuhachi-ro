@@ -7,18 +7,22 @@ import { ScoreParser } from './ScoreParser';
 import type { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
 import type { ShakuNote } from '../notes/ShakuNote';
-import { DurationLineModifier } from '../modifiers/DurationLineModifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import { DurationMarksModifier } from '../modifiers/DurationMarksModifier';
 
-/** Duration lines and dot each note draws, as [lines, dotted] */
-function durationMarks(notes: ScoreNote[]): [number, boolean][] {
+/**
+ * The slots each note takes in the column, a line beside a slot written as
+ * "|": "note stroke|" is a note, then a stroke with one line
+ */
+function durationMarks(notes: ScoreNote[]): string[] {
   return ScoreParser.parse({ notes }).map((note: ShakuNote) => {
-    const modifiers = note.getModifiers();
-    const lines = modifiers.find((m) => m instanceof DurationLineModifier);
-    return [
-      lines ? (lines as DurationLineModifier)['lineCount'] : 0,
-      modifiers.some((m) => m instanceof DurationDotModifier),
-    ];
+    const marks = note
+      .getModifiers()
+      .find((m) => m instanceof DurationMarksModifier);
+    if (!marks) return 'note';
+    return marks
+      .getSlots()
+      .map((slot) => slot.kind + '|'.repeat(slot.lines))
+      .join(' ');
   });
 }
 
@@ -53,9 +57,9 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: '2' }, // Two beats: no duration lines
-          { pitch: { step: 'tsu', octave: 1 }, duration: '2' },
-          { pitch: { step: 'tsu', octave: 2 }, duration: '2' },
+          { pitch: { step: 'tsu', octave: 0 }, duration: '1' }, // One beat: no duration marks
+          { pitch: { step: 'tsu', octave: 1 }, duration: '1' },
+          { pitch: { step: 'tsu', octave: 2 }, duration: '1' },
         ],
       };
 
@@ -84,7 +88,7 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '2', meriKari: 'meri' }, // Two beats: no duration lines
+          { pitch: { step: 'ro', octave: 0 }, duration: '1', meriKari: 'meri' }, // One beat: no duration marks
         ],
       };
 
@@ -101,9 +105,9 @@ describe('ScoreParser', () => {
         notes: [
           {
             pitch: { step: 'chi', octave: 1 },
-            duration: '2',
+            duration: '1',
             meriKari: 'meri',
-          }, // Two beats: no duration lines
+          }, // One beat: no duration marks
         ],
       };
 
@@ -155,19 +159,7 @@ describe('ScoreParser', () => {
 
       expect(notes).toHaveLength(2);
 
-      // First note should have DurationDotModifier
-      const firstNoteModifiers = notes[0].getModifiers();
-      const hasDurationDot = firstNoteModifiers.some(
-        (m) => m.constructor.name === 'DurationDotModifier',
-      );
-      expect(hasDurationDot).toBe(true);
-
-      // Second note should NOT have DurationDotModifier
-      const secondNoteModifiers = notes[1].getModifiers();
-      const hasNoDurationDot = secondNoteModifiers.every(
-        (m) => m.constructor.name !== 'DurationDotModifier',
-      );
-      expect(hasNoDurationDot).toBe(true);
+      expect(durationMarks(scoreData.notes)).toEqual(['note dot', 'note']);
     });
 
     it('should parse rest notes correctly', () => {
@@ -367,37 +359,48 @@ describe('ScoreParser', () => {
   describe('durations in beats', () => {
     it('draws one line for half a beat and two for a quarter', () => {
       expect(durationMarks([ro('1/2'), ro('1/4')])).toEqual([
-        [1, false],
-        [2, false],
+        'note|',
+        'note||',
       ]);
     });
 
-    it('draws no line for one beat or more', () => {
-      expect(durationMarks([ro('1'), ro('2'), ro('3'), ro('4')])).toEqual([
-        [0, false],
-        [0, false],
-        [0, false],
-        [0, false],
+    it('draws a stroke for each beat after the first', () => {
+      expect(durationMarks([ro('1'), ro('2'), ro('4')])).toEqual([
+        'note',
+        'note stroke',
+        'note stroke stroke stroke',
       ]);
     });
 
-    it('draws a dotted length as the lines before the dot, and the dot', () => {
-      expect(durationMarks([ro('3/2', true), ro('3/4', true)])).toEqual([
-        [0, true],
-        [1, true],
+    it('writes a half as a dot, dotted or not', () => {
+      expect(
+        durationMarks([
+          ro('3/2', true),
+          ro('5/2', true),
+          ro('3/4', true),
+          ro('3/2'),
+          ro('3/4'),
+        ]),
+      ).toEqual([
+        'note dot',
+        'note stroke dot',
+        'note| dot|',
+        'note dot',
+        'note| dot|',
       ]);
     });
 
-    it('draws duration lines on rests too', () => {
+    it('draws duration marks on rests too', () => {
       const rest = (duration: string): ScoreNote => ({ rest: true, duration });
-      expect(durationMarks([rest('1'), rest('1/2')])).toEqual([
-        [0, false],
-        [1, false],
+      expect(durationMarks([rest('1'), rest('1/2'), rest('2')])).toEqual([
+        'note',
+        'note|',
+        'note stroke',
       ]);
     });
 
     it('accepts every supported length', () => {
-      const lengths = ['1/4', '1/2', '3/4', '1', '3/2', '2', '3', '4', '6'];
+      const lengths = ['1/4', '1/2', '3/4', '1', '3/2', '2', '5/2', '7/2', '6'];
       expect(() =>
         ScoreParser.validate({ notes: lengths.map((d) => ro(d)) }),
       ).not.toThrow();
@@ -415,8 +418,8 @@ describe('ScoreParser', () => {
     });
 
     it('rejects a length notation cannot show', () => {
-      expect(() => ScoreParser.validate({ notes: [ro('5/2')] })).toThrow(
-        'Note 1 has invalid duration: "5/2". Shakuhachi notation can show',
+      expect(() => ScoreParser.validate({ notes: [ro('5/4')] })).toThrow(
+        'Note 1 has invalid duration: "5/4". Shakuhachi notation can show',
       );
       expect(() =>
         ScoreParser.validate({ notes: [{ rest: true, duration: '1/8' }] }),

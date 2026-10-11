@@ -10,8 +10,7 @@ import type { ShakuNote } from '../notes/ShakuNote';
 import type { ResolvedRenderOptions } from './RenderOptions';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { MeriKariModifier } from '../modifiers/MeriKariModifier';
-import { DurationLineModifier } from '../modifiers/DurationLineModifier';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import { DurationMarksModifier } from '../modifiers/DurationMarksModifier';
 
 /**
  * ModifierConfigurator handles configuration of note modifiers
@@ -29,7 +28,7 @@ export class ModifierConfigurator {
    *    that can be switched off entirely)
    * 2. Configures octave mark appearance (fontSize, fontWeight, color)
    * 3. Configures meri/kari mark appearance (fontSize, fontWeight, color)
-   * 4. Configures duration line/dot color
+   * 4. Configures the color of duration marks (lines, strokes, dots)
    *
    * Steps 2-4 run for every remaining modifier regardless of
    * showOctaveMarks — that flag only controls octave mark removal.
@@ -60,11 +59,7 @@ export class ModifierConfigurator {
           this.configureMeriKariMark(mod, options);
         }
 
-        if (mod instanceof DurationLineModifier) {
-          mod.setColor(options.noteColor);
-        }
-
-        if (mod instanceof DurationDotModifier) {
+        if (mod instanceof DurationMarksModifier) {
           mod.setColor(options.noteColor);
         }
       });

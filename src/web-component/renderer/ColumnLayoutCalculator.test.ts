@@ -5,7 +5,14 @@
 import { describe, it, expect } from 'vitest';
 import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
 import { ShakuNote } from '../notes/ShakuNote';
-import { DurationDotModifier } from '../modifiers/DurationDotModifier';
+import {
+  DurationMarksModifier,
+  durationSlots,
+} from '../modifiers/DurationMarksModifier';
+
+/** A dotted 3/2: the note, then a dot slot */
+const dotted = () =>
+  new DurationMarksModifier(durationSlots({ num: 3, den: 2 }), false);
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { mergeWithDefaults } from './RenderOptions';
 
@@ -175,7 +182,7 @@ describe('ColumnLayoutCalculator', () => {
     it('should add extra spacing for notes with duration dots', () => {
       const note1 = new ShakuNote({ symbol: 'ro' });
       const note2 = new ShakuNote({ symbol: 'tsu' });
-      note2.addModifier(new DurationDotModifier()); // Add duration dot
+      note2.addModifier(dotted());
       const note3 = new ShakuNote({ symbol: 'chi' });
 
       const notes = [note1, note2, note3];
@@ -204,6 +211,22 @@ describe('ColumnLayoutCalculator', () => {
       // Third note has extra spacing because note2 has duration dot
       // y = 50 + 44 + (44 + 12) = 150
       expect(positions[2].y).toBe(50 + 44 + 44 + 12);
+    });
+
+    it('gives each stroke of a long note the space of a note', () => {
+      const long = new ShakuNote({ symbol: 'ro' }).addModifier(
+        new DurationMarksModifier(durationSlots({ num: 3, den: 1 }), false),
+      );
+      const notes = [long, new ShakuNote({ symbol: 'tsu' })];
+
+      const layout = ColumnLayoutCalculator.calculateLayout(
+        notes,
+        800,
+        600,
+        mergeWithDefaults({ topMargin: 50, noteVerticalSpacing: 44 }),
+      );
+
+      expect(layout.columns[0].notePositions[1].y).toBe(50 + 3 * 44);
     });
 
     it('should handle notes that exactly fill columns', () => {
@@ -367,11 +390,11 @@ describe('ColumnLayoutCalculator', () => {
       note1.addModifier(new OctaveMarksModifier('kan'));
 
       const note2 = new ShakuNote({ symbol: 'tsu' });
-      note2.addModifier(new DurationDotModifier());
+      note2.addModifier(dotted());
 
       const note3 = new ShakuNote({ symbol: 'chi' });
       note3.addModifier(new OctaveMarksModifier('otsu'));
-      note3.addModifier(new DurationDotModifier());
+      note3.addModifier(dotted());
 
       const notes = [note1, note2, note3];
 

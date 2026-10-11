@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   dottedLength,
   formatBeats,
+  hasHalf,
+  isSupported,
   noteBeats,
   parseBeats,
   writtenLength,
@@ -13,6 +15,27 @@ describe('Duration', () => {
       expect(formatBeats(parseBeats(text)!)).toBe(text);
     }
     expect(parseBeats('3/2')).toEqual({ num: 3, den: 2 });
+  });
+
+  it('supports whole beats, halves, a quarter and three quarters', () => {
+    const supported = (text: string) => isSupported(parseBeats(text)!);
+    for (const text of ['1', '4', '1/2', '3/2', '7/2', '1/4', '3/4']) {
+      expect(supported(text)).toBe(true);
+    }
+    for (const text of ['5/4', '1/8', '1/3']) {
+      expect(supported(text)).toBe(false);
+    }
+  });
+
+  it('finds the half that can be written as a dot or a stroke', () => {
+    const half = (text: string) => hasHalf(parseBeats(text)!);
+    expect(['3/2', '5/2', '3/4'].map(half)).toEqual([true, true, true]);
+    expect(['1', '2', '1/2', '1/4'].map(half)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 
   // A dot fills a slot of the beat it falls in: half a beat after a beat or
