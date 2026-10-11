@@ -1,5 +1,7 @@
 import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
+import { parseBeats } from '../../web-component/types/Duration';
 import {
+  addStroke,
   targetIndex,
   toggleDot,
   writtenDuration,
@@ -72,9 +74,10 @@ export class PalettePanel {
   }
 
   /**
-   * Shows which keys apply: lengths and the dot need a note to act on, marks
-   * and octave a pitched one, and delete a note to remove. A key whose value
-   * that note already has is pressed. Note and delete titles follow the mode.
+   * Shows which keys apply: lengths and the dot need a note to act on, the
+   * stroke one of a beat or more, marks and octave a pitched one, and delete a
+   * note to remove. A key whose value that note already has is pressed. Note
+   * and delete titles follow the mode; the stroke's says how long the note is.
    *
    * Note keys are pressed only for a highlighted note, which they change; at
    * the cursor they insert, so none is pressed. The highlighted note's key is
@@ -106,6 +109,12 @@ export class PalettePanel {
         case 'duration':
           applies &&= !!note;
           pressed = !!note && writtenDuration(note) === command.duration;
+          break;
+        case 'stroke':
+          applies &&= addStroke({ notes, selection }) !== null;
+          key.title = applies
+            ? `Add a beat after the note, now ${beatCount(note!.duration)}`
+            : 'Add a beat after the note';
           break;
         case 'dot':
           applies &&= toggleDot({ notes, selection }) !== null;
@@ -175,6 +184,14 @@ export class PalettePanel {
   }
 }
 
+/** A length of a beat or more as said: "1 beat", "2½ beats" */
+function beatCount(duration: string): string {
+  const { num, den } = parseBeats(duration)!;
+  const whole = Math.floor(num / den);
+  const half = den === 2 ? '½' : '';
+  return `${whole}${half} ${whole === 1 && !half ? 'beat' : 'beats'}`;
+}
+
 /** Scrolls a key's column just enough to bring the key into view. */
 function reveal(key: HTMLButtonElement): void {
   const column = key.closest<HTMLElement>('.palette-keys')!;
@@ -194,6 +211,8 @@ function commandFor(key: HTMLButtonElement): EditorCommand {
   if (duration) return { type: 'duration', duration };
   if (mark) return { type: 'mark', mark: mark as MeriKari };
   switch (name) {
+    case 'stroke':
+      return { type: 'stroke' };
     case 'dot':
       return { type: 'dot' };
     case 'octave-up':
