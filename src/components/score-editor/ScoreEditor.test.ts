@@ -78,6 +78,7 @@ function renderPage(): void {
           <div data-column="length">
             <button class="palette-key" data-duration="1/2" aria-label="half"></button>
             <button class="palette-key" data-duration="1" aria-label="beat"></button>
+            <button class="palette-key" data-key="stroke" aria-label="add a beat"></button>
             <button class="palette-key" data-key="dot" aria-label="dot"></button>
           </div>
           <div data-column="notes">
@@ -444,6 +445,21 @@ describe('ScoreEditor editing', () => {
     press({ key: 'ArrowUp' });
     expect(key('data-key="delete"').disabled).toBe(true);
     expect(key('data-duration="1"').disabled).toBe(true);
+  });
+
+  it('adds a beat with the stroke key, saying how long the note is now', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    const stroke = key('data-key="stroke"');
+    expect(stroke.title).toBe('Add a beat after the note, now 1 beat');
+
+    stroke.click();
+    key('data-key="dot"').click();
+    expect(source().notes[1].duration).toBe('5/2');
+    expect(stroke.title).toBe('Add a beat after the note, now 2½ beats');
+    expect(stroke.hasAttribute('aria-pressed')).toBe(false);
+
+    key('data-duration="1/2"').click();
+    expect(stroke.disabled).toBe(true);
   });
 
   it('presses the highlighted note’s key, and scrolls its column just enough to show it, once', () => {

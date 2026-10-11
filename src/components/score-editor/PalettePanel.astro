@@ -98,6 +98,20 @@ const otherNotes = OTHER_NOTES.map(noteKey);
         <button
           type="button"
           class="palette-key"
+          data-key="stroke"
+          aria-label="add a beat"
+          title="Add a beat after the note"
+        >
+          <span class="palette-key-glyph palette-key-length" aria-hidden="true">
+            <svg viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5">
+              <line x1="10" y1="6" x2="10" y2="14" />
+            </svg>
+          </span>
+          <span class="palette-key-caption">+1 beat</span>
+        </button>
+        <button
+          type="button"
+          class="palette-key"
           data-key="dot"
           aria-label="dot"
           title="Add or remove the dot"

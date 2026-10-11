@@ -22,11 +22,10 @@ export const OTHER_NOTES: readonly PitchStep[] = PITCH_STEPS.filter(
 );
 
 /**
- * The Length keys: the length in beats written before any dot, the duration
- * lines the score draws for it, and the key's caption.
+ * The Length keys: the length in beats of the note itself, before any stroke
+ * or dot, the duration lines the score draws for it, and the key's caption.
  */
 export const LENGTHS = [
-  { duration: '2', lines: 0, caption: '2 beats' },
   { duration: '1', lines: 0, caption: '1 beat' },
   { duration: '1/2', lines: 1, caption: '½ beat' },
   { duration: '1/4', lines: 2, caption: '¼ beat' },

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { ScoreNote } from '../../web-component/types/ScoreData';
 import {
+  addStroke,
   chooseNote,
   deleteNote,
   setDuration,
@@ -159,6 +160,35 @@ describe('length, dot, mark and octave', () => {
       duration: '1/4',
     });
     expect(setDuration(highlight([dotted], 0), '1')).toBeNull();
+  });
+
+  it('add a beat with a stroke, keeping the dot', () => {
+    const stroke = (note: ScoreNote) =>
+      addStroke(highlight([note], 0))!.notes[0];
+    const dotted = { ...ro, duration: '3/2', dotted: true };
+    expect(stroke(ro)).toEqual({ ...ro, duration: '2' });
+    expect(stroke({ ...ro, duration: '2' })).toEqual({ ...ro, duration: '3' });
+    expect(stroke(dotted)).toEqual({ ...dotted, duration: '5/2' });
+  });
+
+  it('add no stroke to a note under a beat, dotted or not', () => {
+    for (const note of [ri, { ...ro, duration: '1/4' }]) {
+      expect(addStroke(highlight([note], 0))).toBeNull();
+    }
+    const dottedHalf = { ...ri, duration: '3/4', dotted: true };
+    expect(addStroke(highlight([dottedHalf], 0))).toBeNull();
+    expect(addStroke(cursorAt([ro], 0))).toBeNull();
+  });
+
+  it('take the strokes away with the 1-beat key, keeping the dot', () => {
+    expect(
+      setDuration(highlight([{ ...ro, duration: '3' }], 0), '1')!.notes[0],
+    ).toEqual(ro);
+    const dotted = { ...ro, duration: '5/2', dotted: true };
+    expect(setDuration(highlight([dotted], 0), '1')!.notes[0]).toEqual({
+      ...dotted,
+      duration: '3/2',
+    });
   });
 
   it('move the octave within otsu to daikan, and not on a rest', () => {
