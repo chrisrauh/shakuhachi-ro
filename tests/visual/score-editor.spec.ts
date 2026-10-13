@@ -101,7 +101,7 @@ async function editNote(page: Page) {
   await waitForScoreRendered(page);
   await tapNote(page, 1);
   await page.click('.palette-key[data-mark="chu-meri"]');
-  await page.click('.palette-key[data-duration="2"]'); // 1 beat
+  await page.click('.palette-key[data-duration="1"]'); // 1 beat
   await expect(
     page.locator('.palette-key[data-mark="chu-meri"]'),
   ).toHaveAttribute('aria-pressed', 'true');
