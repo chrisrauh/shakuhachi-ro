@@ -13,7 +13,7 @@ export default [
       'dist/**',
       '.vite/**',
       '**/*.min.js',
-      'tests/visual/reports/**',
+      'playwright-report/**',
     ],
   },
 

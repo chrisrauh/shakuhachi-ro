@@ -20,7 +20,7 @@
     "pretest:visual": "npm run build:wc",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
-    "test:visual:report": "playwright show-report tests/visual/reports",
+    "test:visual:report": "playwright show-report",
     "test:visual:debug": "playwright test --debug"
   },
   "dependencies": {
