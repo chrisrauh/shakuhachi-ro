@@ -159,7 +159,7 @@ describe('RenderOptions', () => {
         octaveMarkFontWeight: 600,
         meriKariFontSize: 16,
         meriKariFontWeight: 600,
-        durationDotExtraSpacing: 15,
+        durationDotGap: 15,
         debugLabelFontSize: 10,
         debugLabelOffsetX: 30,
         debugLabelOffsetY: -10,

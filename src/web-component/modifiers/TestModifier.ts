@@ -78,4 +78,8 @@ export class TestModifier extends Modifier {
   getHeight(): number {
     return this.radius * 2;
   }
+
+  extraHeight(): number {
+    return 0;
+  }
 }

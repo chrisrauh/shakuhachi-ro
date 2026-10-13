@@ -155,4 +155,9 @@ export class MeriKariModifier extends Modifier {
   getHeight(): number {
     return this.fontSize * [...MeriKariModifier.symbols[this.type]].length;
   }
+
+  /** None: the mark sits beside the note, within its slot */
+  extraHeight(): number {
+    return 0;
+  }
 }

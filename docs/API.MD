@@ -687,8 +687,8 @@ interface RenderOptions {
   meriKariFontSize?: number; // default: 14
   meriKariFontWeight?: number; // default: 500
 
-  // Height of a duration dot's slot in the column
-  durationDotExtraSpacing?: number; // default: 22
+  // Gap between a duration dot and the note or stroke above it
+  durationDotGap?: number; // default: 14
 
   // Debug Label Configuration
   debugLabelFontSize?: number; // default: 7

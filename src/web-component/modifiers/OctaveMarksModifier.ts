@@ -151,4 +151,9 @@ export class OctaveMarksModifier extends Modifier {
   getHeight(): number {
     return this.fontSize;
   }
+
+  /** None: the mark sits above the note, in the space topMargin leaves */
+  extraHeight(): number {
+    return 0;
+  }
 }

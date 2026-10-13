@@ -9,11 +9,13 @@
  * Forest: ロ・ リ, the line starting at リ. A dot after half a beat is a
  * quarter, inside the note's line, as in Gyoson: リ レ・ under one line (#438).
  *
- * The layout gives each stroke a note's height and each dot a smaller one,
- * which it reads from extraHeight().
+ * The layout gives each stroke a note's height, which it reads from
+ * extraHeight(). A dot hangs a fixed gap below the mark above it, and takes
+ * only the space it reaches below that mark, so the next note keeps its usual
+ * distance from the dot (#488).
  */
 
-import { Modifier, type ModifierLayout } from './Modifier';
+import { Modifier, type ModifierLayout, type SlotSpacing } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Beats } from '../types/Duration';
 import { hasHalf, writtenLength } from '../types/Duration';
@@ -22,14 +24,6 @@ import { hasHalf, writtenLength } from '../types/Duration';
 export interface DurationSlot {
   kind: 'note' | 'stroke' | 'dot';
   lines: number;
-}
-
-/** Heights of the slots in the column */
-export interface SlotSpacing {
-  /** A note's, which a stroke takes too */
-  noteSpacing: number;
-  /** A dot's */
-  dotSpacing: number;
 }
 
 /**
@@ -50,6 +44,8 @@ const KANA_OPTICAL_CENTER_RATIO = 0.4;
 
 /** A stroke's length as a fraction of the font size, as in the Koga duet */
 const STROKE_LENGTH_RATIO = 0.4;
+
+const DOT_RADIUS = 2.5;
 
 /** Number of lines that halve a length `num / den` of a beat until it fits */
 function linesFor(num: number, den: number): number {
@@ -97,7 +93,6 @@ export class DurationMarksModifier extends Modifier {
   private lineSpacing = 8;
   private lineWidth = 1.5;
   private strokeWidth = 2;
-  private dotRadius = 2.5;
   private color = '#000';
 
   /**
@@ -123,9 +118,11 @@ export class DurationMarksModifier extends Modifier {
 
   /** Space the slots after the note take in the column */
   extraHeight(spacing: SlotSpacing): number {
-    return this.slots
-      .slice(1)
-      .reduce((sum, slot) => sum + slotHeight(slot, spacing), 0);
+    let sum = 0;
+    for (let s = 1; s < this.slots.length; s++) {
+      sum += slotHeight(this.slots, s, spacing);
+    }
+    return sum;
   }
 
   render(
@@ -139,24 +136,27 @@ export class DurationMarksModifier extends Modifier {
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
     let baseline = noteY;
-    for (const slot of this.slots) {
+    this.slots.forEach((_, s) => {
       baselines.push(baseline);
-      baseline += slotHeight(slot, layout);
-    }
+      baseline += slotHeight(this.slots, s, layout);
+    });
 
-    // A stroke or dot sits midway between the optical centres of the glyphs
-    // before and after it
+    // A stroke sits on the optical centre of the glyph its slot stands in
+    // for. A dot hangs the gap below the mark above it.
     const markY = (s: number) =>
-      baselines[s] +
-      (slotHeight(this.slots[s], layout) - layout.noteSpacing) / 2 -
-      noteFontSize * KANA_OPTICAL_CENTER_RATIO;
+      this.slots[s].kind === 'dot'
+        ? baselines[s - 1] +
+          markBottom(this.slots[s - 1], noteFontSize) +
+          layout.dotGap +
+          DOT_RADIUS
+        : baselines[s] - noteFontSize * KANA_OPTICAL_CENTER_RATIO;
 
     // Where a slot's lines start. The slot before runs its lines to here, so
     // segments meet without overlapping: overlaps show as two colours on the
     // line in dark mode, from anti-aliasing.
     const lineTop = (s: number) =>
       this.slots[s].kind === 'dot'
-        ? markY(s) - this.dotRadius * 3
+        ? markY(s) - DOT_RADIUS * 3
         : baselines[s] + LINE_START_OFFSET_Y;
 
     this.slots.forEach((slot, s) => {
@@ -171,7 +171,7 @@ export class DurationMarksModifier extends Modifier {
           this.strokeWidth,
         );
       } else if (slot.kind === 'dot') {
-        renderer.drawCircle(noteX, markY(s), this.dotRadius, this.color);
+        renderer.drawCircle(noteX, markY(s), DOT_RADIUS, this.color);
       }
 
       if (slot.lines === 0) return;
@@ -183,7 +183,7 @@ export class DurationMarksModifier extends Modifier {
           ? lineTop(s + 1)
           : noteY + distanceToNext + LINE_START_OFFSET_Y;
       } else if (slot.kind === 'dot') {
-        end = markY(s) + this.dotRadius * 3;
+        end = markY(s) + DOT_RADIUS * 3;
       } else {
         end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
       }
@@ -212,6 +212,29 @@ export class DurationMarksModifier extends Modifier {
   }
 }
 
-function slotHeight(slot: DurationSlot, spacing: SlotSpacing): number {
-  return slot.kind === 'dot' ? spacing.dotSpacing : spacing.noteSpacing;
+/**
+ * Height of slot `s` in the column. A note or stroke takes a note's. A dot
+ * takes how far it reaches below the mark above it, so the next note stands
+ * as far below the dot as it would below that mark.
+ */
+function slotHeight(
+  slots: DurationSlot[],
+  s: number,
+  spacing: SlotSpacing,
+): number {
+  if (slots[s].kind !== 'dot') return spacing.noteSpacing;
+  return (
+    markBottom(slots[s - 1], spacing.noteFontSize) +
+    spacing.dotGap +
+    DOT_RADIUS * 2
+  );
+}
+
+/**
+ * Where a slot's mark ends, below its baseline: a kana sits on the baseline,
+ * and a stroke, centred on the kana's optical centre, ends above it
+ */
+function markBottom(slot: DurationSlot, noteFontSize: number): number {
+  if (slot.kind !== 'stroke') return 0;
+  return -noteFontSize * (KANA_OPTICAL_CENTER_RATIO - STROKE_LENGTH_RATIO / 2);
 }
