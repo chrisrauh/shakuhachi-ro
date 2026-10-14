@@ -318,10 +318,10 @@ describe('ModifierConfigurator', () => {
         0,
         0,
         {
-          distanceToNext: 66,
+          distanceToNext: 63,
           noteFontSize: 32,
           noteSpacing: 44,
-          dotSpacing: 22,
+          dotGap: 14,
         },
       );
       expect(drawCircle).toHaveBeenCalledWith(

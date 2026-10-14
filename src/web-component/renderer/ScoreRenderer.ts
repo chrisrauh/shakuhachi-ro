@@ -199,7 +199,7 @@ export class ScoreRenderer {
           distanceToNext: notePosition.nextY - y,
           noteFontSize: this.options.noteFontSize,
           noteSpacing: this.options.noteVerticalSpacing,
-          dotSpacing: this.options.durationDotExtraSpacing,
+          dotGap: this.options.durationDotGap,
         });
 
         // Render debug label if enabled

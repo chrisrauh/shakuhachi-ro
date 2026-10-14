@@ -159,12 +159,12 @@ export interface RenderOptions extends ViewportOptions {
   // =========================================================================
 
   /**
-   * Height of the space a duration dot takes in the column, between the note
-   * before it and the note after. A stroke takes a note's height
-   * (noteVerticalSpacing).
-   * @default 22
+   * Gap between a duration dot and the mark above it: the note's baseline, or
+   * the end of its last stroke. The next note keeps its usual distance below
+   * the dot, so the dot's space in the column follows from this gap.
+   * @default 14
    */
-  durationDotExtraSpacing?: number;
+  durationDotGap?: number;
 
   // =========================================================================
   // Debug Label Configuration
@@ -253,7 +253,7 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
   meriKariFontWeight: 500,
 
   // Duration dot configuration
-  durationDotExtraSpacing: 22,
+  durationDotGap: 14,
 
   // Debug label configuration
   debugLabelFontSize: 7,

@@ -179,7 +179,7 @@ describe('ColumnLayoutCalculator', () => {
       expect(positions[2].y).toBe(50 + 88);
     });
 
-    it('should add extra spacing for notes with duration dots', () => {
+    it('moves the note after a dot down by how far the dot reaches below its note', () => {
       const note1 = new ShakuNote({ symbol: 'ro' });
       const note2 = new ShakuNote({ symbol: 'tsu' });
       note2.addModifier(dotted());
@@ -190,7 +190,7 @@ describe('ColumnLayoutCalculator', () => {
       const options = mergeWithDefaults({
         topMargin: 50,
         noteVerticalSpacing: 44,
-        durationDotExtraSpacing: 12,
+        durationDotGap: 12,
       });
 
       const layout = ColumnLayoutCalculator.calculateLayout(
@@ -202,15 +202,35 @@ describe('ColumnLayoutCalculator', () => {
 
       const positions = layout.columns[0].notePositions;
 
-      // First note at startY
       expect(positions[0].y).toBe(50);
-
-      // Second note at startY + verticalSpacing
       expect(positions[1].y).toBe(50 + 44);
+      // The dot hangs 12 below note2's baseline and is 5 across, so note3
+      // stands as far below the dot as a note stands below the one before
+      expect(positions[2].y).toBe(50 + 44 + 44 + 12 + 5);
+    });
 
-      // Third note has extra spacing because note2 has duration dot
-      // y = 50 + 44 + (44 + 12) = 150
-      expect(positions[2].y).toBe(50 + 44 + 44 + 12);
+    it('measures the gap of a dot after a stroke from the end of the stroke', () => {
+      const long = new ShakuNote({ symbol: 'ro' }).addModifier(
+        new DurationMarksModifier(durationSlots({ num: 5, den: 2 }), false),
+      );
+      const after = new ShakuNote({ symbol: 'tsu' });
+
+      const options = mergeWithDefaults({
+        topMargin: 50,
+        noteVerticalSpacing: 44,
+        noteFontSize: 32,
+        durationDotGap: 12,
+      });
+      const positions = ColumnLayoutCalculator.calculateLayout(
+        [long, after],
+        800,
+        600,
+        options,
+      ).columns[0].notePositions;
+
+      // A stroke ends 0.2 of the font size above its slot's baseline, so the
+      // dot after it takes that much less space than after a note
+      expect(positions[1].y).toBeCloseTo(50 + 44 + 44 - 32 * 0.2 + 12 + 5);
     });
 
     it('gives each stroke of a long note the space of a note', () => {
@@ -227,6 +247,49 @@ describe('ColumnLayoutCalculator', () => {
       );
 
       expect(layout.columns[0].notePositions[1].y).toBe(50 + 3 * 44);
+    });
+
+    it('moves a long note to the next column when its strokes would not fit', () => {
+      // Defaults (topMargin=32, spacing=44, bottomPadding=20), height 600: the
+      // 13th note starts at 560. A plain note fits there (560 + 20), but a
+      // 2-beat note's stroke takes another 44 (560 + 44 + 20 = 624)
+      const notes = [
+        ...Array.from({ length: 12 }, () => new ShakuNote({ symbol: 'ro' })),
+        new ShakuNote({ symbol: 'ri' }).addModifier(
+          new DurationMarksModifier(durationSlots({ num: 2, den: 1 }), false),
+        ),
+        new ShakuNote({ symbol: 'ro' }),
+      ];
+
+      const layout = ColumnLayoutCalculator.calculateLayout(
+        notes,
+        800,
+        600,
+        mergeWithDefaults({}),
+      );
+
+      expect(layout.columns[0].noteEndIndex).toBe(12);
+      expect(layout.columns[1].noteStartIndex).toBe(12);
+    });
+
+    it('fits a column in exactly the height columnHeight gives it', () => {
+      const notes = [
+        new ShakuNote({ symbol: 'ro' }),
+        new ShakuNote({ symbol: 'tsu' }).addModifier(dotted()),
+        new ShakuNote({ symbol: 're' }),
+        new ShakuNote({ symbol: 'chi' }).addModifier(
+          new DurationMarksModifier(durationSlots({ num: 3, den: 1 }), false),
+        ),
+      ];
+      const options = mergeWithDefaults({});
+      const height = ColumnLayoutCalculator.columnHeight(notes, options);
+
+      const columnsAt = (h: number) =>
+        ColumnLayoutCalculator.calculateLayout(notes, 800, h, options)
+          .totalColumns;
+
+      expect(columnsAt(height)).toBe(1);
+      expect(columnsAt(height - 1)).toBe(2);
     });
 
     it('should handle notes that exactly fill columns', () => {
@@ -401,7 +464,7 @@ describe('ColumnLayoutCalculator', () => {
       const options = mergeWithDefaults({
         topMargin: 50,
         noteVerticalSpacing: 44,
-        durationDotExtraSpacing: 12,
+        durationDotGap: 12,
       });
 
       const layout = ColumnLayoutCalculator.calculateLayout(
@@ -419,8 +482,8 @@ describe('ColumnLayoutCalculator', () => {
       // Note2: has duration dot, extra spacing added after
       expect(positions[1].y).toBe(50 + 44);
 
-      // Note3: positioned after note2's extra spacing
-      expect(positions[2].y).toBe(50 + 44 + 44 + 12);
+      // Note3: positioned after the space note2's dot takes
+      expect(positions[2].y).toBe(50 + 44 + 44 + 12 + 5);
     });
 
     it('should calculate column count based on available height', () => {

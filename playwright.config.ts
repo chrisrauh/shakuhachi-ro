@@ -35,7 +35,7 @@ export default defineConfig({
   workers: 3, // Parallel: setup + no-auth + auth run concurrently
 
   // Reporter configuration
-  reporter: [['html', { outputFolder: 'tests/visual/reports' }], ['list']],
+  reporter: [['html'], ['list']],
 
   // Shared settings for all tests
   use: {

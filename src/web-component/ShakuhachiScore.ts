@@ -17,6 +17,7 @@
 import { ScoreRenderer, type NoteBox } from './renderer/ScoreRenderer';
 import { ScoreParser } from './parser/ScoreParser';
 import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+import { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
 import type { ScoreData } from './types/ScoreData';
 import type { ShakuNote } from './notes/ShakuNote';
 import { resolveNotationFont } from './constants/notation-fonts';
@@ -215,34 +216,19 @@ class ShakuhachiScore extends HTMLElement {
     columnCount: number,
   ): number {
     const notesPerColumn = Math.ceil(notes.length / columnCount);
-    const topMargin = DEFAULT_RENDER_OPTIONS.topMargin;
-    const verticalSpacing = DEFAULT_RENDER_OPTIONS.noteVerticalSpacing; // 44px
-    const spacing = {
-      noteSpacing: verticalSpacing,
-      dotSpacing: DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing,
-    };
-    const BOTTOM_PADDING = 20;
 
     let maxHeight = 0;
 
     // Calculate height for each column and find the tallest
     for (let col = 0; col < columnCount; col++) {
-      let columnHeight = topMargin;
-
       // Notes for this column: from (col × notesPerColumn) to ((col + 1) × notesPerColumn)
       const startIdx = col * notesPerColumn;
       const endIdx = Math.min((col + 1) * notesPerColumn, notes.length);
 
-      for (let i = startIdx; i < endIdx; i++) {
-        const note = notes[i];
-        // Only add spacing between notes (not before first note)
-        if (i > startIdx) {
-          columnHeight += verticalSpacing;
-        }
-        columnHeight += note.extraHeight(spacing);
-      }
-
-      columnHeight += BOTTOM_PADDING;
+      const columnHeight = ColumnLayoutCalculator.columnHeight(
+        notes.slice(startIdx, endIdx),
+        DEFAULT_RENDER_OPTIONS,
+      );
       maxHeight = Math.max(maxHeight, columnHeight);
     }
 

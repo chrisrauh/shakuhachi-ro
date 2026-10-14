@@ -207,4 +207,9 @@ export class AtariModifier extends Modifier {
   getHeight(): number {
     return this.size;
   }
+
+  /** None: the mark sits beside the note, within its slot */
+  extraHeight(): number {
+    return 0;
+  }
 }

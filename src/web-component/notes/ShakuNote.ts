@@ -9,11 +9,11 @@
  */
 
 import type { RenderingBackend } from '../renderer/RenderingBackend';
-import type { Modifier, ModifierLayout } from '../modifiers/Modifier';
-import {
-  DurationMarksModifier,
-  type SlotSpacing,
-} from '../modifiers/DurationMarksModifier';
+import type {
+  Modifier,
+  ModifierLayout,
+  SlotSpacing,
+} from '../modifiers/Modifier';
 import {
   getSymbolByRomaji,
   type KinkoSymbol,
@@ -148,7 +148,7 @@ export class ShakuNote {
       distanceToNext: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       noteFontSize: this.fontSize,
       noteSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
-      dotSpacing: DEFAULT_RENDER_OPTIONS.durationDotExtraSpacing,
+      dotGap: DEFAULT_RENDER_OPTIONS.durationDotGap,
     };
 
     if (options.modifiers) {
@@ -264,14 +264,14 @@ export class ShakuNote {
   }
 
   /**
-   * Space this note needs below it in a column, past its own: the strokes and
-   * dot of its length
+   * Space this note needs below it in a column, past its own: what its
+   * modifiers take, such as the strokes and dot of its length
    */
   extraHeight(spacing: SlotSpacing): number {
-    const marks = this.modifiers.find(
-      (mod) => mod instanceof DurationMarksModifier,
+    return this.modifiers.reduce(
+      (sum, mod) => sum + mod.extraHeight(spacing),
+      0,
     );
-    return marks ? marks.extraHeight(spacing) : 0;
   }
 
   /**

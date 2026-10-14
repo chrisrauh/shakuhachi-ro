@@ -11,8 +11,10 @@ const layout = {
   distanceToNext: 0,
   noteFontSize: 32,
   noteSpacing: 44,
-  dotSpacing: 22,
+  dotGap: 14,
 };
+
+const DOT_RADIUS = 2.5;
 
 /** Renders the marks of a note at (100, 200) and returns what was drawn */
 function draw(duration: string, linesContinue = false) {
@@ -69,13 +71,27 @@ describe('DurationMarksModifier', () => {
     expect(strokes[0].y2).toBeLessThan(200 + distanceToNext - 32);
   });
 
-  it('draws the dot after whole beats below the note, with no line', () => {
+  it('hangs the dot after whole beats the gap below the note, with no line', () => {
     // Dawn in the Forest: ロ・ リ, the line starting at リ
     const { dots, lines } = draw('3/2', true);
 
-    expect(dots).toEqual([{ x: 100, y: expect.any(Number) }]);
-    expect(dots[0].y).toBeGreaterThan(200 - 32 * 0.4);
+    expect(dots).toEqual([{ x: 100, y: 200 + 14 + DOT_RADIUS }]);
     expect(lines).toHaveLength(0);
+  });
+
+  it('hangs a dot after a stroke the gap below the end of the stroke', () => {
+    const { strokes, dots } = draw('5/2');
+
+    expect(dots[0].y - DOT_RADIUS - strokes[0].y2).toBeCloseTo(14);
+  });
+
+  it('leaves the next note as far below the dot as below a plain note', () => {
+    // A plain note's baseline is a note's spacing below the one before; after
+    // a dot it is that far below the bottom of the dot
+    for (const duration of ['3/2', '5/2', '3/4']) {
+      const { dots, distanceToNext } = draw(duration);
+      expect(200 + distanceToNext).toBeCloseTo(dots[0].y + DOT_RADIUS + 44);
+    }
   });
 
   it("runs a half-beat note's line on beside its dot, as one line", () => {

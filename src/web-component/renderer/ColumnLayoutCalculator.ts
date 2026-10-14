@@ -8,7 +8,7 @@
 
 import type { ShakuNote } from '../notes/ShakuNote';
 import type { ResolvedRenderOptions } from './RenderOptions';
-import type { SlotSpacing } from '../modifiers/DurationMarksModifier';
+import type { SlotSpacing } from '../modifiers/Modifier';
 
 /**
  * Position of a note within a column
@@ -69,12 +69,33 @@ interface ColumnBreak {
   endIndex: number;
 }
 
-/** The heights of a note's length slots, from the render options */
+/** Space left below a column's last note and its marks */
+const BOTTOM_PADDING = 20;
+
+/** What the heights of a note's length slots follow from, in the render options */
 function slotSpacing(options: ResolvedRenderOptions): SlotSpacing {
   return {
     noteSpacing: options.noteVerticalSpacing,
-    dotSpacing: options.durationDotExtraSpacing,
+    noteFontSize: options.noteFontSize,
+    dotGap: options.durationDotGap,
   };
+}
+
+/**
+ * Distance from a note's baseline to the next note's: the note's own slot,
+ * then the space its modifiers take below it
+ */
+function noteAdvance(note: ShakuNote, options: ResolvedRenderOptions): number {
+  return options.noteVerticalSpacing + note.extraHeight(slotSpacing(options));
+}
+
+/** Where a column ends when `note`, placed at `y`, is its last note */
+function columnBottom(
+  y: number,
+  note: ShakuNote,
+  options: ResolvedRenderOptions,
+): number {
+  return y + note.extraHeight(slotSpacing(options)) + BOTTOM_PADDING;
 }
 
 /**
@@ -114,14 +135,12 @@ export class ColumnLayoutCalculator {
     const columnWidth = options.columnWidth;
     const columnSpacing = options.columnSpacing;
     const startY = options.topMargin;
-    const verticalSpacing = options.noteVerticalSpacing;
 
     // Calculate column breaks based on available height
     const columnBreaks = this.calculateColumnBreaks(
       notes,
       svgHeight,
       startY,
-      verticalSpacing,
       options,
     );
 
@@ -148,7 +167,6 @@ export class ColumnLayoutCalculator {
           columnSpacing,
           noteStartIndex,
           noteEndIndex,
-          verticalSpacing,
           notes,
           options,
         ),
@@ -166,6 +184,28 @@ export class ColumnLayoutCalculator {
   }
 
   /**
+   * Height a single column of these notes needs: the top margin, each note
+   * with what its modifiers take below it, and the bottom padding. The column
+   * fits in exactly this height, as the breaks are measured the same way.
+   *
+   * @param notes - The notes of one column
+   * @param options - Render options
+   * @returns Height in pixels, 0 for no notes
+   */
+  static columnHeight(
+    notes: ShakuNote[],
+    options: ResolvedRenderOptions,
+  ): number {
+    if (notes.length === 0) return 0;
+
+    let y = options.topMargin;
+    for (let i = 0; i < notes.length - 1; i++) {
+      y += noteAdvance(notes[i], options);
+    }
+    return columnBottom(y, notes[notes.length - 1], options);
+  }
+
+  /**
    * Calculates where columns should break based on available vertical space
    *
    * Simulates filling columns top-to-bottom. When adding the next note would
@@ -174,15 +214,13 @@ export class ColumnLayoutCalculator {
    * @param notes - Array of all notes to distribute
    * @param svgHeight - Available vertical space
    * @param startY - Starting Y position (top margin)
-   * @param verticalSpacing - Base vertical spacing between notes
-   * @param options - Render options (for stroke and dot spacing)
+   * @param options - Render options (for note, stroke and dot spacing)
    * @returns Array of column break points
    */
   private static calculateColumnBreaks(
     notes: ShakuNote[],
     svgHeight: number,
     startY: number,
-    verticalSpacing: number,
     options: ResolvedRenderOptions,
   ): ColumnBreak[] {
     // Handle empty notes array
@@ -196,15 +234,15 @@ export class ColumnLayoutCalculator {
 
     for (let i = 0; i < notes.length; i++) {
       const note = notes[i];
+      const noteHeight = noteAdvance(note, options);
 
-      const extraSpacing = note.extraHeight(slotSpacing(options));
-      const noteHeight = verticalSpacing + extraSpacing;
-
-      // Check if this note + bottom padding would exceed available height
-      // (but always allow at least one note per column)
-      // The last note doesn't need spacing for another note after it, just bottom padding
-      const BOTTOM_PADDING = 20; // From layout constants
-      if (i > currentColumnStart && currentY + BOTTOM_PADDING > svgHeight) {
+      // Start a new column if the column would end past the available height
+      // with this note last: its strokes and dot must fit too, not only the
+      // note. A column always takes at least one note.
+      if (
+        i > currentColumnStart &&
+        columnBottom(currentY, note, options) > svgHeight
+      ) {
         // Start a new column
         columnBreaks.push({
           startIndex: currentColumnStart,
@@ -238,7 +276,6 @@ export class ColumnLayoutCalculator {
    * @param columnSpacing - Spacing between columns
    * @param noteStartIndex - Index of first note in this column (inclusive)
    * @param noteEndIndex - Index after last note in this column (exclusive)
-   * @param verticalSpacing - Vertical spacing between notes
    * @param notes - All notes in the score
    * @param options - Render options
    * @returns Column layout information
@@ -252,7 +289,6 @@ export class ColumnLayoutCalculator {
     columnSpacing: number,
     noteStartIndex: number,
     noteEndIndex: number,
-    verticalSpacing: number,
     notes: ShakuNote[],
     options: ResolvedRenderOptions,
   ): ColumnInfo {
@@ -265,7 +301,6 @@ export class ColumnLayoutCalculator {
       noteStartIndex,
       noteEndIndex,
       startY,
-      verticalSpacing,
       notes,
       options,
     );
@@ -285,7 +320,6 @@ export class ColumnLayoutCalculator {
    * @param startIndex - Index of first note (inclusive)
    * @param endIndex - Index after last note (exclusive)
    * @param startY - Starting Y position
-   * @param verticalSpacing - Base vertical spacing between notes
    * @param notes - All notes in the score
    * @param options - Render options
    * @returns Array of note positions
@@ -294,7 +328,6 @@ export class ColumnLayoutCalculator {
     startIndex: number,
     endIndex: number,
     startY: number,
-    verticalSpacing: number,
     notes: ShakuNote[],
     options: ResolvedRenderOptions,
   ): NotePosition[] {
@@ -302,11 +335,7 @@ export class ColumnLayoutCalculator {
     let currentY = startY;
 
     for (let i = startIndex; i < endIndex; i++) {
-      const note = notes[i];
-
-      // Calculate spacing to next note
-      const extraSpacing = note.extraHeight(slotSpacing(options));
-      const nextY = currentY + verticalSpacing + extraSpacing;
+      const nextY = currentY + noteAdvance(notes[i], options);
 
       positions.push({
         noteIndex: i,
