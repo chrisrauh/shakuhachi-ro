@@ -9,15 +9,16 @@ import {
   durationSlots,
 } from '../modifiers/DurationMarksModifier';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
+import { Modifier } from '../modifiers/Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 function layout(distanceToNext: number) {
-  return { distanceToNext, noteFontSize: 32, noteSpacing: 44, dotSpacing: 22 };
+  return { distanceToNext, noteFontSize: 32, noteSpacing: 44, dotGap: 14 };
 }
 
 describe('ShakuNote', () => {
   describe('extraHeight', () => {
-    const spacing = { noteSpacing: 44, dotSpacing: 22 };
+    const spacing = { noteSpacing: 44, noteFontSize: 32, dotGap: 14 };
 
     it('is 0 for a note without modifiers', () => {
       expect(new ShakuNote({ symbol: 'ro' }).extraHeight(spacing)).toBe(0);
@@ -30,12 +31,29 @@ describe('ShakuNote', () => {
       expect(note.extraHeight(spacing)).toBe(0);
     });
 
-    it('adds a note slot per stroke and a dot slot per dot', () => {
+    it('adds a note slot per stroke', () => {
       const note = new ShakuNote({ symbol: 'ro' }).addModifiers([
         new OctaveMarksModifier('kan'),
-        new DurationMarksModifier(durationSlots({ num: 5, den: 2 }), false),
+        new DurationMarksModifier(durationSlots({ num: 3, den: 1 }), false),
       ]);
-      expect(note.extraHeight(spacing)).toBe(44 + 22);
+      expect(note.extraHeight(spacing)).toBe(44 + 44);
+    });
+
+    it('adds up the space every modifier takes in the column', () => {
+      class SpaceBelow extends Modifier {
+        render() {}
+        getHeight() {
+          return 10;
+        }
+        extraHeight() {
+          return 10;
+        }
+      }
+      const note = new ShakuNote({ symbol: 'ro' }).addModifiers([
+        new SpaceBelow('below'),
+        new DurationMarksModifier(durationSlots({ num: 2, den: 1 }), false),
+      ]);
+      expect(note.extraHeight(spacing)).toBe(10 + 44);
     });
   });
 

@@ -47,7 +47,10 @@ export type {
 
 // Modifier exports
 export { Modifier } from './web-component/modifiers/Modifier';
-export type { ModifierPosition } from './web-component/modifiers/Modifier';
+export type {
+  ModifierPosition,
+  SlotSpacing,
+} from './web-component/modifiers/Modifier';
 export { OctaveMarksModifier } from './web-component/modifiers/OctaveMarksModifier';
 export { MeriKariModifier } from './web-component/modifiers/MeriKariModifier';
 export { AtariModifier } from './web-component/modifiers/AtariModifier';
@@ -56,10 +59,7 @@ export {
   DurationMarksModifier,
   durationSlots,
 } from './web-component/modifiers/DurationMarksModifier';
-export type {
-  DurationSlot,
-  SlotSpacing,
-} from './web-component/modifiers/DurationMarksModifier';
+export type { DurationSlot } from './web-component/modifiers/DurationMarksModifier';
 
 // Data exports
 export {

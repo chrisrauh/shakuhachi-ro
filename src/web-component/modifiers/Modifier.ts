@@ -20,18 +20,22 @@ export type ModifierPosition = 'above' | 'below' | 'left' | 'right';
  * on it (a duration line runs to the next note). Known only once the notes
  * are placed, so it's passed when drawing rather than stored on the modifier.
  */
-export interface ModifierLayout {
+export interface ModifierLayout extends SlotSpacing {
   /**
    * Distance from this note's baseline to the next note's, including the
    * strokes and dot after it
    */
   distanceToNext: number;
-  /** Font size of the note glyph */
-  noteFontSize: number;
+}
+
+/** What the heights of the slots in the column follow from */
+export interface SlotSpacing {
   /** Height of a note in the column, which a stroke takes too */
   noteSpacing: number;
-  /** Height of a duration dot in the column */
-  dotSpacing: number;
+  /** Font size of the note glyph, which a stroke's length follows */
+  noteFontSize: number;
+  /** Gap between a duration dot and the mark above it */
+  dotGap: number;
 }
 
 /**
@@ -115,6 +119,15 @@ export abstract class Modifier {
   getWidth(): number {
     return 0;
   }
+
+  /**
+   * Space this modifier needs in the column below the note's own slot. The
+   * layout leaves it before the next note, and before the column ends, so a
+   * modifier drawn below the note must report it or it overlaps or clips.
+   *
+   * @param spacing - Heights of the slots in the column
+   */
+  abstract extraHeight(spacing: SlotSpacing): number;
 
   /**
    * Height needed by this modifier, for the note's bounding box
