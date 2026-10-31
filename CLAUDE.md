@@ -101,6 +101,21 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes in the browser — see your environment guide
 
+## Writing
+
+Write issues, PRs, commit messages, code comments and docs about 80% of the way to [ASD-STE100](https://www.asd-ste100.org/) (Simplified Technical English). Use its writing rules. Do not use its restricted dictionary.
+
+- **One idea per sentence.** Keep sentences short: up to 20 words for an instruction, 25 for a description.
+- **Use the active voice and simple tenses** (present, past, future).
+- **Write instructions as commands,** one action in each sentence. Put a condition first: "If the source is unreadable, block the save."
+- **Use one word for one thing.** Do not change between synonyms (score, piece, sheet). Use the names the code uses.
+- **Keep noun clusters to three words or fewer.** "ScoreData mapping spec table" becomes "the table in the mapping spec".
+- **Keep articles and verbs.** Do not write in telegraph style ("Cursor wrong after long note").
+- **Use a single verb where one exists,** not a phrasal verb: "remove", not "take out".
+- **Keep paragraphs short,** one topic each, up to six sentences. Use lists and tables for sets of items.
+
+The 20% we skip: technical terms, shakuhachi terms and code names are always correct. Use a word that is not in the STE dictionary when it is the clearest word.
+
 ## Design System
 
 Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE.md](./docs/DESIGN-LANGUAGE.md)
