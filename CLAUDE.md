@@ -105,6 +105,8 @@ The web component renderer lives in a separate package and must be built:
 
 Write issues, PRs, commit messages, code comments and docs 80% of the way to ASD-STE100.
 
+This guideline comes from [a tip by Andrej Karpathy](https://x.com/karpathy/status/2105819303471976479). It is on trial: we are evaluating how well it works.
+
 ## Design System
 
 Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE.md](./docs/DESIGN-LANGUAGE.md)
