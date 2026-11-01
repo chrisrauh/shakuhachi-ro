@@ -44,14 +44,14 @@ Invoke this skill:
 
 ## NEVER (Hard Rules)
 
-| Rule                                                       | Detail                                                                                                                           |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| NEVER use `!important` in CSS                              | See CLAUDE.md → Design System Hard Rules for the full rule and rationale.                                                        |
-| NEVER build for hypothetical future needs                  | YAGNI. Future requirements will change anyway — build what's needed now.                                                         |
-| NEVER create helpers or abstractions for one-time use      | Three similar lines of code is better than a premature abstraction.                                                              |
-| NEVER mix data and presentation                            | Data format = WHAT. Rendering = HOW. Keep them strictly separate.                                                                |
-| NEVER add a `ScoreData` field without its MusicXML concept | Name the concept and use its meaning, or give the reason to differ. See `docs/SCORE-DATA-FORMAT.MD` → "The rule for new fields". |
-| NEVER add error handling for scenarios that can't happen   | Only validate at system boundaries (user input, external APIs). Trust internal code.                                             |
+| Rule                                                       | Detail                                                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| NEVER use `!important` in CSS                              | See CLAUDE.md → Design System Hard Rules for the full rule and rationale.            |
+| NEVER build for hypothetical future needs                  | YAGNI. Future requirements will change anyway — build what's needed now.             |
+| NEVER create helpers or abstractions for one-time use      | Three similar lines of code is better than a premature abstraction.                  |
+| NEVER mix data and presentation                            | Data format = WHAT. Rendering = HOW. Keep them strictly separate.                    |
+| NEVER add a `ScoreData` field without its MusicXML meaning | See "The rule for new fields" in `docs/SCORE-DATA-FORMAT.MD`.                        |
+| NEVER add error handling for scenarios that can't happen   | Only validate at system boundaries (user input, external APIs). Trust internal code. |
 
 ## Red Flags
 

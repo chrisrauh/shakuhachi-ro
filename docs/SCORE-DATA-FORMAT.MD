@@ -6,7 +6,7 @@
 - **Easy to read** - Musicians should understand it quickly
 - **Easy to extend** - Can add more features later
 - **Separation of concerns** - Data describes notes, renderer handles layout
-- **MusicXML meanings** - A field that MusicXML also has uses the MusicXML meaning. See [Relation to MusicXML](#relation-to-musicxml)
+- **MusicXML meanings** - See [Relation to MusicXML](#relation-to-musicxml)
 
 ## Format Structure
 
@@ -85,28 +85,28 @@ When needed, we can add:
 
 ## Relation to MusicXML
 
-This format is not isomorphic to MusicXML. It embeds in MusicXML (#471):
+This format is not the same as MusicXML. It is a smaller format that uses MusicXML meanings (#471).
 
-- **JSON → MusicXML → JSON is exact.** Each value has one MusicXML encoding, and it reads back unchanged. This makes the MusicXML source view lose nothing (#459).
-- **MusicXML → JSON loses information by design.** Many MusicXML documents become the same score, because the importer drops measures, divisions, layout and signatures. Some documents have no score. The importer fails on chords, voices and parts (#464, #465).
-- **Other programs read only the shared part.** Our extensions use MusicXML elements that other programs ignore, such as `<technical><fingering>`. Kan ro and go-no-hi both sound D5, so those programs cannot tell them apart.
+- **JSON to MusicXML and back must not change the score.** Some fields do not do this now. #472 lists them and fixes them.
+- **MusicXML to JSON can lose data.** The importer removes measures, layout and signatures. It stops on chords, voices and parts (#464, #465).
+- **Other programs read only the MusicXML part.** They ignore our fingering names. Kan ro and go-no-hi both sound D5, so other programs show the same note for the two.
 
-A field uses the MusicXML meaning, not the MusicXML document structure. Measures, voices, `<backup>` and `<forward>` organize a MusicXML file. This format is a list of notes.
+Use MusicXML meanings, not MusicXML structure. A MusicXML file has measures and voices. This format has a list of notes.
 
 ### The rule for new fields
 
-1. **For a general feature,** name the MusicXML concept that the field follows, and use the meaning of that concept. One concept can use more than one element. For example, a tuplet uses `<time-modification>` and `<tuplet>`.
-2. **For a shakuhachi feature,** state its MusicXML and ABC encoding, so that JSON → MusicXML → JSON stays exact.
-3. **To differ from MusicXML,** give the reason in the issue that adds the field.
+1. **A general feature:** use the meaning of the MusicXML element. Name that element.
+2. **A shakuhachi feature:** write its MusicXML and ABC encoding.
+3. **A different meaning:** give the reason in the issue for the field.
 
 ### Fields that exist now
 
-| Field                        | MusicXML concept                            | Status                                                                                                                                  |
-| ---------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `pitch.step`, `pitch.octave` | None. They are a fingering and a register.  | Differs from `<pitch>`, because the fingering identifies the note. The names are the same as in MusicXML, but the meaning is different. |
-| `duration`                   | `<type>` and `<dot>`: the written length    | Follows MusicXML (#438). It is not `<duration>`, which is the sounding length.                                                          |
-| `dotted`                     | `<dot/>`                                    | Has no effect on the render. The renderer draws the dot when the field is not set (#438).                                               |
-| `rest`                       | `<rest/>`                                   | Follows MusicXML.                                                                                                                       |
-| `meriKari`, `style`          | None. They are ours.                        | Need an encoding (#472, #473).                                                                                                          |
-| `key`, `tempo`               | `<key>`, `<metronome>`                      | Free text. Nothing uses them, and the serializer does not write them. They get a structure when a feature uses them.                    |
-| `title`, `composer`          | `<work-title>`, `<creator type="composer">` | Follow MusicXML. A missing title reads back as "Untitled", so the round trip is not exact (#472).                                       |
+| Field                        | MusicXML                    | Status                                                                       |
+| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| `pitch.step`, `pitch.octave` | Not `<pitch>`               | Different. The names are the same, but these are a fingering and a register. |
+| `duration`                   | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438).                     |
+| `dotted`                     | `<dot/>`                    | No effect. The renderer always draws the dot (#438).                         |
+| `rest`                       | `<rest/>`                   | Same.                                                                        |
+| `meriKari`, `style`          | None                        | Ours. They need an encoding (#472, #473).                                    |
+| `key`, `tempo`               | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                        |
+| `title`, `composer`          | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                        |
