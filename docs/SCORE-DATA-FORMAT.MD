@@ -85,13 +85,35 @@ When needed, we can add:
 
 ## Relation to MusicXML
 
-This format is not the same as MusicXML. It is a smaller format that uses MusicXML meanings (#471).
+The fields use MusicXML meanings, not MusicXML structure. A MusicXML file has measures and voices. This format has a list of notes (#471).
 
-- **JSON to MusicXML and back must not change the score.** Some fields do not do this now. #472 lists them and fixes them.
-- **MusicXML to JSON can lose data.** The importer removes measures, layout and signatures. It stops on chords, voices and parts (#464, #465).
-- **Other programs read only the MusicXML part.** They ignore our fingering names. Kan ro and go-no-hi both sound D5, so other programs show the same note for the two.
+### Goal
 
-Use MusicXML meanings, not MusicXML structure. A MusicXML file has measures and voices. This format has a list of notes.
+This format is isomorphic with canonical MusicXML for the domain below.
+
+- **Canonical MusicXML** is one fixed way to write the music: one `divisions` value, measures from the time signature, voice 1, no layout (#472). MusicXML can write the same music in many ways. This form makes two files with the same music equal.
+- **The same music** is which notes, at what pitch, for how long, in what order, and with which techniques.
+- **Today the goal is not met.** JSON to MusicXML and back changes some fields (#472). Many features are not in this format yet (#465).
+
+### Domain
+
+- Shakuhachi music in one or more parts (#493).
+- Each part is monophonic: its notes do not overlap.
+- Parts align in bars.
+- A part can use a different flute length (later, #493).
+- Not in the domain: other instruments, chords, multiphonics, and parts that do not align in bars.
+
+### How we test the goal
+
+1. JSON → MusicXML → JSON gives the same score (#472).
+2. canonical(file) → JSON → MusicXML equals canonical(file), for files from other programs (#474).
+3. Each failure is a missing feature (#465), a difference that is not musical (the canonical form), or not in the domain (the importer rejects it). If a failure is none of these, the goal is not possible as stated.
+
+### Other programs
+
+Other programs read only the MusicXML part. They ignore our fingering names. Kan ro and go-no-hi both sound D5, so other programs show the same note for the two.
+
+The pitch for each fingering comes from the fingering table (`constants/kinko-fingerings.ts`). The table assumes a 1.8 flute: ro is D4. For other flute lengths, see #493.
 
 ### The rule for new fields
 
@@ -101,12 +123,12 @@ Use MusicXML meanings, not MusicXML structure. A MusicXML file has measures and 
 
 ### Fields that exist now
 
-| Field                        | MusicXML                    | Status                                                                       |
-| ---------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| `pitch.step`, `pitch.octave` | Not `<pitch>`               | Different. The names are the same, but these are a fingering and a register. |
-| `duration`                   | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438).                     |
-| `dotted`                     | `<dot/>`                    | No effect. The renderer always draws the dot (#438).                         |
-| `rest`                       | `<rest/>`                   | Same.                                                                        |
-| `meriKari`, `style`          | None                        | Ours. They need an encoding (#472, #473).                                    |
-| `key`, `tempo`               | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                        |
-| `title`, `composer`          | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                        |
+| Field                        | MusicXML                    | Status                                                                                                                                                                          |
+| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pitch.step`, `pitch.octave` | Not `<pitch>`               | Different. The names are the same, but these are a fingering and a register. #492 renames them to `written.step` and `written.register`.                                        |
+| `duration`                   | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438).                                                                                                                        |
+| `dotted`                     | `<dot/>`                    | Same. MusicXML export and the editor use it. The renderer does not: it draws a dot for each length with a half. #492 removes the field, and the dot then comes from `duration`. |
+| `rest`                       | `<rest/>`                   | Same.                                                                                                                                                                           |
+| `meriKari`, `style`          | None                        | Ours. They need an encoding (#472, #473).                                                                                                                                       |
+| `key`, `tempo`               | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                                                                                                           |
+| `title`, `composer`          | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                                                                                                           |
