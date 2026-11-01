@@ -6,7 +6,7 @@
 - **Easy to read** - Musicians should understand it quickly
 - **Easy to extend** - Can add more features later
 - **Separation of concerns** - Data describes notes, renderer handles layout
-- **MusicXML-like structure** - Familiar format for music software interoperability
+- **MusicXML meanings** - See [Relation to MusicXML](#relation-to-musicxml)
 
 ## Format Structure
 
@@ -83,6 +83,48 @@ When needed, we can add:
 - More pitch modifiers
 - Additional metadata (composer, tempo, etc.)
 
----
+## Relation to MusicXML
 
-**Note**: This format follows MusicXML structure for easier future integration. MusicXML import/export will be added as a future enhancement.
+The fields use MusicXML meanings, not MusicXML structure. A MusicXML file has measures and voices. This format has a list of notes (#471).
+
+### Goal
+
+This format is isomorphic with canonical MusicXML for the domain below.
+
+The goal is a guide for decisions. We do not work toward it now. Build what we need now, and do not make a choice that blocks the goal.
+
+- **Canonical MusicXML** is one fixed way to write the music: one `divisions` value, measures from the time signature, voice 1, no layout. MusicXML can write the same music in many ways. This form makes two files with the same music equal.
+- **The same music** is which notes, at what pitch, for how long, in what order, and with which techniques.
+- **Today the goal is not met.** Many features are not in this format yet (#465).
+
+### Domain
+
+- Shakuhachi music in one or more parts (#493).
+- Each part is monophonic: its notes do not overlap.
+- Parts align in bars.
+- A part can use a different flute length (later, #493).
+- Not in the domain: other instruments, chords, multiphonics, and parts that do not align in bars.
+
+### Other programs
+
+Other programs read only the MusicXML part. They ignore our fingering names. Kan ro and go-no-hi both sound D5, so other programs show the same note for the two.
+
+The pitch for each fingering comes from the fingering table (`constants/kinko-fingerings.ts`). The table assumes a 1.8 flute: ro is D4. For other flute lengths, see #493.
+
+### The rule for new fields
+
+1. **A general feature:** use the meaning of the MusicXML element. Name that element.
+2. **A shakuhachi feature:** write its MusicXML and ABC encoding.
+3. **A different meaning:** give the reason in the issue for the field.
+
+### Fields that exist now
+
+| Field                        | MusicXML                    | Status                                                                                                                                                                          |
+| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pitch.step`, `pitch.octave` | Not `<pitch>`               | Different. The names are the same, but these are a fingering and a register. #492 renames them to `written.step` and `written.register`.                                        |
+| `duration`                   | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438).                                                                                                                        |
+| `dotted`                     | `<dot/>`                    | Same. MusicXML export and the editor use it. The renderer does not: it draws a dot for each length with a half. #492 removes the field, and the dot then comes from `duration`. |
+| `rest`                       | `<rest/>`                   | Same.                                                                                                                                                                           |
+| `meriKari`, `style`          | None                        | Ours. They need an encoding (#472, #473).                                                                                                                                       |
+| `key`, `tempo`               | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                                                                                                           |
+| `title`, `composer`          | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                                                                                                           |
