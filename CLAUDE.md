@@ -268,7 +268,7 @@ When testing authenticated features (score editor, creating scores, forking), lo
 - Slug `test` — view at `/score/test`, edit at `http://localhost:3001/score/test/edit`
 - Owned by the test account
 - Title is **"A Very Long Score Title That Will Definitely Wrap Across Multiple Lines on Mobile"**. This is deliberate: it exercises title wrapping in the header. Seeing it in a page snapshot means you are on the right score, not the wrong one.
-- Format is **MusicXML**, not JSON. Three notes — D4, F4, G4, rendering as ro, tsu, re. Switch the format radio to convert if you need JSON or ABC.
+- Stored as JSON, like every score (#459). Three notes: ro, tsu, re. The editor opens its source as JSON. Switch the format radio to see it as MusicXML or ABC.
 
 **Test Score for Octave Marks:**
 

@@ -53,8 +53,8 @@ CREATE TABLE scores (
   composer TEXT,
   school school,             -- the school (ryū) this version comes from; NULL = none recorded
   description TEXT,
-  data_format TEXT NOT NULL CHECK (data_format IN ('json', 'musicxml', 'abc')),
-  data JSONB NOT NULL,        -- a ScoreData object for json; the text as a JSON string otherwise
+  data_format TEXT NOT NULL CHECK (data_format = 'json'),
+  data JSONB NOT NULL,        -- a ScoreData object
   forked_from UUID REFERENCES scores(id),  -- fork count is derived from this
   source_url TEXT,           -- Reference URL for source material
   source_description TEXT,   -- Human-readable attribution text
@@ -89,6 +89,7 @@ CREATE TABLE scores (
 | `meri_kari_field.sql`               | Replaces the `meri`/`chu_meri`/`dai_meri` note flags with `meriKari` (#288) |
 | `add_school_to_scores.sql`          | Adds `school`, and moves the schools out of `composer` (#405)               |
 | `duration_beats.sql`                | Rewrites JSON scores' note durations in beats, as fraction strings (#438)   |
+| `scores_json_only.sql`              | Allows only `data_format` `json`; MusicXML and ABC are views (#459)         |
 | `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                              |
 
 ## Seeded Songs

@@ -8,7 +8,8 @@ import {
   parseFormat,
   serializeFormat,
 } from './format-converter';
-import type { ScoreData } from '../web-component/types/ScoreData';
+import type { ScoreData, ScoreNote } from '../web-component/types/ScoreData';
+import { FINGERINGS } from '../web-component/constants/kinko-fingerings';
 
 describe('format-converter', () => {
   const sampleScoreData: ScoreData = {
@@ -255,5 +256,49 @@ D2 F z G>
       expect(parsed.title).toBe('Test Score');
       expect(parsed.composer).toBe('Test Composer');
     });
+  });
+});
+
+/**
+ * MusicXML and ABC are views of the stored JSON in the editor (#459). A score
+ * shown in either and saved again must come back with the same music: every
+ * fingering the table names, every meri and kari, dots and rests. tempo and
+ * key aren't checked: nothing outside the parsers reads them, and MusicXML
+ * export doesn't write them (#472).
+ */
+describe('views of a JSON score lose nothing', () => {
+  const fingerings: ScoreNote[] = FINGERINGS.flatMap(({ written }) =>
+    written
+      ? [
+          {
+            pitch: { step: written.step, octave: written.octave },
+            duration: '1',
+            ...(written.meriKari && { meriKari: written.meriKari }),
+          },
+        ]
+      : [],
+  );
+  const score: ScoreData = {
+    title: 'Every fingering',
+    composer: 'Test Composer',
+    style: 'kinko',
+    notes: [
+      ...fingerings,
+      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
+      { pitch: { step: 'tsu', octave: 0 }, duration: '3/2', dotted: true },
+      { pitch: { step: 're', octave: 0 }, duration: '3/4', dotted: true },
+      { pitch: { step: 'chi', octave: 1 }, duration: '2' },
+      { rest: true, duration: '1' },
+      { rest: true, duration: '1/2' },
+    ],
+  };
+
+  it.each(['musicxml', 'abc'] as const)('through %s', (format) => {
+    const view = serializeFormat(score, format);
+    const back = parseFormat(view, format);
+
+    expect(back.title).toBe(score.title);
+    expect(back.composer).toBe(score.composer);
+    expect(back.notes).toEqual(score.notes);
   });
 });

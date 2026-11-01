@@ -14,6 +14,16 @@ export const FORMAT_NAMES: Record<ScoreDataFormat, string> = {
   abc: 'ABC',
 };
 
+/**
+ * The line under the source view for a format that is only a view: what a
+ * score pasted in that format loses when it is saved as JSON (#459, #464).
+ */
+export const FORMAT_NOT_KEPT: Partial<Record<ScoreDataFormat, string>> = {
+  musicxml:
+    "Saved as JSON. Bar lines, time and key signatures, lyrics, other parts and layout aren't kept.",
+  abc: "Saved as JSON. Bar lines, the time signature, chord symbols, slurs, decorations and comments aren't kept, and repeats are written out.",
+};
+
 // Shared string factory functions for common patterns
 export const STRING_FACTORIES = {
   /**
@@ -43,7 +53,6 @@ export const STRINGS = {
 
     ScoreDetailClient: {
       parseError: 'Failed to load score data',
-      renderError: 'Failed to display score',
       forkLoginRequired: 'Please sign in to fork this score',
       forkError: (message: string) => `Error forking score: ${message}`,
       forkFailed: 'Failed to fork score',

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ScoreEditor } from './ScoreEditor';
 import type { Score } from '../../api/scores';
+import { parseScoreText } from '../../utils/score-data';
 import type { ScoreData } from '../../web-component/types/ScoreData';
 
 vi.mock('../../api/scores');
@@ -64,6 +65,7 @@ function renderPage(): void {
       <input type="radio" name="format" value="json" />
       <input type="radio" name="format" value="musicxml" />
       <input type="radio" name="format" value="abc" />
+      <p id="format-note" hidden></p>
       <div id="validation-error" hidden><span id="validation-message"></span></div>
       <textarea id="score-data-input"></textarea>
     </section>
@@ -146,6 +148,18 @@ function typeSource(text: string): void {
   textarea.dispatchEvent(new Event('input'));
 }
 
+function switchFormat(format: string): void {
+  const radio = document.querySelector<HTMLInputElement>(
+    `input[value="${format}"]`,
+  )!;
+  radio.checked = true;
+  radio.dispatchEvent(new Event('change'));
+}
+
+const checkedFormat = () =>
+  document.querySelector<HTMLInputElement>('input[name="format"]:checked')
+    ?.value;
+
 function renderedScore(): unknown {
   return JSON.parse($('score-renderer').getAttribute('data-score') ?? 'null');
 }
@@ -185,10 +199,12 @@ describe('ScoreEditor score and source', () => {
     expect($('source-view').hidden).toBe(true);
   });
 
-  it('shows the source as stored, and re-renders from it on switching back', () => {
+  it('shows the source as JSON, and re-renders from it on switching back', () => {
     new ScoreEditor(makeScore());
 
     $('source-toggle').click();
+    expect(checkedFormat()).toBe('json');
+    expect($('format-note').hidden).toBe(true);
     expect($('source-view').hidden).toBe(false);
     expect($('score-area').hidden).toBe(true);
     expect($('palette-panel').hidden).toBe(true);
@@ -220,11 +236,18 @@ describe('ScoreEditor score and source', () => {
     expect(renderedScore()).toEqual(JSON_DATA);
   });
 
-  it('opens on the source when the stored score cannot be read', () => {
-    new ScoreEditor(makeScore({ data_format: 'abc', data: 'not abc' }));
+  it('says under MusicXML and ABC what they do not keep', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
 
-    expect($('source-view').hidden).toBe(false);
-    expect($('validation-error').hidden).toBe(false);
+    switchFormat('musicxml');
+    expect($('format-note').hidden).toBe(false);
+    expect($('format-note').textContent).toMatch(/^Saved as JSON\. Bar lines/);
+
+    switchFormat('abc');
+    expect($('format-note').textContent).toMatch(/repeats are written out\.$/);
+
+    switchFormat('json');
+    expect($('format-note').hidden).toBe(true);
   });
 
   // Durations were numbers before they were beats. A score or draft saved
@@ -492,17 +515,30 @@ describe('ScoreEditor editing', () => {
     expect(column.scrollTop).toBe(0);
   });
 
-  it('leaves the editing keys off for a MusicXML score', () => {
-    const musicxml = `<?xml version="1.0"?>
-<score-partwise><part id="P1"><measure number="1">
-<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
-</measure></part></score-partwise>`;
-    new ScoreEditor(makeScore({ data_format: 'musicxml', data: musicxml }));
+  it('keeps the MusicXML view on an edit, writing the source again', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    switchFormat('musicxml');
 
-    expect(key('data-step="re"').disabled).toBe(true);
-    expect(key('data-key="delete"').disabled).toBe(true);
+    key('data-step="re"').click();
+
+    expect(checkedFormat()).toBe('musicxml');
+    const notes = parseScoreText(
+      $<HTMLTextAreaElement>('score-data-input').value,
+      'musicxml',
+    ).notes;
+    expect(notes.map((note) => note.pitch?.step)).toEqual(['ro', 'tsu', 're']);
+  });
+
+  it('does not edit a source that cannot be read', () => {
+    new ScoreEditor(makeScore({ data: TWO_NOTES }));
+    $('source-toggle').click();
+    typeSource('{');
+    $('source-toggle').click();
+
+    key('data-step="re"').click();
     press({ key: 'Backspace' });
-    expect($<HTMLTextAreaElement>('score-data-input').value).toBe(musicxml);
+
+    expect($<HTMLTextAreaElement>('score-data-input').value).toBe('{');
   });
 
   it('forgets what could be undone after an edit to the source', () => {
@@ -560,16 +596,22 @@ describe('ScoreEditor.save', () => {
     );
   });
 
-  it('saves ABC as the text the author typed, so it reopens as ABC', async () => {
+  it('saves JSON from the ABC view', async () => {
     const { updateScore } = await import('../../api/scores');
     const abc = 'X:1\nT:Akatombo\n% a comment the parser drops\nK:D\nD F G|';
-    new ScoreEditor(makeScore({ data_format: 'abc', data: abc }));
+    new ScoreEditor(makeScore());
+    switchFormat('abc');
+    $('source-toggle').click();
+    typeSource(abc);
 
     await save();
 
     expect(updateScore).toHaveBeenCalledWith(
       'score-123',
-      expect.objectContaining({ data_format: 'abc', data: abc }),
+      expect.objectContaining({
+        data_format: 'json',
+        data: parseScoreText(abc, 'abc'),
+      }),
     );
   });
 

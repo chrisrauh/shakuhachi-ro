@@ -37,7 +37,7 @@ SSR with embedded renderer. Server fetches score by slug, embeds JSON. Client in
 
 ### Score Edit Page (`/score/[slug]/edit`)
 
-Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). The page fills the viewport on every screen size (`fullHeightOnMobile`): a toolbar (Details, Source, save status, Save) and a status line over the score, rendered in one column, which scrolls inside the page. A cursor between notes or a highlighted note is drawn over the score, moved by taps and the arrow keys; the page places them from where the renderer reports drawing each note (`getNoteBoxes()`). The source view replaces the score and holds the notation as stored — ABC, JSON or MusicXML — with automatic conversion when switching formats; an unreadable source keeps the last readable render. Title, composer, description and licence live in the details dialog. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Save writes to Supabase and stays on the page. The visual editor (#437) is being built on this page in parts.
+Edit-only. Returns 404 for missing scores — score creation goes through `startNewScore()` which calls the API and redirects here (see Data Flow). The page fills the viewport on every screen size (`fullHeightOnMobile`): a toolbar (Details, Source, save status, Save) and a status line over the score, rendered in one column, which scrolls inside the page. A cursor between notes or a highlighted note is drawn over the score, moved by taps and the arrow keys; the page places them from where the renderer reports drawing each note (`getNoteBoxes()`). The source view replaces the score and shows it as JSON, MusicXML or ABC, converted when the format changes. The score is stored as JSON; the other two are views of it, and a way to paste a score in, with a line that says what they don't keep (#459). Palette edits work in every view; in MusicXML and ABC they write the source again from the score's data. While the source can't be read, palette edits do nothing and the last readable render stays. Save always writes JSON. Title, composer, description and licence live in the details dialog. The slug is fixed at creation and a title change does not move it, so shared links keep working. Per-slug localStorage autosave. Save writes to Supabase and stays on the page. The visual editor (#437) is being built on this page in parts.
 
 **Components** (`src/components/score-editor/`): `ScoreEditor.ts` (controller: state, render, save), `SourceView.ts` (source text and format), `DetailsDialog.astro` / `DetailsDialog.ts` (metadata and licence), `PalettePanel.astro` / `PalettePanel.ts` (the palette keys, and ⇄ moving them to either side; the keys' contents are in `palette.ts`), `SelectionView.ts` (the cursor, highlight and status line, and the taps and keys that move them; the rules are plain functions in `selection.ts`), `<shakuhachi-score columns="1">` (the score)
 
@@ -93,13 +93,13 @@ expires. A purge that fails is logged and ignored — the save has already happe
 
 ## Notation Formats
 
-Three formats with full bidirectional conversion:
+Every score is stored as JSON (`data_format` `'json'`, #459). The editor's source view shows it in three formats, with full bidirectional conversion:
 
-| Format   | `data_format` | Notes                                                          |
-| -------- | ------------- | -------------------------------------------------------------- |
-| ABC      | `'abc'`       | Text-based, human-readable, folk/traditional music communities |
-| JSON     | `'json'`      | Native ScoreData format, used internally by renderer           |
-| MusicXML | `'musicxml'`  | Industry standard, compatible with Finale, Sibelius, MuseScore |
+| Format   | Role                                                                                |
+| -------- | ----------------------------------------------------------------------------------- |
+| JSON     | Native ScoreData format: stored, and read by the renderer                           |
+| MusicXML | A view, and a way to paste a score in. Compatible with Finale, Sibelius, MuseScore  |
+| ABC      | A view, and a way to paste a score in. Text-based, folk/traditional music community |
 
 **Conversion matrix** (all conversions use ScoreData as intermediate):
 
@@ -118,7 +118,7 @@ MusicXML ✓      ✓        -
 - `src/web-component/constants/kinko-fingerings.ts` — the fingering table both MusicXML and ABC import and export read (D shakuhachi, Kinko). It lists every fingering in Koga's chart, transcribed in `reference/fingering-charts/koga-inventory.md`, with its Western note, holes and chin position, and one default fingering per pitch for import. Notes are matched by sounding pitch, so any spelling of a note imports the same way. Export names a fingering that isn't its pitch's default (`<technical><fingering>` in MusicXML, a `!ri-meri!` decoration in ABC), and import prefers that name, so every listed fingering reads back exactly. A fingering the table doesn't list exports at an estimated pitch, with its name; the offsets used for marks are part of the file format, so never change them. Importing a note outside the table fails rather than changing the note. The table is under review in #423; change it here only.
 - `src/web-component/constants/abc-pitch-map.ts` — ABC pitch spelling ↔ Western note
 
-**Editor UX:** Switching formats triggers automatic conversion. On failure, user is prompted to clear content or cancel.
+**Editor UX:** Switching formats converts the source. If the conversion fails, the source and its format stay, and the validation line says why (#458).
 
 ## Authentication
 
