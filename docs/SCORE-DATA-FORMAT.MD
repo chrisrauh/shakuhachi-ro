@@ -91,9 +91,11 @@ The fields use MusicXML meanings, not MusicXML structure. A MusicXML file has me
 
 This format is isomorphic with canonical MusicXML for the domain below.
 
-- **Canonical MusicXML** is one fixed way to write the music: one `divisions` value, measures from the time signature, voice 1, no layout (#472). MusicXML can write the same music in many ways. This form makes two files with the same music equal.
+The goal is a guide for decisions. We do not work toward it now. Build what we need now, and do not make a choice that blocks the goal.
+
+- **Canonical MusicXML** is one fixed way to write the music: one `divisions` value, measures from the time signature, voice 1, no layout. MusicXML can write the same music in many ways. This form makes two files with the same music equal.
 - **The same music** is which notes, at what pitch, for how long, in what order, and with which techniques.
-- **Today the goal is not met.** JSON to MusicXML and back changes some fields (#472). Many features are not in this format yet (#465).
+- **Today the goal is not met.** Many features are not in this format yet (#465).
 
 ### Domain
 
@@ -102,12 +104,6 @@ This format is isomorphic with canonical MusicXML for the domain below.
 - Parts align in bars.
 - A part can use a different flute length (later, #493).
 - Not in the domain: other instruments, chords, multiphonics, and parts that do not align in bars.
-
-### How we test the goal
-
-1. JSON → MusicXML → JSON gives the same score (#472).
-2. canonical(file) → JSON → MusicXML equals canonical(file), for files from other programs (#474).
-3. Each failure is a missing feature (#465), a difference that is not musical (the canonical form), or not in the domain (the importer rejects it). If a failure is none of these, the goal is not possible as stated.
 
 ### Other programs
 
