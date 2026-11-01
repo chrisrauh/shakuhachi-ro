@@ -2,7 +2,6 @@ import { forkScore, deleteScore } from '../api/scores';
 import { purgeScoreCache } from '../api/purge';
 import { onAuthReady, getCurrentUser } from '../api/auth';
 import { confirmDialog } from '../utils/init-header';
-import { toScoreData } from '../utils/score-data';
 import { toast } from './Toast';
 import { ButtonLoadingState } from './LoadingSpinner';
 import type { Score } from '../api/scores';
@@ -82,49 +81,31 @@ export class ScoreDetailClient {
       return;
     }
 
-    try {
-      // Convert score data to ScoreData format based on data_format
-      const scoreData = toScoreData(this.score);
+    // Detect mobile viewport
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-      // Detect mobile viewport
-      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    // Set CSS variables for theme colors BEFORE setting attributes
+    // (setting data-score attribute triggers render, so CSS vars must be ready)
+    container.style.setProperty(
+      '--shakuhachi-note-color',
+      'var(--color-text-primary)',
+    );
 
-      // Set CSS variables for theme colors BEFORE setting attributes
-      // (setting data-score attribute triggers render, so CSS vars must be ready)
-      container.style.setProperty(
-        '--shakuhachi-note-color',
-        'var(--color-text-primary)',
-      );
-
-      if (isMobile) {
-        // Mobile: single-column mode with intrinsic sizing
-        container.setAttribute('columns', '1');
-        // Don't set width - let component use intrinsic width (140px)
-        // Parent container centers it with flexbox align-items: center
-      } else {
-        // Desktop: auto-detect columns based on viewport height
-        container.setAttribute('columns', 'auto');
-        container.style.width = '100%';
-        container.style.height = '100%';
-      }
-
-      // Set web component attributes (triggers render)
-      // This MUST come after width/height attributes are set
-      container.setAttribute('data-score', JSON.stringify(scoreData));
-    } catch (error) {
-      // Set as text: a parse error can quote the score, which is user content
-      const box = document.createElement('div');
-      box.className = 'page-error';
-      for (const text of [
-        STRINGS.ERRORS.ScoreDetailClient.renderError,
-        error instanceof Error ? error.message : 'Unknown error',
-      ]) {
-        const p = document.createElement('p');
-        p.textContent = text;
-        box.append(p);
-      }
-      container.replaceChildren(box);
+    if (isMobile) {
+      // Mobile: single-column mode with intrinsic sizing
+      container.setAttribute('columns', '1');
+      // Don't set width - let component use intrinsic width (140px)
+      // Parent container centers it with flexbox align-items: center
+    } else {
+      // Desktop: auto-detect columns based on viewport height
+      container.setAttribute('columns', 'auto');
+      container.style.width = '100%';
+      container.style.height = '100%';
     }
+
+    // Set web component attributes (triggers render)
+    // This MUST come after width/height attributes are set
+    container.setAttribute('data-score', JSON.stringify(this.score.data));
   }
 
   private attachEventListeners() {

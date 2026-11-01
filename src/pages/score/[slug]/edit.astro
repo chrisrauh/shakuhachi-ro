@@ -95,7 +95,7 @@ const formats = Object.entries(FORMAT_NAMES).map(([value, label]) => ({
                   type="radio"
                   name="format"
                   value={value}
-                  checked={value === score.data_format}
+                  checked={value === 'json'}
                 />
                 {label}
               </label>
@@ -111,6 +111,7 @@ const formats = Object.entries(FORMAT_NAMES).map(([value, label]) => ({
             <CircleQuestionMark size={16} />
           </a>
         </div>
+        <p class="format-note" id="format-note" hidden></p>
         <div class="validation-error" id="validation-error" hidden>
           <CircleAlert size={16} />
           <span id="validation-message"></span>

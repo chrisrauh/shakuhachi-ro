@@ -1,4 +1,5 @@
 import type { ScoreDataFormat } from '../../api/scores';
+import { FORMAT_NOT_KEPT } from '../../constants/strings';
 
 interface SourceViewCallbacks {
   onInput: (source: string) => void;
@@ -6,13 +7,14 @@ interface SourceViewCallbacks {
 }
 
 /**
- * The score editor's source view: the score as stored, as editable text, with
- * the format it is in. Owns only the DOM; the editor owns the source and decides
+ * The score editor's source view: the score as editable text in the format
+ * chosen, with a line that says what that format doesn't keep. Owns only the DOM; the editor owns the source and decides
  * what a change means.
  */
 export class SourceView {
   private section: HTMLElement;
   private textarea: HTMLTextAreaElement;
+  private formatNote: HTMLElement;
   private validation: HTMLElement;
   private validationMessage: HTMLElement;
   private formatRadios: HTMLInputElement[];
@@ -20,6 +22,7 @@ export class SourceView {
   constructor({ onInput, onFormatChange }: SourceViewCallbacks) {
     this.section = byId('source-view');
     this.textarea = byId<HTMLTextAreaElement>('score-data-input');
+    this.formatNote = byId('format-note');
     this.validation = byId('validation-error');
     this.validationMessage = byId('validation-message');
     this.formatRadios = [
@@ -49,6 +52,9 @@ export class SourceView {
     for (const radio of this.formatRadios) {
       radio.checked = radio.value === format;
     }
+    const note = FORMAT_NOT_KEPT[format];
+    this.formatNote.textContent = note ?? '';
+    this.formatNote.hidden = !note;
   }
 
   /** The reason the source can't be read, or null to clear it. Set as text: it can quote the source. */
