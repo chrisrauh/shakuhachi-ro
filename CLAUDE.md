@@ -101,6 +101,12 @@ The web component renderer lives in a separate package and must be built:
 3. Refresh browser (dev server serves from `public/`)
 4. Verify changes in the browser — see your environment guide
 
+## Writing
+
+Write issues, PRs, commit messages, code comments and docs 80% of the way to ASD-STE100.
+
+This guideline comes from [a tip by Andrej Karpathy](https://x.com/karpathy/status/2105819303471976479). It is on trial: we are evaluating how well it works.
+
 ## Design System
 
 Quick-reference rules for styling and UI work. Background: [docs/DESIGN-LANGUAGE.md](./docs/DESIGN-LANGUAGE.md)
