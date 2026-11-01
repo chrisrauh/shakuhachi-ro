@@ -297,7 +297,7 @@ When testing authenticated features (score editor, creating scores, forking), lo
 
 **Before You Build**
 
-- Ask before data format decisions
+- Ask before data format decisions. A new `ScoreData` field follows the [rule for new fields](./docs/SCORE-DATA-FORMAT.MD#the-rule-for-new-fields): it uses the MusicXML meaning, or gives a reason to differ
 - Set up test infrastructure before major features
 
 **File Organization**

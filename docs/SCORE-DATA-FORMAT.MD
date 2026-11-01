@@ -6,7 +6,7 @@
 - **Easy to read** - Musicians should understand it quickly
 - **Easy to extend** - Can add more features later
 - **Separation of concerns** - Data describes notes, renderer handles layout
-- **MusicXML-like structure** - Familiar format for music software interoperability
+- **MusicXML meanings** - A field that MusicXML also has uses the MusicXML meaning. See [Relation to MusicXML](#relation-to-musicxml)
 
 ## Format Structure
 
@@ -83,6 +83,30 @@ When needed, we can add:
 - More pitch modifiers
 - Additional metadata (composer, tempo, etc.)
 
----
+## Relation to MusicXML
 
-**Note**: This format follows MusicXML structure for easier future integration. MusicXML import/export will be added as a future enhancement.
+This format is not isomorphic to MusicXML. It embeds in MusicXML (#471):
+
+- **JSON → MusicXML → JSON is exact.** Each value has one MusicXML encoding, and it reads back unchanged. This makes the MusicXML source view lose nothing (#459).
+- **MusicXML → JSON loses information by design.** Many MusicXML documents become the same score, because the importer drops measures, divisions, layout and signatures. Some documents have no score. The importer fails on chords, voices and parts (#464, #465).
+- **Other programs read only the shared part.** Our extensions use MusicXML elements that other programs ignore, such as `<technical><fingering>`. Kan ro and go-no-hi both sound D5, so those programs cannot tell them apart.
+
+A field uses the MusicXML meaning, not the MusicXML document structure. Measures, voices, `<backup>` and `<forward>` organize a MusicXML file. This format is a list of notes.
+
+### The rule for new fields
+
+1. **For a general feature,** name the MusicXML concept that the field follows, and use the meaning of that concept. One concept can use more than one element. For example, a tuplet uses `<time-modification>` and `<tuplet>`.
+2. **For a shakuhachi feature,** state its MusicXML and ABC encoding, so that JSON → MusicXML → JSON stays exact.
+3. **To differ from MusicXML,** give the reason in the issue that adds the field.
+
+### Fields that exist now
+
+| Field                        | MusicXML concept                            | Status                                                                                                                                  |
+| ---------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `pitch.step`, `pitch.octave` | None. They are a fingering and a register.  | Differs from `<pitch>`, because the fingering identifies the note. The names are the same as in MusicXML, but the meaning is different. |
+| `duration`                   | `<type>` and `<dot>`: the written length    | Follows MusicXML (#438). It is not `<duration>`, which is the sounding length.                                                          |
+| `dotted`                     | `<dot/>`                                    | Has no effect on the render. The renderer draws the dot when the field is not set (#438).                                               |
+| `rest`                       | `<rest/>`                                   | Follows MusicXML.                                                                                                                       |
+| `meriKari`, `style`          | None. They are ours.                        | Need an encoding (#472, #473).                                                                                                          |
+| `key`, `tempo`               | `<key>`, `<metronome>`                      | Free text. Nothing uses them, and the serializer does not write them. They get a structure when a feature uses them.                    |
+| `title`, `composer`          | `<work-title>`, `<creator type="composer">` | Follow MusicXML. A missing title reads back as "Untitled", so the round trip is not exact (#472).                                       |
