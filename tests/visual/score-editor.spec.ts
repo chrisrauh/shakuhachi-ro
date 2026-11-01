@@ -5,14 +5,14 @@
  * - The score with the palette panel on either side, the cursor (in every
  *   score screenshot), a highlighted note, an empty score, the source view
  *   and the details dialog
- * - Editing from the palette, on the score converted to JSON (the test score
- *   is MusicXML, whose editing keys stay disabled)
+ * - Editing from the palette
  * - Desktop (1280x720) and mobile (375x667) viewports, light and dark themes
- * - Validation and format conversion in the source view
+ * - Validation, format conversion and the line under MusicXML and ABC that
+ *   says what they don't keep, in the source view
  *
  * Authentication:
  * - Session provided by auth-setup.ts via project storageState
- * - Test score at /score/test/edit (MusicXML, three notes; see CLAUDE.md)
+ * - Test score at /score/test/edit (three notes: ro, tsu, re; see CLAUDE.md)
  */
 
 import { test, expect, type Page } from '@playwright/test';
@@ -82,23 +82,21 @@ async function tapNote(page: Page, index: number) {
   await expect(page.locator('#score-highlight')).toBeVisible();
 }
 
-/** Converts the score to JSON in the source view, without saving. */
-async function convertToJson(page: Page) {
-  await openSource(page);
-  await page.click('input[type="radio"][value="json"]');
-  // The conversion loads the converter first. Changing the source before it is
-  // done would have it overwrite the change with the converted score
-  await expect(page.locator('#score-data-input')).toHaveValue(/"notes"/);
+/** Taps the second note, tsu, and checks that its key is pressed. */
+async function highlightTsu(page: Page) {
+  await tapNote(page, 1);
+  await expect(page.locator('#status-mode')).toHaveText('Changing');
+  await expect(page.locator('.palette-key[data-step="tsu"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 }
 
 /**
- * Edits the second note from the palette, the way a viewer does: a JSON score's
- * keys are enabled, and the ones the note now matches are pressed.
+ * Edits the second note from the palette, the way a viewer does: the keys the
+ * note now matches are pressed.
  */
 async function editNote(page: Page) {
-  await convertToJson(page);
-  await page.click('#source-toggle');
-  await waitForScoreRendered(page);
   await tapNote(page, 1);
   await page.click('.palette-key[data-mark="chu-meri"]');
   await page.click('.palette-key[data-duration="1"]'); // 1 beat
@@ -111,7 +109,7 @@ async function editNote(page: Page) {
 
 /** Empties the score through the source view, without saving. */
 async function emptyScore(page: Page) {
-  await convertToJson(page);
+  await openSource(page);
   await page
     .locator('#score-data-input')
     .fill('{"title": "", "style": "kinko", "notes": []}');
@@ -157,8 +155,7 @@ test.describe('Score Editor Visual Regression', () => {
 
     test('Highlight - light', async ({ page }) => {
       await openEditor(page, 'light');
-      await tapNote(page, 1);
-      await expect(page.locator('#status-mode')).toHaveText('Changing');
+      await highlightTsu(page);
       await expect(page).toHaveScreenshot('desktop-highlight-light.png');
     });
 
@@ -187,6 +184,7 @@ test.describe('Score Editor Visual Regression', () => {
     }) => {
       await openEditor(page, 'light');
       await openSource(page);
+      await page.click('input[type="radio"][value="musicxml"]');
 
       await page.locator('#score-data-input').fill('<unclosed');
       await expect(page.locator('#validation-error')).toContainText(
@@ -199,12 +197,17 @@ test.describe('Score Editor Visual Regression', () => {
       await waitForScoreRendered(page);
     });
 
-    test('Switching format converts the source', async ({ page }) => {
+    test('Switching format converts the source, and says what is not kept', async ({
+      page,
+    }) => {
       await openEditor(page, 'light');
       await openSource(page);
+      await expect(page.locator('#score-data-input')).toHaveValue(/"notes"/);
+      await expect(page.locator('#format-note')).toBeHidden();
 
       await page.click('input[type="radio"][value="abc"]');
       await expect(page.locator('#score-data-input')).toHaveValue(/^X:/);
+      await expect(page.locator('#format-note')).toHaveText(/^Saved as JSON\./);
     });
   });
 
@@ -229,7 +232,7 @@ test.describe('Score Editor Visual Regression', () => {
 
     test('Highlight - dark', async ({ page }) => {
       await openEditor(page, 'dark');
-      await tapNote(page, 1);
+      await highlightTsu(page);
       await expect(page).toHaveScreenshot('mobile-highlight-dark.png');
     });
 

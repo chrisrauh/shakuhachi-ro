@@ -13,16 +13,15 @@ import type {
 } from '../utils/license';
 import type { School } from '../utils/school';
 
+/** The formats the editor's source view shows and reads. Storage is JSON only. */
 export type ScoreDataFormat = 'musicxml' | 'json' | 'abc';
 
 /**
- * Stored score content: a ScoreData object when data_format is 'json',
- * the text as typed when it is 'musicxml' or 'abc'. Keyed on data_format so
- * checking the format narrows the data, and a mismatched pair doesn't compile.
+ * Stored score content. Every score is stored as JSON (#459). MusicXML and ABC
+ * are only views of it in the editor's source view, and a way to paste a score
+ * in.
  */
-export type ScoreContent =
-  | { data_format: 'json'; data: ScoreData }
-  | { data_format: 'musicxml' | 'abc'; data: string };
+export type ScoreContent = { data_format: 'json'; data: ScoreData };
 
 /**
  * The parent of a fork, embedded in the same query as the score itself.
@@ -507,9 +506,8 @@ export async function forkScore(scoreId: string): Promise<ScoreResult> {
       composer: originalScore.composer || undefined,
       school: originalScore.school,
       description: originalScore.description || undefined,
-      ...(originalScore.data_format === 'json'
-        ? { data_format: 'json', data: originalScore.data }
-        : { data_format: originalScore.data_format, data: originalScore.data }),
+      data_format: 'json',
+      data: originalScore.data,
       forked_from: scoreId,
       source_url: originalScore.source_url || undefined,
       source_description: originalScore.source_description || undefined,

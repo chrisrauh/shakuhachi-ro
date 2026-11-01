@@ -4,16 +4,12 @@ import { getCurrentUser } from '../../api/auth';
 import { toast } from '../Toast';
 import { ButtonLoadingState } from '../LoadingSpinner';
 import { parseScoreText } from '../../utils/score-data';
+import { convertFormat, serializeFormat } from '../../utils/format-converter';
 import { validateScoreInput } from '../../utils/score-validation';
 import { EditorAutosave } from '../../utils/editor-autosave';
 import type { DraftData, ScoreMetadata } from '../../utils/editor-autosave';
 import type { ScoreLicense } from '../../utils/license';
-import type {
-  Score,
-  ScoreContent,
-  ScoreDataFormat,
-  UpdateScoreData,
-} from '../../api/scores';
+import type { Score, ScoreDataFormat, UpdateScoreData } from '../../api/scores';
 import type { ScoreData, ScoreNote } from '../../web-component/types/ScoreData';
 import { STRINGS } from '../../constants/strings';
 import { DetailsDialog } from './DetailsDialog';
@@ -35,13 +31,17 @@ const UNSAVED = 'Unsaved';
  * source text and format, and its details — and saves it. The markup is
  * rendered by edit.astro; the details and the source have their own views.
  * Edits from the palette and keyboard rewrite the source, and can be undone.
+ *
+ * The score is stored as JSON. The format is only how the source view shows
+ * it: JSON, MusicXML or ABC. Save always writes JSON (#459).
  */
 export class ScoreEditor {
   private readonly scoreId: string;
   private readonly slug: string;
-  /** The score as stored: JSON as indented text, MusicXML and ABC as typed. */
+  /** The score as text in the view's format. */
   private source: string;
-  private format: ScoreDataFormat;
+  /** The source view's format. Opening a score shows JSON. */
+  private format: ScoreDataFormat = 'json';
   /** The notes of the score last drawn, which edits start from. */
   private notes: ScoreNote[] = [];
   private readonly history = new EditHistory();
@@ -65,11 +65,7 @@ export class ScoreEditor {
   constructor(score: Score) {
     this.scoreId = score.id;
     this.slug = score.slug;
-    this.format = score.data_format;
-    this.source =
-      score.data_format === 'json'
-        ? JSON.stringify(score.data, null, 2)
-        : score.data;
+    this.source = serializeFormat(score.data, this.format);
     this.metadata = {
       title: score.title,
       composer: score.composer ?? '',
@@ -145,13 +141,10 @@ export class ScoreEditor {
     return true;
   }
 
-  /** Only JSON scores are edited from the palette for now. */
-  private get editable(): boolean {
-    return this.format === 'json';
-  }
-
   private handleCommand(command: EditorCommand): void {
-    if (!this.editable) return;
+    // While the source can't be read, an edit would overwrite the text the
+    // user is fixing in the source view
+    if (!this.readSource().data) return;
     const current: EditorState = {
       notes: this.notes,
       selection: this.selection.selection,
@@ -168,10 +161,15 @@ export class ScoreEditor {
     this.applyState(next);
   }
 
-  /** Writes notes into the JSON source, keeping its other fields as they are. */
+  /**
+   * Writes notes into the source, in the view's format, keeping the other
+   * fields as they are. In MusicXML and ABC, the source is written again from
+   * the score's data, so what the format holds but the data doesn't (bar
+   * lines, comments) goes. It would not have been saved.
+   */
   private applyState({ notes, selection }: EditorState): void {
-    const data = JSON.parse(this.source) as ScoreData;
-    this.source = JSON.stringify({ ...data, notes }, null, 2);
+    const data = this.readSource().data!;
+    this.source = serializeFormat({ ...data, notes }, this.format);
     this.sourceView.setSource(this.source, this.format);
     this.renderScore(selection);
     this.markChanged();
@@ -183,7 +181,6 @@ export class ScoreEditor {
       selection: this.selection.selection,
       canUndo: this.history.canUndo,
       canRedo: this.history.canRedo,
-      editable: this.editable,
     });
   }
 
@@ -222,12 +219,11 @@ export class ScoreEditor {
     this.markChanged();
   }
 
-  private async handleFormatChange(format: ScoreDataFormat): Promise<void> {
+  private handleFormatChange(format: ScoreDataFormat): void {
     if (format === this.format) return;
 
     if (this.source.trim()) {
       try {
-        const { convertFormat } = await import('../../utils/format-converter');
         this.source = convertFormat(this.source, this.format, format);
       } catch (error) {
         // The source stays as it is, so the radio goes back to its format and
@@ -293,7 +289,8 @@ export class ScoreEditor {
       this.metadata.title = 'Untitled Score';
     }
 
-    if (!this.readSource().data) {
+    const { data } = this.readSource();
+    if (!data) {
       toast.error(STRINGS.ERRORS.ScoreEditor.saveValidationFailed);
       this.showSource(true);
       return;
@@ -303,15 +300,10 @@ export class ScoreEditor {
     saveLoading.show();
 
     try {
-      // Text formats are stored as typed, so reopening the editor gives the
-      // author back their own source, not a conversion of it.
-      const content: ScoreContent =
-        this.format === 'json'
-          ? { data_format: 'json', data: JSON.parse(this.source) }
-          : { data_format: this.format, data: this.source };
-
       const update: UpdateScoreData = {
-        ...content,
+        // JSON whatever the view: MusicXML and ABC are views of the score
+        data_format: 'json',
+        data,
         title: this.metadata.title,
         composer: this.metadata.composer || undefined,
         school: this.metadata.school,

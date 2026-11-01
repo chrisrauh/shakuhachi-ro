@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toScoreData, parseScoreText } from './score-data';
-import type { Score, ScoreContent } from '../api/scores';
+import { parseScoreText } from './score-data';
 import type { ScoreData } from '../web-component/types/ScoreData';
 
 const sampleScoreData: ScoreData = {
@@ -49,68 +48,7 @@ K:D
 D2 F
 `;
 
-function makeScore(content: ScoreContent): Score {
-  return {
-    ...content,
-    id: 'test-id',
-    user_id: 'test-user',
-    title: 'Test',
-    slug: 'test',
-    created_at: '',
-    updated_at: '',
-    fork_count: 0,
-    composer: null,
-    school: null,
-    description: null,
-    forked_from: null,
-    parent: null,
-    source_url: null,
-    source_description: null,
-    composition_copyright_status: 'not_evaluated',
-    composition_copyright_basis: null,
-    composition_copyright_source: null,
-    composition_year_author_died: null,
-    composition_year_published: null,
-    license: 'CC-BY-SA-4.0',
-  };
-}
-
 describe('score-data', () => {
-  describe('toScoreData()', () => {
-    it('should pass JSON data through as-is (no parsing)', () => {
-      const score = makeScore({ data_format: 'json', data: sampleScoreData });
-      const result = toScoreData(score);
-
-      // Should be the same object reference — no parsing
-      expect(result).toBe(sampleScoreData);
-    });
-
-    it('should parse MusicXML string data', () => {
-      const score = makeScore({
-        data_format: 'musicxml',
-        data: sampleMusicXML,
-      });
-      const result = toScoreData(score);
-
-      expect(result.title).toBe('Test');
-      expect(result.notes).toHaveLength(1);
-    });
-
-    it('should parse ABC string data', () => {
-      const score = makeScore({ data_format: 'abc', data: sampleABC });
-      const result = toScoreData(score);
-
-      expect(result.title).toBe('Test Score');
-      expect(result.composer).toBe('Test Composer');
-      expect(result.notes.length).toBeGreaterThan(0);
-    });
-
-    it('should throw for unsupported format', () => {
-      const score = makeScore({ data_format: 'unknown', data: 'data' } as any);
-      expect(() => toScoreData(score)).toThrow('Unsupported score format');
-    });
-  });
-
   describe('parseScoreText()', () => {
     it('should parse JSON text', () => {
       const result = parseScoreText(sampleJSON, 'json');

@@ -4,6 +4,8 @@ title: Notation Format Help
 
 ## Score Notation Formats
 
+Every score is saved as JSON. In the editor's source view, you can show a score as JSON, MusicXML or ABC, and edit it in any of the three. To bring in a score, paste it in MusicXML or ABC. When you save, it becomes JSON, and what JSON can't hold is not kept. The source view says what that is.
+
 ### JSON Format
 
 Shakuhachi score notation in JSON format. Each note has a pitch (step and octave) and duration.
@@ -38,10 +40,14 @@ Header fields such as `T:` (title) and `K:` (key) are optional. Without a key, n
 
 [ABC Notation Standard](https://abcnotation.com/wiki/abc:standard:v2.1)
 
+Not kept: bar lines, the time signature, chord symbols, slurs, decorations and comments. Repeats are written out.
+
 **Note:** Plans to add shakuhachi-specific ABC notation using Ro-Tsu-Re notation in the future.
 
 ### MusicXML Format
 
 Standard music notation XML format.
+
+Not kept: bar lines, time and key signatures, lyrics, other parts and layout.
 
 [MusicXML Documentation](https://www.w3.org/2021/06/musicxml40/)

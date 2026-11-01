@@ -324,6 +324,15 @@
   color: var(--color-text-primary);
 }
 
+.format-note {
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--spacing-small) var(--spacing-medium);
+  border-bottom: var(--panel-border-width) solid var(--panel-border-color);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
 .validation-error:not([hidden]) {
   flex-shrink: 0;
   display: flex;

@@ -21,8 +21,6 @@ const HIGHEST_OCTAVE = 2;
 export interface PaletteState extends EditorState {
   canUndo: boolean;
   canRedo: boolean;
-  /** False for a score that can't be edited from the palette yet. */
-  editable: boolean;
 }
 
 /**
@@ -83,7 +81,7 @@ export class PalettePanel {
    * the cursor they insert, so none is pressed. The highlighted note's key is
    * scrolled into view in its column.
    */
-  update({ notes, selection, canUndo, canRedo, editable }: PaletteState): void {
+  update({ notes, selection, canUndo, canRedo }: PaletteState): void {
     const index = targetIndex(selection);
     const note = notes[index];
     const pitch = note && !note.rest ? note.pitch : undefined;
@@ -92,7 +90,7 @@ export class PalettePanel {
 
     for (const key of this.keys) {
       const command = commandFor(key);
-      let applies = editable;
+      let applies = true;
       let pressed: boolean | undefined;
 
       switch (command.type) {

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ScoreDetailClient } from './ScoreDetailClient';
 import { deleteScore } from '../api/scores';
 import { purgeScoreCache } from '../api/purge';
-import { toScoreData } from '../utils/score-data';
 import type { Score } from '../api/scores';
 
 // vi.mock must be at top level for Vitest hoisting to work
@@ -17,7 +16,6 @@ vi.mock('../utils/init-header', () => ({
   confirmDialog: { show: vi.fn(({ onConfirm }) => onConfirm()) },
 }));
 vi.mock('./Toast', () => ({ toast: { error: vi.fn() } }));
-vi.mock('../utils/score-data');
 
 const calls: string[] = [];
 
@@ -79,24 +77,5 @@ describe('ScoreDetailClient delete', () => {
     await deleteViaButton();
 
     expect(calls).toEqual(['delete', 'purge akatombo']);
-  });
-});
-
-describe('ScoreDetailClient render error', () => {
-  it('shows a parse error as text, not markup', async () => {
-    mountScorePage({ data_format: 'abc', data: 'not abc' });
-    document.body.insertAdjacentHTML(
-      'beforeend',
-      '<div id="score-renderer"></div>',
-    );
-    vi.mocked(toScoreData).mockImplementation(() => {
-      throw new Error('<img src=x onerror="alert(1)">');
-    });
-
-    await new ScoreDetailClient().init();
-
-    const error = document.querySelector('.page-error')!;
-    expect(error.querySelector('img')).toBeNull();
-    expect(error.textContent).toContain('<img src=x onerror="alert(1)">');
   });
 });
