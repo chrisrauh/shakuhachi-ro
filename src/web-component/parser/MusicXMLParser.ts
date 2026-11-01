@@ -18,7 +18,6 @@ import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
   beatsOf,
   formatBeats,
-  hasHalf,
   isSupported,
   type Beats,
 } from '../types/Duration';
@@ -228,20 +227,15 @@ export class MusicXMLParser {
           MESSAGES.unsupportedLength(locate(noteElement), formatBeats(beats)),
         );
       }
+      // A length with a half is drawn with a dot, whether or not the file
+      // writes <dot/>. A dotted half note in 4/4 is three beats, which Kinko
+      // writes with strokes.
       const duration = formatBeats(beats);
-      // A dot is kept where the length has a half to write as one. A dotted
-      // half note in 4/4 is three beats, which Kinko writes with strokes.
-      const isDotted =
-        noteElement.querySelector('dot') !== null && hasHalf(beats);
 
       // Check for rests
       const restElement = noteElement.querySelector('rest');
       if (restElement) {
-        const rest: ScoreNote = { rest: true, duration };
-        if (isDotted) {
-          rest.dotted = true;
-        }
-        notes.push(rest);
+        notes.push({ rest: true, duration });
         return;
       }
 
@@ -280,20 +274,15 @@ export class MusicXMLParser {
 
       // Create note
       const note: ScoreNote = {
-        pitch: {
+        written: {
           step: shakuPitch.step,
-          octave: shakuPitch.octave,
+          register: shakuPitch.register,
         },
         duration,
       };
 
       if (shakuPitch.meriKari) {
         note.meriKari = shakuPitch.meriKari;
-      }
-
-      // Add dotted flag if needed
-      if (isDotted) {
-        note.dotted = true;
       }
 
       notes.push(note);

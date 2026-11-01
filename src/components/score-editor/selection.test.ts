@@ -147,9 +147,13 @@ describe('cursor geometry', () => {
 
 describe('describeSelection', () => {
   const notes: ScoreNote[] = [
-    { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+    { written: { step: 'ro', register: 0 }, duration: '1' },
     { rest: true, duration: '1' },
-    { pitch: { step: 'go-no-hi', octave: 1 }, duration: '1', meriKari: 'meri' },
+    {
+      written: { step: 'go-no-hi', register: 1 },
+      duration: '1',
+      meriKari: 'meri',
+    },
   ];
 
   it('says what the cursor is after, and where', () => {

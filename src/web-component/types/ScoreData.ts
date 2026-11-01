@@ -1,8 +1,8 @@
 /**
  * Score Data Type Definitions
  *
- * TypeScript types for the minimal JSON score data format.
- * This format follows MusicXML-like structure for familiarity.
+ * TypeScript types for the minimal JSON score data format. Fields use
+ * MusicXML meanings where MusicXML has them (docs/SCORE-DATA-FORMAT.MD).
  *
  * Note: Column layout is determined dynamically by the renderer
  * based on available space. Score data contains only the sequence of notes.
@@ -48,14 +48,17 @@ export type PitchStep = (typeof PITCH_STEPS)[number];
 export type NotationStyle = 'kinko' | 'tozan';
 
 /**
- * Pitch information (similar to MusicXML <pitch>)
+ * What the score writes for a note: a character and its register. Not a
+ * sounding pitch, which MusicXML's <pitch> is: kan ro and go no hi are
+ * written differently and sound the same. The fingering table gives the
+ * pitch (constants/kinko-fingerings.ts).
  */
-export interface Pitch {
-  /** Fingering step */
+export interface Written {
+  /** The written character */
   step: PitchStep;
 
-  /** Octave: 0=otsu (base), 1=kan, 2=daikan */
-  octave: number;
+  /** 0 otsu (the low register), 1 kan, 2 daikan */
+  register: number;
 }
 
 /**
@@ -83,30 +86,22 @@ export type MeriKari = (typeof MERI_KARI)[number];
  * Individual note within a score
  */
 export interface ScoreNote {
-  /** Pitch information (undefined for rests) */
-  pitch?: Pitch;
+  /** The written character and register (undefined for rests) */
+  written?: Written;
 
   /**
    * Length in beats, as an exact fraction: "1" is one beat, "1/2" half a
-   * beat, "3" three beats. See types/Duration.ts for the lengths notation can
+   * beat, "3" three beats. A length with a half ("3/2", "5/2"…, "3/4") is
+   * drawn with a dot. See types/Duration.ts for the lengths notation can
    * show.
    */
   duration: string;
 
-  /** Rest indicator (mutually exclusive with pitch) */
+  /** Rest indicator (mutually exclusive with written) */
   rest?: boolean;
 
   /** Meri or kari, if the note is played with one */
   meriKari?: MeriKari;
-
-  /**
-   * The last part of the length is written as a dot: half a beat after a
-   * note of a beat or more, a quarter after half a beat. Only a length with a
-   * half can be dotted: "3/2", "5/2"…, "3/4". The renderer draws that half as
-   * a dot whether or not this is set; no score writing it as a stroke has
-   * been found (#438).
-   */
-  dotted?: boolean;
 }
 
 /**

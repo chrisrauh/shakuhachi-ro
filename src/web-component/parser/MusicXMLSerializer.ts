@@ -6,7 +6,12 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { formatBeats, noteBeats, writtenLength } from '../types/Duration';
+import {
+  formatBeats,
+  hasHalf,
+  noteBeats,
+  writtenLength,
+} from '../types/Duration';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
   fingeringName,
@@ -114,8 +119,8 @@ export class MusicXMLSerializer {
    */
   private static serializeNote(note: ScoreNote, index: number): string {
     const parts: string[] = [];
-    const fingering: WrittenFingering | undefined = note.pitch && {
-      ...note.pitch,
+    const fingering: WrittenFingering | undefined = note.written && {
+      ...note.written,
       meriKari: note.meriKari,
     };
 
@@ -151,13 +156,14 @@ export class MusicXMLSerializer {
     // A Western dot adds half the written value, and the Kinko dot half a
     // beat, or a quarter after half a beat. They agree up to one beat, so a
     // note dotted after two beats or more, such as 5/2, has no type or dot.
-    const written = writtenLength(beats, note.dotted);
-    if (!note.dotted || written.num <= written.den) {
+    const dotted = hasHalf(beats);
+    const written = writtenLength(beats);
+    if (!dotted || written.num <= written.den) {
       const type = NOTE_TYPES[formatBeats(written)];
       if (type) {
         parts.push(`        <type>${type}</type>`);
       }
-      if (note.dotted) {
+      if (dotted) {
         parts.push('        <dot/>');
       }
     }

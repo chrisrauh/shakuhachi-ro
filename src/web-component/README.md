@@ -6,7 +6,7 @@ Renders shakuhachi notation as SVG. One custom element, no framework, no build s
 <script src="/embed/shakuhachi-score.js"></script>
 
 <shakuhachi-score
-  data-score='{"notes":[{"pitch":{"step":"ro","octave":0},"duration":"1"}]}'
+  data-score='{"notes":[{"written":{"step":"ro","register":0},"duration":"1"}]}'
 ></shakuhachi-score>
 ```
 
@@ -27,17 +27,16 @@ interface ScoreData {
 }
 
 interface ScoreNote {
-  duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "5/2"…, "3/4"
-  pitch?: { step: PitchStep; octave: number }; // omit for a rest
+  duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "5/2"…, "3/4"; a length with a half is drawn with a dot
+  written?: { step: PitchStep; register: number }; // the written character; omit for a rest
   rest?: boolean;
   meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
-  dotted?: boolean; // a length with a half ("3/2", "5/2"…, "3/4") whose half is written as a dot; it is drawn as one either way
 }
 
 type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';
 ```
 
-`octave` is `0` for otsu (base), `1` for kan, `2` for daikan.
+`register` is `0` for otsu (base), `1` for kan, `2` for daikan.
 
 Notes carry no layout information. Column breaks are the renderer's decision — see [Sizing](#sizing).
 

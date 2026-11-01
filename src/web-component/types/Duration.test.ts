@@ -50,11 +50,11 @@ describe('Duration', () => {
 
   it('gives the length written before the dot', () => {
     const written = (beats: string) =>
-      formatBeats(writtenLength(parseBeats(beats)!, true));
+      formatBeats(writtenLength(parseBeats(beats)!));
     expect(written('3/2')).toBe('1');
     expect(written('5/2')).toBe('2');
     expect(written('3/4')).toBe('1/2');
-    expect(writtenLength(parseBeats('3/2')!)).toEqual({ num: 3, den: 2 });
+    expect(written('2')).toBe('2');
   });
 
   it("gives a note's length in beats, and fails on one it cannot read", () => {

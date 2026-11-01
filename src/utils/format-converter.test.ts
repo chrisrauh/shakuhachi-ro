@@ -17,10 +17,10 @@ describe('format-converter', () => {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
+      { written: { step: 'ro', register: 0 }, duration: '1' },
+      { written: { step: 'tsu', register: 0 }, duration: '1/2' },
       { rest: true, duration: '1/2' },
-      { pitch: { step: 're', octave: 0 }, duration: '3/4', dotted: true },
+      { written: { step: 're', register: 0 }, duration: '3/4' },
     ],
   };
 
@@ -271,7 +271,7 @@ describe('views of a JSON score lose nothing', () => {
     written
       ? [
           {
-            pitch: { step: written.step, octave: written.octave },
+            written: { step: written.step, register: written.register },
             duration: '1',
             ...(written.meriKari && { meriKari: written.meriKari }),
           },
@@ -284,10 +284,10 @@ describe('views of a JSON score lose nothing', () => {
     style: 'kinko',
     notes: [
       ...fingerings,
-      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
-      { pitch: { step: 'tsu', octave: 0 }, duration: '3/2', dotted: true },
-      { pitch: { step: 're', octave: 0 }, duration: '3/4', dotted: true },
-      { pitch: { step: 'chi', octave: 1 }, duration: '2' },
+      { written: { step: 'ro', register: 0 }, duration: '1/2' },
+      { written: { step: 'tsu', register: 0 }, duration: '3/2' },
+      { written: { step: 're', register: 0 }, duration: '3/4' },
+      { written: { step: 'chi', register: 1 }, duration: '2' },
       { rest: true, duration: '1' },
       { rest: true, duration: '1/2' },
     ],

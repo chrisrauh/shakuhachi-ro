@@ -98,7 +98,7 @@ export function chooseNote(
       step === 'rest'
         ? { rest: true, duration }
         : {
-            pitch: { step, octave: octaveAfter(notes, position, step) },
+            written: { step, register: octaveAfter(notes, position, step) },
             duration,
           };
     return {
@@ -109,27 +109,31 @@ export function chooseNote(
 
   const { index } = selection;
   const old = notes[index];
-  if (step === (isRest(old) ? 'rest' : old.pitch!.step)) return null;
+  if (step === (isRest(old) ? 'rest' : old.written!.step)) return null;
   let note: ScoreNote;
   if (step === 'rest') {
     note = { rest: true, duration: old.duration };
   } else {
     const octave = isRest(old)
       ? octaveAfter(notes, index, step)
-      : old.pitch!.octave;
-    note = { pitch: { step, octave }, duration: old.duration };
+      : old.written!.register;
+    note = { written: { step, register: octave }, duration: old.duration };
     if (old.meriKari) note.meriKari = old.meriKari;
   }
-  if (old.dotted) note.dotted = true;
   return { notes: notes.with(index, note), selection };
 }
 
 /**
  * The length a note is written with before any dot, as a Length key's value:
- * "1" for a dotted 3/2.
+ * "1" for 3/2.
  */
 export function writtenDuration(note: ScoreNote): string {
-  return formatBeats(writtenLength(parseBeats(note.duration)!, note.dotted));
+  return formatBeats(writtenLength(parseBeats(note.duration)!));
+}
+
+/** Whether the note is drawn with a dot: its length has a half. */
+export function isDotted(note: ScoreNote): boolean {
+  return hasHalf(parseBeats(note.duration)!);
 }
 
 /**
@@ -143,16 +147,13 @@ export function setDuration(
 ): EditorState | null {
   const note = target(state);
   if (!note) return null;
-  const { dotted, ...undotted } = note;
   const dottedBeats = dottedLength(parseBeats(duration)!);
-  const next: ScoreNote =
-    dotted && hasHalf(dottedBeats)
-      ? { ...note, duration: formatBeats(dottedBeats) }
-      : { ...undotted, duration };
-  if (next.duration === note.duration && !!next.dotted === !!dotted) {
-    return null;
-  }
-  return withTarget(state, next);
+  const next =
+    isDotted(note) && hasHalf(dottedBeats)
+      ? formatBeats(dottedBeats)
+      : duration;
+  if (next === note.duration) return null;
+  return withTarget(state, { ...note, duration: next });
 }
 
 /**
@@ -164,7 +165,7 @@ export function addStroke(state: EditorState): EditorState | null {
   const note = target(state);
   if (!note) return null;
   const beats = parseBeats(note.duration)!;
-  const written = writtenLength(beats, note.dotted);
+  const written = writtenLength(beats);
   if (written.num < written.den) return null;
   return withTarget(state, {
     ...note,
@@ -174,31 +175,22 @@ export function addStroke(state: EditorState): EditorState | null {
 
 /**
  * The Dot key: adds a dot after the note, half a beat after one beat and a
- * quarter after half a beat, or takes the dot away with its length. A length
- * that already has a half but isn't marked dotted, as an import can write,
- * keeps its length and is marked dotted. A quarter beat can't be dotted.
+ * quarter after half a beat, or takes the dot away with its length. A quarter
+ * beat can't be dotted.
  */
 export function toggleDot(state: EditorState): EditorState | null {
   const note = target(state);
   if (!note) return null;
-  const { dotted, ...undotted } = note;
   const beats = parseBeats(note.duration)!;
-
-  if (dotted) {
+  if (hasHalf(beats)) {
     return withTarget(state, {
-      ...undotted,
-      duration: formatBeats(writtenLength(beats, true)),
+      ...note,
+      duration: formatBeats(writtenLength(beats)),
     });
   }
-  if (hasHalf(beats)) return withTarget(state, { ...note, dotted: true });
-
   const withDot = dottedLength(beats);
   if (!isSupported(withDot) || !hasHalf(withDot)) return null;
-  return withTarget(state, {
-    ...note,
-    duration: formatBeats(withDot),
-    dotted: true,
-  });
+  return withTarget(state, { ...note, duration: formatBeats(withDot) });
 }
 
 /** Marks exclude each other: choosing one replaces another, or removes itself. */
@@ -221,9 +213,12 @@ export function shiftOctave(
 ): EditorState | null {
   const note = target(state);
   if (!note || isRest(note)) return null;
-  const octave = note.pitch!.octave + step;
-  if (octave < 0 || octave > HIGHEST_OCTAVE) return null;
-  return withTarget(state, { ...note, pitch: { ...note.pitch!, octave } });
+  const register = note.written!.register + step;
+  if (register < 0 || register > HIGHEST_OCTAVE) return null;
+  return withTarget(state, {
+    ...note,
+    written: { ...note.written!, register },
+  });
 }
 
 /**
@@ -254,7 +249,7 @@ function withTarget(state: EditorState, note: ScoreNote): EditorState {
 }
 
 function isRest(note: ScoreNote): boolean {
-  return note.rest === true || !note.pitch;
+  return note.rest === true || !note.written;
 }
 
 /**
@@ -269,6 +264,6 @@ function octaveAfter(
 ): number {
   const previous = notes.slice(0, index).findLast((note) => !isRest(note));
   if (!previous) return 0;
-  const { pitch } = previous;
-  return closestOctave(step, getNoteMidi(pitch!.step, pitch!.octave));
+  const { written } = previous;
+  return closestOctave(step, getNoteMidi(written!.step, written!.register));
 }

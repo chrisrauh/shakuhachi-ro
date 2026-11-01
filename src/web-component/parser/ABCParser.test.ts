@@ -44,14 +44,14 @@ D F G A
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(4);
-      expect(scoreData.notes[0].pitch?.step).toBe('ro'); // D → ro
-      expect(scoreData.notes[0].pitch?.octave).toBe(0); // Uppercase = otsu
-      expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // F → tsu
-      expect(scoreData.notes[1].pitch?.octave).toBe(0);
-      expect(scoreData.notes[2].pitch?.step).toBe('re'); // G → re
-      expect(scoreData.notes[2].pitch?.octave).toBe(0);
-      expect(scoreData.notes[3].pitch?.step).toBe('chi'); // A → chi
-      expect(scoreData.notes[3].pitch?.octave).toBe(0);
+      expect(scoreData.notes[0].written?.step).toBe('ro'); // D → ro
+      expect(scoreData.notes[0].written?.register).toBe(0); // Uppercase = otsu
+      expect(scoreData.notes[1].written?.step).toBe('tsu'); // F → tsu
+      expect(scoreData.notes[1].written?.register).toBe(0);
+      expect(scoreData.notes[2].written?.step).toBe('re'); // G → re
+      expect(scoreData.notes[2].written?.register).toBe(0);
+      expect(scoreData.notes[3].written?.step).toBe('chi'); // A → chi
+      expect(scoreData.notes[3].written?.register).toBe(0);
     });
 
     it('should parse notes with octave modifiers (lowercase = kan)', () => {
@@ -66,12 +66,12 @@ d f g a c
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(5);
-      expect(scoreData.notes[0].pitch?.step).toBe('ro'); // d → ro kan
-      expect(scoreData.notes[0].pitch?.octave).toBe(1); // Lowercase = kan
-      expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // f → tsu kan
-      expect(scoreData.notes[1].pitch?.octave).toBe(1);
-      expect(scoreData.notes[4].pitch?.step).toBe('ri'); // c → ri
-      expect(scoreData.notes[4].pitch?.octave).toBe(0); // c is end of otsu
+      expect(scoreData.notes[0].written?.step).toBe('ro'); // d → ro kan
+      expect(scoreData.notes[0].written?.register).toBe(1); // Lowercase = kan
+      expect(scoreData.notes[1].written?.step).toBe('tsu'); // f → tsu kan
+      expect(scoreData.notes[1].written?.register).toBe(1);
+      expect(scoreData.notes[4].written?.step).toBe('ri'); // c → ri
+      expect(scoreData.notes[4].written?.register).toBe(0); // c is end of otsu
     });
 
     it('should parse notes with apostrophe (dai-kan)', () => {
@@ -86,10 +86,10 @@ d' f' g'
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(3);
-      expect(scoreData.notes[0].pitch?.step).toBe('go-no-hi'); // d' → kan go no hi
-      expect(scoreData.notes[0].pitch?.octave).toBe(1);
-      expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // f' → tsu dai-kan
-      expect(scoreData.notes[1].pitch?.octave).toBe(2);
+      expect(scoreData.notes[0].written?.step).toBe('go-no-hi'); // d' → kan go no hi
+      expect(scoreData.notes[0].written?.register).toBe(1);
+      expect(scoreData.notes[1].written?.step).toBe('tsu'); // f' → tsu dai-kan
+      expect(scoreData.notes[1].written?.register).toBe(2);
     });
 
     it('should parse duration fractions correctly', () => {
@@ -110,7 +110,6 @@ D2 D/2 D3/2 D
       // D3/2 = a dotted eighth, 3/4 of a beat written with a dot
       expect(scoreData.notes[2]).toMatchObject({
         duration: '3/4',
-        dotted: true,
       });
       expect(scoreData.notes[3].duration).toBe('1/2'); // D = an eighth, half a beat
     });
@@ -129,12 +128,10 @@ D> D
       expect(scoreData.notes).toHaveLength(2);
       expect(scoreData.notes[0]).toMatchObject({
         duration: '3/4',
-        dotted: true,
       });
       expect(scoreData.notes[1]).toEqual(
         expect.objectContaining({ duration: '1/4' }),
       );
-      expect(scoreData.notes[1].dotted).toBeUndefined();
     });
 
     it('should read < as broken rhythm: halve the first note, dot the second', () => {
@@ -150,10 +147,8 @@ D< D
 
       expect(scoreData.notes).toHaveLength(2);
       expect(scoreData.notes[0].duration).toBe('1/4');
-      expect(scoreData.notes[0].dotted).toBeUndefined();
       expect(scoreData.notes[1]).toMatchObject({
         duration: '3/4',
-        dotted: true,
       });
     });
 
@@ -162,7 +157,6 @@ D< D
 
       expect(scoreData.notes[1]).toMatchObject({
         duration: '3/4',
-        dotted: true,
       });
     });
 
@@ -178,9 +172,9 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].written?.step).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].meriKari).toBe('meri'); // Sharp maps to meri
-      expect(scoreData.notes[1].pitch?.step).toBe('re'); // ^F → re
+      expect(scoreData.notes[1].written?.step).toBe('re'); // ^F → re
       expect(scoreData.notes[1].meriKari).toBe('meri');
     });
 
@@ -196,7 +190,7 @@ _E
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(1);
-      expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // _E → tsu
+      expect(scoreData.notes[0].written?.step).toBe('tsu'); // _E → tsu
       expect(scoreData.notes[0].meriKari).toBe('meri'); // Flat maps to meri
     });
 
@@ -212,9 +206,9 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].pitch?.step).toBe('ro'); // =D → ro
+      expect(scoreData.notes[0].written?.step).toBe('ro'); // =D → ro
       expect(scoreData.notes[0].meriKari).toBeUndefined(); // Natural = no meri
-      expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // =F → tsu
+      expect(scoreData.notes[1].written?.step).toBe('tsu'); // =F → tsu
       expect(scoreData.notes[1].meriKari).toBeUndefined();
     });
 
@@ -294,11 +288,11 @@ D2 z F z/2 G
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(5);
-      expect(scoreData.notes[0].pitch?.step).toBe('ro'); // D
+      expect(scoreData.notes[0].written?.step).toBe('ro'); // D
       expect(scoreData.notes[1].rest).toBe(true); // z
-      expect(scoreData.notes[2].pitch?.step).toBe('tsu'); // F
+      expect(scoreData.notes[2].written?.step).toBe('tsu'); // F
       expect(scoreData.notes[3].rest).toBe(true); // z/2
-      expect(scoreData.notes[4].pitch?.step).toBe('re'); // G
+      expect(scoreData.notes[4].written?.step).toBe('re'); // G
     });
 
     it('should parse notes with both accidental and duration', () => {
@@ -313,10 +307,10 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].written?.step).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].meriKari).toBe('meri');
       expect(scoreData.notes[0].duration).toBe('1');
-      expect(scoreData.notes[1].pitch?.step).toBe('tsu'); // _E → tsu
+      expect(scoreData.notes[1].written?.step).toBe('tsu'); // _E → tsu
       expect(scoreData.notes[1].meriKari).toBe('meri');
       expect(scoreData.notes[1].duration).toBe('1/4');
     });
@@ -333,10 +327,9 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(1);
-      expect(scoreData.notes[0].pitch?.step).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].written?.step).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].meriKari).toBe('meri');
       expect(scoreData.notes[0].duration).toBe('3/2');
-      expect(scoreData.notes[0].dotted).toBe(true);
     });
 
     it('should ignore comments and empty lines', () => {
@@ -361,7 +354,9 @@ G
   describe('parse() - key signatures', () => {
     const fingerings = (abc: string) =>
       ABCParser.parse(abc).notes.map((n) =>
-        [n.pitch?.step, n.pitch?.octave, n.meriKari].filter(Boolean).join(' '),
+        [n.written?.step, n.written?.register, n.meriKari]
+          .filter(Boolean)
+          .join(' '),
       );
 
     it('applies the key to notes without an accidental', () => {
@@ -442,7 +437,9 @@ G
   describe('parse() - fields in the tune body', () => {
     const fingerings = (abc: string) =>
       ABCParser.parse(abc).notes.map((n) =>
-        [n.pitch?.step, n.pitch?.octave, n.meriKari].filter(Boolean).join(' '),
+        [n.written?.step, n.written?.register, n.meriKari]
+          .filter(Boolean)
+          .join(' '),
       );
 
     it('changes the key from a K: line in the body', () => {
@@ -495,8 +492,7 @@ G
     // Each note as "step length", with a dot for a dotted note
     const played = (abc: string) =>
       ABCParser.parse(`X:1\nL:1/8\nK:C\n${abc}`).notes.map(
-        (n) =>
-          `${n.rest ? 'rest' : n.pitch?.step} ${n.duration}${n.dotted ? '.' : ''}`,
+        (n) => `${n.rest ? 'rest' : n.written?.step} ${n.duration}`,
       );
 
     it('plays out repeats and first and second endings', () => {
@@ -517,8 +513,8 @@ G
 
     it('joins tied notes into one, and fails when the sum cannot be shown', () => {
       expect(played('D2-D2 F')).toEqual(['ro 2', 'tsu 1/2']);
-      expect(played('D-D-D F')).toEqual(['ro 3/2.', 'tsu 1/2']);
-      expect(played('D4-D F')).toEqual(['ro 5/2.', 'tsu 1/2']);
+      expect(played('D-D-D F')).toEqual(['ro 3/2', 'tsu 1/2']);
+      expect(played('D4-D F')).toEqual(['ro 5/2', 'tsu 1/2']);
       expect(() => played('D4-D/2 F')).toThrow(
         'Note 1 (D4-D/2) is 9/4 beats long',
       );
@@ -526,7 +522,7 @@ G
 
     it('scales the notes of a tuplet, and fails when they cannot be shown', () => {
       // Two notes in the time of three
-      expect(played('(2DF G')).toEqual(['ro 3/4.', 'tsu 3/4.', 're 1/2']);
+      expect(played('(2DF G')).toEqual(['ro 3/4', 'tsu 3/4', 're 1/2']);
       expect(() => played('(3DFG A')).toThrow('Note 1 (D) is 0.333 beats long');
     });
 
@@ -569,9 +565,9 @@ G
     it('should keep a fingering named in a decoration, and ignore other decorations', () => {
       const abc = 'X:1\nK:C\n!san-no-u!_b !trill!_b\n';
 
-      expect(ABCParser.parse(abc).notes.map((n) => n.pitch)).toEqual([
-        { step: 'san-no-u', octave: 1 },
-        { step: 'hi', octave: 1 },
+      expect(ABCParser.parse(abc).notes.map((n) => n.written)).toEqual([
+        { step: 'san-no-u', register: 1 },
+        { step: 'hi', register: 1 },
       ]);
     });
 
@@ -656,9 +652,9 @@ Q
           title: 'Test Score',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '1' }, // D
-            { pitch: { step: 'tsu', octave: 0 }, duration: '1' }, // F
-            { pitch: { step: 're', octave: 0 }, duration: '1' }, // G
+            { written: { step: 'ro', register: 0 }, duration: '1' }, // D
+            { written: { step: 'tsu', register: 0 }, duration: '1' }, // F
+            { written: { step: 're', register: 0 }, duration: '1' }, // G
           ],
         };
 
@@ -671,10 +667,14 @@ Q
 
       it('writes notes relative to the key, and reads them back', () => {
         const notes: ScoreData['notes'] = [
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
-          { pitch: { step: 're', octave: 0 }, duration: '1', meriKari: 'meri' },
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
-          { pitch: { step: 'ri', octave: 0 }, duration: '1' },
+          { written: { step: 'tsu', register: 0 }, duration: '1' },
+          {
+            written: { step: 're', register: 0 },
+            duration: '1',
+            meriKari: 'meri',
+          },
+          { written: { step: 'tsu', register: 0 }, duration: '1' },
+          { written: { step: 'ri', register: 0 }, duration: '1' },
         ];
         const scoreData: ScoreData = { title: 'T', style: 'kinko', notes };
 
@@ -695,7 +695,7 @@ Q
           title: 'T',
           style: 'kinko',
           key: 'Hirajoshi',
-          notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+          notes: [{ written: { step: 'ro', register: 0 }, duration: '1' }],
         };
 
         expect(() => ABCSerializer.serialize(scoreData)).toThrow(
@@ -708,7 +708,7 @@ Q
           title: 'Test Score',
           composer: 'Test Composer',
           style: 'kinko',
-          notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+          notes: [{ written: { step: 'ro', register: 0 }, duration: '1' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -721,7 +721,7 @@ Q
           title: 'Test Score',
           tempo: '120',
           style: 'kinko',
-          notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+          notes: [{ written: { step: 'ro', register: 0 }, duration: '1' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -735,7 +735,7 @@ Q
           style: 'kinko',
           notes: [
             {
-              pitch: { step: 'tsu', octave: 0 },
+              written: { step: 'tsu', register: 0 },
               duration: '1',
               meriKari: 'meri',
             }, // ^D
@@ -752,9 +752,9 @@ Q
           title: 'Test',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '1' }, // D (uppercase)
-            { pitch: { step: 'ro', octave: 1 }, duration: '1' }, // d (lowercase)
-            { pitch: { step: 'tsu', octave: 2 }, duration: '1' }, // =f' (apostrophe; natural, as K:D makes f sharp)
+            { written: { step: 'ro', register: 0 }, duration: '1' }, // D (uppercase)
+            { written: { step: 'ro', register: 1 }, duration: '1' }, // d (lowercase)
+            { written: { step: 'tsu', register: 2 }, duration: '1' }, // =f' (apostrophe; natural, as K:D makes f sharp)
           ],
         };
 
@@ -767,8 +767,8 @@ Q
         const scoreData = {
           title: 'Test',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-            { pitch: { step: 'go', octave: 0 }, duration: '1' },
+            { written: { step: 'ro', register: 0 }, duration: '1' },
+            { written: { step: 'go', register: 0 }, duration: '1' },
           ],
         } as unknown as ScoreData;
 
@@ -781,9 +781,7 @@ Q
         const scoreData: ScoreData = {
           title: 'Test',
           style: 'kinko',
-          notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '3/2', dotted: true },
-          ],
+          notes: [{ written: { step: 'ro', register: 0 }, duration: '3/2' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -795,11 +793,11 @@ Q
 
       it('keeps each note length and dot through ABC and back', () => {
         const notes: ScoreData['notes'] = [
-          { pitch: { step: 'ro', octave: 0 }, duration: '3/2', dotted: true },
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
-          { pitch: { step: 're', octave: 0 }, duration: '3' },
-          { pitch: { step: 'chi', octave: 0 }, duration: '3/4', dotted: true },
-          { pitch: { step: 'ri', octave: 0 }, duration: '1/4' },
+          { written: { step: 'ro', register: 0 }, duration: '3/2' },
+          { written: { step: 'tsu', register: 0 }, duration: '1/2' },
+          { written: { step: 're', register: 0 }, duration: '3' },
+          { written: { step: 'chi', register: 0 }, duration: '3/4' },
+          { written: { step: 'ri', register: 0 }, duration: '1/4' },
           { rest: true, duration: '2' },
         ];
 
@@ -816,11 +814,11 @@ Q
         const back = ABCParser.parse(
           ABCSerializer.serialize({
             title: 'T',
-            notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '3/2' }],
+            notes: [{ written: { step: 'ro', register: 0 }, duration: '3/2' }],
           }),
         );
 
-        expect(back.notes[0]).toMatchObject({ duration: '3/2', dotted: true });
+        expect(back.notes[0]).toMatchObject({ duration: '3/2' });
       });
 
       it('should serialize rests', () => {
@@ -844,10 +842,10 @@ Q
           title: 'Test',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '2' }, // D2
-            { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' }, // F/2
-            { pitch: { step: 're', octave: 0 }, duration: '3/2' }, // G3/2
-            { pitch: { step: 'chi', octave: 0 }, duration: '1' }, // A (no suffix)
+            { written: { step: 'ro', register: 0 }, duration: '2' }, // D2
+            { written: { step: 'tsu', register: 0 }, duration: '1/2' }, // F/2
+            { written: { step: 're', register: 0 }, duration: '3/2' }, // G3/2
+            { written: { step: 'chi', register: 0 }, duration: '1' }, // A (no suffix)
           ],
         };
 
@@ -878,20 +876,17 @@ D2 F G/2 A>
         expect(reparsed.notes).toHaveLength(scoreData.notes.length);
 
         // Should have same pitches
-        expect(reparsed.notes[0].pitch?.step).toBe('ro'); // D
-        expect(reparsed.notes[1].pitch?.step).toBe('re'); // F is F♯ in D
+        expect(reparsed.notes[0].written?.step).toBe('ro'); // D
+        expect(reparsed.notes[1].written?.step).toBe('re'); // F is F♯ in D
         expect(reparsed.notes[1].meriKari).toBe('meri');
-        expect(reparsed.notes[2].pitch?.step).toBe('re'); // G
-        expect(reparsed.notes[3].pitch?.step).toBe('chi'); // A
+        expect(reparsed.notes[2].written?.step).toBe('re'); // G
+        expect(reparsed.notes[3].written?.step).toBe('chi'); // A
 
         // Should have same durations, in beats of a quarter note
         expect(reparsed.notes[0].duration).toBe('1'); // D2
         expect(reparsed.notes[1].duration).toBe('1/2'); // F
         expect(reparsed.notes[2].duration).toBe('1/4'); // G/2
         expect(reparsed.notes[3].duration).toBe('3/4'); // A>
-
-        // Should preserve dotted flag
-        expect(reparsed.notes[3].dotted).toBe(true); // A>
       });
 
       it('should round-trip with meri notes', () => {
@@ -926,10 +921,10 @@ D z2 F z/2
         const reparsed = ABCParser.parse(serializedAbc);
 
         expect(reparsed.notes).toHaveLength(4);
-        expect(reparsed.notes[0].pitch?.step).toBe('ro'); // D
+        expect(reparsed.notes[0].written?.step).toBe('ro'); // D
         expect(reparsed.notes[1].rest).toBe(true); // z2
         expect(reparsed.notes[1].duration).toBe('1');
-        expect(reparsed.notes[2].pitch?.step).toBe('re'); // F is F♯ in D
+        expect(reparsed.notes[2].written?.step).toBe('re'); // F is F♯ in D
         expect(reparsed.notes[3].rest).toBe(true); // z/2
         expect(reparsed.notes[3].duration).toBe('1/4');
       });

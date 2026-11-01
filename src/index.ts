@@ -83,7 +83,7 @@ export type {
 export type {
   ScoreData,
   ScoreNote,
-  Pitch,
+  Written,
   PitchStep,
   MeriKari,
   NotationStyle,

@@ -2,6 +2,7 @@ import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
 import { parseBeats } from '../../web-component/types/Duration';
 import {
   addStroke,
+  isDotted,
   targetIndex,
   toggleDot,
   writtenDuration,
@@ -84,7 +85,7 @@ export class PalettePanel {
   update({ notes, selection, canUndo, canRedo }: PaletteState): void {
     const index = targetIndex(selection);
     const note = notes[index];
-    const pitch = note && !note.rest ? note.pitch : undefined;
+    const written = note && !note.rest ? note.written : undefined;
     const changing = selection.type === 'highlight';
     let noteKey: HTMLButtonElement | undefined;
 
@@ -99,7 +100,7 @@ export class PalettePanel {
             command.step === 'rest' ? 'a rest' : key.getAttribute('aria-label');
           key.title = `${changing ? 'Change to' : 'Insert'} ${name}`;
           if (changing) {
-            pressed = command.step === (pitch ? pitch.step : 'rest');
+            pressed = command.step === (written ? written.step : 'rest');
             if (pressed) noteKey = key;
           }
           break;
@@ -116,18 +117,18 @@ export class PalettePanel {
           break;
         case 'dot':
           applies &&= toggleDot({ notes, selection }) !== null;
-          pressed = !!note?.dotted;
+          pressed = !!note && isDotted(note);
           break;
         case 'mark':
-          applies &&= !!pitch;
-          pressed = !!pitch && note.meriKari === command.mark;
+          applies &&= !!written;
+          pressed = !!written && note.meriKari === command.mark;
           break;
         case 'octave':
           applies &&=
-            !!pitch &&
+            !!written &&
             (command.step > 0
-              ? pitch.octave < HIGHEST_OCTAVE
-              : pitch.octave > 0);
+              ? written.register < HIGHEST_OCTAVE
+              : written.register > 0);
           break;
         case 'delete':
           applies &&= index >= 0;

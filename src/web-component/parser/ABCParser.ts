@@ -37,12 +37,7 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import {
-  formatBeats,
-  hasHalf,
-  isSupported,
-  type Beats,
-} from '../types/Duration';
+import { formatBeats, isSupported, type Beats } from '../types/Duration';
 import {
   ABCAccidentals,
   keySignature,
@@ -578,9 +573,9 @@ export class ABCParser {
 
       // Sounding length for now; toBaseAndDot() splits out the dot below
       const note: ParsedNote = {
-        pitch: {
+        written: {
           step: shakuPitch.step,
-          octave: shakuPitch.octave,
+          register: shakuPitch.register,
         },
         duration,
       };
@@ -609,10 +604,8 @@ export class ABCParser {
         );
       }
       // ABC writes the length, not how it is written. A length with a half
-      // is written with a dot, as the editor does by default.
-      const scoreNote: ScoreNote = { ...note, duration: formatBeats(beats) };
-      if (hasHalf(beats)) scoreNote.dotted = true;
-      return scoreNote;
+      // is drawn with a dot.
+      return { ...note, duration: formatBeats(beats) };
     });
   }
 
@@ -659,8 +652,8 @@ export class ABCParser {
     return (
       !a.rest &&
       !b.rest &&
-      a.pitch?.step === b.pitch?.step &&
-      a.pitch?.octave === b.pitch?.octave &&
+      a.written?.step === b.written?.step &&
+      a.written?.register === b.written?.register &&
       a.meriKari === b.meriKari
     );
   }

@@ -28,28 +28,28 @@ export const PARSER_STRINGS = {
     ScoreParser: {
       scoreDataRequired: 'Score data is required',
       notesArrayRequired: 'Score notes must be an array',
-      noteIndexPitchRequired: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch'),
-      noteIndexPitchWhenNotRest: (index: number) =>
-        `Note ${index + 1} must have pitch when rest is not set`,
-      noteIndexPitchStep: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.step'),
+      noteIndexWrittenRequired: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'written'),
+      noteIndexWrittenWhenNotRest: (index: number) =>
+        `Note ${index + 1} must have written when rest is not set`,
+      noteIndexWrittenStep: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'written.step'),
       noteIndexStepInvalid: (index: number, step: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'pitch.step',
+          'written.step',
           step,
           `Must be one of: ${PITCH_STEPS.join(', ')}.`,
         ),
-      noteIndexPitchOctave: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.octave'),
+      noteIndexWrittenRegister: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'written.register'),
       noteIndexDuration: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'duration'),
-      noteIndexOctaveInvalid: (index: number, octave: number) =>
+      noteIndexRegisterInvalid: (index: number, register: number) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'octave',
-          octave,
+          'written.register',
+          register,
           'Must be 0-2.',
         ),
       noteIndexDurationInvalid: (index: number, duration: unknown) =>
@@ -66,8 +66,6 @@ export const PARSER_STRINGS = {
           JSON.stringify(duration),
           'Shakuhachi notation can show whole beats ("1", "2", "3"…), "1/2", "1/4", and a half after these ("3/2", "5/2"…, "3/4").',
         ),
-      noteIndexDottedWithoutHalf: (index: number, duration: string) =>
-        `Note ${index + 1} is dotted, but its duration, "${duration}", has no half to write as a dot. Only a length with a half, such as "3/2", "5/2" or "3/4", can be dotted.`,
       noteIndexMeriKariInvalid: (index: number, meriKari: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,

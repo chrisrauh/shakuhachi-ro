@@ -22,8 +22,8 @@ const TWO_NOTES: ScoreData = {
   title: '',
   style: 'kinko',
   notes: [
-    { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-    { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
+    { written: { step: 'ro', register: 0 }, duration: '1' },
+    { written: { step: 'tsu', register: 0 }, duration: '1' },
   ],
 };
 
@@ -256,7 +256,7 @@ describe('ScoreEditor score and source', () => {
     new ScoreEditor(
       makeScore({
         data: {
-          notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 2 }],
+          notes: [{ written: { step: 'ro', register: 0 }, duration: 2 }],
         } as unknown as ScoreData,
       }),
     );
@@ -274,8 +274,8 @@ describe('ScoreEditor score and source', () => {
           title: '',
           style: 'kinko',
           notes: [
-            { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
-            { pitch: { step: 'go', octave: 0 }, duration: '1/2' } as any,
+            { written: { step: 'ro', register: 0 }, duration: '1/2' },
+            { written: { step: 'go', register: 0 }, duration: '1/2' } as any,
           ],
         },
       }),
@@ -418,7 +418,7 @@ describe('ScoreEditor editing', () => {
       title: 'Kept',
       notes: [
         ...TWO_NOTES.notes,
-        { pitch: { step: 're', octave: 0 }, duration: '1' },
+        { written: { step: 're', register: 0 }, duration: '1' },
       ],
     });
     expect(renderedScore()).toEqual(source());
@@ -526,7 +526,11 @@ describe('ScoreEditor editing', () => {
       $<HTMLTextAreaElement>('score-data-input').value,
       'musicxml',
     ).notes;
-    expect(notes.map((note) => note.pitch?.step)).toEqual(['ro', 'tsu', 're']);
+    expect(notes.map((note) => note.written?.step)).toEqual([
+      'ro',
+      'tsu',
+      're',
+    ]);
   });
 
   it('does not edit a source that cannot be read', () => {

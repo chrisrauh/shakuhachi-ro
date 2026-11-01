@@ -97,10 +97,10 @@ describe('MusicXMLParser', () => {
       expect(score.composer).toBe('My Composer');
       expect(score.style).toBe('kinko');
       expect(score.notes).toHaveLength(3);
-      expect(score.notes[0].pitch?.step).toBe('ro');
-      expect(score.notes[0].pitch?.octave).toBe(0);
-      expect(score.notes[1].pitch?.step).toBe('tsu');
-      expect(score.notes[2].pitch?.step).toBe('re');
+      expect(score.notes[0].written?.step).toBe('ro');
+      expect(score.notes[0].written?.register).toBe(0);
+      expect(score.notes[1].written?.step).toBe('tsu');
+      expect(score.notes[2].written?.step).toBe('re');
     });
 
     it('should produce rest: true for <rest> element', () => {
@@ -138,7 +138,6 @@ describe('MusicXMLParser', () => {
       const score = MusicXMLParser.parse(xml);
 
       expect(score.notes[0].duration).toBe('3/2');
-      expect(score.notes[0].dotted).toBe(true);
     });
 
     it('should read a dotted half in 4/4 as 3 beats, which have no dot', () => {
@@ -148,7 +147,6 @@ describe('MusicXMLParser', () => {
 
       expect(score.notes[0].rest).toBe(true);
       expect(score.notes[0].duration).toBe('3');
-      expect(score.notes[0].dotted).toBeUndefined();
     });
 
     it('should read a note whose type and dots match its duration', () => {
@@ -186,7 +184,6 @@ describe('MusicXMLParser', () => {
       const notes = MusicXMLParser.parse(xml).notes;
 
       expect(notes.map((n) => n.duration)).toEqual(['1', '3']);
-      expect(notes[1].dotted).toBeUndefined();
     });
 
     it('should fail on a length notation cannot show, such as a triplet', () => {
@@ -217,7 +214,7 @@ describe('MusicXMLParser', () => {
         { name: 'Shakuhachi', body: makeNote('D', 4) + makeNote('F', 4) },
       ]);
 
-      const steps = MusicXMLParser.parse(xml).notes.map((n) => n.pitch?.step);
+      const steps = MusicXMLParser.parse(xml).notes.map((n) => n.written?.step);
 
       expect(steps).toEqual(['ro', 'tsu']);
     });
@@ -306,9 +303,9 @@ describe('MusicXMLParser', () => {
     it('should import every semitone at the top of the range', () => {
       const xml = makeXML(makeAlteredNote('C', 1, 7) + makeNote('D', 7));
 
-      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
-        { step: 'go-no-hi', octave: 2 },
-        { step: 'ha', octave: 2 },
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.written)).toEqual([
+        { step: 'go-no-hi', register: 2 },
+        { step: 'ha', register: 2 },
       ]);
     });
 
@@ -320,9 +317,9 @@ describe('MusicXMLParser', () => {
         );
       const xml = makeXML(withFingering('san-no-u') + withFingering('2'));
 
-      expect(MusicXMLParser.parse(xml).notes.map((n) => n.pitch)).toEqual([
-        { step: 'san-no-u', octave: 1 },
-        { step: 'hi', octave: 1 },
+      expect(MusicXMLParser.parse(xml).notes.map((n) => n.written)).toEqual([
+        { step: 'san-no-u', register: 1 },
+        { step: 'hi', register: 1 },
       ]);
     });
 
@@ -351,7 +348,7 @@ describe('MusicXMLParser', () => {
       );
 
       const fingerings = MusicXMLParser.parse(xml).notes.map((n) => [
-        n.pitch?.step,
+        n.written?.step,
         n.meriKari,
       ]);
 

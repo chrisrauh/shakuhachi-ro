@@ -23,11 +23,11 @@ import {
   type ScoreData,
   type ScoreNote,
 } from '../types/ScoreData';
-import { hasHalf, isSupported, parseBeats } from '../types/Duration';
+import { isSupported, parseBeats } from '../types/Duration';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
-/** Register for each `pitch.octave` value validate() accepts: 0, 1, 2 */
+/** Register for each `written.register` value validate() accepts: 0, 1, 2 */
 export const OCTAVE_REGISTERS: readonly OctaveRegister[] = [
   'otsu',
   'kan',
@@ -124,30 +124,30 @@ export class ScoreParser {
       }
 
       // Ensure pitch exists for non-rest notes
-      if (!note.pitch) {
+      if (!note.written) {
         throw new Error(
-          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexPitchWhenNotRest(i),
+          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexWrittenWhenNotRest(i),
         );
       }
 
       // Calculate which octave would be "expected" based on closest-note principle
       const needsOctaveMark = this.needsOctaveMark(
-        note.pitch.step,
-        note.pitch.octave,
+        note.written.step,
+        note.written.register,
         previousNoteMidi,
         i === 0 || previousNoteMidi === null,
       );
 
       // Create the base note
       const shakuNote = new ShakuNote({
-        symbol: note.pitch.step,
+        symbol: note.written.step,
         color: noteColor,
       });
 
       // Add octave mark only if needed (violates closest-note rule)
       if (needsOctaveMark) {
         const octaveModifier = new OctaveMarksModifier(
-          OCTAVE_REGISTERS[note.pitch.octave],
+          OCTAVE_REGISTERS[note.written.register],
         );
         shakuNote.addModifier(octaveModifier);
       }
@@ -162,7 +162,7 @@ export class ScoreParser {
       shakuNotes.push(shakuNote);
 
       // Update previous note MIDI for next iteration
-      previousNoteMidi = getNoteMidi(note.pitch.step, note.pitch.octave);
+      previousNoteMidi = getNoteMidi(note.written.step, note.written.register);
     }
 
     return shakuNotes;
@@ -224,30 +224,35 @@ export class ScoreParser {
         return;
       }
 
-      // Regular notes need pitch
-      if (!note.pitch) {
-        throw new Error(S.noteIndexPitchRequired(index));
+      // Notes that are not rests need a written character and register
+      if (!note.written) {
+        throw new Error(S.noteIndexWrittenRequired(index));
       }
 
-      if (!note.pitch.step) {
-        throw new Error(S.noteIndexPitchStep(index));
+      if (!note.written.step) {
+        throw new Error(S.noteIndexWrittenStep(index));
       }
 
-      if (!(PITCH_STEPS as readonly string[]).includes(note.pitch.step)) {
-        throw new Error(S.noteIndexStepInvalid(index, note.pitch.step));
+      if (!(PITCH_STEPS as readonly string[]).includes(note.written.step)) {
+        throw new Error(S.noteIndexStepInvalid(index, note.written.step));
       }
 
-      if (note.pitch.octave === undefined || note.pitch.octave === null) {
-        throw new Error(S.noteIndexPitchOctave(index));
+      if (
+        note.written.register === undefined ||
+        note.written.register === null
+      ) {
+        throw new Error(S.noteIndexWrittenRegister(index));
       }
 
       if (note.duration === undefined || note.duration === null) {
         throw new Error(S.noteIndexDuration(index));
       }
 
-      // Validate octave range
-      if (note.pitch.octave < 0 || note.pitch.octave > 2) {
-        throw new Error(S.noteIndexOctaveInvalid(index, note.pitch.octave));
+      // Validate the register
+      if (note.written.register < 0 || note.written.register > 2) {
+        throw new Error(
+          S.noteIndexRegisterInvalid(index, note.written.register),
+        );
       }
 
       this.validateDuration(note, index);
@@ -262,8 +267,8 @@ export class ScoreParser {
   }
 
   /**
-   * Checks a note's duration and dot: a supported length in beats, dotted
-   * only if it has a half. A number is not a duration, though it once was.
+   * Checks a note's duration: a supported length in beats. A number is not a
+   * duration, though it once was.
    */
   private static validateDuration(note: ScoreNote, index: number): void {
     const S = PARSER_STRINGS.ERRORS.ScoreParser;
@@ -275,9 +280,6 @@ export class ScoreParser {
     }
     if (!isSupported(beats)) {
       throw new Error(S.noteIndexDurationUnsupported(index, duration));
-    }
-    if (note.dotted && !hasHalf(beats)) {
-      throw new Error(S.noteIndexDottedWithoutHalf(index, duration));
     }
   }
 

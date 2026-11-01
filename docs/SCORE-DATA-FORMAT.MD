@@ -18,9 +18,9 @@
 }
 
 Note = {
-  "pitch": {
+  "written": {
     "step": string,          // Written character, e.g. "ro", "tsu", "go-no-hi" (see below)
-    "octave": number         // 0=otsu (base), 1=kan, 2=daikan
+    "register": number       // 0=otsu (base), 1=kan, 2=daikan
   },
   "duration": number,        // Duration in relative timing units
   "meriKari"?: string        // Optional: "dai-meri" | "meri" | "chu-meri" | "chu-kari" | "kari" | "dai-kari"
@@ -29,15 +29,15 @@ Note = {
 
 ## Required Fields
 
-- `pitch.step` - The written character (required). The five basic notes `"ro"`, `"tsu"`, `"re"`, `"chi"` and `"ri"`; `"u"`, `"hi"` and `"ha"`; and the fingerings written with a small numeral: `"go-no-hi"` (ヒ五), `"go-no-ha"` (ハ五), `"san-no-u"` (ウ三), `"san-no-ha"` (ハ三), `"shi-no-ha"` (ハ四) and `"ni-shi-go-no-ha"` (ハ二四五). The list is `PITCH_STEPS` in `src/web-component/types/ScoreData.ts`.
-- `pitch.octave` - Octave indicator (required, 0=otsu, 1=kan, 2=daikan)
+- `written.step` - The written character (required). The five basic notes `"ro"`, `"tsu"`, `"re"`, `"chi"` and `"ri"`; `"u"`, `"hi"` and `"ha"`; and the fingerings written with a small numeral: `"go-no-hi"` (ヒ五), `"go-no-ha"` (ハ五), `"san-no-u"` (ウ三), `"san-no-ha"` (ハ三), `"shi-no-ha"` (ハ四) and `"ni-shi-go-no-ha"` (ハ二四五). The list is `PITCH_STEPS` in `src/web-component/types/ScoreData.ts`.
+- `written.register` - The register (required, 0=otsu, 1=kan, 2=daikan)
 - `duration` - Duration value (required)
 
 ## Optional Fields
 
 - `meriKari` - The meri or kari mark the score writes beside the note: `"dai-meri"` (大メ), `"meri"` (メ), `"chu-meri"` (中), `"chu-kari"` (中カ), `"kari"` (カ) or `"dai-kari"` (大カ). It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. It is only what is written: u and san no u are played meri and kari without a mark, and the fingering table (`src/web-component/constants/kinko-fingerings.ts`) records that. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not a `meriKari` value.
 
-A step, octave and mark that the fingering table doesn't list still render. Converted to MusicXML or ABC, they get an estimated Western pitch (the character's pitch, moved by the mark) and their name, so they read back exactly; other software plays the estimate.
+A step, register and mark that the fingering table doesn't list still render. Converted to MusicXML or ABC, they get an estimated Western pitch (the character's pitch, moved by the mark) and their name, so they read back exactly; other software plays the estimate.
 
 ## Column Layout
 
@@ -57,15 +57,15 @@ This separation allows the same score data to be rendered differently on mobile,
   "title": "Akatombo",
   "style": "kinko",
   "notes": [
-    { "pitch": { "step": "tsu", "octave": 1 }, "duration": 1 },
-    { "pitch": { "step": "re", "octave": 1 }, "duration": 1 },
-    { "pitch": { "step": "chi", "octave": 1 }, "duration": 2 },
+    { "written": { "step": "tsu", "register": 1 }, "duration": 1 },
+    { "written": { "step": "re", "register": 1 }, "duration": 1 },
+    { "written": { "step": "chi", "register": 1 }, "duration": 2 },
     {
-      "pitch": { "step": "ri", "octave": 0 },
+      "written": { "step": "ri", "register": 0 },
       "duration": 1,
       "meriKari": "meri"
     },
-    { "pitch": { "step": "ro", "octave": 0 }, "duration": 4 }
+    { "written": { "step": "ro", "register": 0 }, "duration": 4 }
   ]
 }
 ```
@@ -119,12 +119,11 @@ The pitch for each fingering comes from the fingering table (`constants/kinko-fi
 
 ### Fields that exist now
 
-| Field                        | MusicXML                    | Status                                                                                                                                                                          |
-| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pitch.step`, `pitch.octave` | Not `<pitch>`               | Different. The names are the same, but these are a fingering and a register. #492 renames them to `written.step` and `written.register`.                                        |
-| `duration`                   | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438).                                                                                                                        |
-| `dotted`                     | `<dot/>`                    | Same. MusicXML export and the editor use it. The renderer does not: it draws a dot for each length with a half. #492 removes the field, and the dot then comes from `duration`. |
-| `rest`                       | `<rest/>`                   | Same.                                                                                                                                                                           |
-| `meriKari`, `style`          | None                        | Ours. They need an encoding (#472, #473).                                                                                                                                       |
-| `key`, `tempo`               | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                                                                                                           |
-| `title`, `composer`          | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                                                                                                           |
+| Field                              | MusicXML                    | Status                                                                                          |
+| ---------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
+| `written.step`, `written.register` | Not `<pitch>`               | Different. These are a fingering and a register, not a sounding pitch (#492).                   |
+| `duration`                         | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438). A length with a half has a dot (#492). |
+| `rest`                             | `<rest/>`                   | Same.                                                                                           |
+| `meriKari`, `style`                | None                        | Ours. They need an encoding (#472, #473).                                                       |
+| `key`, `tempo`                     | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                           |
+| `title`, `composer`                | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                           |

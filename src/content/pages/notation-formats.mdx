@@ -8,25 +8,25 @@ Every score is saved as JSON. In the editor's source view, you can show a score 
 
 ### JSON Format
 
-Shakuhachi score notation in JSON format. Each note has a pitch (step and octave) and duration.
+Shakuhachi score notation in JSON format. Each note has a written character (step and register) and a duration.
 
 **Example:**
 
 ```json
 {
   "notes": [
-    { "pitch": { "step": "ro", "octave": 0 }, "duration": "1" },
-    { "pitch": { "step": "tsu", "octave": 0 }, "duration": "1" },
-    { "pitch": { "step": "re", "octave": 0 }, "duration": "1" }
+    { "written": { "step": "ro", "register": 0 }, "duration": "1" },
+    { "written": { "step": "tsu", "register": 0 }, "duration": "1" },
+    { "written": { "step": "re", "register": 0 }, "duration": "1" }
   ]
 }
 ```
 
 **Valid note steps:** ro, tsu, re, chi, ri, u, hi
 
-**Octaves:** 0 (otsu), 1 (kan), 2 (daikan)
+**Registers:** 0 (otsu), 1 (kan), 2 (daikan)
 
-**Duration:** the length in beats, as a string: "1" (one beat), "2" (two beats, the note and a stroke), "1/2" (half a beat, one line), "1/4" (a quarter, two lines). A half after these, as in "3/2", "5/2" or "3/4", is drawn as a dot, and marked `"dotted": true`.
+**Duration:** the length in beats, as a string: "1" (one beat), "2" (two beats, the note and a stroke), "1/2" (half a beat, one line), "1/4" (a quarter, two lines). A half after these, as in "3/2", "5/2" or "3/4", is drawn as a dot.
 
 ### ABC Notation
 
