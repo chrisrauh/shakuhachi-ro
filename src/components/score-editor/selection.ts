@@ -158,12 +158,12 @@ export function describeSelection(
 
 /** A note as the status line says it: "ヒ五 go no hi meri, kan", or "rest". */
 function describeNote(note: ScoreNote): string {
-  if (note.rest || !note.pitch) return 'rest';
-  // The score was validated before it rendered, so every step has a symbol
-  const symbol = getSymbolByRomaji(note.pitch.step)!;
+  if (note.rest || !note.character) return 'rest';
+  // The score was validated before it rendered, so every character has a symbol
+  const symbol = getSymbolByRomaji(note.character)!;
   const glyph = `${symbol.kana}${symbol.numerals ?? ''}`;
-  const mark = note.meriKari ? ` ${note.meriKari}` : '';
-  return `${glyph} ${stepName(note.pitch.step)}${mark}, ${OCTAVE_REGISTERS[note.pitch.octave]}`;
+  const mark = note.accidental ? ` ${note.accidental}` : '';
+  return `${glyph} ${stepName(note.character)}${mark}, ${OCTAVE_REGISTERS[note.register!]}`;
 }
 
 /** Whether a note is drawn on the column line at x. */

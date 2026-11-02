@@ -26,10 +26,10 @@ function durationMarks(notes: ScoreNote[]): string[] {
   });
 }
 
-const ro = (duration: string, dotted?: boolean): ScoreNote => ({
-  pitch: { step: 'ro', octave: 0 },
+const ro = (duration: string): ScoreNote => ({
+  character: 'ro',
+  register: 0,
   duration,
-  ...(dotted && { dotted }),
 });
 
 describe('ScoreParser', () => {
@@ -40,7 +40,8 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            pitch: { step: 'ro', octave: 0 },
+            character: 'ro',
+            register: 0,
             duration: '1',
           },
         ],
@@ -57,9 +58,9 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' }, // One beat: no duration marks
-          { pitch: { step: 'tsu', octave: 1 }, duration: '1' },
-          { pitch: { step: 'tsu', octave: 2 }, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' }, // One beat: no duration marks
+          { character: 'tsu', register: 1, duration: '1' },
+          { character: 'tsu', register: 2, duration: '1' },
         ],
       };
 
@@ -88,7 +89,12 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1', meriKari: 'meri' }, // One beat: no duration marks
+          {
+            character: 'ro',
+            register: 0,
+            duration: '1',
+            accidental: 'meri',
+          }, // One beat: no duration marks
         ],
       };
 
@@ -104,9 +110,10 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            pitch: { step: 'chi', octave: 1 },
+            character: 'chi',
+            register: 1,
             duration: '1',
-            meriKari: 'meri',
+            accidental: 'meri',
           }, // One beat: no duration marks
         ],
       };
@@ -118,18 +125,18 @@ describe('ScoreParser', () => {
       expect(notes[0].getModifiers()).toHaveLength(2);
     });
 
-    it('should parse all valid pitch steps', () => {
+    it('should parse all valid characters', () => {
       const scoreData: ScoreData = {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
-          { pitch: { step: 're', octave: 0 }, duration: '1' },
-          { pitch: { step: 'chi', octave: 0 }, duration: '1' },
-          { pitch: { step: 'ri', octave: 0 }, duration: '1' },
-          { pitch: { step: 'u', octave: 0 }, duration: '1' },
-          { pitch: { step: 'hi', octave: 0 }, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' },
+          { character: 're', register: 0, duration: '1' },
+          { character: 'chi', register: 0, duration: '1' },
+          { character: 'ri', register: 0, duration: '1' },
+          { character: 'u', register: 0, duration: '1' },
+          { character: 'hi', register: 0, duration: '1' },
         ],
       };
 
@@ -150,8 +157,8 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '3/2', dotted: true },
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1', dotted: false },
+          { character: 'ro', register: 0, duration: '3/2' },
+          { character: 'tsu', register: 0, duration: '1' },
         ],
       };
 
@@ -168,7 +175,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           { rest: true, duration: '1' },
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
         ],
       };
 
@@ -185,10 +192,10 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            pitch: { step: 'chi', octave: 1 },
+            character: 'chi',
+            register: 1,
             duration: '3/2',
-            meriKari: 'meri',
-            dotted: true,
+            accidental: 'meri',
           }, // A beat and its dot: no duration lines
         ],
       };
@@ -210,7 +217,7 @@ describe('ScoreParser', () => {
 
     it('should parse minimal data without title or style', () => {
       const minimalData = {
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       } as any;
 
       const parsed = ScoreParser.parse(minimalData);
@@ -232,39 +239,39 @@ describe('ScoreParser', () => {
       expect(ScoreParser.parse({ notes: [] } as any)).toEqual([]);
     });
 
-    it('should throw error if note is missing pitch', () => {
+    it('should throw error if note is missing character', () => {
       const scoreData = {
-        notes: [{ duration: '1' }],
+        notes: [{ register: 0, duration: '1' }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 is missing pitch',
+        'Note 1 is missing character',
       );
     });
 
-    it('should throw error if note is missing pitch.step', () => {
+    it('should throw error for a note in the shape before #492', () => {
       const scoreData = {
-        notes: [{ pitch: { octave: 0 }, duration: '1' }],
+        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 is missing pitch.step',
+        'Note 1 is missing character',
       );
     });
 
-    it('should throw error if note is missing pitch.octave', () => {
+    it('should throw error if note is missing register', () => {
       const scoreData = {
-        notes: [{ pitch: { step: 'ro' }, duration: '1' }],
+        notes: [{ character: 'ro', duration: '1' }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 is missing pitch.octave',
+        'Note 1 is missing register',
       );
     });
 
     it('should throw error if note is missing duration', () => {
       const scoreData = {
-        notes: [{ pitch: { step: 'ro', octave: 0 } }],
+        notes: [{ character: 'ro', register: 0 }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -272,62 +279,63 @@ describe('ScoreParser', () => {
       );
     });
 
-    it('should throw error if octave is out of range (too low)', () => {
+    it('should throw error if register is out of range (too low)', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: -1 }, duration: '1' }],
+        notes: [{ character: 'ro', register: -1, duration: '1' }],
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 has invalid octave: -1',
+        'Note 1 has invalid register: -1',
       );
     });
 
-    it('should throw error if octave is out of range (too high)', () => {
+    it('should throw error if register is out of range (too high)', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 3 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 3, duration: '1' }],
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 has invalid octave: 3',
+        'Note 1 has invalid register: 3',
       );
     });
 
-    it('should throw error if meriKari is not a known value', () => {
+    it('should throw error if accidental is not a known value', () => {
       const scoreData = {
         notes: [
           {
-            pitch: { step: 'ro', octave: 0 },
+            character: 'ro',
+            register: 0,
             duration: '1',
-            meriKari: 'merri',
+            accidental: 'merri',
           },
         ],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 has invalid meriKari: merri',
+        'Note 1 has invalid accidental: merri',
       );
     });
 
-    it('should throw error if step is not a known value, numbering notes from 1', () => {
+    it('should throw error if character is not a known value, numbering notes from 1', () => {
       const scoreData = {
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-          { pitch: { step: 'go', octave: 0 }, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'go', register: 0, duration: '1' },
         ],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 2 has invalid pitch.step: go. Must be one of: ro, tsu,',
+        'Note 2 has invalid character: go. Must be one of: ro, tsu,',
       );
     });
 
     it('should throw error if duration is a number, the form before beats', () => {
       const scoreData = {
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: 2 }],
+        notes: [{ character: 'ro', register: 0, duration: 2 }],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -372,20 +380,10 @@ describe('ScoreParser', () => {
       ]);
     });
 
-    it('writes a half as a dot, dotted or not', () => {
-      expect(
-        durationMarks([
-          ro('3/2', true),
-          ro('5/2', true),
-          ro('3/4', true),
-          ro('3/2'),
-          ro('3/4'),
-        ]),
-      ).toEqual([
+    it('writes a half as a dot', () => {
+      expect(durationMarks([ro('3/2'), ro('5/2'), ro('3/4')])).toEqual([
         'note dot',
         'note stroke dot',
-        'note| dot|',
-        'note dot',
         'note| dot|',
       ]);
     });
@@ -425,12 +423,6 @@ describe('ScoreParser', () => {
         ScoreParser.validate({ notes: [{ rest: true, duration: '1/8' }] }),
       ).toThrow('Note 1 has invalid duration: "1/8"');
     });
-
-    it('rejects a dot on a length without a half', () => {
-      expect(() => ScoreParser.validate({ notes: [ro('1', true)] })).toThrow(
-        'Note 1 is dotted, but its duration, "1", has no half',
-      );
-    });
   });
 
   describe('parseJSON()', () => {
@@ -438,7 +430,7 @@ describe('ScoreParser', () => {
       const json = JSON.stringify({
         title: 'Test Score',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       });
 
       const notes = ScoreParser.parseJSON(json);

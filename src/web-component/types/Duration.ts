@@ -85,12 +85,12 @@ const HALF_BEAT: Beats = { num: 1, den: 2 };
  */
 
 /**
- * The length written before the dot: a dotted 3/2 is written as one beat and
- * its dot, a dotted 3/4 as half a beat and its dot. An undotted length is
- * written as itself.
+ * The length written before the dot. A length with a half is written with a
+ * dot: 3/2 as one beat and its dot, 3/4 as half a beat and its dot. Any other
+ * length is written as itself.
  */
-export function writtenLength(beats: Beats, dotted?: boolean): Beats {
-  if (!dotted) return beats;
+export function writtenLength(beats: Beats): Beats {
+  if (!hasHalf(beats)) return beats;
   return beats.num > beats.den
     ? scale({ num: 2 * beats.num - beats.den, den: beats.den }, 1, 2)
     : scale(beats, 2, 3);

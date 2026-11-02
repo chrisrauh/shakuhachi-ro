@@ -18,16 +18,16 @@ import {
   durationSlots,
 } from '../modifiers/DurationMarksModifier';
 import {
-  MERI_KARI,
-  PITCH_STEPS,
+  ACCIDENTALS,
+  CHARACTERS,
   type ScoreData,
   type ScoreNote,
 } from '../types/ScoreData';
-import { hasHalf, isSupported, parseBeats } from '../types/Duration';
+import { isSupported, parseBeats } from '../types/Duration';
 import { getNoteMidi } from '../constants/kinko-symbols';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 
-/** Register for each `pitch.octave` value validate() accepts: 0, 1, 2 */
+/** Register for each `register` value validate() accepts: 0, 1, 2 */
 export const OCTAVE_REGISTERS: readonly OctaveRegister[] = [
   'otsu',
   'kan',
@@ -123,37 +123,37 @@ export class ScoreParser {
         continue;
       }
 
-      // Ensure pitch exists for non-rest notes
-      if (!note.pitch) {
+      // A note that is not a rest needs a character
+      if (!note.character || note.register === undefined) {
         throw new Error(
-          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexPitchWhenNotRest(i),
+          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexCharacterWhenNotRest(i),
         );
       }
 
       // Calculate which octave would be "expected" based on closest-note principle
       const needsOctaveMark = this.needsOctaveMark(
-        note.pitch.step,
-        note.pitch.octave,
+        note.character,
+        note.register,
         previousNoteMidi,
         i === 0 || previousNoteMidi === null,
       );
 
       // Create the base note
       const shakuNote = new ShakuNote({
-        symbol: note.pitch.step,
+        symbol: note.character,
         color: noteColor,
       });
 
       // Add octave mark only if needed (violates closest-note rule)
       if (needsOctaveMark) {
         const octaveModifier = new OctaveMarksModifier(
-          OCTAVE_REGISTERS[note.pitch.octave],
+          OCTAVE_REGISTERS[note.register],
         );
         shakuNote.addModifier(octaveModifier);
       }
 
-      if (note.meriKari) {
-        shakuNote.addModifier(new MeriKariModifier(note.meriKari));
+      if (note.accidental) {
+        shakuNote.addModifier(new MeriKariModifier(note.accidental));
       }
 
       const marks = durationMarks(scoreData.notes, i);
@@ -162,7 +162,7 @@ export class ScoreParser {
       shakuNotes.push(shakuNote);
 
       // Update previous note MIDI for next iteration
-      previousNoteMidi = getNoteMidi(note.pitch.step, note.pitch.octave);
+      previousNoteMidi = getNoteMidi(note.character, note.register);
     }
 
     return shakuNotes;
@@ -215,7 +215,7 @@ export class ScoreParser {
 
     // Validate each note
     notes.forEach((note, index) => {
-      // Rest notes don't need pitch
+      // A rest has no character or register
       if (note.rest) {
         if (!note.duration) {
           throw new Error(S.restIndexDuration(index));
@@ -224,46 +224,42 @@ export class ScoreParser {
         return;
       }
 
-      // Regular notes need pitch
-      if (!note.pitch) {
-        throw new Error(S.noteIndexPitchRequired(index));
+      // A note that is not a rest needs a character and a register
+      if (!note.character) {
+        throw new Error(S.noteIndexCharacterRequired(index));
       }
 
-      if (!note.pitch.step) {
-        throw new Error(S.noteIndexPitchStep(index));
+      if (!(CHARACTERS as readonly string[]).includes(note.character)) {
+        throw new Error(S.noteIndexCharacterInvalid(index, note.character));
       }
 
-      if (!(PITCH_STEPS as readonly string[]).includes(note.pitch.step)) {
-        throw new Error(S.noteIndexStepInvalid(index, note.pitch.step));
-      }
-
-      if (note.pitch.octave === undefined || note.pitch.octave === null) {
-        throw new Error(S.noteIndexPitchOctave(index));
+      if (note.register === undefined || note.register === null) {
+        throw new Error(S.noteIndexRegisterRequired(index));
       }
 
       if (note.duration === undefined || note.duration === null) {
         throw new Error(S.noteIndexDuration(index));
       }
 
-      // Validate octave range
-      if (note.pitch.octave < 0 || note.pitch.octave > 2) {
-        throw new Error(S.noteIndexOctaveInvalid(index, note.pitch.octave));
+      // Validate the register
+      if (note.register < 0 || note.register > 2) {
+        throw new Error(S.noteIndexRegisterInvalid(index, note.register));
       }
 
       this.validateDuration(note, index);
 
       if (
-        note.meriKari !== undefined &&
-        !(MERI_KARI as readonly string[]).includes(note.meriKari)
+        note.accidental !== undefined &&
+        !(ACCIDENTALS as readonly string[]).includes(note.accidental)
       ) {
-        throw new Error(S.noteIndexMeriKariInvalid(index, note.meriKari));
+        throw new Error(S.noteIndexAccidentalInvalid(index, note.accidental));
       }
     });
   }
 
   /**
-   * Checks a note's duration and dot: a supported length in beats, dotted
-   * only if it has a half. A number is not a duration, though it once was.
+   * Checks a note's duration: a supported length in beats. A number is not a
+   * duration, though it once was.
    */
   private static validateDuration(note: ScoreNote, index: number): void {
     const S = PARSER_STRINGS.ERRORS.ScoreParser;
@@ -275,9 +271,6 @@ export class ScoreParser {
     }
     if (!isSupported(beats)) {
       throw new Error(S.noteIndexDurationUnsupported(index, duration));
-    }
-    if (note.dotted && !hasHalf(beats)) {
-      throw new Error(S.noteIndexDottedWithoutHalf(index, duration));
     }
   }
 

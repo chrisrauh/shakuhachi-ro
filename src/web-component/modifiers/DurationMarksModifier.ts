@@ -65,7 +65,7 @@ function linesFor(num: number, den: number): number {
  */
 export function durationSlots(beats: Beats): DurationSlot[] {
   const dotted = hasHalf(beats);
-  const written = writtenLength(beats, dotted);
+  const written = writtenLength(beats);
   const whole = Math.floor(written.num / written.den);
   const slots: DurationSlot[] = [];
 

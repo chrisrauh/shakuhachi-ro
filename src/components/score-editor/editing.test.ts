@@ -11,9 +11,9 @@ import {
   type EditorState,
 } from './editing';
 
-const ro: ScoreNote = { pitch: { step: 'ro', octave: 0 }, duration: '1' };
+const ro: ScoreNote = { character: 'ro', register: 0, duration: '1' };
 // Ri is C5: the ro closest to it is kan ro (D5), not otsu ro (D4)
-const ri: ScoreNote = { pitch: { step: 'ri', octave: 0 }, duration: '1/2' };
+const ri: ScoreNote = { character: 'ri', register: 0, duration: '1/2' };
 const rest: ScoreNote = { rest: true, duration: '2' };
 
 const cursorAt = (notes: ScoreNote[], position: number): EditorState => ({
@@ -28,14 +28,14 @@ const highlight = (notes: ScoreNote[], index: number): EditorState => ({
 describe('chooseNote at a cursor', () => {
   it('inserts with the previous note’s duration, and moves the cursor after it', () => {
     const before = cursorAt(
-      [{ ...ro, duration: '3/2', dotted: true, meriKari: 'meri' }],
+      [{ ...ro, duration: '3/2', accidental: 'meri' }],
       1,
     );
 
     expect(chooseNote(before, 'tsu')).toEqual({
       notes: [
         before.notes[0],
-        { pitch: { step: 'tsu', octave: 0 }, duration: '1' },
+        { character: 'tsu', register: 0, duration: '1' },
       ],
       selection: { type: 'cursor', position: 2 },
     });
@@ -43,14 +43,15 @@ describe('chooseNote at a cursor', () => {
 
   it('starts an empty score with a one-beat note in the lowest octave', () => {
     expect(chooseNote(cursorAt([], 0), 're')!.notes).toEqual([
-      { pitch: { step: 're', octave: 0 }, duration: '1' },
+      { character: 're', register: 0, duration: '1' },
     ]);
   });
 
   it('picks the octave closest to the previous pitched note, past rests', () => {
     const { notes } = chooseNote(cursorAt([ri, rest], 2), 'ro')!;
     expect(notes[2]).toEqual({
-      pitch: { step: 'ro', octave: 1 },
+      character: 'ro',
+      register: 1,
       duration: '2',
     });
   });
@@ -66,14 +67,14 @@ describe('chooseNote at a cursor', () => {
 describe('chooseNote on a highlight', () => {
   it('changes the fingering, keeping duration, dot, octave and mark', () => {
     const note: ScoreNote = {
-      pitch: { step: 'ri', octave: 1 },
+      character: 'ri',
+      register: 1,
       duration: '3/4',
-      dotted: true,
-      meriKari: 'kari',
+      accidental: 'kari',
     };
 
     expect(chooseNote(highlight([note], 0), 'chi')).toEqual({
-      notes: [{ ...note, pitch: { step: 'chi', octave: 1 } }],
+      notes: [{ ...note, character: 'chi', register: 1 }],
       selection: { type: 'highlight', index: 0 },
     });
   });
@@ -81,7 +82,8 @@ describe('chooseNote on a highlight', () => {
   it('gives a rest turned into a note the closest octave', () => {
     const { notes } = chooseNote(highlight([ri, rest], 1), 'ro')!;
     expect(notes[1]).toEqual({
-      pitch: { step: 'ro', octave: 1 },
+      character: 'ro',
+      register: 1,
       duration: '2',
     });
   });
@@ -90,11 +92,10 @@ describe('chooseNote on a highlight', () => {
     const note: ScoreNote = {
       ...ro,
       duration: '3/2',
-      dotted: true,
-      meriKari: 'meri',
+      accidental: 'meri',
     };
     expect(chooseNote(highlight([note], 0), 'rest')!.notes).toEqual([
-      { rest: true, duration: '3/2', dotted: true },
+      { rest: true, duration: '3/2' },
     ]);
   });
 
@@ -114,11 +115,11 @@ describe('length, dot, mark and octave', () => {
 
   it('toggle the dot and the mark off again', () => {
     const dotted = toggleDot(highlight([ro], 0))!;
-    expect(dotted.notes[0]).toEqual({ ...ro, duration: '3/2', dotted: true });
+    expect(dotted.notes[0]).toEqual({ ...ro, duration: '3/2' });
     expect(toggleDot(dotted)!.notes[0]).toEqual(ro);
 
     const meri = setMark(highlight([ro], 0), 'meri')!;
-    expect(setMark(meri, 'dai-meri')!.notes[0].meriKari).toBe('dai-meri');
+    expect(setMark(meri, 'dai-meri')!.notes[0].accidental).toBe('dai-meri');
     expect(setMark(meri, 'meri')!.notes[0]).toEqual(ro);
   });
 
@@ -126,27 +127,20 @@ describe('length, dot, mark and octave', () => {
     expect(setDuration(highlight([ro], 0), '1')).toBeNull();
   });
 
-  it('dot whole beats and half a beat, and mark an undotted half dotted', () => {
+  it('dot whole beats and half a beat, but not a quarter', () => {
     const half = { ...ro, duration: '1/2' };
     expect(toggleDot(highlight([half], 0))!.notes[0]).toEqual({
       ...half,
       duration: '3/4',
-      dotted: true,
     });
     expect(
       toggleDot(highlight([{ ...ro, duration: '2' }], 0))!.notes[0],
-    ).toEqual({ ...ro, duration: '5/2', dotted: true });
+    ).toEqual({ ...ro, duration: '5/2' });
     expect(toggleDot(highlight([{ ...ro, duration: '1/4' }], 0))).toBeNull();
-
-    const undotted = { ...ro, duration: '3/2' };
-    expect(toggleDot(highlight([undotted], 0))!.notes[0]).toEqual({
-      ...undotted,
-      dotted: true,
-    });
   });
 
   it('set the length before the dot, dropping a dot it cannot take', () => {
-    const dotted = { ...ro, duration: '3/2', dotted: true };
+    const dotted = { ...ro, duration: '3/2' };
     expect(setDuration(highlight([dotted], 0), '1/2')!.notes[0]).toEqual({
       ...dotted,
       duration: '3/4',
@@ -165,7 +159,7 @@ describe('length, dot, mark and octave', () => {
   it('add a beat with a stroke, keeping the dot', () => {
     const stroke = (note: ScoreNote) =>
       addStroke(highlight([note], 0))!.notes[0];
-    const dotted = { ...ro, duration: '3/2', dotted: true };
+    const dotted = { ...ro, duration: '3/2' };
     expect(stroke(ro)).toEqual({ ...ro, duration: '2' });
     expect(stroke({ ...ro, duration: '2' })).toEqual({ ...ro, duration: '3' });
     expect(stroke(dotted)).toEqual({ ...dotted, duration: '5/2' });
@@ -175,7 +169,7 @@ describe('length, dot, mark and octave', () => {
     for (const note of [ri, { ...ro, duration: '1/4' }]) {
       expect(addStroke(highlight([note], 0))).toBeNull();
     }
-    const dottedHalf = { ...ri, duration: '3/4', dotted: true };
+    const dottedHalf = { ...ri, duration: '3/4' };
     expect(addStroke(highlight([dottedHalf], 0))).toBeNull();
     expect(addStroke(cursorAt([ro], 0))).toBeNull();
   });
@@ -184,7 +178,7 @@ describe('length, dot, mark and octave', () => {
     expect(
       setDuration(highlight([{ ...ro, duration: '3' }], 0), '1')!.notes[0],
     ).toEqual(ro);
-    const dotted = { ...ro, duration: '5/2', dotted: true };
+    const dotted = { ...ro, duration: '5/2' };
     expect(setDuration(highlight([dotted], 0), '1')!.notes[0]).toEqual({
       ...dotted,
       duration: '3/2',
@@ -192,7 +186,7 @@ describe('length, dot, mark and octave', () => {
   });
 
   it('move the octave within otsu to daikan, and not on a rest', () => {
-    expect(shiftOctave(highlight([ro], 0), 1)!.notes[0].pitch!.octave).toBe(1);
+    expect(shiftOctave(highlight([ro], 0), 1)!.notes[0].register).toBe(1);
     expect(shiftOctave(highlight([ro], 0), -1)).toBeNull();
     expect(setMark(highlight([rest], 0), 'meri')).toBeNull();
     expect(shiftOctave(highlight([rest], 0), 1)).toBeNull();

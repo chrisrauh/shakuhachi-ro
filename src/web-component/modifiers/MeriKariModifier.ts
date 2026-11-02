@@ -17,12 +17,12 @@
 import { Modifier, type ModifierPosition } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { DEFAULT_RENDER_OPTIONS } from '../renderer/RenderOptions';
-import type { MeriKari } from '../types/ScoreData';
+import type { Accidental } from '../types/ScoreData';
 import { MARK_WIDTH_RATIO, MERI_KARI_SIDE_OFFSET } from './mark-geometry';
 
 export class MeriKariModifier extends Modifier {
   /** Type of pitch alteration */
-  private type: MeriKari;
+  private type: Accidental;
 
   /** Font size — overridden by ModifierConfigurator from render options */
   private fontSize: number = DEFAULT_RENDER_OPTIONS.meriKariFontSize;
@@ -37,7 +37,7 @@ export class MeriKariModifier extends Modifier {
   private color: string = '#000'; // Black, like traditional notation
 
   /** The mark for each meri and kari */
-  private static readonly symbols: Record<MeriKari, string> = {
+  private static readonly symbols: Record<Accidental, string> = {
     meri: 'メ',
     'chu-meri': '中',
     'dai-meri': '大メ',
@@ -52,7 +52,7 @@ export class MeriKariModifier extends Modifier {
    * @param type - Which meri or kari
    * @param position - Where to position relative to note (default: 'left')
    */
-  constructor(type: MeriKari = 'meri', position: ModifierPosition = 'left') {
+  constructor(type: Accidental = 'meri', position: ModifierPosition = 'left') {
     super(position);
     this.type = type;
     this.setDefaultOffsets();
@@ -137,7 +137,7 @@ export class MeriKariModifier extends Modifier {
   /**
    * Gets the type of alteration
    */
-  getType(): MeriKari {
+  getType(): Accidental {
     return this.type;
   }
 

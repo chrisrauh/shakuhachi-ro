@@ -9,9 +9,9 @@
 import { Delete, Redo2, Undo2 } from '@lucide/astro';
 import { kinkoMap } from '../../web-component/constants/kinko-symbols';
 import { LENGTHS, MAIN_NOTES, MARKS, OTHER_NOTES, stepName } from './palette';
-import type { PitchStep } from '../../web-component/types/ScoreData';
+import type { Character } from '../../web-component/types/ScoreData';
 
-const noteKey = (step: PitchStep) => ({
+const noteKey = (step: Character) => ({
   step,
   name: stepName(step),
   kana: kinkoMap[step].kana,
