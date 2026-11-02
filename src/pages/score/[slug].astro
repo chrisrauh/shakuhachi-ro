@@ -33,12 +33,14 @@ if (!score) {
   //
   // max-age is only the backstop for a missed purge — the tag below is what keeps
   // edits immediately visible, which is why these pages are SSR in the first place
-  // (docs/ARCHITECTURE-PLATFORM.MD). stale-while-revalidate is what makes a short
-  // max-age cheap: past it the edge serves the stale copy at once and refreshes
-  // behind the request, so nobody waits for the round trip.
+  // (docs/ARCHITECTURE-PLATFORM.MD). It is a day, not minutes, because each edge
+  // node keeps its own copy and serves it only while it is fresh: a stale edge copy
+  // waits for the durable cache in N. Virginia, the same as a miss (#411, Analysis
+  // B). stale-while-revalidate applies in the durable cache, so a page past max-age
+  // still does not wait for a render.
   Astro.response.headers.set(
     'Netlify-CDN-Cache-Control',
-    'public, max-age=300, stale-while-revalidate=86400, durable',
+    'public, max-age=86400, stale-while-revalidate=86400, durable',
   );
   // Netlify-Cache-Tag rather than Cache-Tag: Netlify prefers it when both are
   // present, and keeps it internal instead of passing it on to the client.

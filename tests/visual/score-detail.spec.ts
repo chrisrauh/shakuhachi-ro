@@ -47,7 +47,7 @@ test.describe('Score Detail Page Visual Regression', () => {
     const response = await page.goto('/score/akatombo');
     const headers = response!.headers();
 
-    expect(headers['netlify-cdn-cache-control']).toContain('max-age=300');
+    expect(headers['netlify-cdn-cache-control']).toContain('max-age=86400');
     expect(headers['netlify-cdn-cache-control']).toContain(
       'stale-while-revalidate',
     );
