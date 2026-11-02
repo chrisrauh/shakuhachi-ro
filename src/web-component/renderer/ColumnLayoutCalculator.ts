@@ -73,7 +73,7 @@ interface ColumnBreak {
 const BOTTOM_PADDING = 20;
 
 /** What the heights of a note's length slots follow from, in the render options */
-function slotSpacing(options: ResolvedRenderOptions): SlotSpacing {
+export function slotSpacing(options: ResolvedRenderOptions): SlotSpacing {
   return {
     noteSpacing: options.noteVerticalSpacing,
     noteFontSize: options.noteFontSize,

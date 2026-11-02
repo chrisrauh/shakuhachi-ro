@@ -14,11 +14,12 @@ export type Selection =
   | { type: 'highlight'; index: number };
 
 /**
- * The bands at the top and bottom of a note's cell where a tap is between
- * notes, not on one, as fractions of the cell's height. The cursor goes on
- * the cell's edges, so they're where it's expected.
+ * The height in pixels of the bands at the top and bottom of a note's cell
+ * where a tap is between notes, not on one. The cursor goes on the cell's
+ * edges, so they're where it's expected. A fixed size, so a long note's taller
+ * cell does not get wider bands.
  */
-const BETWEEN_NOTES_RATIO = 1 / 8;
+const BETWEEN_NOTES_BAND = 5;
 
 /**
  * The cursor's width in an empty score, where there's no note cell to take it
@@ -41,12 +42,11 @@ export function selectAt(
   current: Selection,
 ): Selection {
   const hit = boxes.findIndex(({ cell }) => {
-    const band = cell.height * BETWEEN_NOTES_RATIO;
     return (
       x >= cell.x &&
       x <= cell.x + cell.width &&
-      y >= cell.y + band &&
-      y <= cell.y + cell.height - band
+      y >= cell.y + BETWEEN_NOTES_BAND &&
+      y <= cell.y + cell.height - BETWEEN_NOTES_BAND
     );
   });
   if (hit >= 0) {

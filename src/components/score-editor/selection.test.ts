@@ -53,6 +53,22 @@ describe('selectAt', () => {
     });
   });
 
+  it("keeps the between-notes bands the same size on a long note's taller cell", () => {
+    // The first note's cell reaches 60px further down, over its strokes: 5 to 107
+    const long = box(70, 10);
+    long.cell.height += 60;
+    const column = [long, box(70, 114)];
+    // 9px above the bottom edge is on the note, 3px is between the notes
+    expect(selectAt(column, 70, 98, CURSOR_AT_END)).toEqual({
+      type: 'highlight',
+      index: 0,
+    });
+    expect(selectAt(column, 70, 104, CURSOR_AT_END)).toEqual({
+      type: 'cursor',
+      position: 1,
+    });
+  });
+
   it('puts the cursor after the highlighted note when it is tapped again', () => {
     expect(selectAt(COLUMN, 70, 70, { type: 'highlight', index: 1 })).toEqual({
       type: 'cursor',
