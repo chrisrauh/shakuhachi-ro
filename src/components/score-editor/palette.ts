@@ -1,12 +1,12 @@
 import {
-  MERI_KARI,
-  PITCH_STEPS,
-  type MeriKari,
-  type PitchStep,
+  ACCIDENTALS,
+  CHARACTERS,
+  type Accidental,
+  type Character,
 } from '../../web-component/types/ScoreData';
 
 /** The seven notes of the basic scale, listed first; the rest key follows them. */
-export const MAIN_NOTES: readonly PitchStep[] = [
+export const MAIN_NOTES: readonly Character[] = [
   'ro',
   'tsu',
   're',
@@ -17,7 +17,7 @@ export const MAIN_NOTES: readonly PitchStep[] = [
 ];
 
 /** Every other fingering, after the rest key, in the order the score data lists them. */
-export const OTHER_NOTES: readonly PitchStep[] = PITCH_STEPS.filter(
+export const OTHER_NOTES: readonly Character[] = CHARACTERS.filter(
   (step) => !MAIN_NOTES.includes(step),
 );
 
@@ -32,7 +32,7 @@ export const LENGTHS = [
 ] as const;
 
 /** The mark each meri and kari is written with, as the score draws it. */
-const MARK_GLYPHS: Record<MeriKari, string> = {
+const MARK_GLYPHS: Record<Accidental, string> = {
   'dai-meri': '大メ',
   meri: 'メ',
   'chu-meri': '中',
@@ -41,12 +41,12 @@ const MARK_GLYPHS: Record<MeriKari, string> = {
   'dai-kari': '大カ',
 };
 
-export const MARKS = MERI_KARI.map((mark) => ({
+export const MARKS = ACCIDENTALS.map((mark) => ({
   mark,
   glyph: MARK_GLYPHS[mark],
 }));
 
 /** A fingering's name as said and labelled: go-no-hi is "go no hi". */
-export function stepName(step: PitchStep): string {
+export function stepName(step: Character): string {
   return step.replaceAll('-', ' ');
 }

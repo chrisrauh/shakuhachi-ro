@@ -6,7 +6,12 @@
  */
 
 import type { ScoreData, ScoreNote } from '../types/ScoreData';
-import { formatBeats, noteBeats, writtenLength } from '../types/Duration';
+import {
+  formatBeats,
+  hasHalf,
+  noteBeats,
+  writtenLength,
+} from '../types/Duration';
 import { PARSER_STRINGS } from '../constants/parser-strings';
 import {
   fingeringName,
@@ -92,7 +97,7 @@ export class MusicXMLSerializer {
     parts.push('          <beat-type>4</beat-type>');
     parts.push('        </time>');
     parts.push('        <clef>');
-    parts.push('          <sign>G</sign>');
+    parts.push('          <character>G</character>');
     parts.push('          <line>2</line>');
     parts.push('        </clef>');
     parts.push('      </attributes>');
@@ -114,9 +119,10 @@ export class MusicXMLSerializer {
    */
   private static serializeNote(note: ScoreNote, index: number): string {
     const parts: string[] = [];
-    const fingering: WrittenFingering | undefined = note.pitch && {
-      ...note.pitch,
-      meriKari: note.meriKari,
+    const fingering: WrittenFingering | undefined = note.character && {
+      character: note.character,
+      register: note.register!,
+      accidental: note.accidental,
     };
 
     parts.push('      <note>');
@@ -151,13 +157,14 @@ export class MusicXMLSerializer {
     // A Western dot adds half the written value, and the Kinko dot half a
     // beat, or a quarter after half a beat. They agree up to one beat, so a
     // note dotted after two beats or more, such as 5/2, has no type or dot.
-    const written = writtenLength(beats, note.dotted);
-    if (!note.dotted || written.num <= written.den) {
+    const dotted = hasHalf(beats);
+    const written = writtenLength(beats);
+    if (!dotted || written.num <= written.den) {
       const type = NOTE_TYPES[formatBeats(written)];
       if (type) {
         parts.push(`        <type>${type}</type>`);
       }
-      if (note.dotted) {
+      if (dotted) {
         parts.push('        <dot/>');
       }
     }
@@ -183,7 +190,7 @@ export class MusicXMLSerializer {
   /**
    * The written note for a fingering: its pitch in the fingering table, or an
    * estimate for one the table doesn't list (see pitchForFingering). Fails
-   * only for a step, octave or mark that isn't valid.
+   * only for a character, register or accidental that isn't valid.
    */
   private static convertToWesternPitch(
     fingering: WrittenFingering,

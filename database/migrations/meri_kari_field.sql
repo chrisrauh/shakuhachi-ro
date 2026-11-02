@@ -1,4 +1,4 @@
--- Replace the meri, chu_meri and dai_meri note flags with one meriKari field (#288)
+-- Replace the meri, chu_meri and dai_meri note flags with one accidental field (#288)
 -- Run this migration in Supabase SQL Editor before the macOS visual run on the
 -- PR, and deploy soon after: the visual tests load akatombo, whose meri notes use
 -- the old flags. Between running it and deploying, production shows JSON scores
@@ -20,9 +20,9 @@ set data = jsonb_set(
           (note - 'meri' - 'chu_meri' - 'dai_meri')
           || coalesce(
             case
-              when (note->>'dai_meri')::boolean then '{"meriKari": "dai-meri"}'::jsonb
-              when (note->>'meri')::boolean then '{"meriKari": "meri"}'::jsonb
-              when (note->>'chu_meri')::boolean then '{"meriKari": "chu-meri"}'::jsonb
+              when (note->>'dai_meri')::boolean then '{"accidental": "dai-meri"}'::jsonb
+              when (note->>'meri')::boolean then '{"accidental": "meri"}'::jsonb
+              when (note->>'chu_meri')::boolean then '{"accidental": "chu-meri"}'::jsonb
             end,
             '{}'::jsonb
           )

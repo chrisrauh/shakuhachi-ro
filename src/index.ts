@@ -83,9 +83,8 @@ export type {
 export type {
   ScoreData,
   ScoreNote,
-  Pitch,
-  PitchStep,
-  MeriKari,
+  Character,
+  Accidental,
   NotationStyle,
 } from './web-component/types/ScoreData';
 

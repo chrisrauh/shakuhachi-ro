@@ -1,7 +1,11 @@
-import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
+import type {
+  Accidental,
+  Character,
+} from '../../web-component/types/ScoreData';
 import { parseBeats } from '../../web-component/types/Duration';
 import {
   addStroke,
+  isDotted,
   targetIndex,
   toggleDot,
   writtenDuration,
@@ -84,7 +88,7 @@ export class PalettePanel {
   update({ notes, selection, canUndo, canRedo }: PaletteState): void {
     const index = targetIndex(selection);
     const note = notes[index];
-    const pitch = note && !note.rest ? note.pitch : undefined;
+    const character = note && !note.rest ? note.character : undefined;
     const changing = selection.type === 'highlight';
     let noteKey: HTMLButtonElement | undefined;
 
@@ -99,7 +103,7 @@ export class PalettePanel {
             command.step === 'rest' ? 'a rest' : key.getAttribute('aria-label');
           key.title = `${changing ? 'Change to' : 'Insert'} ${name}`;
           if (changing) {
-            pressed = command.step === (pitch ? pitch.step : 'rest');
+            pressed = command.step === (character ?? 'rest');
             if (pressed) noteKey = key;
           }
           break;
@@ -116,18 +120,18 @@ export class PalettePanel {
           break;
         case 'dot':
           applies &&= toggleDot({ notes, selection }) !== null;
-          pressed = !!note?.dotted;
+          pressed = !!note && isDotted(note);
           break;
         case 'mark':
-          applies &&= !!pitch;
-          pressed = !!pitch && note.meriKari === command.mark;
+          applies &&= !!character;
+          pressed = !!character && note.accidental === command.mark;
           break;
         case 'octave':
           applies &&=
-            !!pitch &&
+            !!character &&
             (command.step > 0
-              ? pitch.octave < HIGHEST_OCTAVE
-              : pitch.octave > 0);
+              ? note.register! < HIGHEST_OCTAVE
+              : note.register! > 0);
           break;
         case 'delete':
           applies &&= index >= 0;
@@ -205,9 +209,9 @@ function reveal(key: HTMLButtonElement): void {
 /** The command a key gives, from the data attributes PalettePanel.astro sets. */
 function commandFor(key: HTMLButtonElement): EditorCommand {
   const { step, duration, mark, key: name } = key.dataset;
-  if (step) return { type: 'note', step: step as PitchStep | 'rest' };
+  if (step) return { type: 'note', step: step as Character | 'rest' };
   if (duration) return { type: 'duration', duration };
-  if (mark) return { type: 'mark', mark: mark as MeriKari };
+  if (mark) return { type: 'mark', mark: mark as Accidental };
   switch (name) {
     case 'stroke':
       return { type: 'stroke' };

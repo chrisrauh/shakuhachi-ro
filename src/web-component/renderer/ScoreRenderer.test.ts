@@ -35,9 +35,9 @@ function createTestScoreData(): ScoreData {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { pitch: { step: 'ro', octave: 0 }, duration: '1/2' },
-      { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
-      { pitch: { step: 'chi', octave: 0 }, duration: '1/2' },
+      { character: 'ro', register: 0, duration: '1/2' },
+      { character: 'tsu', register: 0, duration: '1/2' },
+      { character: 'chi', register: 0, duration: '1/2' },
     ],
   };
 }
@@ -430,11 +430,12 @@ describe('ScoreRenderer', () => {
         title: '',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
           {
-            pitch: { step: 'ro', octave: 2 },
+            character: 'ro',
+            register: 2,
             duration: '1',
-            meriKari: 'dai-meri',
+            accidental: 'dai-meri',
           },
         ],
       });
@@ -458,7 +459,7 @@ describe('ScoreRenderer', () => {
       const score: ScoreData = {
         title: '',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       };
       const cellWith = (options: RenderOptions) => {
         const renderer = new ScoreRenderer(container, options);
@@ -586,12 +587,12 @@ describe('ScoreRenderer', () => {
         style: 'kinko',
         notes: [
           {
-            pitch: { step: 'ro', octave: 0 },
+            character: 'ro',
+            register: 0,
             duration: firstDotted ? '3/4' : '1/2',
-            dotted: firstDotted,
           },
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1/2' },
-          { pitch: { step: 're', octave: 0 }, duration: '1/2' },
+          { character: 'tsu', register: 0, duration: '1/2' },
+          { character: 're', register: 0, duration: '1/2' },
         ],
       };
     }

@@ -14,9 +14,9 @@ describe('MusicXMLSerializer', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' }, // D4
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' }, // F4
-          { pitch: { step: 're', octave: 0 }, duration: '1' }, // G4
+          { character: 'ro', register: 0, duration: '1' }, // D4
+          { character: 'tsu', register: 0, duration: '1' }, // F4
+          { character: 're', register: 0, duration: '1' }, // G4
         ],
       };
 
@@ -36,7 +36,7 @@ describe('MusicXMLSerializer', () => {
         title: 'Test Score',
         composer: 'Test Composer',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       };
 
       const xml = MusicXMLSerializer.serialize(scoreData);
@@ -49,9 +49,9 @@ describe('MusicXMLSerializer', () => {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' }, // D4 (otsu)
-          { pitch: { step: 'ro', octave: 1 }, duration: '1' }, // D5 (kan)
-          { pitch: { step: 'tsu', octave: 2 }, duration: '1' }, // F6 (daikan)
+          { character: 'ro', register: 0, duration: '1' }, // D4 (otsu)
+          { character: 'ro', register: 1, duration: '1' }, // D5 (kan)
+          { character: 'tsu', register: 2, duration: '1' }, // F6 (daikan)
         ],
       };
 
@@ -69,14 +69,16 @@ describe('MusicXMLSerializer', () => {
         style: 'kinko',
         notes: [
           {
-            pitch: { step: 'tsu', octave: 0 },
+            character: 'tsu',
+            register: 0,
             duration: '1',
-            meriKari: 'meri',
+            accidental: 'meri',
           }, // D#4
           {
-            pitch: { step: 'tsu', octave: 0 },
+            character: 'tsu',
+            register: 0,
             duration: '1',
-            meriKari: 'chu-meri',
+            accidental: 'chu-meri',
           }, // E4
         ],
       };
@@ -97,13 +99,13 @@ describe('MusicXMLSerializer', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '1' },
-          { pitch: { step: 'ro', octave: 3 }, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'ro', register: 3, duration: '1' },
         ],
       };
 
       expect(() => MusicXMLSerializer.serialize(scoreData)).toThrow(
-        "Note 2 has a step, octave or meri/kari mark that isn't valid.",
+        "Note 2 has a character, register or accidental that isn't valid.",
       );
     });
 
@@ -111,8 +113,13 @@ describe('MusicXMLSerializer', () => {
       const xml = MusicXMLSerializer.serialize({
         title: 'Test',
         notes: [
-          { pitch: { step: 'san-no-u', octave: 1 }, duration: '1' },
-          { pitch: { step: 'hi', octave: 1 }, duration: '1', meriKari: 'meri' },
+          { character: 'san-no-u', register: 1, duration: '1' },
+          {
+            character: 'hi',
+            register: 1,
+            duration: '1',
+            accidental: 'meri',
+          },
         ],
       });
 
@@ -139,9 +146,7 @@ describe('MusicXMLSerializer', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '3/2', dotted: true },
-        ],
+        notes: [{ character: 'ro', register: 0, duration: '3/2' }],
       };
 
       const xml = MusicXMLSerializer.serialize(scoreData);
@@ -158,9 +163,7 @@ describe('MusicXMLSerializer', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '3/2', dotted: true },
-        ],
+        notes: [{ character: 'ro', register: 0, duration: '3/2' }],
       };
 
       const xml = MusicXMLSerializer.serialize(scoreData);
@@ -174,11 +177,11 @@ describe('MusicXMLSerializer', () => {
         title: 'Test',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '4' }, // whole
-          { pitch: { step: 'tsu', octave: 0 }, duration: '2' }, // half
-          { pitch: { step: 're', octave: 0 }, duration: '1' }, // quarter
-          { pitch: { step: 'chi', octave: 0 }, duration: '1/2' }, // eighth
-          { pitch: { step: 'ri', octave: 0 }, duration: '1/4' }, // 16th
+          { character: 'ro', register: 0, duration: '4' }, // whole
+          { character: 'tsu', register: 0, duration: '2' }, // half
+          { character: 're', register: 0, duration: '1' }, // quarter
+          { character: 'chi', register: 0, duration: '1/2' }, // eighth
+          { character: 'ri', register: 0, duration: '1/4' }, // 16th
         ],
       };
 
@@ -194,7 +197,7 @@ describe('MusicXMLSerializer', () => {
     it('should write a length no note value shows without a type', () => {
       const xml = MusicXMLSerializer.serialize({
         title: 'Test',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '3' }],
+        notes: [{ character: 'ro', register: 0, duration: '3' }],
       });
 
       expect(xml).toContain('<duration>12</duration>');
@@ -205,7 +208,7 @@ describe('MusicXMLSerializer', () => {
       const scoreData: ScoreData = {
         title: 'Test & "Score" <with> \'special\' chars',
         style: 'kinko',
-        notes: [{ pitch: { step: 'ro', octave: 0 }, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       };
 
       const xml = MusicXMLSerializer.serialize(scoreData);
@@ -223,10 +226,10 @@ describe('MusicXMLSerializer', () => {
         composer: 'Test Composer',
         style: 'kinko',
         notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '2' }, // D4 half
-          { pitch: { step: 'tsu', octave: 0 }, duration: '1' }, // F4 quarter
+          { character: 'ro', register: 0, duration: '2' }, // D4 half
+          { character: 'tsu', register: 0, duration: '1' }, // F4 quarter
           { rest: true, duration: '1' }, // quarter rest
-          { pitch: { step: 're', octave: 0 }, duration: '3/2', dotted: true }, // G4 dotted quarter
+          { character: 're', register: 0, duration: '3/2' }, // G4 dotted quarter
         ],
       };
 
@@ -241,13 +244,10 @@ describe('MusicXMLSerializer', () => {
       expect(reparsed.notes).toHaveLength(4);
 
       // Should preserve pitches
-      expect(reparsed.notes[0].pitch?.step).toBe('ro');
-      expect(reparsed.notes[1].pitch?.step).toBe('tsu');
+      expect(reparsed.notes[0].character).toBe('ro');
+      expect(reparsed.notes[1].character).toBe('tsu');
       expect(reparsed.notes[2].rest).toBe(true);
-      expect(reparsed.notes[3].pitch?.step).toBe('re');
-
-      // Should preserve dotted flag
-      expect(reparsed.notes[3].dotted).toBe(true);
+      expect(reparsed.notes[3].character).toBe('re');
 
       // Should preserve durations. Asserting only structure is what let the
       // <divisions> bug survive: every duration used to come back doubled.
@@ -262,13 +262,14 @@ describe('MusicXMLSerializer', () => {
     it('should round-trip every supported length exactly, dotted and plain', () => {
       const notes: ScoreData['notes'] = [
         ...['4', '3', '2', '1', '3/2', '1/2', '3/4', '1/4'].map((duration) => ({
-          pitch: { step: 'ro' as const, octave: 0 },
+          character: 'ro' as const,
+          register: 0,
           duration,
         })),
         ...['3/2', '3/4'].map((duration) => ({
-          pitch: { step: 'ro' as const, octave: 0 },
+          character: 'ro' as const,
+          register: 0,
           duration,
-          dotted: true,
         })),
       ];
 
@@ -279,18 +280,13 @@ describe('MusicXMLSerializer', () => {
       expect(reparsed.notes.map((n) => n.duration)).toEqual(
         notes.map((n) => n.duration),
       );
-      expect(reparsed.notes.map((n) => n.dotted ?? false)).toEqual(
-        notes.map((n) => n.dotted ?? false),
-      );
     });
 
     // A Western dot would make a dotted half 3 beats, not 5/2
     it('should export a note dotted after two beats by its length alone', () => {
       const xml = MusicXMLSerializer.serialize({
         title: 'Dotted 5/2',
-        notes: [
-          { pitch: { step: 'ro', octave: 0 }, duration: '5/2', dotted: true },
-        ],
+        notes: [{ character: 'ro', register: 0, duration: '5/2' }],
       });
 
       expect(xml).not.toContain('<dot/>');

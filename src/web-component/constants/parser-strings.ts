@@ -5,7 +5,7 @@
  * Part of the standalone renderer library.
  */
 
-import { MERI_KARI, PITCH_STEPS } from '../types/ScoreData';
+import { ACCIDENTALS, CHARACTERS } from '../types/ScoreData';
 
 // Shared string factory functions for parser validation. Notes are numbered
 // from 1, as people count them; callers pass the 0-based array index.
@@ -28,28 +28,26 @@ export const PARSER_STRINGS = {
     ScoreParser: {
       scoreDataRequired: 'Score data is required',
       notesArrayRequired: 'Score notes must be an array',
-      noteIndexPitchRequired: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch'),
-      noteIndexPitchWhenNotRest: (index: number) =>
-        `Note ${index + 1} must have pitch when rest is not set`,
-      noteIndexPitchStep: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.step'),
-      noteIndexStepInvalid: (index: number, step: unknown) =>
+      noteIndexCharacterWhenNotRest: (index: number) =>
+        `Note ${index + 1} must have character when rest is not set`,
+      noteIndexCharacterRequired: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'character'),
+      noteIndexCharacterInvalid: (index: number, character: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'pitch.step',
-          step,
-          `Must be one of: ${PITCH_STEPS.join(', ')}.`,
+          'character',
+          character,
+          `Must be one of: ${CHARACTERS.join(', ')}.`,
         ),
-      noteIndexPitchOctave: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'pitch.octave'),
+      noteIndexRegisterRequired: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'register'),
       noteIndexDuration: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'duration'),
-      noteIndexOctaveInvalid: (index: number, octave: number) =>
+      noteIndexRegisterInvalid: (index: number, register: number) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'octave',
-          octave,
+          'register',
+          register,
           'Must be 0-2.',
         ),
       noteIndexDurationInvalid: (index: number, duration: unknown) =>
@@ -66,14 +64,12 @@ export const PARSER_STRINGS = {
           JSON.stringify(duration),
           'Shakuhachi notation can show whole beats ("1", "2", "3"…), "1/2", "1/4", and a half after these ("3/2", "5/2"…, "3/4").',
         ),
-      noteIndexDottedWithoutHalf: (index: number, duration: string) =>
-        `Note ${index + 1} is dotted, but its duration, "${duration}", has no half to write as a dot. Only a length with a half, such as "3/2", "5/2" or "3/4", can be dotted.`,
-      noteIndexMeriKariInvalid: (index: number, meriKari: unknown) =>
+      noteIndexAccidentalInvalid: (index: number, accidental: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'meriKari',
-          meriKari,
-          `Must be one of: ${MERI_KARI.join(', ')}.`,
+          'accidental',
+          accidental,
+          `Must be one of: ${ACCIDENTALS.join(', ')}.`,
         ),
       restIndexDuration: (index: number) =>
         `Note ${index + 1} is a rest and is missing duration`,
@@ -156,7 +152,7 @@ export const PARSER_STRINGS = {
       // The editor prefixes these with "Can't switch to <format>.", so they
       // don't name the format again
       invalidFingering: (index: number) =>
-        `Note ${index + 1} has a step, octave or meri/kari mark that isn't valid. Fix that note, or keep the score in its current format.`,
+        `Note ${index + 1} has a character, register or accidental that isn't valid. Fix that note, or keep the score in its current format.`,
       unknownABCKey: (key: string) =>
         `The score's key, "${key}", isn't one ABC defines. Change it to a key such as D, Dm or D dorian.`,
     },

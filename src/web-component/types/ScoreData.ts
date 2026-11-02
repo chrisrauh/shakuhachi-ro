@@ -1,22 +1,24 @@
 /**
  * Score Data Type Definitions
  *
- * TypeScript types for the minimal JSON score data format.
- * This format follows MusicXML-like structure for familiarity.
+ * TypeScript types for the minimal JSON score data format. A note records
+ * what the score writes, not what sounds: the fingering table gives the
+ * sound. Fields use MusicXML meanings where MusicXML has them
+ * (docs/SCORE-DATA-FORMAT.MD).
  *
  * Note: Column layout is determined dynamically by the renderer
  * based on available space. Score data contains only the sequence of notes.
  */
 
 /**
- * Shakuhachi pitch steps (Kinko-ryū). Each names a written character: the five
- * basic notes, u, hi and ha, the fingerings written with small hole numbers
- * inside the character, such as go no hi (ヒ with 五), and characters other
- * Kinko charts use (i, a, ru). Which pitch each
- * gives, and how it is fingered, is in the fingering table
+ * The main notation character of a note (譜字 fuji), by name (Kinko-ryū): the
+ * five basic notes, u, hi and ha, the characters written with a small hole
+ * number, such as go no hi (ヒ with 五), and characters other Kinko charts use
+ * (i, a, ru). The name is not the glyph: `style` picks how it is drawn. Which
+ * pitch each gives, and how it is fingered, is in the fingering table
  * (constants/kinko-fingerings.ts).
  */
-export const PITCH_STEPS = [
+export const CHARACTERS = [
   'ro',
   'tsu',
   're',
@@ -40,7 +42,7 @@ export const PITCH_STEPS = [
   'ni-no-re',
   'ichi-san-no-u',
 ] as const;
-export type PitchStep = (typeof PITCH_STEPS)[number];
+export type Character = (typeof CHARACTERS)[number];
 
 /**
  * Notation style
@@ -48,28 +50,19 @@ export type PitchStep = (typeof PITCH_STEPS)[number];
 export type NotationStyle = 'kinko' | 'tozan';
 
 /**
- * Pitch information (similar to MusicXML <pitch>)
- */
-export interface Pitch {
-  /** Fingering step */
-  step: PitchStep;
-
-  /** Octave: 0=otsu (base), 1=kan, 2=daikan */
-  octave: number;
-}
-
-/**
- * Meri or kari: a fixed lowering (meri) or raising (kari) of a note, played by
- * changing the angle of the lips to the blowing edge.
+ * The meri or kari mark written beside a note. The same meaning as MusicXML
+ * <accidental>: the written mark, not the change in sound. Meri lowers a note
+ * and kari raises it, played by changing the angle of the lips to the blowing
+ * edge. Meri also changes the tone colour.
  *
- * The exact pitch change varies with school, piece and player, so this names
- * the technique rather than an interval. Pitch that moves within a note (yuri,
- * ori, suri) is a separate technique, not a meri or kari.
+ * The exact pitch change varies with school, piece and player, so the values
+ * name the marks, not intervals. Pitch that moves within a note (yuri, ori,
+ * suri) is a separate technique, not an accidental.
  *
- * On a note, this is the mark the score writes. Some fingerings are played
- * meri or kari without a mark (u, san no u); the fingering table records that.
+ * Some fingerings are played meri or kari without a mark (u, san no u); the
+ * fingering table records that.
  */
-export const MERI_KARI = [
+export const ACCIDENTALS = [
   'dai-meri',
   'meri',
   'chu-meri',
@@ -77,36 +70,31 @@ export const MERI_KARI = [
   'kari',
   'dai-kari',
 ] as const;
-export type MeriKari = (typeof MERI_KARI)[number];
+export type Accidental = (typeof ACCIDENTALS)[number];
 
 /**
  * Individual note within a score
  */
 export interface ScoreNote {
-  /** Pitch information (undefined for rests) */
-  pitch?: Pitch;
+  /** The main notation character (undefined for rests) */
+  character?: Character;
+
+  /** 0 otsu (the low register), 1 kan, 2 daikan (undefined for rests) */
+  register?: number;
+
+  /** The meri or kari mark written beside the note, if any */
+  accidental?: Accidental;
 
   /**
    * Length in beats, as an exact fraction: "1" is one beat, "1/2" half a
-   * beat, "3" three beats. See types/Duration.ts for the lengths notation can
+   * beat, "3" three beats. A length with a half ("3/2", "5/2"…, "3/4") is
+   * drawn with a dot. See types/Duration.ts for the lengths notation can
    * show.
    */
   duration: string;
 
-  /** Rest indicator (mutually exclusive with pitch) */
+  /** Rest indicator (a rest has no character, register or accidental) */
   rest?: boolean;
-
-  /** Meri or kari, if the note is played with one */
-  meriKari?: MeriKari;
-
-  /**
-   * The last part of the length is written as a dot: half a beat after a
-   * note of a beat or more, a quarter after half a beat. Only a length with a
-   * half can be dotted: "3/2", "5/2"…, "3/4". The renderer draws that half as
-   * a dot whether or not this is set; no score writing it as a stroke has
-   * been found (#438).
-   */
-  dotted?: boolean;
 }
 
 /**
