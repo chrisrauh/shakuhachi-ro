@@ -7,8 +7,8 @@ const PURGE_TIMEOUT_MS = 3000;
  * Asks the server to drop a score page's cached copy after changing it.
  *
  * Never throws and never reports failure to the caller. A purge that does not
- * land costs at most a few minutes of staleness, bounded by the page's max-age,
- * which is not worth failing a save the database already accepted.
+ * land costs at most a day of staleness, bounded by the page's max-age, which is
+ * not worth failing a save the database already accepted.
  */
 export async function purgeScoreCache(slug: string): Promise<void> {
   try {
