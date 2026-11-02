@@ -573,15 +573,11 @@ export class ABCParser {
 
       // Sounding length for now; toBaseAndDot() splits out the dot below
       const note: ParsedNote = {
-        written: {
-          step: shakuPitch.step,
-          register: shakuPitch.register,
-        },
+        sign: shakuPitch.sign,
+        register: shakuPitch.register,
+        ...(shakuPitch.accidental && { accidental: shakuPitch.accidental }),
         duration,
       };
-      if (shakuPitch.meriKari) {
-        note.meriKari = shakuPitch.meriKari;
-      }
       push(note, token.text, token.broken);
     }
 
@@ -652,9 +648,9 @@ export class ABCParser {
     return (
       !a.rest &&
       !b.rest &&
-      a.written?.step === b.written?.step &&
-      a.written?.register === b.written?.register &&
-      a.meriKari === b.meriKari
+      a.sign === b.sign &&
+      a.register === b.register &&
+      a.accidental === b.accidental
     );
   }
 

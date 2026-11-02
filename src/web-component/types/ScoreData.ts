@@ -1,22 +1,24 @@
 /**
  * Score Data Type Definitions
  *
- * TypeScript types for the minimal JSON score data format. Fields use
- * MusicXML meanings where MusicXML has them (docs/SCORE-DATA-FORMAT.MD).
+ * TypeScript types for the minimal JSON score data format. A note records
+ * what the score writes, not what sounds: the fingering table gives the
+ * sound. Fields use MusicXML meanings where MusicXML has them
+ * (docs/SCORE-DATA-FORMAT.MD).
  *
  * Note: Column layout is determined dynamically by the renderer
  * based on available space. Score data contains only the sequence of notes.
  */
 
 /**
- * Shakuhachi pitch steps (Kinko-ryū). Each names a written character: the five
- * basic notes, u, hi and ha, the fingerings written with small hole numbers
- * inside the character, such as go no hi (ヒ with 五), and characters other
- * Kinko charts use (i, a, ru). Which pitch each
- * gives, and how it is fingered, is in the fingering table
+ * The main notation sign of a note (譜字 fuji), by name (Kinko-ryū): the five
+ * basic notes, u, hi and ha, the signs written with small hole numbers inside
+ * the character, such as go no hi (ヒ with 五), and signs other Kinko charts
+ * use (i, a, ru). The name is not the glyph: `style` picks how it is drawn.
+ * Which pitch each gives, and how it is fingered, is in the fingering table
  * (constants/kinko-fingerings.ts).
  */
-export const PITCH_STEPS = [
+export const SIGNS = [
   'ro',
   'tsu',
   're',
@@ -40,7 +42,7 @@ export const PITCH_STEPS = [
   'ni-no-re',
   'ichi-san-no-u',
 ] as const;
-export type PitchStep = (typeof PITCH_STEPS)[number];
+export type Sign = (typeof SIGNS)[number];
 
 /**
  * Notation style
@@ -48,31 +50,19 @@ export type PitchStep = (typeof PITCH_STEPS)[number];
 export type NotationStyle = 'kinko' | 'tozan';
 
 /**
- * What the score writes for a note: a character and its register. Not a
- * sounding pitch, which MusicXML's <pitch> is: kan ro and go no hi are
- * written differently and sound the same. The fingering table gives the
- * pitch (constants/kinko-fingerings.ts).
- */
-export interface Written {
-  /** The written character */
-  step: PitchStep;
-
-  /** 0 otsu (the low register), 1 kan, 2 daikan */
-  register: number;
-}
-
-/**
- * Meri or kari: a fixed lowering (meri) or raising (kari) of a note, played by
- * changing the angle of the lips to the blowing edge.
+ * The meri or kari mark written beside a note. The same meaning as MusicXML
+ * <accidental>: the written sign, not the change in sound. Meri lowers a note
+ * and kari raises it, played by changing the angle of the lips to the blowing
+ * edge. Meri also changes the tone colour.
  *
- * The exact pitch change varies with school, piece and player, so this names
- * the technique rather than an interval. Pitch that moves within a note (yuri,
- * ori, suri) is a separate technique, not a meri or kari.
+ * The exact pitch change varies with school, piece and player, so the values
+ * name the marks, not intervals. Pitch that moves within a note (yuri, ori,
+ * suri) is a separate technique, not an accidental.
  *
- * On a note, this is the mark the score writes. Some fingerings are played
- * meri or kari without a mark (u, san no u); the fingering table records that.
+ * Some fingerings are played meri or kari without a mark (u, san no u); the
+ * fingering table records that.
  */
-export const MERI_KARI = [
+export const ACCIDENTALS = [
   'dai-meri',
   'meri',
   'chu-meri',
@@ -80,14 +70,20 @@ export const MERI_KARI = [
   'kari',
   'dai-kari',
 ] as const;
-export type MeriKari = (typeof MERI_KARI)[number];
+export type Accidental = (typeof ACCIDENTALS)[number];
 
 /**
  * Individual note within a score
  */
 export interface ScoreNote {
-  /** The written character and register (undefined for rests) */
-  written?: Written;
+  /** The main notation sign (undefined for rests) */
+  sign?: Sign;
+
+  /** 0 otsu (the low register), 1 kan, 2 daikan (undefined for rests) */
+  register?: number;
+
+  /** The meri or kari mark written beside the note, if any */
+  accidental?: Accidental;
 
   /**
    * Length in beats, as an exact fraction: "1" is one beat, "1/2" half a
@@ -97,11 +93,8 @@ export interface ScoreNote {
    */
   duration: string;
 
-  /** Rest indicator (mutually exclusive with written) */
+  /** Rest indicator (a rest has no sign, register or accidental) */
   rest?: boolean;
-
-  /** Meri or kari, if the note is played with one */
-  meriKari?: MeriKari;
 }
 
 /**

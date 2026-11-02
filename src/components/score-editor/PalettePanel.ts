@@ -1,4 +1,4 @@
-import type { MeriKari, PitchStep } from '../../web-component/types/ScoreData';
+import type { Accidental, Sign } from '../../web-component/types/ScoreData';
 import { parseBeats } from '../../web-component/types/Duration';
 import {
   addStroke,
@@ -85,7 +85,7 @@ export class PalettePanel {
   update({ notes, selection, canUndo, canRedo }: PaletteState): void {
     const index = targetIndex(selection);
     const note = notes[index];
-    const written = note && !note.rest ? note.written : undefined;
+    const sign = note && !note.rest ? note.sign : undefined;
     const changing = selection.type === 'highlight';
     let noteKey: HTMLButtonElement | undefined;
 
@@ -100,7 +100,7 @@ export class PalettePanel {
             command.step === 'rest' ? 'a rest' : key.getAttribute('aria-label');
           key.title = `${changing ? 'Change to' : 'Insert'} ${name}`;
           if (changing) {
-            pressed = command.step === (written ? written.step : 'rest');
+            pressed = command.step === (sign ?? 'rest');
             if (pressed) noteKey = key;
           }
           break;
@@ -120,15 +120,15 @@ export class PalettePanel {
           pressed = !!note && isDotted(note);
           break;
         case 'mark':
-          applies &&= !!written;
-          pressed = !!written && note.meriKari === command.mark;
+          applies &&= !!sign;
+          pressed = !!sign && note.accidental === command.mark;
           break;
         case 'octave':
           applies &&=
-            !!written &&
+            !!sign &&
             (command.step > 0
-              ? written.register < HIGHEST_OCTAVE
-              : written.register > 0);
+              ? note.register! < HIGHEST_OCTAVE
+              : note.register! > 0);
           break;
         case 'delete':
           applies &&= index >= 0;
@@ -206,9 +206,9 @@ function reveal(key: HTMLButtonElement): void {
 /** The command a key gives, from the data attributes PalettePanel.astro sets. */
 function commandFor(key: HTMLButtonElement): EditorCommand {
   const { step, duration, mark, key: name } = key.dataset;
-  if (step) return { type: 'note', step: step as PitchStep | 'rest' };
+  if (step) return { type: 'note', step: step as Sign | 'rest' };
   if (duration) return { type: 'duration', duration };
-  if (mark) return { type: 'mark', mark: mark as MeriKari };
+  if (mark) return { type: 'mark', mark: mark as Accidental };
   switch (name) {
     case 'stroke':
       return { type: 'stroke' };

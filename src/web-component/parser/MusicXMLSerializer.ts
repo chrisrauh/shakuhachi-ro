@@ -119,9 +119,10 @@ export class MusicXMLSerializer {
    */
   private static serializeNote(note: ScoreNote, index: number): string {
     const parts: string[] = [];
-    const fingering: WrittenFingering | undefined = note.written && {
-      ...note.written,
-      meriKari: note.meriKari,
+    const fingering: WrittenFingering | undefined = note.sign && {
+      sign: note.sign,
+      register: note.register!,
+      accidental: note.accidental,
     };
 
     parts.push('      <note>');
@@ -189,7 +190,7 @@ export class MusicXMLSerializer {
   /**
    * The written note for a fingering: its pitch in the fingering table, or an
    * estimate for one the table doesn't list (see pitchForFingering). Fails
-   * only for a step, octave or mark that isn't valid.
+   * only for a sign, register or accidental that isn't valid.
    */
   private static convertToWesternPitch(
     fingering: WrittenFingering,

@@ -34,10 +34,15 @@ const RANGE = Array.from({ length: 39 }, (_, i) => {
   return `${LETTERS[i % 12]}${4 + Math.floor(i / 12)}`;
 });
 
-const toNote = ({ step, register, meriKari }: WrittenFingering): ScoreNote => ({
-  written: { step, register },
+const toNote = ({
+  sign,
+  register,
+  accidental,
+}: WrittenFingering): ScoreNote => ({
+  sign,
+  register,
   duration: '1',
-  ...(meriKari && { meriKari }),
+  ...(accidental && { accidental }),
 });
 
 const named = FINGERINGS.flatMap((f) => (f.written ? [f.written] : []));
@@ -73,7 +78,7 @@ describe('fingering table', () => {
   it('can store several sets of holes for one fingering, all at one pitch', () => {
     const kanHi = FINGERINGS.filter(
       ({ written }) =>
-        written?.step === 'hi' && written.register === 1 && !written.meriKari,
+        written?.sign === 'hi' && written.register === 1 && !written.accidental,
     );
 
     expect(kanHi.map((f) => f.holes)).toEqual(['●○○●●', '●○○○●']);
@@ -100,11 +105,11 @@ describe('fingering table', () => {
 
   describe('fingerings no chart lists', () => {
     const unlisted: WrittenFingering[] = [
-      { step: 'ri', register: 1 }, // kan ri
-      { step: 'ri', register: 1, meriKari: 'meri' }, // as otsu ri meri, a tone down
-      { step: 'ro', register: 0, meriKari: 'kari' }, // no ro kari anywhere
-      { step: 're', register: 0, meriKari: 'chu-meri' },
-      { step: 'chi', register: 0, meriKari: 'dai-kari' },
+      { sign: 'ri', register: 1 }, // kan ri
+      { sign: 'ri', register: 1, accidental: 'meri' }, // as otsu ri meri, a tone down
+      { sign: 'ro', register: 0, accidental: 'kari' }, // no ro kari anywhere
+      { sign: 're', register: 0, accidental: 'chu-meri' },
+      { sign: 'chi', register: 0, accidental: 'dai-kari' },
     ];
 
     it('estimates a pitch from the character, the octave and the mark', () => {

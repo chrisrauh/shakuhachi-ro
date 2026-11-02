@@ -6,7 +6,7 @@ Renders shakuhachi notation as SVG. One custom element, no framework, no build s
 <script src="/embed/shakuhachi-score.js"></script>
 
 <shakuhachi-score
-  data-score='{"notes":[{"written":{"step":"ro","register":0},"duration":"1"}]}'
+  data-score='{"notes":[{"sign":"ro","register":0,"duration":"1"}]}'
 ></shakuhachi-score>
 ```
 
@@ -27,16 +27,18 @@ interface ScoreData {
 }
 
 interface ScoreNote {
+  sign?: Sign; // the main notation sign; omit for a rest
+  register?: number; // 0 otsu, 1 kan, 2 daikan; omit for a rest
+  accidental?: Accidental; // the meri or kari mark written beside the note, if any
   duration: string; // length in beats: "1" one beat, "2" two, "1/2" half, "1/4" a quarter, "3/2", "5/2"…, "3/4"; a length with a half is drawn with a dot
-  written?: { step: PitchStep; register: number }; // the written character; omit for a rest
   rest?: boolean;
-  meriKari?: 'dai-meri' | 'meri' | 'chu-meri'; // meri or kari, if played with one
 }
 
-type PitchStep = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi';
+type Sign = 'ro' | 'tsu' | 're' | 'chi' | 'ri' | 'u' | 'hi' | 'ha' | 'go-no-hi' | …; // SIGNS in types/ScoreData.ts
+type Accidental = 'dai-meri' | 'meri' | 'chu-meri' | 'chu-kari' | 'kari' | 'dai-kari';
 ```
 
-`register` is `0` for otsu (base), `1` for kan, `2` for daikan.
+A note records what the score writes, not what sounds. `register` is `0` for otsu (base), `1` for kan, `2` for daikan.
 
 Notes carry no layout information. Column breaks are the renderer's decision — see [Sizing](#sizing).
 

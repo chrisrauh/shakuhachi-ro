@@ -6,6 +6,7 @@
 - **Easy to read** - Musicians should understand it quickly
 - **Easy to extend** - Can add more features later
 - **Separation of concerns** - Data describes notes, renderer handles layout
+- **What is written, not what sounds** - A note records the score: its sign, register and mark. The fingering table gives the sound. A score gives one sound, but one sound can be written in more than one way, so the score is what we keep
 - **MusicXML meanings** - See [Relation to MusicXML](#relation-to-musicxml)
 
 ## Format Structure
@@ -18,26 +19,26 @@
 }
 
 Note = {
-  "written": {
-    "step": string,          // Written character, e.g. "ro", "tsu", "go-no-hi" (see below)
-    "register": number       // 0=otsu (base), 1=kan, 2=daikan
-  },
-  "duration": number,        // Duration in relative timing units
-  "meriKari"?: string        // Optional: "dai-meri" | "meri" | "chu-meri" | "chu-kari" | "kari" | "dai-kari"
+  "sign": string,            // The main notation sign, e.g. "ro", "tsu", "go-no-hi" (see below)
+  "register": number,        // 0=otsu (base), 1=kan, 2=daikan
+  "accidental"?: string,     // Optional: "dai-meri" | "meri" | "chu-meri" | "chu-kari" | "kari" | "dai-kari"
+  "duration": string         // Length in beats, e.g. "1", "1/2", "3/2"
 }
+
+Rest = { "rest": true, "duration": string }
 ```
 
 ## Required Fields
 
-- `written.step` - The written character (required). The five basic notes `"ro"`, `"tsu"`, `"re"`, `"chi"` and `"ri"`; `"u"`, `"hi"` and `"ha"`; and the fingerings written with a small numeral: `"go-no-hi"` (ヒ五), `"go-no-ha"` (ハ五), `"san-no-u"` (ウ三), `"san-no-ha"` (ハ三), `"shi-no-ha"` (ハ四) and `"ni-shi-go-no-ha"` (ハ二四五). The list is `PITCH_STEPS` in `src/web-component/types/ScoreData.ts`.
-- `written.register` - The register (required, 0=otsu, 1=kan, 2=daikan)
+- `sign` - The main notation sign of the note (譜字 _fuji_; 音符 in everyday Japanese use), by name (required). It names the sign, not the glyph: `style` picks how it is drawn. The five basic notes `"ro"`, `"tsu"`, `"re"`, `"chi"` and `"ri"`; `"u"`, `"hi"` and `"ha"`; and the fingerings written with a small numeral: `"go-no-hi"` (ヒ五), `"go-no-ha"` (ハ五), `"san-no-u"` (ウ三), `"san-no-ha"` (ハ三), `"shi-no-ha"` (ハ四) and `"ni-shi-go-no-ha"` (ハ二四五). The list is `SIGNS` in `src/web-component/types/ScoreData.ts`.
+- `register` - The register (required, 0=otsu, 1=kan, 2=daikan)
 - `duration` - Duration value (required)
 
 ## Optional Fields
 
-- `meriKari` - The meri or kari mark the score writes beside the note: `"dai-meri"` (大メ), `"meri"` (メ), `"chu-meri"` (中), `"chu-kari"` (中カ), `"kari"` (カ) or `"dai-kari"` (大カ). It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. It is only what is written: u and san no u are played meri and kari without a mark, and the fingering table (`src/web-component/constants/kinko-fingerings.ts`) records that. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not a `meriKari` value.
+- `accidental` - The meri or kari mark the score writes beside the note. The same meaning as MusicXML `<accidental>`: the written sign, not the change in sound. The values are shakuhachi marks, not Western sharps and flats, and meri also changes the tone colour. The values are `"dai-meri"` (大メ), `"meri"` (メ), `"chu-meri"` (中), `"chu-kari"` (中カ), `"kari"` (カ) or `"dai-kari"` (大カ). It names the technique, not a pitch interval, because how far meri lowers a note varies with school, piece and player. It is only what is written: u and san no u are played meri and kari without a mark, and the fingering table (`src/web-component/constants/kinko-fingerings.ts`) records that. Pitch that moves within a note (yuri, ori, suri) is a separate technique, not an accidental.
 
-A step, register and mark that the fingering table doesn't list still render. Converted to MusicXML or ABC, they get an estimated Western pitch (the character's pitch, moved by the mark) and their name, so they read back exactly; other software plays the estimate.
+A sign, register and accidental that the fingering table doesn't list still render. Converted to MusicXML or ABC, they get an estimated Western pitch (the character's pitch, moved by the mark) and their name, so they read back exactly; other software plays the estimate.
 
 ## Column Layout
 
@@ -57,15 +58,16 @@ This separation allows the same score data to be rendered differently on mobile,
   "title": "Akatombo",
   "style": "kinko",
   "notes": [
-    { "written": { "step": "tsu", "register": 1 }, "duration": 1 },
-    { "written": { "step": "re", "register": 1 }, "duration": 1 },
-    { "written": { "step": "chi", "register": 1 }, "duration": 2 },
+    { "sign": "tsu", "register": 1, "duration": 1 },
+    { "sign": "re", "register": 1, "duration": 1 },
+    { "sign": "chi", "register": 1, "duration": 2 },
     {
-      "written": { "step": "ri", "register": 0 },
+      "sign": "ri",
+      "register": 0,
       "duration": 1,
-      "meriKari": "meri"
+      "accidental": "meri"
     },
-    { "written": { "step": "ro", "register": 0 }, "duration": 4 }
+    { "sign": "ro", "register": 0, "duration": 4 }
   ]
 }
 ```
@@ -119,11 +121,12 @@ The pitch for each fingering comes from the fingering table (`constants/kinko-fi
 
 ### Fields that exist now
 
-| Field                              | MusicXML                    | Status                                                                                          |
-| ---------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
-| `written.step`, `written.register` | Not `<pitch>`               | Different. These are a fingering and a register, not a sounding pitch (#492).                   |
-| `duration`                         | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438). A length with a half has a dot (#492). |
-| `rest`                             | `<rest/>`                   | Same.                                                                                           |
-| `meriKari`, `style`                | None                        | Ours. They need an encoding (#472, #473).                                                       |
-| `key`, `tempo`                     | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                           |
-| `title`, `composer`                | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                           |
+| Field               | MusicXML                    | Status                                                                                                                                        |
+| ------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sign`, `register`  | Not `<pitch>`               | Different. These are the written sign and its register, not a sounding pitch (#492).                                                          |
+| `duration`          | `<type>` and `<dot>`        | Same. It is the written length, not `<duration>` (#438). A length with a half has a dot (#492).                                               |
+| `rest`              | `<rest/>`                   | Same.                                                                                                                                         |
+| `accidental`        | `<accidental>`              | Same meaning: the written mark. MusicXML has no meri or kari value, and SMuFL has no glyph for one, so export needs an encoding (#472, #473). |
+| `style`             | None                        | Ours. It needs an encoding (#472).                                                                                                            |
+| `key`, `tempo`      | `<key>`, `<metronome>`      | Free text. Not used and not exported.                                                                                                         |
+| `title`, `composer` | `<work-title>`, `<creator>` | Same. An empty title comes back as "Untitled" (#472).                                                                                         |

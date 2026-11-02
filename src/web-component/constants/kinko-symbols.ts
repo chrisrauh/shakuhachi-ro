@@ -10,7 +10,7 @@
  * - Japanese Kana References: https://en.wikipedia.org/wiki/Ro_(kana), https://en.wikipedia.org/wiki/Tsu_(kana), etc.
  */
 
-import type { PitchStep } from '../types/ScoreData';
+import type { Sign } from '../types/ScoreData';
 
 /**
  * Octave range for shakuhachi
@@ -33,7 +33,7 @@ export type Technique =
   | 'ori'; // Slide down
 
 /**
- * How a pitch step is written
+ * How a sign is written
  */
 export interface KinkoSymbol {
   /** Japanese kana character */
@@ -47,7 +47,7 @@ export interface KinkoSymbol {
   numerals?: string;
 
   /** Romanized name */
-  romaji: PitchStep;
+  romaji: Sign;
 
   /**
    * Western pitch in otsu (octave 0), for finding which octave a note is
@@ -58,9 +58,9 @@ export interface KinkoSymbol {
 }
 
 /**
- * Kinko-ryū pitch steps, keyed by romaji. See PITCH_STEPS.
+ * Kinko-ryū signs, keyed by romaji. See SIGNS.
  */
-export const kinkoMap: Record<PitchStep, KinkoSymbol> = {
+export const kinkoMap: Record<Sign, KinkoSymbol> = {
   ro: { kana: 'ロ', romaji: 'ro', pitch: 'D4' },
   tsu: { kana: 'ツ', romaji: 'tsu', pitch: 'F4' },
   re: { kana: 'レ', romaji: 're', pitch: 'G4' },
@@ -124,7 +124,7 @@ export function getSymbolByKana(kana: string): KinkoSymbol | undefined {
  */
 export function getSymbolByRomaji(romaji: string): KinkoSymbol | undefined {
   const key = romaji.toLowerCase();
-  return Object.hasOwn(kinkoMap, key) ? kinkoMap[key as PitchStep] : undefined;
+  return Object.hasOwn(kinkoMap, key) ? kinkoMap[key as Sign] : undefined;
 }
 
 /**

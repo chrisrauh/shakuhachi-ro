@@ -1,6 +1,6 @@
 import type {
-  MeriKari,
-  PitchStep,
+  Accidental,
+  Sign,
   ScoreNote,
 } from '../../web-component/types/ScoreData';
 import { getNoteMidi } from '../../web-component/constants/kinko-symbols';
@@ -26,11 +26,11 @@ export interface EditorState {
 
 /** What a palette key or shortcut asks for: an edit, or undo or redo. */
 export type EditAction =
-  | { type: 'note'; step: PitchStep | 'rest' }
+  | { type: 'note'; step: Sign | 'rest' }
   | { type: 'duration'; duration: string }
   | { type: 'stroke' }
   | { type: 'dot' }
-  | { type: 'mark'; mark: MeriKari }
+  | { type: 'mark'; mark: Accidental }
   | { type: 'octave'; step: -1 | 1 }
   | { type: 'delete' };
 export type EditorCommand = EditAction | { type: 'undo' } | { type: 'redo' };
@@ -88,7 +88,7 @@ export function targetIndex(selection: Selection): number {
  */
 export function chooseNote(
   { notes, selection }: EditorState,
-  step: PitchStep | 'rest',
+  step: Sign | 'rest',
 ): EditorState | null {
   if (selection.type === 'cursor') {
     const { position } = selection;
@@ -98,7 +98,8 @@ export function chooseNote(
       step === 'rest'
         ? { rest: true, duration }
         : {
-            written: { step, register: octaveAfter(notes, position, step) },
+            sign: step,
+            register: octaveAfter(notes, position, step),
             duration,
           };
     return {
@@ -109,16 +110,20 @@ export function chooseNote(
 
   const { index } = selection;
   const old = notes[index];
-  if (step === (isRest(old) ? 'rest' : old.written!.step)) return null;
+  if (step === (isRest(old) ? 'rest' : old.sign)) return null;
   let note: ScoreNote;
   if (step === 'rest') {
     note = { rest: true, duration: old.duration };
   } else {
     const octave = isRest(old)
       ? octaveAfter(notes, index, step)
-      : old.written!.register;
-    note = { written: { step, register: octave }, duration: old.duration };
-    if (old.meriKari) note.meriKari = old.meriKari;
+      : old.register!;
+    note = {
+      sign: step,
+      register: octave,
+      ...(old.accidental && { accidental: old.accidental }),
+      duration: old.duration,
+    };
   }
   return { notes: notes.with(index, note), selection };
 }
@@ -196,14 +201,14 @@ export function toggleDot(state: EditorState): EditorState | null {
 /** Marks exclude each other: choosing one replaces another, or removes itself. */
 export function setMark(
   state: EditorState,
-  mark: MeriKari,
+  mark: Accidental,
 ): EditorState | null {
   const note = target(state);
   if (!note || isRest(note)) return null;
-  const { meriKari, ...unmarked } = note;
+  const { accidental, ...unmarked } = note;
   return withTarget(
     state,
-    meriKari === mark ? unmarked : { ...note, meriKari: mark },
+    accidental === mark ? unmarked : { ...note, accidental: mark },
   );
 }
 
@@ -213,12 +218,9 @@ export function shiftOctave(
 ): EditorState | null {
   const note = target(state);
   if (!note || isRest(note)) return null;
-  const register = note.written!.register + step;
+  const register = note.register! + step;
   if (register < 0 || register > HIGHEST_OCTAVE) return null;
-  return withTarget(state, {
-    ...note,
-    written: { ...note.written!, register },
-  });
+  return withTarget(state, { ...note, register });
 }
 
 /**
@@ -249,7 +251,7 @@ function withTarget(state: EditorState, note: ScoreNote): EditorState {
 }
 
 function isRest(note: ScoreNote): boolean {
-  return note.rest === true || !note.written;
+  return note.rest === true || !note.sign;
 }
 
 /**
@@ -257,13 +259,8 @@ function isRest(note: ScoreNote): boolean {
  * the last pitched note, or the lowest with none. Rests are passed over, as
  * when the score decides where octave marks are needed.
  */
-function octaveAfter(
-  notes: ScoreNote[],
-  index: number,
-  step: PitchStep,
-): number {
+function octaveAfter(notes: ScoreNote[], index: number, step: Sign): number {
   const previous = notes.slice(0, index).findLast((note) => !isRest(note));
   if (!previous) return 0;
-  const { written } = previous;
-  return closestOctave(step, getNoteMidi(written!.step, written!.register));
+  return closestOctave(step, getNoteMidi(previous.sign!, previous.register!));
 }

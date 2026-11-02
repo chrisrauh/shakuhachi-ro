@@ -11,9 +11,9 @@ import {
   type EditorState,
 } from './editing';
 
-const ro: ScoreNote = { written: { step: 'ro', register: 0 }, duration: '1' };
+const ro: ScoreNote = { sign: 'ro', register: 0, duration: '1' };
 // Ri is C5: the ro closest to it is kan ro (D5), not otsu ro (D4)
-const ri: ScoreNote = { written: { step: 'ri', register: 0 }, duration: '1/2' };
+const ri: ScoreNote = { sign: 'ri', register: 0, duration: '1/2' };
 const rest: ScoreNote = { rest: true, duration: '2' };
 
 const cursorAt = (notes: ScoreNote[], position: number): EditorState => ({
@@ -27,27 +27,28 @@ const highlight = (notes: ScoreNote[], index: number): EditorState => ({
 
 describe('chooseNote at a cursor', () => {
   it('inserts with the previous note’s duration, and moves the cursor after it', () => {
-    const before = cursorAt([{ ...ro, duration: '3/2', meriKari: 'meri' }], 1);
+    const before = cursorAt(
+      [{ ...ro, duration: '3/2', accidental: 'meri' }],
+      1,
+    );
 
     expect(chooseNote(before, 'tsu')).toEqual({
-      notes: [
-        before.notes[0],
-        { written: { step: 'tsu', register: 0 }, duration: '1' },
-      ],
+      notes: [before.notes[0], { sign: 'tsu', register: 0, duration: '1' }],
       selection: { type: 'cursor', position: 2 },
     });
   });
 
   it('starts an empty score with a one-beat note in the lowest octave', () => {
     expect(chooseNote(cursorAt([], 0), 're')!.notes).toEqual([
-      { written: { step: 're', register: 0 }, duration: '1' },
+      { sign: 're', register: 0, duration: '1' },
     ]);
   });
 
   it('picks the octave closest to the previous pitched note, past rests', () => {
     const { notes } = chooseNote(cursorAt([ri, rest], 2), 'ro')!;
     expect(notes[2]).toEqual({
-      written: { step: 'ro', register: 1 },
+      sign: 'ro',
+      register: 1,
       duration: '2',
     });
   });
@@ -63,13 +64,14 @@ describe('chooseNote at a cursor', () => {
 describe('chooseNote on a highlight', () => {
   it('changes the fingering, keeping duration, dot, octave and mark', () => {
     const note: ScoreNote = {
-      written: { step: 'ri', register: 1 },
+      sign: 'ri',
+      register: 1,
       duration: '3/4',
-      meriKari: 'kari',
+      accidental: 'kari',
     };
 
     expect(chooseNote(highlight([note], 0), 'chi')).toEqual({
-      notes: [{ ...note, written: { step: 'chi', register: 1 } }],
+      notes: [{ ...note, sign: 'chi', register: 1 }],
       selection: { type: 'highlight', index: 0 },
     });
   });
@@ -77,7 +79,8 @@ describe('chooseNote on a highlight', () => {
   it('gives a rest turned into a note the closest octave', () => {
     const { notes } = chooseNote(highlight([ri, rest], 1), 'ro')!;
     expect(notes[1]).toEqual({
-      written: { step: 'ro', register: 1 },
+      sign: 'ro',
+      register: 1,
       duration: '2',
     });
   });
@@ -86,7 +89,7 @@ describe('chooseNote on a highlight', () => {
     const note: ScoreNote = {
       ...ro,
       duration: '3/2',
-      meriKari: 'meri',
+      accidental: 'meri',
     };
     expect(chooseNote(highlight([note], 0), 'rest')!.notes).toEqual([
       { rest: true, duration: '3/2' },
@@ -113,7 +116,7 @@ describe('length, dot, mark and octave', () => {
     expect(toggleDot(dotted)!.notes[0]).toEqual(ro);
 
     const meri = setMark(highlight([ro], 0), 'meri')!;
-    expect(setMark(meri, 'dai-meri')!.notes[0].meriKari).toBe('dai-meri');
+    expect(setMark(meri, 'dai-meri')!.notes[0].accidental).toBe('dai-meri');
     expect(setMark(meri, 'meri')!.notes[0]).toEqual(ro);
   });
 
@@ -180,9 +183,7 @@ describe('length, dot, mark and octave', () => {
   });
 
   it('move the octave within otsu to daikan, and not on a rest', () => {
-    expect(shiftOctave(highlight([ro], 0), 1)!.notes[0].written!.register).toBe(
-      1,
-    );
+    expect(shiftOctave(highlight([ro], 0), 1)!.notes[0].register).toBe(1);
     expect(shiftOctave(highlight([ro], 0), -1)).toBeNull();
     expect(setMark(highlight([rest], 0), 'meri')).toBeNull();
     expect(shiftOctave(highlight([rest], 0), 1)).toBeNull();

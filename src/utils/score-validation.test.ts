@@ -28,7 +28,7 @@ describe('validateScoreInput', () => {
   it('accepts a score with notes', () => {
     expect(
       validateScoreInput(
-        '{"notes":[{"written":{"step":"ro","register":0},"duration":"1/2"}]}',
+        '{"notes":[{"sign":"ro","register":0,"duration":"1/2"}]}',
         'json',
       ),
     ).toEqual({ valid: true });

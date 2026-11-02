@@ -95,8 +95,12 @@ export class ABCSerializer {
       if (note.rest) {
         // Rest: "z" + duration
         abcNotes.push(`z${this.formatDuration(noteBeats(note))}`);
-      } else if (note.written) {
-        const fingering = { ...note.written, meriKari: note.meriKari };
+      } else if (note.sign) {
+        const fingering = {
+          sign: note.sign,
+          register: note.register!,
+          accidental: note.accidental,
+        };
         const written = pitchForFingering(fingering);
         if (!written) {
           throw new Error(

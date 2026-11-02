@@ -274,16 +274,11 @@ export class MusicXMLParser {
 
       // Create note
       const note: ScoreNote = {
-        written: {
-          step: shakuPitch.step,
-          register: shakuPitch.register,
-        },
+        sign: shakuPitch.sign,
+        register: shakuPitch.register,
+        ...(shakuPitch.accidental && { accidental: shakuPitch.accidental }),
         duration,
       };
-
-      if (shakuPitch.meriKari) {
-        note.meriKari = shakuPitch.meriKari;
-      }
 
       notes.push(note);
     });

@@ -37,7 +37,7 @@ The live example below shows it in action:
 <div class="score-example">
   <shakuhachi-score
     columns="1"
-    data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"written":{"step":"ro","register":0},"duration":"1/2"},{"written":{"step":"tsu","register":0},"duration":"1/2"},{"written":{"step":"tsu","register":0},"duration":"3/2"},{"written":{"step":"chi","register":0},"duration":"1/2"},{"written":{"step":"ri","register":0},"duration":"1/2"},{"written":{"step":"ro","register":1},"duration":"1/2"},{"written":{"step":"u","register":1},"duration":"1/2"},{"written":{"step":"hi","register":1},"duration":"1/2"},{"written":{"step":"ro","register":1},"duration":"1"}]}'
+    data-score='{"title":"Akatombo (Opening Phrase)","notes":[{"sign":"ro","register":0,"duration":"1/2"},{"sign":"tsu","register":0,"duration":"1/2"},{"sign":"tsu","register":0,"duration":"3/2"},{"sign":"chi","register":0,"duration":"1/2"},{"sign":"ri","register":0,"duration":"1/2"},{"sign":"ro","register":1,"duration":"1/2"},{"sign":"u","register":1,"duration":"1/2"},{"sign":"hi","register":1,"duration":"1/2"},{"sign":"ro","register":1,"duration":"1"}]}'
   ></shakuhachi-score>
 
   <svg class="score-annotation-desktop"
@@ -106,15 +106,15 @@ Here's how you can embed it in your own site:
   data-score='{
     "title": "Akatombo (Opening Phrase)",
     "notes": [
-      { "written": { "step": "ro", "register": 0 }, "duration": "1/2" },
-      { "written": { "step": "tsu", "register": 0 }, "duration": "1/2" },
-      { "written": { "step": "tsu", "register": 0 }, "duration": "3/2" },
-      { "written": { "step": "chi", "register": 0 }, "duration": "1/2" },
-      { "written": { "step": "ri", "register": 0 }, "duration": "1/2" },
-      { "written": { "step": "ro", "register": 1 }, "duration": "1/2" },
-      { "written": { "step": "u", "register": 1 }, "duration": "1/2" },
-      { "written": { "step": "hi", "register": 1 }, "duration": "1/2" },
-      { "written": { "step": "ro", "register": 1 }, "duration": "1" }
+      { "sign": "ro", "register": 0, "duration": "1/2" },
+      { "sign": "tsu", "register": 0, "duration": "1/2" },
+      { "sign": "tsu", "register": 0, "duration": "3/2" },
+      { "sign": "chi", "register": 0, "duration": "1/2" },
+      { "sign": "ri", "register": 0, "duration": "1/2" },
+      { "sign": "ro", "register": 1, "duration": "1/2" },
+      { "sign": "u", "register": 1, "duration": "1/2" },
+      { "sign": "hi", "register": 1, "duration": "1/2" },
+      { "sign": "ro", "register": 1, "duration": "1" }
     ]
   }'
 ></shakuhachi-score>

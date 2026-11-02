@@ -10,26 +10,26 @@
     },
     {
       "_comment": "Start in otsu: ro (no mark)",
-      "written": { "step": "ro", "register": 0 },
+      "sign": "ro", "register": 0,
       "duration": "1/2"
     },
     {
       "_comment": "Jump to kan with meri: ri kan (甲) + meri (メ)",
-      "written": { "step": "ri", "register": 1 },
+      "sign": "ri", "register": 1,
       "duration": "1/2",
-      "meriKari": "meri"
+      "accidental": "meri"
     },
     {
       "_comment": "Back to otsu with chu meri: ro (乙) + chu meri (中)",
-      "written": { "step": "ro", "register": 0 },
+      "sign": "ro", "register": 0,
       "duration": "1/2",
-      "meriKari": "chu-meri"
+      "accidental": "chu-meri"
     },
     {
       "_comment": "Jump to kan with dai meri: chi kan (甲) + dai meri (大)",
-      "written": { "step": "chi", "register": 1 },
+      "sign": "chi", "register": 1,
       "duration": "1/2",
-      "meriKari": "dai-meri"
+      "accidental": "dai-meri"
     },
     {
       "_comment": "=== MERI + DURATION DOTS ===",
@@ -38,26 +38,26 @@
     },
     {
       "_comment": "ro with dotted duration",
-      "written": { "step": "ro", "register": 0 },
+      "sign": "ro", "register": 0,
       "duration": "3/4"
     },
     {
       "_comment": "ro meri (メ) with dotted duration",
-      "written": { "step": "ro", "register": 0 },
+      "sign": "ro", "register": 0,
       "duration": "3/4",
-      "meriKari": "meri"
+      "accidental": "meri"
     },
     {
       "_comment": "tsu chu meri (中) with dotted duration",
-      "written": { "step": "tsu", "register": 0 },
+      "sign": "tsu", "register": 0,
       "duration": "3/4",
-      "meriKari": "chu-meri"
+      "accidental": "chu-meri"
     },
     {
       "_comment": "chi dai meri (大) with dotted duration",
-      "written": { "step": "chi", "register": 0 },
+      "sign": "chi", "register": 0,
       "duration": "3/4",
-      "meriKari": "dai-meri"
+      "accidental": "dai-meri"
     },
     {
       "_comment": "=== ALL MODIFIERS TOGETHER ===",
@@ -66,26 +66,26 @@
     },
     {
       "_comment": "Start in otsu for clear context",
-      "written": { "step": "tsu", "register": 0 },
+      "sign": "tsu", "register": 0,
       "duration": "1/2"
     },
     {
       "_comment": "ri kan (甲) with meri (メ) and dotted",
-      "written": { "step": "ri", "register": 1 },
+      "sign": "ri", "register": 1,
       "duration": "3/4",
-      "meriKari": "meri"
+      "accidental": "meri"
     },
     {
       "_comment": "Back to otsu: tsu (乙) with chu meri (中) and dotted",
-      "written": { "step": "tsu", "register": 0 },
+      "sign": "tsu", "register": 0,
       "duration": "3/4",
-      "meriKari": "chu-meri"
+      "accidental": "chu-meri"
     },
     {
       "_comment": "Jump to kan: chi kan (甲) with dai meri (大) and dotted",
-      "written": { "step": "chi", "register": 1 },
+      "sign": "chi", "register": 1,
       "duration": "3/4",
-      "meriKari": "dai-meri"
+      "accidental": "dai-meri"
     },
     {
       "_comment": "=== EDGE CASES ===",
@@ -94,14 +94,14 @@
     },
     {
       "_comment": "First note in kan - should have octave mark",
-      "written": { "step": "ri", "register": 1 },
+      "sign": "ri", "register": 1,
       "duration": "1/2"
     },
     {
       "_comment": "First note in kan with meri - octave mark + meri",
-      "written": { "step": "ri", "register": 1 },
+      "sign": "ri", "register": 1,
       "duration": "1/2",
-      "meriKari": "meri"
+      "accidental": "meri"
     },
     {
       "_comment": "Rest to reset context",
@@ -110,14 +110,14 @@
     },
     {
       "_comment": "First note after rest - otsu (no mark)",
-      "written": { "step": "re", "register": 0 },
+      "sign": "re", "register": 0,
       "duration": "1/2"
     },
     {
       "_comment": "Same note with chu meri",
-      "written": { "step": "re", "register": 0 },
+      "sign": "re", "register": 0,
       "duration": "1/2",
-      "meriKari": "chu-meri"
+      "accidental": "chu-meri"
     }
   ]
 }

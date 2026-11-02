@@ -8,21 +8,23 @@ Every score is saved as JSON. In the editor's source view, you can show a score 
 
 ### JSON Format
 
-Shakuhachi score notation in JSON format. Each note has a written character (step and register) and a duration.
+Shakuhachi score notation in JSON format. Each note records what the score writes: its sign, its register, its meri or kari mark if it has one, and its duration.
 
 **Example:**
 
 ```json
 {
   "notes": [
-    { "written": { "step": "ro", "register": 0 }, "duration": "1" },
-    { "written": { "step": "tsu", "register": 0 }, "duration": "1" },
-    { "written": { "step": "re", "register": 0 }, "duration": "1" }
+    { "sign": "ro", "register": 0, "duration": "1" },
+    { "sign": "tsu", "register": 0, "duration": "1" },
+    { "sign": "re", "register": 0, "duration": "1" }
   ]
 }
 ```
 
-**Valid note steps:** ro, tsu, re, chi, ri, u, hi
+**Signs:** ro, tsu, re, chi, ri, u, hi, and others such as go-no-hi
+
+**Accidentals:** dai-meri, meri, chu-meri, chu-kari, kari, dai-kari
 
 **Registers:** 0 (otsu), 1 (kan), 2 (daikan)
 

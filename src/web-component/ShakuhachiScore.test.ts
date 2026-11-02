@@ -21,12 +21,12 @@ describe('ShakuhachiScore Web Component - Columns Attribute', () => {
     title: 'Test Score',
     style: 'kinko',
     notes: [
-      { written: { step: 'ro', register: 0 }, duration: '1/2' },
-      { written: { step: 'tsu', register: 0 }, duration: '1/2' },
-      { written: { step: 're', register: 0 }, duration: '1/2' },
-      { written: { step: 'chi', register: 0 }, duration: '1/2' },
-      { written: { step: 'ri', register: 0 }, duration: '1/2' },
-      { written: { step: 'u', register: 0 }, duration: '1/2' },
+      { sign: 'ro', register: 0, duration: '1/2' },
+      { sign: 'tsu', register: 0, duration: '1/2' },
+      { sign: 're', register: 0, duration: '1/2' },
+      { sign: 'chi', register: 0, duration: '1/2' },
+      { sign: 'ri', register: 0, duration: '1/2' },
+      { sign: 'u', register: 0, duration: '1/2' },
     ],
   };
 
@@ -188,9 +188,9 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
   it('renders with minimal data (only notes)', async () => {
     const minimalData = {
       notes: [
-        { written: { step: 'ro', register: 0 }, duration: '1/2' },
-        { written: { step: 'tsu', register: 0 }, duration: '1/2' },
-        { written: { step: 're', register: 0 }, duration: '1/2' },
+        { sign: 'ro', register: 0, duration: '1/2' },
+        { sign: 'tsu', register: 0, duration: '1/2' },
+        { sign: 're', register: 0, duration: '1/2' },
       ],
     };
 
@@ -234,7 +234,7 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     component.setAttribute(
       'data-score',
       JSON.stringify({
-        notes: [{ written: { step: 'ro', register: 0 }, duration: '1/2' }],
+        notes: [{ sign: 'ro', register: 0, duration: '1/2' }],
       }),
     );
     component.setAttribute('columns', '1');
@@ -252,7 +252,7 @@ describe('ShakuhachiScore Web Component - Minimal Data Support', () => {
     const fullData = {
       title: 'Test Score',
       style: 'kinko' as const,
-      notes: [{ written: { step: 'ro', register: 0 }, duration: '1/2' }],
+      notes: [{ sign: 'ro', register: 0, duration: '1/2' }],
       composer: 'Test Composer',
       tempo: '120 BPM',
     };
@@ -285,9 +285,9 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
 
   const minimalScoreData = {
     notes: [
-      { written: { step: 'ro', register: 0 }, duration: '1/2' },
-      { written: { step: 'tsu', register: 0 }, duration: '1/2' },
-      { written: { step: 're', register: 0 }, duration: '1/2' },
+      { sign: 'ro', register: 0, duration: '1/2' },
+      { sign: 'tsu', register: 0, duration: '1/2' },
+      { sign: 're', register: 0, duration: '1/2' },
     ],
   };
 
@@ -368,12 +368,12 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     // 6 notes divided by 3 columns = 2 notes per column
     const scoreDataSixNotes = {
       notes: [
-        { written: { step: 'ro', register: 0 }, duration: '1/2' },
-        { written: { step: 'tsu', register: 0 }, duration: '1/2' },
-        { written: { step: 're', register: 0 }, duration: '1/2' },
-        { written: { step: 'chi', register: 0 }, duration: '1/2' },
-        { written: { step: 'ri', register: 0 }, duration: '1/2' },
-        { written: { step: 'u', register: 0 }, duration: '1/2' },
+        { sign: 'ro', register: 0, duration: '1/2' },
+        { sign: 'tsu', register: 0, duration: '1/2' },
+        { sign: 're', register: 0, duration: '1/2' },
+        { sign: 'chi', register: 0, duration: '1/2' },
+        { sign: 'ri', register: 0, duration: '1/2' },
+        { sign: 'u', register: 0, duration: '1/2' },
       ],
     };
 
@@ -422,12 +422,12 @@ describe('ShakuhachiScore Web Component - ResizeObserver Initial Render', () => 
     // 6 notes in single column
     const scoreDataSixNotes = {
       notes: [
-        { written: { step: 'ro', register: 0 }, duration: '1/2' },
-        { written: { step: 'tsu', register: 0 }, duration: '1/2' },
-        { written: { step: 're', register: 0 }, duration: '1/2' },
-        { written: { step: 'chi', register: 0 }, duration: '1/2' },
-        { written: { step: 'ri', register: 0 }, duration: '1/2' },
-        { written: { step: 'u', register: 0 }, duration: '1/2' },
+        { sign: 'ro', register: 0, duration: '1/2' },
+        { sign: 'tsu', register: 0, duration: '1/2' },
+        { sign: 're', register: 0, duration: '1/2' },
+        { sign: 'chi', register: 0, duration: '1/2' },
+        { sign: 'ri', register: 0, duration: '1/2' },
+        { sign: 'u', register: 0, duration: '1/2' },
       ],
     };
 

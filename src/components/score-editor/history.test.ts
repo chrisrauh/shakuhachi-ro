@@ -3,7 +3,7 @@ import type { ScoreNote } from '../../web-component/types/ScoreData';
 import type { EditorState } from './editing';
 import { EditHistory } from './history';
 
-const ro: ScoreNote = { written: { step: 'ro', register: 0 }, duration: '1' };
+const ro: ScoreNote = { sign: 'ro', register: 0, duration: '1' };
 
 /** A state with n notes, the cursor after them. */
 const state = (n: number): EditorState => ({

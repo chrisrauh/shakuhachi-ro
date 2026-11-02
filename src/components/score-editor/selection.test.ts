@@ -147,12 +147,13 @@ describe('cursor geometry', () => {
 
 describe('describeSelection', () => {
   const notes: ScoreNote[] = [
-    { written: { step: 'ro', register: 0 }, duration: '1' },
+    { sign: 'ro', register: 0, duration: '1' },
     { rest: true, duration: '1' },
     {
-      written: { step: 'go-no-hi', register: 1 },
+      sign: 'go-no-hi',
+      register: 1,
       duration: '1',
-      meriKari: 'meri',
+      accidental: 'meri',
     },
   ];
 
