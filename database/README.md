@@ -73,25 +73,25 @@ CREATE TABLE scores (
 
 ## Migrations
 
-| Migration                           | Description                                                                                                     |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `add_slug_to_scores.sql`            | Adds slug field for human-readable URLs                                                                         |
-| `add_attribution_to_scores.sql`     | Adds source_url, rights, source_description fields                                                              |
-| `remove_difficulty_from_scores.sql` | Removes unused difficulty field                                                                                 |
-| `remove_tags_from_scores.sql`       | Removes unused tags field                                                                                       |
-| `remove_view_count_from_scores.sql` | Removes unused view_count field                                                                                 |
-| `rls_policies_scores.sql`           | Row Level Security policies (public read, owner-only write)                                                     |
-| `derive_fork_count.sql`             | Drops stored `fork_count`; the count is derived from `forked_from`                                              |
-| `add_licensing_to_scores.sql`       | Two rights layers, backfill, and the fork licence trigger (#306)                                                |
-| `drop_rights_from_scores.sql`       | Drops `rights`, superseded by the two layers                                                                    |
-| `default_license_nc_sa.sql`         | New scores default to CC BY-NC-SA 4.0                                                                           |
-| `allow_abc_data_format.sql`         | Allows `data_format` `abc`, so ABC is stored as typed (#262)                                                    |
-| `meri_kari_field.sql`               | Replaces the `meri`/`chu_meri`/`dai_meri` note flags with `accidental` (#288)                                   |
-| `add_school_to_scores.sql`          | Adds `school`, and moves the schools out of `composer` (#405)                                                   |
-| `duration_beats.sql`                | Rewrites JSON scores' note durations in beats, as fraction strings (#438)                                       |
-| `scores_json_only.sql`              | Allows only `data_format` `json`; MusicXML and ABC are views (#459)                                             |
-| `note_signs.sql`                    | Stores a note's `sign`, `register` and `accidental` in place of `pitch` and `meriKari`; removes `dotted` (#492) |
-| `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                                                                  |
+| Migration                           | Description                                                                                                          |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `add_slug_to_scores.sql`            | Adds slug field for human-readable URLs                                                                              |
+| `add_attribution_to_scores.sql`     | Adds source_url, rights, source_description fields                                                                   |
+| `remove_difficulty_from_scores.sql` | Removes unused difficulty field                                                                                      |
+| `remove_tags_from_scores.sql`       | Removes unused tags field                                                                                            |
+| `remove_view_count_from_scores.sql` | Removes unused view_count field                                                                                      |
+| `rls_policies_scores.sql`           | Row Level Security policies (public read, owner-only write)                                                          |
+| `derive_fork_count.sql`             | Drops stored `fork_count`; the count is derived from `forked_from`                                                   |
+| `add_licensing_to_scores.sql`       | Two rights layers, backfill, and the fork licence trigger (#306)                                                     |
+| `drop_rights_from_scores.sql`       | Drops `rights`, superseded by the two layers                                                                         |
+| `default_license_nc_sa.sql`         | New scores default to CC BY-NC-SA 4.0                                                                                |
+| `allow_abc_data_format.sql`         | Allows `data_format` `abc`, so ABC is stored as typed (#262)                                                         |
+| `meri_kari_field.sql`               | Replaces the `meri`/`chu_meri`/`dai_meri` note flags with `accidental` (#288)                                        |
+| `add_school_to_scores.sql`          | Adds `school`, and moves the schools out of `composer` (#405)                                                        |
+| `duration_beats.sql`                | Rewrites JSON scores' note durations in beats, as fraction strings (#438)                                            |
+| `scores_json_only.sql`              | Allows only `data_format` `json`; MusicXML and ABC are views (#459)                                                  |
+| `note_characters.sql`               | Stores a note's `character`, `register` and `accidental` in place of `pitch` and `meriKari`; removes `dotted` (#492) |
+| `seed_scores.sql`                   | Seeds 6 shakuhachi songs with full attribution                                                                       |
 
 ## Seeded Songs
 

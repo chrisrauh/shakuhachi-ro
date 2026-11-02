@@ -44,13 +44,13 @@ D F G A
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(4);
-      expect(scoreData.notes[0].sign).toBe('ro'); // D → ro
+      expect(scoreData.notes[0].character).toBe('ro'); // D → ro
       expect(scoreData.notes[0].register).toBe(0); // Uppercase = otsu
-      expect(scoreData.notes[1].sign).toBe('tsu'); // F → tsu
+      expect(scoreData.notes[1].character).toBe('tsu'); // F → tsu
       expect(scoreData.notes[1].register).toBe(0);
-      expect(scoreData.notes[2].sign).toBe('re'); // G → re
+      expect(scoreData.notes[2].character).toBe('re'); // G → re
       expect(scoreData.notes[2].register).toBe(0);
-      expect(scoreData.notes[3].sign).toBe('chi'); // A → chi
+      expect(scoreData.notes[3].character).toBe('chi'); // A → chi
       expect(scoreData.notes[3].register).toBe(0);
     });
 
@@ -66,11 +66,11 @@ d f g a c
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(5);
-      expect(scoreData.notes[0].sign).toBe('ro'); // d → ro kan
+      expect(scoreData.notes[0].character).toBe('ro'); // d → ro kan
       expect(scoreData.notes[0].register).toBe(1); // Lowercase = kan
-      expect(scoreData.notes[1].sign).toBe('tsu'); // f → tsu kan
+      expect(scoreData.notes[1].character).toBe('tsu'); // f → tsu kan
       expect(scoreData.notes[1].register).toBe(1);
-      expect(scoreData.notes[4].sign).toBe('ri'); // c → ri
+      expect(scoreData.notes[4].character).toBe('ri'); // c → ri
       expect(scoreData.notes[4].register).toBe(0); // c is end of otsu
     });
 
@@ -86,9 +86,9 @@ d' f' g'
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(3);
-      expect(scoreData.notes[0].sign).toBe('go-no-hi'); // d' → kan go no hi
+      expect(scoreData.notes[0].character).toBe('go-no-hi'); // d' → kan go no hi
       expect(scoreData.notes[0].register).toBe(1);
-      expect(scoreData.notes[1].sign).toBe('tsu'); // f' → tsu dai-kan
+      expect(scoreData.notes[1].character).toBe('tsu'); // f' → tsu dai-kan
       expect(scoreData.notes[1].register).toBe(2);
     });
 
@@ -172,9 +172,9 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].sign).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].character).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].accidental).toBe('meri'); // Sharp maps to meri
-      expect(scoreData.notes[1].sign).toBe('re'); // ^F → re
+      expect(scoreData.notes[1].character).toBe('re'); // ^F → re
       expect(scoreData.notes[1].accidental).toBe('meri');
     });
 
@@ -190,7 +190,7 @@ _E
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(1);
-      expect(scoreData.notes[0].sign).toBe('tsu'); // _E → tsu
+      expect(scoreData.notes[0].character).toBe('tsu'); // _E → tsu
       expect(scoreData.notes[0].accidental).toBe('meri'); // Flat maps to meri
     });
 
@@ -206,9 +206,9 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].sign).toBe('ro'); // =D → ro
+      expect(scoreData.notes[0].character).toBe('ro'); // =D → ro
       expect(scoreData.notes[0].accidental).toBeUndefined(); // Natural = no meri
-      expect(scoreData.notes[1].sign).toBe('tsu'); // =F → tsu
+      expect(scoreData.notes[1].character).toBe('tsu'); // =F → tsu
       expect(scoreData.notes[1].accidental).toBeUndefined();
     });
 
@@ -288,11 +288,11 @@ D2 z F z/2 G
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(5);
-      expect(scoreData.notes[0].sign).toBe('ro'); // D
+      expect(scoreData.notes[0].character).toBe('ro'); // D
       expect(scoreData.notes[1].rest).toBe(true); // z
-      expect(scoreData.notes[2].sign).toBe('tsu'); // F
+      expect(scoreData.notes[2].character).toBe('tsu'); // F
       expect(scoreData.notes[3].rest).toBe(true); // z/2
-      expect(scoreData.notes[4].sign).toBe('re'); // G
+      expect(scoreData.notes[4].character).toBe('re'); // G
     });
 
     it('should parse notes with both accidental and duration', () => {
@@ -307,10 +307,10 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(2);
-      expect(scoreData.notes[0].sign).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].character).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].accidental).toBe('meri');
       expect(scoreData.notes[0].duration).toBe('1');
-      expect(scoreData.notes[1].sign).toBe('tsu'); // _E → tsu
+      expect(scoreData.notes[1].character).toBe('tsu'); // _E → tsu
       expect(scoreData.notes[1].accidental).toBe('meri');
       expect(scoreData.notes[1].duration).toBe('1/4');
     });
@@ -327,7 +327,7 @@ K:C
       const scoreData = ABCParser.parse(abc);
 
       expect(scoreData.notes).toHaveLength(1);
-      expect(scoreData.notes[0].sign).toBe('tsu'); // ^D → tsu
+      expect(scoreData.notes[0].character).toBe('tsu'); // ^D → tsu
       expect(scoreData.notes[0].accidental).toBe('meri');
       expect(scoreData.notes[0].duration).toBe('3/2');
     });
@@ -354,7 +354,7 @@ G
   describe('parse() - key signatures', () => {
     const fingerings = (abc: string) =>
       ABCParser.parse(abc).notes.map((n) =>
-        [n.sign, n.register, n.accidental].filter(Boolean).join(' '),
+        [n.character, n.register, n.accidental].filter(Boolean).join(' '),
       );
 
     it('applies the key to notes without an accidental', () => {
@@ -435,7 +435,7 @@ G
   describe('parse() - fields in the tune body', () => {
     const fingerings = (abc: string) =>
       ABCParser.parse(abc).notes.map((n) =>
-        [n.sign, n.register, n.accidental].filter(Boolean).join(' '),
+        [n.character, n.register, n.accidental].filter(Boolean).join(' '),
       );
 
     it('changes the key from a K: line in the body', () => {
@@ -488,7 +488,7 @@ G
     // Each note as "step length", with a dot for a dotted note
     const played = (abc: string) =>
       ABCParser.parse(`X:1\nL:1/8\nK:C\n${abc}`).notes.map(
-        (n) => `${n.rest ? 'rest' : n.sign} ${n.duration}`,
+        (n) => `${n.rest ? 'rest' : n.character} ${n.duration}`,
       );
 
     it('plays out repeats and first and second endings', () => {
@@ -562,13 +562,13 @@ G
       const abc = 'X:1\nK:C\n!san-no-u!_b !trill!_b\n';
 
       expect(
-        ABCParser.parse(abc).notes.map(({ sign, register }) => ({
-          sign,
+        ABCParser.parse(abc).notes.map(({ character, register }) => ({
+          character,
           register,
         })),
       ).toEqual([
-        { sign: 'san-no-u', register: 1 },
-        { sign: 'hi', register: 1 },
+        { character: 'san-no-u', register: 1 },
+        { character: 'hi', register: 1 },
       ]);
     });
 
@@ -653,9 +653,9 @@ Q
           title: 'Test Score',
           style: 'kinko',
           notes: [
-            { sign: 'ro', register: 0, duration: '1' }, // D
-            { sign: 'tsu', register: 0, duration: '1' }, // F
-            { sign: 're', register: 0, duration: '1' }, // G
+            { character: 'ro', register: 0, duration: '1' }, // D
+            { character: 'tsu', register: 0, duration: '1' }, // F
+            { character: 're', register: 0, duration: '1' }, // G
           ],
         };
 
@@ -668,15 +668,15 @@ Q
 
       it('writes notes relative to the key, and reads them back', () => {
         const notes: ScoreData['notes'] = [
-          { sign: 'tsu', register: 0, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' },
           {
-            sign: 're',
+            character: 're',
             register: 0,
             duration: '1',
             accidental: 'meri',
           },
-          { sign: 'tsu', register: 0, duration: '1' },
-          { sign: 'ri', register: 0, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' },
+          { character: 'ri', register: 0, duration: '1' },
         ];
         const scoreData: ScoreData = { title: 'T', style: 'kinko', notes };
 
@@ -697,7 +697,7 @@ Q
           title: 'T',
           style: 'kinko',
           key: 'Hirajoshi',
-          notes: [{ sign: 'ro', register: 0, duration: '1' }],
+          notes: [{ character: 'ro', register: 0, duration: '1' }],
         };
 
         expect(() => ABCSerializer.serialize(scoreData)).toThrow(
@@ -710,7 +710,7 @@ Q
           title: 'Test Score',
           composer: 'Test Composer',
           style: 'kinko',
-          notes: [{ sign: 'ro', register: 0, duration: '1' }],
+          notes: [{ character: 'ro', register: 0, duration: '1' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -723,7 +723,7 @@ Q
           title: 'Test Score',
           tempo: '120',
           style: 'kinko',
-          notes: [{ sign: 'ro', register: 0, duration: '1' }],
+          notes: [{ character: 'ro', register: 0, duration: '1' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -737,7 +737,7 @@ Q
           style: 'kinko',
           notes: [
             {
-              sign: 'tsu',
+              character: 'tsu',
               register: 0,
               duration: '1',
               accidental: 'meri',
@@ -755,9 +755,9 @@ Q
           title: 'Test',
           style: 'kinko',
           notes: [
-            { sign: 'ro', register: 0, duration: '1' }, // D (uppercase)
-            { sign: 'ro', register: 1, duration: '1' }, // d (lowercase)
-            { sign: 'tsu', register: 2, duration: '1' }, // =f' (apostrophe; natural, as K:D makes f sharp)
+            { character: 'ro', register: 0, duration: '1' }, // D (uppercase)
+            { character: 'ro', register: 1, duration: '1' }, // d (lowercase)
+            { character: 'tsu', register: 2, duration: '1' }, // =f' (apostrophe; natural, as K:D makes f sharp)
           ],
         };
 
@@ -766,17 +766,17 @@ Q
         expect(abc).toContain("D d =f'");
       });
 
-      it('should fail on a note whose sign is not valid', () => {
+      it('should fail on a note whose character is not valid', () => {
         const scoreData = {
           title: 'Test',
           notes: [
-            { sign: 'ro', register: 0, duration: '1' },
-            { sign: 'go', register: 0, duration: '1' },
+            { character: 'ro', register: 0, duration: '1' },
+            { character: 'go', register: 0, duration: '1' },
           ],
         } as unknown as ScoreData;
 
         expect(() => ABCSerializer.serialize(scoreData)).toThrow(
-          "Note 2 has a sign, register or accidental that isn't valid.",
+          "Note 2 has a character, register or accidental that isn't valid.",
         );
       });
 
@@ -784,7 +784,7 @@ Q
         const scoreData: ScoreData = {
           title: 'Test',
           style: 'kinko',
-          notes: [{ sign: 'ro', register: 0, duration: '3/2' }],
+          notes: [{ character: 'ro', register: 0, duration: '3/2' }],
         };
 
         const abc = ABCSerializer.serialize(scoreData);
@@ -796,11 +796,11 @@ Q
 
       it('keeps each note length and dot through ABC and back', () => {
         const notes: ScoreData['notes'] = [
-          { sign: 'ro', register: 0, duration: '3/2' },
-          { sign: 'tsu', register: 0, duration: '1/2' },
-          { sign: 're', register: 0, duration: '3' },
-          { sign: 'chi', register: 0, duration: '3/4' },
-          { sign: 'ri', register: 0, duration: '1/4' },
+          { character: 'ro', register: 0, duration: '3/2' },
+          { character: 'tsu', register: 0, duration: '1/2' },
+          { character: 're', register: 0, duration: '3' },
+          { character: 'chi', register: 0, duration: '3/4' },
+          { character: 'ri', register: 0, duration: '1/4' },
           { rest: true, duration: '2' },
         ];
 
@@ -817,7 +817,7 @@ Q
         const back = ABCParser.parse(
           ABCSerializer.serialize({
             title: 'T',
-            notes: [{ sign: 'ro', register: 0, duration: '3/2' }],
+            notes: [{ character: 'ro', register: 0, duration: '3/2' }],
           }),
         );
 
@@ -845,10 +845,10 @@ Q
           title: 'Test',
           style: 'kinko',
           notes: [
-            { sign: 'ro', register: 0, duration: '2' }, // D2
-            { sign: 'tsu', register: 0, duration: '1/2' }, // F/2
-            { sign: 're', register: 0, duration: '3/2' }, // G3/2
-            { sign: 'chi', register: 0, duration: '1' }, // A (no suffix)
+            { character: 'ro', register: 0, duration: '2' }, // D2
+            { character: 'tsu', register: 0, duration: '1/2' }, // F/2
+            { character: 're', register: 0, duration: '3/2' }, // G3/2
+            { character: 'chi', register: 0, duration: '1' }, // A (no suffix)
           ],
         };
 
@@ -879,11 +879,11 @@ D2 F G/2 A>
         expect(reparsed.notes).toHaveLength(scoreData.notes.length);
 
         // Should have same pitches
-        expect(reparsed.notes[0].sign).toBe('ro'); // D
-        expect(reparsed.notes[1].sign).toBe('re'); // F is F♯ in D
+        expect(reparsed.notes[0].character).toBe('ro'); // D
+        expect(reparsed.notes[1].character).toBe('re'); // F is F♯ in D
         expect(reparsed.notes[1].accidental).toBe('meri');
-        expect(reparsed.notes[2].sign).toBe('re'); // G
-        expect(reparsed.notes[3].sign).toBe('chi'); // A
+        expect(reparsed.notes[2].character).toBe('re'); // G
+        expect(reparsed.notes[3].character).toBe('chi'); // A
 
         // Should have same durations, in beats of a quarter note
         expect(reparsed.notes[0].duration).toBe('1'); // D2
@@ -924,10 +924,10 @@ D z2 F z/2
         const reparsed = ABCParser.parse(serializedAbc);
 
         expect(reparsed.notes).toHaveLength(4);
-        expect(reparsed.notes[0].sign).toBe('ro'); // D
+        expect(reparsed.notes[0].character).toBe('ro'); // D
         expect(reparsed.notes[1].rest).toBe(true); // z2
         expect(reparsed.notes[1].duration).toBe('1');
-        expect(reparsed.notes[2].sign).toBe('re'); // F is F♯ in D
+        expect(reparsed.notes[2].character).toBe('re'); // F is F♯ in D
         expect(reparsed.notes[3].rest).toBe(true); // z/2
         expect(reparsed.notes[3].duration).toBe('1/4');
       });

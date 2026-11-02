@@ -7,8 +7,8 @@ const sampleScoreData: ScoreData = {
   composer: 'Test Composer',
   style: 'kinko',
   notes: [
-    { sign: 'ro', register: 0, duration: '1' },
-    { sign: 'tsu', register: 0, duration: '1/2' },
+    { character: 'ro', register: 0, duration: '1' },
+    { character: 'tsu', register: 0, duration: '1/2' },
   ],
 };
 

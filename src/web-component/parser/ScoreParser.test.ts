@@ -27,7 +27,7 @@ function durationMarks(notes: ScoreNote[]): string[] {
 }
 
 const ro = (duration: string): ScoreNote => ({
-  sign: 'ro',
+  character: 'ro',
   register: 0,
   duration,
 });
@@ -40,7 +40,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            sign: 'ro',
+            character: 'ro',
             register: 0,
             duration: '1',
           },
@@ -58,9 +58,9 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { sign: 'tsu', register: 0, duration: '1' }, // One beat: no duration marks
-          { sign: 'tsu', register: 1, duration: '1' },
-          { sign: 'tsu', register: 2, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' }, // One beat: no duration marks
+          { character: 'tsu', register: 1, duration: '1' },
+          { character: 'tsu', register: 2, duration: '1' },
         ],
       };
 
@@ -90,7 +90,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            sign: 'ro',
+            character: 'ro',
             register: 0,
             duration: '1',
             accidental: 'meri',
@@ -110,7 +110,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            sign: 'chi',
+            character: 'chi',
             register: 1,
             duration: '1',
             accidental: 'meri',
@@ -125,18 +125,18 @@ describe('ScoreParser', () => {
       expect(notes[0].getModifiers()).toHaveLength(2);
     });
 
-    it('should parse all valid signs', () => {
+    it('should parse all valid characters', () => {
       const scoreData: ScoreData = {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { sign: 'ro', register: 0, duration: '1' },
-          { sign: 'tsu', register: 0, duration: '1' },
-          { sign: 're', register: 0, duration: '1' },
-          { sign: 'chi', register: 0, duration: '1' },
-          { sign: 'ri', register: 0, duration: '1' },
-          { sign: 'u', register: 0, duration: '1' },
-          { sign: 'hi', register: 0, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'tsu', register: 0, duration: '1' },
+          { character: 're', register: 0, duration: '1' },
+          { character: 'chi', register: 0, duration: '1' },
+          { character: 'ri', register: 0, duration: '1' },
+          { character: 'u', register: 0, duration: '1' },
+          { character: 'hi', register: 0, duration: '1' },
         ],
       };
 
@@ -157,8 +157,8 @@ describe('ScoreParser', () => {
         title: 'Test Score',
         style: 'kinko',
         notes: [
-          { sign: 'ro', register: 0, duration: '3/2' },
-          { sign: 'tsu', register: 0, duration: '1' },
+          { character: 'ro', register: 0, duration: '3/2' },
+          { character: 'tsu', register: 0, duration: '1' },
         ],
       };
 
@@ -175,7 +175,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           { rest: true, duration: '1' },
-          { sign: 'ro', register: 0, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
         ],
       };
 
@@ -192,7 +192,7 @@ describe('ScoreParser', () => {
         style: 'kinko',
         notes: [
           {
-            sign: 'chi',
+            character: 'chi',
             register: 1,
             duration: '3/2',
             accidental: 'meri',
@@ -217,7 +217,7 @@ describe('ScoreParser', () => {
 
     it('should parse minimal data without title or style', () => {
       const minimalData = {
-        notes: [{ sign: 'ro', register: 0, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       } as any;
 
       const parsed = ScoreParser.parse(minimalData);
@@ -239,13 +239,13 @@ describe('ScoreParser', () => {
       expect(ScoreParser.parse({ notes: [] } as any)).toEqual([]);
     });
 
-    it('should throw error if note is missing sign', () => {
+    it('should throw error if note is missing character', () => {
       const scoreData = {
         notes: [{ register: 0, duration: '1' }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 is missing sign',
+        'Note 1 is missing character',
       );
     });
 
@@ -255,13 +255,13 @@ describe('ScoreParser', () => {
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 1 is missing sign',
+        'Note 1 is missing character',
       );
     });
 
     it('should throw error if note is missing register', () => {
       const scoreData = {
-        notes: [{ sign: 'ro', duration: '1' }],
+        notes: [{ character: 'ro', duration: '1' }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -271,7 +271,7 @@ describe('ScoreParser', () => {
 
     it('should throw error if note is missing duration', () => {
       const scoreData = {
-        notes: [{ sign: 'ro', register: 0 }],
+        notes: [{ character: 'ro', register: 0 }],
       } as any;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -283,7 +283,7 @@ describe('ScoreParser', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [{ sign: 'ro', register: -1, duration: '1' }],
+        notes: [{ character: 'ro', register: -1, duration: '1' }],
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -295,7 +295,7 @@ describe('ScoreParser', () => {
       const scoreData: ScoreData = {
         title: 'Test',
         style: 'kinko',
-        notes: [{ sign: 'ro', register: 3, duration: '1' }],
+        notes: [{ character: 'ro', register: 3, duration: '1' }],
       };
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -307,7 +307,7 @@ describe('ScoreParser', () => {
       const scoreData = {
         notes: [
           {
-            sign: 'ro',
+            character: 'ro',
             register: 0,
             duration: '1',
             accidental: 'merri',
@@ -320,22 +320,22 @@ describe('ScoreParser', () => {
       );
     });
 
-    it('should throw error if sign is not a known value, numbering notes from 1', () => {
+    it('should throw error if character is not a known value, numbering notes from 1', () => {
       const scoreData = {
         notes: [
-          { sign: 'ro', register: 0, duration: '1' },
-          { sign: 'go', register: 0, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'go', register: 0, duration: '1' },
         ],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
-        'Note 2 has invalid sign: go. Must be one of: ro, tsu,',
+        'Note 2 has invalid character: go. Must be one of: ro, tsu,',
       );
     });
 
     it('should throw error if duration is a number, the form before beats', () => {
       const scoreData = {
-        notes: [{ sign: 'ro', register: 0, duration: 2 }],
+        notes: [{ character: 'ro', register: 0, duration: 2 }],
       } as unknown as ScoreData;
 
       expect(() => ScoreParser.parse(scoreData)).toThrow(
@@ -430,7 +430,7 @@ describe('ScoreParser', () => {
       const json = JSON.stringify({
         title: 'Test Score',
         style: 'kinko',
-        notes: [{ sign: 'ro', register: 0, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       });
 
       const notes = ScoreParser.parseJSON(json);

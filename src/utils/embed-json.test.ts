@@ -18,7 +18,7 @@ describe('embedJson', () => {
       description: 'A folk song about red dragonflies (赤とんぼ)',
       data_format: 'json',
       data: {
-        notes: [{ sign: 'ro', register: 0, duration: '1/2' }],
+        notes: [{ character: 'ro', register: 0, duration: '1/2' }],
       },
     };
 

@@ -1,12 +1,12 @@
 import {
   ACCIDENTALS,
-  SIGNS,
+  CHARACTERS,
   type Accidental,
-  type Sign,
+  type Character,
 } from '../../web-component/types/ScoreData';
 
 /** The seven notes of the basic scale, listed first; the rest key follows them. */
-export const MAIN_NOTES: readonly Sign[] = [
+export const MAIN_NOTES: readonly Character[] = [
   'ro',
   'tsu',
   're',
@@ -17,7 +17,7 @@ export const MAIN_NOTES: readonly Sign[] = [
 ];
 
 /** Every other fingering, after the rest key, in the order the score data lists them. */
-export const OTHER_NOTES: readonly Sign[] = SIGNS.filter(
+export const OTHER_NOTES: readonly Character[] = CHARACTERS.filter(
   (step) => !MAIN_NOTES.includes(step),
 );
 
@@ -47,6 +47,6 @@ export const MARKS = ACCIDENTALS.map((mark) => ({
 }));
 
 /** A fingering's name as said and labelled: go-no-hi is "go no hi". */
-export function stepName(step: Sign): string {
+export function stepName(step: Character): string {
   return step.replaceAll('-', ' ');
 }

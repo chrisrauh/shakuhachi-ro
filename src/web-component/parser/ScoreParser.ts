@@ -19,7 +19,7 @@ import {
 } from '../modifiers/DurationMarksModifier';
 import {
   ACCIDENTALS,
-  SIGNS,
+  CHARACTERS,
   type ScoreData,
   type ScoreNote,
 } from '../types/ScoreData';
@@ -123,16 +123,16 @@ export class ScoreParser {
         continue;
       }
 
-      // A note that is not a rest needs a sign
-      if (!note.sign || note.register === undefined) {
+      // A note that is not a rest needs a character
+      if (!note.character || note.register === undefined) {
         throw new Error(
-          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexSignWhenNotRest(i),
+          PARSER_STRINGS.ERRORS.ScoreParser.noteIndexCharacterWhenNotRest(i),
         );
       }
 
       // Calculate which octave would be "expected" based on closest-note principle
       const needsOctaveMark = this.needsOctaveMark(
-        note.sign,
+        note.character,
         note.register,
         previousNoteMidi,
         i === 0 || previousNoteMidi === null,
@@ -140,7 +140,7 @@ export class ScoreParser {
 
       // Create the base note
       const shakuNote = new ShakuNote({
-        symbol: note.sign,
+        symbol: note.character,
         color: noteColor,
       });
 
@@ -162,7 +162,7 @@ export class ScoreParser {
       shakuNotes.push(shakuNote);
 
       // Update previous note MIDI for next iteration
-      previousNoteMidi = getNoteMidi(note.sign, note.register);
+      previousNoteMidi = getNoteMidi(note.character, note.register);
     }
 
     return shakuNotes;
@@ -215,7 +215,7 @@ export class ScoreParser {
 
     // Validate each note
     notes.forEach((note, index) => {
-      // A rest has no sign or register
+      // A rest has no character or register
       if (note.rest) {
         if (!note.duration) {
           throw new Error(S.restIndexDuration(index));
@@ -224,13 +224,13 @@ export class ScoreParser {
         return;
       }
 
-      // A note that is not a rest needs a sign and a register
-      if (!note.sign) {
-        throw new Error(S.noteIndexSignRequired(index));
+      // A note that is not a rest needs a character and a register
+      if (!note.character) {
+        throw new Error(S.noteIndexCharacterRequired(index));
       }
 
-      if (!(SIGNS as readonly string[]).includes(note.sign)) {
-        throw new Error(S.noteIndexSignInvalid(index, note.sign));
+      if (!(CHARACTERS as readonly string[]).includes(note.character)) {
+        throw new Error(S.noteIndexCharacterInvalid(index, note.character));
       }
 
       if (note.register === undefined || note.register === null) {

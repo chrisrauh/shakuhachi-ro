@@ -35,11 +35,11 @@ const RANGE = Array.from({ length: 39 }, (_, i) => {
 });
 
 const toNote = ({
-  sign,
+  character,
   register,
   accidental,
 }: WrittenFingering): ScoreNote => ({
-  sign,
+  character,
   register,
   duration: '1',
   ...(accidental && { accidental }),
@@ -78,7 +78,9 @@ describe('fingering table', () => {
   it('can store several sets of holes for one fingering, all at one pitch', () => {
     const kanHi = FINGERINGS.filter(
       ({ written }) =>
-        written?.sign === 'hi' && written.register === 1 && !written.accidental,
+        written?.character === 'hi' &&
+        written.register === 1 &&
+        !written.accidental,
     );
 
     expect(kanHi.map((f) => f.holes)).toEqual(['●○○●●', '●○○○●']);
@@ -105,11 +107,11 @@ describe('fingering table', () => {
 
   describe('fingerings no chart lists', () => {
     const unlisted: WrittenFingering[] = [
-      { sign: 'ri', register: 1 }, // kan ri
-      { sign: 'ri', register: 1, accidental: 'meri' }, // as otsu ri meri, a tone down
-      { sign: 'ro', register: 0, accidental: 'kari' }, // no ro kari anywhere
-      { sign: 're', register: 0, accidental: 'chu-meri' },
-      { sign: 'chi', register: 0, accidental: 'dai-kari' },
+      { character: 'ri', register: 1 }, // kan ri
+      { character: 'ri', register: 1, accidental: 'meri' }, // as otsu ri meri, a tone down
+      { character: 'ro', register: 0, accidental: 'kari' }, // no ro kari anywhere
+      { character: 're', register: 0, accidental: 'chu-meri' },
+      { character: 'chi', register: 0, accidental: 'dai-kari' },
     ];
 
     it('estimates a pitch from the character, the octave and the mark', () => {

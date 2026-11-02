@@ -17,10 +17,10 @@ describe('format-converter', () => {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { sign: 'ro', register: 0, duration: '1' },
-      { sign: 'tsu', register: 0, duration: '1/2' },
+      { character: 'ro', register: 0, duration: '1' },
+      { character: 'tsu', register: 0, duration: '1/2' },
       { rest: true, duration: '1/2' },
-      { sign: 're', register: 0, duration: '3/4' },
+      { character: 're', register: 0, duration: '3/4' },
     ],
   };
 
@@ -271,7 +271,7 @@ describe('views of a JSON score lose nothing', () => {
     written
       ? [
           {
-            sign: written.sign,
+            character: written.character,
             register: written.register,
             duration: '1',
             ...(written.accidental && { accidental: written.accidental }),
@@ -285,10 +285,10 @@ describe('views of a JSON score lose nothing', () => {
     style: 'kinko',
     notes: [
       ...fingerings,
-      { sign: 'ro', register: 0, duration: '1/2' },
-      { sign: 'tsu', register: 0, duration: '3/2' },
-      { sign: 're', register: 0, duration: '3/4' },
-      { sign: 'chi', register: 1, duration: '2' },
+      { character: 'ro', register: 0, duration: '1/2' },
+      { character: 'tsu', register: 0, duration: '3/2' },
+      { character: 're', register: 0, duration: '3/4' },
+      { character: 'chi', register: 1, duration: '2' },
       { rest: true, duration: '1' },
       { rest: true, duration: '1/2' },
     ],

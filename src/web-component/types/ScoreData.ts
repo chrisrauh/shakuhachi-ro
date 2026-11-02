@@ -11,14 +11,14 @@
  */
 
 /**
- * The main notation sign of a note (譜字 fuji), by name (Kinko-ryū): the five
- * basic notes, u, hi and ha, the signs written with small hole numbers inside
- * the character, such as go no hi (ヒ with 五), and signs other Kinko charts
- * use (i, a, ru). The name is not the glyph: `style` picks how it is drawn.
- * Which pitch each gives, and how it is fingered, is in the fingering table
+ * The main notation character of a note (譜字 fuji), by name (Kinko-ryū): the
+ * five basic notes, u, hi and ha, the characters written with a small hole
+ * number, such as go no hi (ヒ with 五), and characters other Kinko charts use
+ * (i, a, ru). The name is not the glyph: `style` picks how it is drawn. Which
+ * pitch each gives, and how it is fingered, is in the fingering table
  * (constants/kinko-fingerings.ts).
  */
-export const SIGNS = [
+export const CHARACTERS = [
   'ro',
   'tsu',
   're',
@@ -42,7 +42,7 @@ export const SIGNS = [
   'ni-no-re',
   'ichi-san-no-u',
 ] as const;
-export type Sign = (typeof SIGNS)[number];
+export type Character = (typeof CHARACTERS)[number];
 
 /**
  * Notation style
@@ -51,7 +51,7 @@ export type NotationStyle = 'kinko' | 'tozan';
 
 /**
  * The meri or kari mark written beside a note. The same meaning as MusicXML
- * <accidental>: the written sign, not the change in sound. Meri lowers a note
+ * <accidental>: the written mark, not the change in sound. Meri lowers a note
  * and kari raises it, played by changing the angle of the lips to the blowing
  * edge. Meri also changes the tone colour.
  *
@@ -76,8 +76,8 @@ export type Accidental = (typeof ACCIDENTALS)[number];
  * Individual note within a score
  */
 export interface ScoreNote {
-  /** The main notation sign (undefined for rests) */
-  sign?: Sign;
+  /** The main notation character (undefined for rests) */
+  character?: Character;
 
   /** 0 otsu (the low register), 1 kan, 2 daikan (undefined for rests) */
   register?: number;
@@ -93,7 +93,7 @@ export interface ScoreNote {
    */
   duration: string;
 
-  /** Rest indicator (a rest has no sign, register or accidental) */
+  /** Rest indicator (a rest has no character, register or accidental) */
   rest?: boolean;
 }
 

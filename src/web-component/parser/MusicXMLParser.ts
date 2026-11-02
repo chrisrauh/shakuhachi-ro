@@ -274,7 +274,7 @@ export class MusicXMLParser {
 
       // Create note
       const note: ScoreNote = {
-        sign: shakuPitch.sign,
+        character: shakuPitch.character,
         register: shakuPitch.register,
         ...(shakuPitch.accidental && { accidental: shakuPitch.accidental }),
         duration,

@@ -1,4 +1,7 @@
-import type { Accidental, Sign } from '../../web-component/types/ScoreData';
+import type {
+  Accidental,
+  Character,
+} from '../../web-component/types/ScoreData';
 import { parseBeats } from '../../web-component/types/Duration';
 import {
   addStroke,
@@ -85,7 +88,7 @@ export class PalettePanel {
   update({ notes, selection, canUndo, canRedo }: PaletteState): void {
     const index = targetIndex(selection);
     const note = notes[index];
-    const sign = note && !note.rest ? note.sign : undefined;
+    const character = note && !note.rest ? note.character : undefined;
     const changing = selection.type === 'highlight';
     let noteKey: HTMLButtonElement | undefined;
 
@@ -100,7 +103,7 @@ export class PalettePanel {
             command.step === 'rest' ? 'a rest' : key.getAttribute('aria-label');
           key.title = `${changing ? 'Change to' : 'Insert'} ${name}`;
           if (changing) {
-            pressed = command.step === (sign ?? 'rest');
+            pressed = command.step === (character ?? 'rest');
             if (pressed) noteKey = key;
           }
           break;
@@ -120,12 +123,12 @@ export class PalettePanel {
           pressed = !!note && isDotted(note);
           break;
         case 'mark':
-          applies &&= !!sign;
-          pressed = !!sign && note.accidental === command.mark;
+          applies &&= !!character;
+          pressed = !!character && note.accidental === command.mark;
           break;
         case 'octave':
           applies &&=
-            !!sign &&
+            !!character &&
             (command.step > 0
               ? note.register! < HIGHEST_OCTAVE
               : note.register! > 0);
@@ -206,7 +209,7 @@ function reveal(key: HTMLButtonElement): void {
 /** The command a key gives, from the data attributes PalettePanel.astro sets. */
 function commandFor(key: HTMLButtonElement): EditorCommand {
   const { step, duration, mark, key: name } = key.dataset;
-  if (step) return { type: 'note', step: step as Sign | 'rest' };
+  if (step) return { type: 'note', step: step as Character | 'rest' };
   if (duration) return { type: 'duration', duration };
   if (mark) return { type: 'mark', mark: mark as Accidental };
   switch (name) {

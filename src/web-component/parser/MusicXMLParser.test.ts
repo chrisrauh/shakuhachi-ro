@@ -97,10 +97,10 @@ describe('MusicXMLParser', () => {
       expect(score.composer).toBe('My Composer');
       expect(score.style).toBe('kinko');
       expect(score.notes).toHaveLength(3);
-      expect(score.notes[0].sign).toBe('ro');
+      expect(score.notes[0].character).toBe('ro');
       expect(score.notes[0].register).toBe(0);
-      expect(score.notes[1].sign).toBe('tsu');
-      expect(score.notes[2].sign).toBe('re');
+      expect(score.notes[1].character).toBe('tsu');
+      expect(score.notes[2].character).toBe('re');
     });
 
     it('should produce rest: true for <rest> element', () => {
@@ -214,9 +214,11 @@ describe('MusicXMLParser', () => {
         { name: 'Shakuhachi', body: makeNote('D', 4) + makeNote('F', 4) },
       ]);
 
-      const signs = MusicXMLParser.parse(xml).notes.map((n) => n.sign);
+      const characters = MusicXMLParser.parse(xml).notes.map(
+        (n) => n.character,
+      );
 
-      expect(signs).toEqual(['ro', 'tsu']);
+      expect(characters).toEqual(['ro', 'tsu']);
     });
 
     it('should fail on a multi-part file with no part named shakuhachi', () => {
@@ -304,13 +306,13 @@ describe('MusicXMLParser', () => {
       const xml = makeXML(makeAlteredNote('C', 1, 7) + makeNote('D', 7));
 
       expect(
-        MusicXMLParser.parse(xml).notes.map(({ sign, register }) => ({
-          sign,
+        MusicXMLParser.parse(xml).notes.map(({ character, register }) => ({
+          character,
           register,
         })),
       ).toEqual([
-        { sign: 'go-no-hi', register: 2 },
-        { sign: 'ha', register: 2 },
+        { character: 'go-no-hi', register: 2 },
+        { character: 'ha', register: 2 },
       ]);
     });
 
@@ -323,13 +325,13 @@ describe('MusicXMLParser', () => {
       const xml = makeXML(withFingering('san-no-u') + withFingering('2'));
 
       expect(
-        MusicXMLParser.parse(xml).notes.map(({ sign, register }) => ({
-          sign,
+        MusicXMLParser.parse(xml).notes.map(({ character, register }) => ({
+          character,
           register,
         })),
       ).toEqual([
-        { sign: 'san-no-u', register: 1 },
-        { sign: 'hi', register: 1 },
+        { character: 'san-no-u', register: 1 },
+        { character: 'hi', register: 1 },
       ]);
     });
 
@@ -358,7 +360,7 @@ describe('MusicXMLParser', () => {
       );
 
       const fingerings = MusicXMLParser.parse(xml).notes.map((n) => [
-        n.sign,
+        n.character,
         n.accidental,
       ]);
 

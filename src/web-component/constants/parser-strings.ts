@@ -5,7 +5,7 @@
  * Part of the standalone renderer library.
  */
 
-import { ACCIDENTALS, SIGNS } from '../types/ScoreData';
+import { ACCIDENTALS, CHARACTERS } from '../types/ScoreData';
 
 // Shared string factory functions for parser validation. Notes are numbered
 // from 1, as people count them; callers pass the 0-based array index.
@@ -28,16 +28,16 @@ export const PARSER_STRINGS = {
     ScoreParser: {
       scoreDataRequired: 'Score data is required',
       notesArrayRequired: 'Score notes must be an array',
-      noteIndexSignWhenNotRest: (index: number) =>
-        `Note ${index + 1} must have sign when rest is not set`,
-      noteIndexSignRequired: (index: number) =>
-        PARSER_STRING_FACTORIES.noteIndexError(index, 'sign'),
-      noteIndexSignInvalid: (index: number, sign: unknown) =>
+      noteIndexCharacterWhenNotRest: (index: number) =>
+        `Note ${index + 1} must have character when rest is not set`,
+      noteIndexCharacterRequired: (index: number) =>
+        PARSER_STRING_FACTORIES.noteIndexError(index, 'character'),
+      noteIndexCharacterInvalid: (index: number, character: unknown) =>
         PARSER_STRING_FACTORIES.noteIndexInvalid(
           index,
-          'sign',
-          sign,
-          `Must be one of: ${SIGNS.join(', ')}.`,
+          'character',
+          character,
+          `Must be one of: ${CHARACTERS.join(', ')}.`,
         ),
       noteIndexRegisterRequired: (index: number) =>
         PARSER_STRING_FACTORIES.noteIndexError(index, 'register'),
@@ -152,7 +152,7 @@ export const PARSER_STRINGS = {
       // The editor prefixes these with "Can't switch to <format>.", so they
       // don't name the format again
       invalidFingering: (index: number) =>
-        `Note ${index + 1} has a sign, register or accidental that isn't valid. Fix that note, or keep the score in its current format.`,
+        `Note ${index + 1} has a character, register or accidental that isn't valid. Fix that note, or keep the score in its current format.`,
       unknownABCKey: (key: string) =>
         `The score's key, "${key}", isn't one ABC defines. Change it to a key such as D, Dm or D dorian.`,
     },

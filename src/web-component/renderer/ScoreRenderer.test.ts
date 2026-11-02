@@ -35,9 +35,9 @@ function createTestScoreData(): ScoreData {
     composer: 'Test Composer',
     style: 'kinko',
     notes: [
-      { sign: 'ro', register: 0, duration: '1/2' },
-      { sign: 'tsu', register: 0, duration: '1/2' },
-      { sign: 'chi', register: 0, duration: '1/2' },
+      { character: 'ro', register: 0, duration: '1/2' },
+      { character: 'tsu', register: 0, duration: '1/2' },
+      { character: 'chi', register: 0, duration: '1/2' },
     ],
   };
 }
@@ -430,9 +430,9 @@ describe('ScoreRenderer', () => {
         title: '',
         style: 'kinko',
         notes: [
-          { sign: 'ro', register: 0, duration: '1' },
+          { character: 'ro', register: 0, duration: '1' },
           {
-            sign: 'ro',
+            character: 'ro',
             register: 2,
             duration: '1',
             accidental: 'dai-meri',
@@ -459,7 +459,7 @@ describe('ScoreRenderer', () => {
       const score: ScoreData = {
         title: '',
         style: 'kinko',
-        notes: [{ sign: 'ro', register: 0, duration: '1' }],
+        notes: [{ character: 'ro', register: 0, duration: '1' }],
       };
       const cellWith = (options: RenderOptions) => {
         const renderer = new ScoreRenderer(container, options);
@@ -587,12 +587,12 @@ describe('ScoreRenderer', () => {
         style: 'kinko',
         notes: [
           {
-            sign: 'ro',
+            character: 'ro',
             register: 0,
             duration: firstDotted ? '3/4' : '1/2',
           },
-          { sign: 'tsu', register: 0, duration: '1/2' },
-          { sign: 're', register: 0, duration: '1/2' },
+          { character: 'tsu', register: 0, duration: '1/2' },
+          { character: 're', register: 0, duration: '1/2' },
         ],
       };
     }

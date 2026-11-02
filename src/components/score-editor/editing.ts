@@ -1,6 +1,6 @@
 import type {
   Accidental,
-  Sign,
+  Character,
   ScoreNote,
 } from '../../web-component/types/ScoreData';
 import { getNoteMidi } from '../../web-component/constants/kinko-symbols';
@@ -26,7 +26,7 @@ export interface EditorState {
 
 /** What a palette key or shortcut asks for: an edit, or undo or redo. */
 export type EditAction =
-  | { type: 'note'; step: Sign | 'rest' }
+  | { type: 'note'; step: Character | 'rest' }
   | { type: 'duration'; duration: string }
   | { type: 'stroke' }
   | { type: 'dot' }
@@ -88,7 +88,7 @@ export function targetIndex(selection: Selection): number {
  */
 export function chooseNote(
   { notes, selection }: EditorState,
-  step: Sign | 'rest',
+  step: Character | 'rest',
 ): EditorState | null {
   if (selection.type === 'cursor') {
     const { position } = selection;
@@ -98,7 +98,7 @@ export function chooseNote(
       step === 'rest'
         ? { rest: true, duration }
         : {
-            sign: step,
+            character: step,
             register: octaveAfter(notes, position, step),
             duration,
           };
@@ -110,7 +110,7 @@ export function chooseNote(
 
   const { index } = selection;
   const old = notes[index];
-  if (step === (isRest(old) ? 'rest' : old.sign)) return null;
+  if (step === (isRest(old) ? 'rest' : old.character)) return null;
   let note: ScoreNote;
   if (step === 'rest') {
     note = { rest: true, duration: old.duration };
@@ -119,7 +119,7 @@ export function chooseNote(
       ? octaveAfter(notes, index, step)
       : old.register!;
     note = {
-      sign: step,
+      character: step,
       register: octave,
       ...(old.accidental && { accidental: old.accidental }),
       duration: old.duration,
@@ -251,7 +251,7 @@ function withTarget(state: EditorState, note: ScoreNote): EditorState {
 }
 
 function isRest(note: ScoreNote): boolean {
-  return note.rest === true || !note.sign;
+  return note.rest === true || !note.character;
 }
 
 /**
@@ -259,8 +259,15 @@ function isRest(note: ScoreNote): boolean {
  * the last pitched note, or the lowest with none. Rests are passed over, as
  * when the score decides where octave marks are needed.
  */
-function octaveAfter(notes: ScoreNote[], index: number, step: Sign): number {
+function octaveAfter(
+  notes: ScoreNote[],
+  index: number,
+  step: Character,
+): number {
   const previous = notes.slice(0, index).findLast((note) => !isRest(note));
   if (!previous) return 0;
-  return closestOctave(step, getNoteMidi(previous.sign!, previous.register!));
+  return closestOctave(
+    step,
+    getNoteMidi(previous.character!, previous.register!),
+  );
 }

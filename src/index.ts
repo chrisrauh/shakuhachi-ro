@@ -83,7 +83,7 @@ export type {
 export type {
   ScoreData,
   ScoreNote,
-  Sign,
+  Character,
   Accidental,
   NotationStyle,
 } from './web-component/types/ScoreData';

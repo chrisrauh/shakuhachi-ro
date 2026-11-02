@@ -1,9 +1,9 @@
--- Store what a note writes: sign, register and accidental; remove dotted (#492)
--- A note records the score, not the sound. Its "pitch" was the written sign
+-- Store what a note writes: character, register and accidental; remove dotted (#492)
+-- A note records the score, not the sound. Its "pitch" was the written character
 -- and register, not a sounding pitch, so:
 --   "pitch": { "step": "tsu", "octave": 1 }, "meriKari": "meri"
 -- becomes
---   "sign": "tsu", "register": 1, "accidental": "meri"
+--   "character": "tsu", "register": 1, "accidental": "meri"
 -- The dot is no longer stored: a length with a half ("3/2", "5/2", "3/4") is
 -- always drawn with one.
 --
@@ -22,7 +22,7 @@ set data = jsonb_set(
       (note - 'pitch' - 'meriKari' - 'dotted')
       || case
         when note ? 'pitch' then jsonb_build_object(
-          'sign', note->'pitch'->'step',
+          'character', note->'pitch'->'step',
           'register', note->'pitch'->'octave'
         )
         else '{}'::jsonb

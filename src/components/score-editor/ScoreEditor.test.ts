@@ -22,8 +22,8 @@ const TWO_NOTES: ScoreData = {
   title: '',
   style: 'kinko',
   notes: [
-    { sign: 'ro', register: 0, duration: '1' },
-    { sign: 'tsu', register: 0, duration: '1' },
+    { character: 'ro', register: 0, duration: '1' },
+    { character: 'tsu', register: 0, duration: '1' },
   ],
 };
 
@@ -256,7 +256,7 @@ describe('ScoreEditor score and source', () => {
     new ScoreEditor(
       makeScore({
         data: {
-          notes: [{ sign: 'ro', register: 0, duration: 2 }],
+          notes: [{ character: 'ro', register: 0, duration: 2 }],
         } as unknown as ScoreData,
       }),
     );
@@ -274,8 +274,8 @@ describe('ScoreEditor score and source', () => {
           title: '',
           style: 'kinko',
           notes: [
-            { sign: 'ro', register: 0, duration: '1/2' },
-            { sign: 'go', register: 0, duration: '1/2' } as any,
+            { character: 'ro', register: 0, duration: '1/2' },
+            { character: 'go', register: 0, duration: '1/2' } as any,
           ],
         },
       }),
@@ -293,7 +293,7 @@ describe('ScoreEditor score and source', () => {
 
     await vi.waitFor(() =>
       expect($('validation-message').textContent).toBe(
-        "Can't switch to MusicXML. Note 2 has a sign, register or accidental that isn't valid. Fix that note, or keep the score in its current format.",
+        "Can't switch to MusicXML. Note 2 has a character, register or accidental that isn't valid. Fix that note, or keep the score in its current format.",
       ),
     );
     expect(
@@ -416,7 +416,10 @@ describe('ScoreEditor editing', () => {
     expect(source()).toEqual({
       ...TWO_NOTES,
       title: 'Kept',
-      notes: [...TWO_NOTES.notes, { sign: 're', register: 0, duration: '1' }],
+      notes: [
+        ...TWO_NOTES.notes,
+        { character: 're', register: 0, duration: '1' },
+      ],
     });
     expect(renderedScore()).toEqual(source());
     expect(status()).toBe('after レ re, otsu · 3 of 3');
@@ -523,7 +526,7 @@ describe('ScoreEditor editing', () => {
       $<HTMLTextAreaElement>('score-data-input').value,
       'musicxml',
     ).notes;
-    expect(notes.map((note) => note.sign)).toEqual(['ro', 'tsu', 're']);
+    expect(notes.map((note) => note.character)).toEqual(['ro', 'tsu', 're']);
   });
 
   it('does not edit a source that cannot be read', () => {

@@ -8,11 +8,11 @@ import {
   pitchToMidi,
   getNoteMidi,
 } from './kinko-symbols';
-import { SIGNS } from '../types/ScoreData';
+import { CHARACTERS } from '../types/ScoreData';
 
 describe('kinkoMap', () => {
-  it('has a symbol for every sign', () => {
-    expect(Object.keys(kinkoMap)).toEqual([...SIGNS]);
+  it('has a symbol for every character', () => {
+    expect(Object.keys(kinkoMap)).toEqual([...CHARACTERS]);
   });
 });
 

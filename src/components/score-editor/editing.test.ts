@@ -11,9 +11,9 @@ import {
   type EditorState,
 } from './editing';
 
-const ro: ScoreNote = { sign: 'ro', register: 0, duration: '1' };
+const ro: ScoreNote = { character: 'ro', register: 0, duration: '1' };
 // Ri is C5: the ro closest to it is kan ro (D5), not otsu ro (D4)
-const ri: ScoreNote = { sign: 'ri', register: 0, duration: '1/2' };
+const ri: ScoreNote = { character: 'ri', register: 0, duration: '1/2' };
 const rest: ScoreNote = { rest: true, duration: '2' };
 
 const cursorAt = (notes: ScoreNote[], position: number): EditorState => ({
@@ -33,21 +33,24 @@ describe('chooseNote at a cursor', () => {
     );
 
     expect(chooseNote(before, 'tsu')).toEqual({
-      notes: [before.notes[0], { sign: 'tsu', register: 0, duration: '1' }],
+      notes: [
+        before.notes[0],
+        { character: 'tsu', register: 0, duration: '1' },
+      ],
       selection: { type: 'cursor', position: 2 },
     });
   });
 
   it('starts an empty score with a one-beat note in the lowest octave', () => {
     expect(chooseNote(cursorAt([], 0), 're')!.notes).toEqual([
-      { sign: 're', register: 0, duration: '1' },
+      { character: 're', register: 0, duration: '1' },
     ]);
   });
 
   it('picks the octave closest to the previous pitched note, past rests', () => {
     const { notes } = chooseNote(cursorAt([ri, rest], 2), 'ro')!;
     expect(notes[2]).toEqual({
-      sign: 'ro',
+      character: 'ro',
       register: 1,
       duration: '2',
     });
@@ -64,14 +67,14 @@ describe('chooseNote at a cursor', () => {
 describe('chooseNote on a highlight', () => {
   it('changes the fingering, keeping duration, dot, octave and mark', () => {
     const note: ScoreNote = {
-      sign: 'ri',
+      character: 'ri',
       register: 1,
       duration: '3/4',
       accidental: 'kari',
     };
 
     expect(chooseNote(highlight([note], 0), 'chi')).toEqual({
-      notes: [{ ...note, sign: 'chi', register: 1 }],
+      notes: [{ ...note, character: 'chi', register: 1 }],
       selection: { type: 'highlight', index: 0 },
     });
   });
@@ -79,7 +82,7 @@ describe('chooseNote on a highlight', () => {
   it('gives a rest turned into a note the closest octave', () => {
     const { notes } = chooseNote(highlight([ri, rest], 1), 'ro')!;
     expect(notes[1]).toEqual({
-      sign: 'ro',
+      character: 'ro',
       register: 1,
       duration: '2',
     });
