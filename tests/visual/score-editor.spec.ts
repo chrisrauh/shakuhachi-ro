@@ -12,7 +12,7 @@
  *
  * Authentication:
  * - Session provided by auth-setup.ts via project storageState
- * - Test score at /score/test/edit (three notes: ro, tsu, re; see CLAUDE.md)
+ * - Test score at /score/test/edit (nine notes, tsu second; see CLAUDE.md)
  */
 
 import { test, expect, type Page } from '@playwright/test';

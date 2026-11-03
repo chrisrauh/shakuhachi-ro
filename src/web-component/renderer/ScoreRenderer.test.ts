@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ScoreRenderer } from './ScoreRenderer';
 import type { RenderOptions } from './RenderOptions';
+import { slotSpacing } from './ColumnLayoutCalculator';
 import { SVGRenderer } from './SVGRenderer';
 import { ShakuNote } from '../notes/ShakuNote';
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
@@ -453,6 +454,34 @@ describe('ScoreRenderer', () => {
       expect(marked.x + marked.width).toBeLessThanOrEqual(
         marked.cell.x + marked.cell.width,
       );
+    });
+
+    it("should extend a long note's cell over its strokes and dot, keeping the gap to the next", () => {
+      const renderer = new ScoreRenderer(container);
+      renderer.renderFromScoreData({
+        title: '',
+        style: 'kinko',
+        notes: [
+          { character: 'ro', register: 0, duration: '1' },
+          { character: 'tsu', register: 0, duration: '7/2' },
+          { character: 're', register: 0, duration: '1' },
+          { character: 'chi', register: 0, duration: '1' },
+        ],
+      });
+
+      const [short, long, next, last] = renderer
+        .getNoteBoxes()
+        .map(({ cell }) => cell);
+      const bottom = (cell: typeof short) => cell.y + cell.height;
+      const stroked = renderer.getNotes()[1];
+      const below = stroked.extraHeight(slotSpacing(renderer.getOptions()));
+
+      // Three strokes and a dot take room below the long note
+      expect(below).toBeGreaterThan(0);
+      expect(long.height).toBe(short.height + below);
+      // The gap between cells is the same after the long note as after a short one
+      expect(next.y - bottom(long)).toBeCloseTo(last.y - bottom(next));
+      expect(long.y - bottom(short)).toBeCloseTo(last.y - bottom(next));
     });
 
     it('should size the note cell from the note spacing and the marks', () => {

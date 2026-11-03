@@ -268,7 +268,8 @@ When testing authenticated features (score editor, creating scores, forking), lo
 - Slug `test` — view at `/score/test`, edit at `http://localhost:3001/score/test/edit`
 - Owned by the test account
 - Title is **"A Very Long Score Title That Will Definitely Wrap Across Multiple Lines on Mobile"**. This is deliberate: it exercises title wrapping in the header. Seeing it in a page snapshot means you are on the right score, not the wrong one.
-- Stored as JSON, like every score (#459). Three notes: ro, tsu, re. The editor opens its source as JSON. Switch the format radio to see it as MusicXML or ABC.
+- Stored as JSON, like every score (#459). The editor opens its source as JSON. Switch the format radio to see it as MusicXML or ABC.
+- Nine notes, one for each length case the editor draws differently: ro, tsu and re of 4 beats each (three strokes); chi of 1 beat (nothing below); ri of ½ beat (a line beside it); u of 3/2 (a dot); hi of 2 (one stroke); kan ro of 5/2 (a stroke and a dot); a rest of 1 beat. The visual tests tap the second note, tsu, so keep it there.
 
 **Test Score for Octave Marks:**
 
