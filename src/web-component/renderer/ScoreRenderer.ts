@@ -16,7 +16,7 @@ import { ScoreParser } from '../parser/ScoreParser';
 import { SVGRenderer } from './SVGRenderer';
 import type { RenderingBackend } from './RenderingBackend';
 import { ModifierConfigurator } from './ModifierConfigurator';
-import { ColumnLayoutCalculator } from './ColumnLayoutCalculator';
+import { ColumnLayoutCalculator, slotSpacing } from './ColumnLayoutCalculator';
 import {
   mergeWithDefaults,
   type RenderOptions,
@@ -52,8 +52,10 @@ export interface NoteBox {
   /** The middle of the note's glyph ink, which marks are drawn around. */
   centerY: number;
   /**
-   * A cell around the note for a highlight: centred on the glyph's ink and
-   * the same size for every note, whatever its marks. See `noteCellSize`.
+   * A cell around the note for a highlight. Its top part is centred on the
+   * glyph's ink and the same size for every note (see `noteCellSize`). Below
+   * that, it is as much taller as the space the note's marks take below it,
+   * such as a long note's strokes and dot.
    */
   cell: { x: number; y: number; width: number; height: number };
 }
@@ -74,11 +76,11 @@ const CELL_GAP_RATIO = 1 / 16;
 const CELL_PADDING_RATIO = 1 / 8;
 
 /**
- * The size of a note's cell. It's as tall as the distance between notes less
- * a gap, the most it can be without touching the next note's cell. It's wide
- * enough, with padding, for a meri mark on the left and an octave mark on the
- * right, whichever the note has. An octave mark, which reaches above the cell,
- * can rise past its top edge, as a dot can below.
+ * The size of a note's cell before the marks below it. It's as tall as the
+ * distance between notes less a gap, the most it can be without touching the
+ * next note's cell. It's wide enough, with padding, for a meri mark on the
+ * left and an octave mark on the right, whichever the note has. An octave
+ * mark, which reaches above the cell, can rise past its top edge.
  */
 function noteCellSize(options: ResolvedRenderOptions): {
   width: number;
@@ -348,11 +350,18 @@ export class ScoreRenderer {
     return this.currentNotes.map((note) => {
       const { x, y } = note.getPosition();
       const centerY = y - this.options.noteFontSize * GLYPH_INK_CENTER_RATIO;
+      // The next note is moved down by the same amount, so the gap stays
+      const below = note.extraHeight(slotSpacing(this.options));
       return {
         ...note.getBBox(),
         centerX: x,
         centerY,
-        cell: { x: x - width / 2, y: centerY - height / 2, width, height },
+        cell: {
+          x: x - width / 2,
+          y: centerY - height / 2,
+          width,
+          height: height + below,
+        },
       };
     });
   }
