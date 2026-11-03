@@ -87,6 +87,14 @@ describe('fingering table', () => {
     expect(new Set(kanHi.map((f) => f.pitch))).toEqual(new Set(['C6']));
   });
 
+  it("writes otsu ハ, as Koga's Kurokami score does, with ni shi go no ha's pitch", () => {
+    const ha = pitchForFingering({ character: 'ha', register: 0 });
+    expect(ha).toEqual(
+      pitchForFingering({ character: 'ni-shi-go-no-ha', register: 0 }),
+    );
+    expect(ha).toEqual({ letter: 'C', alter: 0, octave: 5 });
+  });
+
   it('marks only named fingerings as defaults', () => {
     for (const f of FINGERINGS) {
       if (f.default) expect(f.written).toBeDefined();

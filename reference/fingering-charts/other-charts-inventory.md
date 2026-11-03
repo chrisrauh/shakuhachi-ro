@@ -29,7 +29,7 @@ Candidates to add as named fingerings. "New step" means a new character for the 
 | A6 | chi meri | チメ | otsu | A♭4 | ●●◐○○ | メ | SF; N mentions it | Koga uses u here. Same holes as Koga's u meri, #11. |
 | A7 | ro kari | ロカ | kan | E♭5 | ○○●●● | カ, head raised | N, SF | The holes of Koga's unnamed #36 |
 | A8 | go no ha | ハ五 | otsu | D5 | ○●●●● | ↓ | N | Koga has go no ha only in kan |
-| A9 | ni shi go no ha | ハ二四五, or ハ | otsu | C5 | ○○●○● | ↓↓ | N | A grace note before kan ro ("ha ro"). Koga has it only in kan, at E♭6. |
+| A9 | ni shi go no ha | ハ二四五, or ハ | otsu | C5 | ○○●○● | ↓↓ | N | A grace note before kan ro ("ha ro"). Koga has it only in kan, at E♭6. Koga's Kurokami score writes it as plain ハ, so the table also has otsu ha at C5 (#508). |
 | A10 | ro | ロ | daikan | D6 | ●◐●●● | — | BC (ロ大甲); SF lists the same holes as "also" for D6 | ⚠ The BC character sits under a "Ni no Ha" heading |
 | A11 | i | イ | otsu, kan | D5, D6 | ○○○●● (BC: □○○○●; SF kan also ○○○●○) | — | N, BC, SF | **New step.** Another character for go no hi. N also gives i meri (C) and i chu-meri (C♯). |
 | A12 | a | ア | otsu ⚠ | D5 | N: ○○●●●; BC, SF: ○○●○● | N: ↓↓ (kan, D6); BC: ↑; SF: カ | N, BC, SF | **New step.** "A substitute for kan ro, airier" (N). N also gives it in kan at D6, as an alternative to yon go no ha. ⚠ The holes conflict. |
