@@ -1,6 +1,7 @@
 import type {
   Accidental,
   Character,
+  ScoreNote,
 } from '../../web-component/types/ScoreData';
 import { parseBeats } from '../../web-component/types/Duration';
 import {
@@ -8,6 +9,7 @@ import {
   isDotted,
   targetIndex,
   toggleDot,
+  trimTail,
   writtenDuration,
   type EditorCommand,
   type EditorState,
@@ -79,7 +81,8 @@ export class PalettePanel {
    * Shows which keys apply: lengths and the dot need a note to act on, the
    * stroke one of a beat or more, marks and octave a pitched one, and delete a
    * note to remove. A key whose value that note already has is pressed. Note
-   * and delete titles follow the mode; the stroke's says how long the note is.
+   * and delete titles follow the mode; the stroke's says how long the note is,
+   * and delete's what it removes.
    *
    * Note keys are pressed only for a highlighted note, which they change; at
    * the cursor they insert, so none is pressed. The highlighted note's key is
@@ -135,9 +138,7 @@ export class PalettePanel {
           break;
         case 'delete':
           applies &&= index >= 0;
-          key.title = changing
-            ? 'Delete the highlighted note'
-            : 'Delete the note before the cursor';
+          key.title = deleteTitle(note, changing);
           break;
         case 'undo':
           applies = canUndo;
@@ -183,6 +184,22 @@ export class PalettePanel {
     const other = this.side === 'right' ? 'left' : 'right';
     this.sideToggle.setAttribute('aria-label', `Move palettes to the ${other}`);
     this.sideToggle.title = `Move the palettes to the ${other} side`;
+  }
+}
+
+/**
+ * The delete key's title: what it removes. At the cursor that is the dot or
+ * last stroke of the note before it, while it has one, and then the note.
+ */
+function deleteTitle(note: ScoreNote | undefined, changing: boolean): string {
+  if (changing) return 'Delete the highlighted note';
+  switch (note && trimTail(note)?.removed) {
+    case 'dot':
+      return 'Remove the dot from the note before the cursor';
+    case 'stroke':
+      return `Remove a beat from the note before the cursor, now ${beatCount(note!.duration)}`;
+    default:
+      return 'Delete the note before the cursor';
   }
 }
 
