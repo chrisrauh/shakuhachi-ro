@@ -58,6 +58,17 @@ describe('fingering table', () => {
     }
   });
 
+  it('lists holes from 1, nearest the bottom of the flute, to the thumb hole 5', () => {
+    // Otsu tsu opens only hole 1
+    const tsu = FINGERINGS.find(
+      (f) =>
+        f.written?.character === 'tsu' &&
+        f.written.register === 0 &&
+        !f.written.accidental,
+    );
+    expect(tsu?.holes).toBe('○●●●●');
+  });
+
   it('spans C4–D7', () => {
     expect(PITCH_RANGE).toBe('C4–D7');
   });
@@ -83,7 +94,7 @@ describe('fingering table', () => {
         !written.accidental,
     );
 
-    expect(kanHi.map((f) => f.holes)).toEqual(['●○○●●', '●○○○●']);
+    expect(kanHi.map((f) => f.holes)).toEqual(['●●○○●', '●○○○●']);
     expect(new Set(kanHi.map((f) => f.pitch))).toEqual(new Set(['C6']));
   });
 
