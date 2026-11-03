@@ -194,6 +194,23 @@ describe('length, dot, mark and octave', () => {
 });
 
 describe('deleteNote', () => {
+  it('at the cursor, removes a dot, then strokes one at a time, then the note', () => {
+    const long: ScoreNote = { character: 'tsu', register: 0, duration: '5/2' };
+    let state = cursorAt([ro, long], 2);
+    const lengths: string[] = [];
+    while (state.notes.length === 2) {
+      state = deleteNote(state)!;
+      lengths.push(state.notes[1]?.duration ?? 'deleted');
+    }
+    expect(lengths).toEqual(['2', '1', 'deleted']);
+    expect(state.selection).toEqual({ type: 'cursor', position: 1 });
+  });
+
+  it("removes a short note's dot before the note", () => {
+    const dottedHalf: ScoreNote = { ...ri, duration: '3/4' };
+    expect(deleteNote(cursorAt([dottedHalf], 1))!.notes).toEqual([ri]);
+  });
+
   it('removes the note before the cursor, and moves the cursor back', () => {
     expect(deleteNote(cursorAt([ro, ri], 2))).toEqual({
       notes: [ro],
@@ -202,10 +219,10 @@ describe('deleteNote', () => {
     expect(deleteNote(cursorAt([ro], 0))).toBeNull();
   });
 
-  it('removes the highlighted note, leaving a cursor where it was', () => {
-    expect(deleteNote(highlight([ro, ri, rest], 1))).toEqual({
-      notes: [ro, rest],
-      selection: { type: 'cursor', position: 1 },
+  it('removes the highlighted note whole, strokes and all, leaving a cursor where it was', () => {
+    expect(deleteNote(highlight([ro, ri, rest], 2))).toEqual({
+      notes: [ro, ri],
+      selection: { type: 'cursor', position: 2 },
     });
   });
 });

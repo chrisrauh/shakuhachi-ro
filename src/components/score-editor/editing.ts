@@ -224,15 +224,38 @@ export function shiftOctave(
 }
 
 /**
- * Removes the highlighted note, leaving a cursor where it was, or the note
- * before the cursor, which moves back, as Backspace does.
+ * What Backspace takes off the end of a note before it deletes the note: its
+ * dot, else its last stroke. Null for a note of one beat or less with no dot,
+ * which has neither.
  */
-export function deleteNote({
-  notes,
-  selection,
-}: EditorState): EditorState | null {
+export function trimTail(
+  note: ScoreNote,
+): { duration: string; removed: 'dot' | 'stroke' } | null {
+  const beats = parseBeats(note.duration)!;
+  if (hasHalf(beats)) {
+    return { duration: formatBeats(writtenLength(beats)), removed: 'dot' };
+  }
+  if (beats.num < 2 * beats.den) return null;
+  return {
+    duration: formatBeats({ num: beats.num - beats.den, den: beats.den }),
+    removed: 'stroke',
+  };
+}
+
+/**
+ * Delete and Backspace. At the cursor they act like a text editor's
+ * Backspace on what is just above the cursor: the note's dot, else its last
+ * stroke, else the note, which moves the cursor back (#505). On a highlighted
+ * note they remove the whole note, leaving a cursor where it was.
+ */
+export function deleteNote(state: EditorState): EditorState | null {
+  const { notes, selection } = state;
   const index = targetIndex(selection);
   if (index < 0) return null;
+  const trimmed = selection.type === 'cursor' && trimTail(notes[index]);
+  if (trimmed) {
+    return withTarget(state, { ...notes[index], duration: trimmed.duration });
+  }
   return {
     notes: notes.toSpliced(index, 1),
     selection: { type: 'cursor', position: index },
