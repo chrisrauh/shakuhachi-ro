@@ -92,6 +92,9 @@ export class DurationMarksModifier extends Modifier {
   /** Whether the next note has lines, so the last slot's lines run on to it */
   private readonly linesContinue: boolean;
 
+  /** Whether the previous note's lines run on into this note */
+  private readonly linesFromPrevious: boolean;
+
   private lineSpacing = 8;
   private lineWidth = 1.5;
   private strokeWidth = 2;
@@ -100,11 +103,18 @@ export class DurationMarksModifier extends Modifier {
   /**
    * @param slots - The note's slots, from durationSlots()
    * @param linesContinue - Whether the next note starts with lines
+   * @param linesFromPrevious - Whether the previous note's lines run on into
+   * this one
    */
-  constructor(slots: DurationSlot[], linesContinue: boolean) {
+  constructor(
+    slots: DurationSlot[],
+    linesContinue: boolean,
+    linesFromPrevious = false,
+  ) {
     super('right');
     this.slots = slots;
     this.linesContinue = linesContinue;
+    this.linesFromPrevious = linesFromPrevious;
     this.offsetX = LINE_OFFSET_X;
     this.offsetY = LINE_START_OFFSET_Y;
   }
@@ -193,8 +203,15 @@ export class DurationMarksModifier extends Modifier {
       if (slot.lines === 0) return;
       const next = this.slots[s + 1];
       const runsOn = next ? next.lines > 0 : this.linesContinue;
+      let top = lineTop(s);
       let end: number;
-      if (runsOn) {
+      if (centered && s === 0 && !runsOn && !this.linesFromPrevious) {
+        // A note alone under its line would get a line from its middle to its
+        // middle, which is nothing. It gets the side line's length instead.
+        // Kurokami has no example of this.
+        top = baselines[s] + LINE_START_OFFSET_Y;
+        end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+      } else if (runsOn) {
         end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {
         end = markY(s) + DOT_RADIUS * 3;
@@ -203,7 +220,7 @@ export class DurationMarksModifier extends Modifier {
       }
       for (let i = 0; i < slot.lines; i++) {
         const x = lineX(i, slot.lines);
-        renderer.drawLine(x, lineTop(s), x, end, this.color, this.lineWidth);
+        renderer.drawLine(x, top, x, end, this.color, this.lineWidth);
       }
     });
   }

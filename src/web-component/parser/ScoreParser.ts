@@ -60,7 +60,8 @@ export function closestOctave(romaji: string, referenceMidi: number): number {
 /**
  * The strokes, dot and lines that show a note's length, or none for a note of
  * one beat, which is the note alone. The lines run on into the next note's
- * when it starts with lines too.
+ * when it starts with lines too, and the modifier knows when the previous
+ * note's lines run on into it.
  *
  * Expects validated notes.
  */
@@ -73,9 +74,13 @@ function durationMarks(
   const slots = slotsOf(notes[i]);
   if (!DurationMarksModifier.marksAnything(slots)) return null;
   const next = notes[i + 1];
+  const previous = notes[i - 1];
   return new DurationMarksModifier(
     slots,
     next !== undefined && slotsOf(next)[0].lines > 0,
+    previous !== undefined &&
+      slots[0].lines > 0 &&
+      slotsOf(previous).at(-1)!.lines > 0,
   );
 }
 

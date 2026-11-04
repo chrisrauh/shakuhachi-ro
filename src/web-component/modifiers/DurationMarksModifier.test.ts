@@ -22,10 +22,12 @@ function draw(
   duration: string,
   linesContinue = false,
   durationLines: 'side' | 'center' = 'side',
+  linesFromPrevious = false,
 ) {
   const marks = new DurationMarksModifier(
     durationSlots(parseBeats(duration)!),
     linesContinue,
+    linesFromPrevious,
   );
   const drawLine = vi.fn();
   const drawCircle = vi.fn();
@@ -137,6 +139,22 @@ describe('DurationMarksModifier', () => {
     expect(strokes).toHaveLength(1);
     expect(strokes[0].y1).toBeCloseTo(200 - glyphMiddle);
     expect(strokes[0].y2).toBeCloseTo(200 + distanceToNext - glyphMiddle);
+  });
+
+  it('gives a half-beat note alone the side line, on the centre line', () => {
+    const ys = (durationLines: 'side' | 'center') => {
+      const { strokes, lines } = draw('1/2', false, durationLines);
+      return [...strokes, ...lines].map(({ y1, y2 }) => [y1, y2]);
+    };
+
+    expect(ys('center')).toEqual(ys('side'));
+  });
+
+  it("draws nothing above the middle of a group's last glyph", () => {
+    // The previous note's line already runs to the middle of this glyph
+    const { strokes } = draw('1/2', false, 'center', true);
+
+    expect(strokes.every((l) => l.y1 >= 200 - 32 * 0.4 - 0.001)).toBe(true);
   });
 
   it('is as wide as its most lines', () => {
