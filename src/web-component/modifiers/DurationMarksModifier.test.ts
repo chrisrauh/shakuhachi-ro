@@ -129,13 +129,14 @@ describe('DurationMarksModifier', () => {
     expect(right - left).toBe(8);
   });
 
-  it('draws centre lines as long as side lines', () => {
-    const ys = (durationLines: 'side' | 'center') => {
-      const { strokes, lines } = draw('3/4', true, durationLines);
-      return [...strokes, ...lines].map(({ y1, y2 }) => [y1, y2]);
-    };
+  it('runs a centre line from the middle of this glyph to the middle of the next', () => {
+    // Kurokami: the line starts in the glyph, not above it
+    const glyphMiddle = 32 * 0.4;
+    const { strokes, distanceToNext } = draw('1/2', true, 'center');
 
-    expect(ys('center')).toEqual(ys('side'));
+    expect(strokes).toHaveLength(1);
+    expect(strokes[0].y1).toBeCloseTo(200 - glyphMiddle);
+    expect(strokes[0].y2).toBeCloseTo(200 + distanceToNext - glyphMiddle);
   });
 
   it('is as wide as its most lines', () => {

@@ -135,12 +135,19 @@ export class DurationMarksModifier extends Modifier {
   ): void {
     const { noteFontSize, distanceToNext } = layout;
 
-    // Beside the note, lines go right from the offset. On the centre line,
-    // they are spread evenly about it.
+    // Beside the note, lines go right from the offset, from just above the
+    // note. On the centre line, they are spread evenly about it, and start and
+    // end at the middle of the glyph, as in Koga's Kurokami.
+    const centered = layout.durationLines === 'center';
     const lineX = (i: number, lines: number) =>
-      layout.durationLines === 'center'
+      centered
         ? noteX + (i - (lines - 1) / 2) * this.lineSpacing
         : noteX + this.offsetX + i * this.lineSpacing;
+    const glyphMiddle = -noteFontSize * KANA_OPTICAL_CENTER_RATIO;
+    const lineStartOffsetY = centered ? glyphMiddle : LINE_START_OFFSET_Y;
+    const lineEndOffsetY = centered
+      ? glyphMiddle
+      : -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
 
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
@@ -166,7 +173,7 @@ export class DurationMarksModifier extends Modifier {
     const lineTop = (s: number) =>
       this.slots[s].kind === 'dot'
         ? markY(s) - DOT_RADIUS * 3
-        : baselines[s] + LINE_START_OFFSET_Y;
+        : baselines[s] + lineStartOffsetY;
 
     this.slots.forEach((slot, s) => {
       if (slot.kind === 'stroke') {
@@ -188,13 +195,11 @@ export class DurationMarksModifier extends Modifier {
       const runsOn = next ? next.lines > 0 : this.linesContinue;
       let end: number;
       if (runsOn) {
-        end = next
-          ? lineTop(s + 1)
-          : noteY + distanceToNext + LINE_START_OFFSET_Y;
+        end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {
         end = markY(s) + DOT_RADIUS * 3;
       } else {
-        end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+        end = baselines[s] + lineEndOffsetY;
       }
       for (let i = 0; i < slot.lines; i++) {
         const x = lineX(i, slot.lines);
