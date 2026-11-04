@@ -8,6 +8,8 @@
  * A dot after whole beats is half a beat with no line, as in Koga's Dawn in the
  * Forest: ロ・ リ, the line starting at リ. A dot after half a beat is a
  * quarter, inside the note's line, as in Gyoson: リ レ・ under one line (#438).
+ * Koga's scores draw the same lines on the column's centre line instead, over
+ * the notes; the render option durationLines picks where they go (#507).
  *
  * The layout gives each stroke a note's height, which it reads from
  * extraHeight(). A dot hangs a fixed gap below the mark above it, and takes
@@ -133,6 +135,13 @@ export class DurationMarksModifier extends Modifier {
   ): void {
     const { noteFontSize, distanceToNext } = layout;
 
+    // Beside the note, lines go right from the offset. On the centre line,
+    // they are spread evenly about it.
+    const lineX = (i: number, lines: number) =>
+      layout.durationLines === 'center'
+        ? noteX + (i - (lines - 1) / 2) * this.lineSpacing
+        : noteX + this.offsetX + i * this.lineSpacing;
+
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
     let baseline = noteY;
@@ -188,7 +197,7 @@ export class DurationMarksModifier extends Modifier {
         end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
       }
       for (let i = 0; i < slot.lines; i++) {
-        const x = noteX + this.offsetX + i * this.lineSpacing;
+        const x = lineX(i, slot.lines);
         renderer.drawLine(x, lineTop(s), x, end, this.color, this.lineWidth);
       }
     });

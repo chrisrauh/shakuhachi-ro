@@ -77,6 +77,7 @@ The renderer is wrapped as a custom element `<shakuhachi-score>`:
 - `columns` - `"auto"` (default), `"1"` (single column), or explicit number
 - `auto-resize` - Enable ResizeObserver (default: `true`)
 - `notation-font` - `"sans"` (default) or `"serif"`. Matched case-insensitively; an unrecognised value falls back to `"sans"`.
+- `duration-lines` - `"side"` (default) or `"center"`: where the lines that halve or quarter a note go. Matched case-insensitively; an unrecognised value falls back to `"side"`.
 - `debug` - Show debug labels (optional)
 
 **Build:** `npm run build:wc` → `public/embed/shakuhachi-score.js` (IIFE, ~25KB)

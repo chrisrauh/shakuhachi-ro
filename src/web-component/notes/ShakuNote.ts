@@ -149,6 +149,7 @@ export class ShakuNote {
       noteFontSize: this.fontSize,
       noteSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       dotGap: DEFAULT_RENDER_OPTIONS.durationDotGap,
+      durationLines: DEFAULT_RENDER_OPTIONS.durationLines,
     };
 
     if (options.modifiers) {

@@ -160,6 +160,7 @@ describe('RenderOptions', () => {
         meriKariFontSize: 16,
         meriKariFontWeight: 600,
         durationDotGap: 15,
+        durationLines: 'center',
         debugLabelFontSize: 10,
         debugLabelOffsetX: 30,
         debugLabelOffsetY: -10,

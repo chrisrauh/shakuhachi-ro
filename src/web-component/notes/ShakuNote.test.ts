@@ -13,7 +13,13 @@ import { Modifier } from '../modifiers/Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 
 function layout(distanceToNext: number) {
-  return { distanceToNext, noteFontSize: 32, noteSpacing: 44, dotGap: 14 };
+  return {
+    distanceToNext,
+    noteFontSize: 32,
+    noteSpacing: 44,
+    dotGap: 14,
+    durationLines: 'side' as const,
+  };
 }
 
 describe('ShakuNote', () => {

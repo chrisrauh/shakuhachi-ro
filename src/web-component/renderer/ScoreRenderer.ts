@@ -202,6 +202,7 @@ export class ScoreRenderer {
           noteFontSize: this.options.noteFontSize,
           noteSpacing: this.options.noteVerticalSpacing,
           dotGap: this.options.durationDotGap,
+          durationLines: this.options.durationLines,
         });
 
         // Render debug label if enabled

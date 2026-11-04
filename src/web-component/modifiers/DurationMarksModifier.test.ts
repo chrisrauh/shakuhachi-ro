@@ -12,12 +12,17 @@ const layout = {
   noteFontSize: 32,
   noteSpacing: 44,
   dotGap: 14,
+  durationLines: 'side' as const,
 };
 
 const DOT_RADIUS = 2.5;
 
 /** Renders the marks of a note at (100, 200) and returns what was drawn */
-function draw(duration: string, linesContinue = false) {
+function draw(
+  duration: string,
+  linesContinue = false,
+  durationLines: 'side' | 'center' = 'side',
+) {
   const marks = new DurationMarksModifier(
     durationSlots(parseBeats(duration)!),
     linesContinue,
@@ -29,7 +34,7 @@ function draw(duration: string, linesContinue = false) {
     { drawLine, drawCircle } as unknown as RenderingBackend,
     100,
     200,
-    { ...layout, distanceToNext },
+    { ...layout, distanceToNext, durationLines },
   );
   const lines = drawLine.mock.calls.map(([x1, y1, x2, y2]) => ({
     x1,
@@ -109,6 +114,28 @@ describe('DurationMarksModifier', () => {
     const { lines, distanceToNext } = draw('3/4', true);
 
     expect(lines.at(-1)!.y2).toBe(200 + distanceToNext - 22);
+  });
+
+  it('draws the lines on the column centre line, spread evenly about it', () => {
+    // Notes this short have no strokes, so every line drawn is a duration line
+    const lineXs = (duration: string) => {
+      const { strokes, lines } = draw(duration, false, 'center');
+      return [...strokes, ...lines].map((l) => l.x1).sort((a, b) => a - b);
+    };
+
+    expect(lineXs('1/2')).toEqual([100]);
+    const [left, right] = lineXs('1/4');
+    expect((left + right) / 2).toBe(100);
+    expect(right - left).toBe(8);
+  });
+
+  it('draws centre lines as long as side lines', () => {
+    const ys = (durationLines: 'side' | 'center') => {
+      const { strokes, lines } = draw('3/4', true, durationLines);
+      return [...strokes, ...lines].map(({ y1, y2 }) => [y1, y2]);
+    };
+
+    expect(ys('center')).toEqual(ys('side'));
   });
 
   it('is as wide as its most lines', () => {

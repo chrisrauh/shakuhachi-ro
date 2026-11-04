@@ -27,7 +27,13 @@ class ShakuhachiScore extends HTMLElement {
   private shadow: ShadowRoot;
 
   static get observedAttributes() {
-    return ['data-score', 'columns', 'auto-resize', 'notation-font'];
+    return [
+      'data-score',
+      'columns',
+      'auto-resize',
+      'notation-font',
+      'duration-lines',
+    ];
   }
 
   constructor() {
@@ -347,6 +353,10 @@ class ShakuhachiScore extends HTMLElement {
         noteFontWeight: DEFAULT_RENDER_OPTIONS.noteFontWeight,
         noteFontFamily: resolveNotationFont(this.getAttribute('notation-font')),
         noteVerticalSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+        durationLines:
+          this.getAttribute('duration-lines')?.toLowerCase() === 'center'
+            ? 'center'
+            : 'side',
       };
 
       // Render using ScoreRenderer

@@ -13,6 +13,7 @@ import {
   DEFAULT_NOTATION_FONT,
 } from '../constants/notation-fonts';
 import { octaveMarkReachAbove } from '../modifiers/mark-geometry';
+import type { DurationLinePosition } from '../modifiers/Modifier';
 
 /**
  * SVG viewport dimensions. Kept separate from the other options because they
@@ -166,6 +167,14 @@ export interface RenderOptions extends ViewportOptions {
    */
   durationDotGap?: number;
 
+  /**
+   * Where the lines that halve or quarter a note go: beside the note, on the
+   * right of the column, or on the column's centre line, as in Koga's scores
+   * (#507). The same score can show either.
+   * @default 'side'
+   */
+  durationLines?: DurationLinePosition;
+
   // =========================================================================
   // Debug Label Configuration
   // =========================================================================
@@ -254,6 +263,7 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
 
   // Duration dot configuration
   durationDotGap: 14,
+  durationLines: 'side',
 
   // Debug label configuration
   debugLabelFontSize: 7,
