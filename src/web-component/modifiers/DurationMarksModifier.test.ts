@@ -141,13 +141,13 @@ describe('DurationMarksModifier', () => {
     expect(strokes[0].y2).toBeCloseTo(200 + distanceToNext - glyphMiddle);
   });
 
-  it('gives a half-beat note alone the side line, on the centre line', () => {
-    const ys = (durationLines: 'side' | 'center') => {
-      const { strokes, lines } = draw('1/2', false, durationLines);
-      return [...strokes, ...lines].map(({ y1, y2 }) => [y1, y2]);
-    };
+  it('centres the line of a half-beat note alone on the middle of its glyph', () => {
+    const glyphMiddle = 200 - 32 * 0.4;
+    const side = draw('1/2', false, 'side').lines[0];
+    const [center] = draw('1/2', false, 'center').strokes;
 
-    expect(ys('center')).toEqual(ys('side'));
+    expect(center.y1).toBe(side.y1);
+    expect((center.y1 + center.y2) / 2).toBeCloseTo(glyphMiddle);
   });
 
   it("draws nothing above the middle of a group's last glyph", () => {

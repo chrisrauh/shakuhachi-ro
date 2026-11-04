@@ -207,10 +207,11 @@ export class DurationMarksModifier extends Modifier {
       let end: number;
       if (centered && s === 0 && !runsOn && !this.linesFromPrevious) {
         // A note alone under its line would get a line from its middle to its
-        // middle, which is nothing. It gets the side line's length instead.
-        // Kurokami has no example of this.
+        // middle, which is nothing. It gets a line from where a side line
+        // starts, centred on the middle of the glyph. Kurokami has no example
+        // of this.
         top = baselines[s] + LINE_START_OFFSET_Y;
-        end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+        end = baselines[s] + 2 * glyphMiddle - LINE_START_OFFSET_Y;
       } else if (runsOn) {
         end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {
