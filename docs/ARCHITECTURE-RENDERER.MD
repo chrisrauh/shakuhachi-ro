@@ -77,6 +77,7 @@ The renderer is wrapped as a custom element `<shakuhachi-score>`:
 - `columns` - `"auto"` (default), `"1"` (single column), or explicit number
 - `auto-resize` - Enable ResizeObserver (default: `true`)
 - `notation-font` - `"sans"` (default) or `"serif"`. Matched case-insensitively; an unrecognised value falls back to `"sans"`.
+- `duration-lines` - `"side"` (default) or `"center"`: where the lines that halve or quarter a note go. Matched case-insensitively; an unrecognised value falls back to `"side"`.
 - `debug` - Show debug labels (optional)
 
 **Build:** `npm run build:wc` → `public/embed/shakuhachi-score.js` (IIFE, ~25KB)
@@ -101,6 +102,8 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 **Composition over inheritance:** Modifiers are added to notes. Layout uses a calculator. Renderer uses a configurator.
 
 **VexFlow-inspired:** Constructor takes container + options. Explicit render() calls. Separation of data and presentation.
+
+**Font metrics, not pixels:** Marks are placed relative to the glyph by metrics read from the font files, as fractions of the em (`modifiers/mark-geometry.ts`). See [TYPOGRAPHY.MD](./TYPOGRAPHY.MD) for each value and where it comes from.
 
 ## Extension Points
 

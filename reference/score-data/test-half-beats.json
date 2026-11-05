@@ -1,7 +1,7 @@
 {
-  "title": "Love Story",
+  "title": "Test: Half Beats",
   "style": "kinko",
-  "composer": "Unknown",
+  "composer": "Test data with many half-beat notes. Not a transcription of any score.",
   "notes": [
     { "character": "tsu", "register": 1, "duration": "1/2" },
     { "character": "chi", "register": 1, "duration": "1/2" },

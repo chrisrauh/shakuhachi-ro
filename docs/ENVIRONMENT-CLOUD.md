@@ -75,7 +75,39 @@ await page.screenshot({ path: '<scratchpad>/detail-dark.png', fullPage: true });
 await browser.close();
 ```
 
-Without the proxy flag, every client-side Supabase call fails with `TypeError: Failed to fetch` and the page shows its error state. Server-rendered content still appears, so the page can look half right. With `proxy: { server }` instead of the flag, Chromium also routes `localhost` through the proxy, which rejects it. A few `ERR_TOO_MANY_RETRIES` console errors remain: hosts the network policy blocks, such as Google Fonts. They are harmless.
+Without the proxy flag, every client-side Supabase call fails with `TypeError: Failed to fetch` and the page shows its error state. Server-rendered content still appears, so the page can look half right. With `proxy: { server }` instead of the flag, Chromium also routes `localhost` through the proxy, which rejects it. A few `ERR_TOO_MANY_RETRIES` console errors remain: hosts the network policy blocks. The one that matters is Google Fonts: see "Fonts" below.
+
+- **Fonts:** the network policy blocks Google Fonts, so the notation is not drawn in Noto Sans JP. Chromium uses a system font instead (WenQuanYi Zen Hei), with no error on the page. Layout and colour checks still work, but anything that depends on where a glyph's ink is, such as how a mark or a line sits against a note, measures the wrong font (#507). For those checks, serve the fonts from npm. The registry is not blocked. Download the package once, into your scratchpad:
+
+  ```bash
+  npm pack @fontsource/noto-sans-jp@5.1.0
+  ```
+
+  Unpack it (`tar xzf fontsource-noto-sans-jp-5.1.0.tgz`), then answer the Google Fonts request with its CSS before `page.goto`:
+
+  ```js
+  import { readFileSync } from 'node:fs';
+
+  const PKG = '<scratchpad>/package'; // the unpacked npm package
+  // 400 for notes, 500 for octave and meri/kari marks
+  const css = ['400', '500']
+    .map((w) => readFileSync(`${PKG}/${w}.css`, 'utf8'))
+    .join('\n')
+    .replaceAll('./files/', 'http://localhost:3001/__font/');
+  await page.route(/fonts\.googleapis\.com/, (r) =>
+    r.fulfill({ contentType: 'text/css', body: css }),
+  );
+  await page.route(/\/__font\//, (r) =>
+    r.fulfill({
+      contentType: 'font/woff2',
+      body: readFileSync(
+        `${PKG}/files/${r.request().url().split('/__font/')[1]}`,
+      ),
+    }),
+  );
+  ```
+
+  The `/__font/` URLs never reach the dev server: the route answers them. The serif notation font works the same way, from `@fontsource/noto-serif-jp`. To check that a weight loaded, evaluate `(await document.fonts.load('500 12px "Noto Sans JP"', '乙')).length > 0` in the page. `document.fonts.check` alone returns false for a weight that no text has used yet. On the deploy preview, register these two routes after the `'**/*'` route below: Playwright tries the last route registered first.
 
 - **Light and dark:** set `colorScheme` per page. View the PNGs with the Read tool.
 - **Logged-out layout of owner-only pages:** the edit page redirects logged-out visitors to the score page on the client. To keep it in place, answer that navigation with an empty response: `await page.route('http://localhost:3001/score/test', (r) => r.fulfill({ status: 204 }))`. Aborting the request instead leaves an error page.
