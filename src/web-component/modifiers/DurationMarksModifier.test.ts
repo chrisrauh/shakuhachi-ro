@@ -6,21 +6,37 @@ import { describe, it, expect, vi } from 'vitest';
 import { DurationMarksModifier, durationSlots } from './DurationMarksModifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { parseBeats } from '../types/Duration';
+import {
+  GLYPH_CENTRE,
+  IDEOGRAPHIC_FACE_BOTTOM,
+  IDEOGRAPHIC_FACE_TOP,
+} from './mark-geometry';
 
 const layout = {
   distanceToNext: 0,
   noteFontSize: 32,
   noteSpacing: 44,
   dotGap: 14,
+  durationLines: 'side' as const,
+  firstInColumn: false,
+  lastInColumn: false,
 };
 
 const DOT_RADIUS = 2.5;
 
 /** Renders the marks of a note at (100, 200) and returns what was drawn */
-function draw(duration: string, linesContinue = false) {
+function draw(
+  duration: string,
+  linesContinue = false,
+  durationLines: 'side' | 'center' = 'side',
+  linesFromPrevious = false,
+  lastInColumn = false,
+  firstInColumn = false,
+) {
   const marks = new DurationMarksModifier(
     durationSlots(parseBeats(duration)!),
     linesContinue,
+    linesFromPrevious,
   );
   const drawLine = vi.fn();
   const drawCircle = vi.fn();
@@ -29,7 +45,13 @@ function draw(duration: string, linesContinue = false) {
     { drawLine, drawCircle } as unknown as RenderingBackend,
     100,
     200,
-    { ...layout, distanceToNext },
+    {
+      ...layout,
+      distanceToNext,
+      durationLines,
+      lastInColumn,
+      firstInColumn,
+    },
   );
   const lines = drawLine.mock.calls.map(([x1, y1, x2, y2]) => ({
     x1,
@@ -109,6 +131,61 @@ describe('DurationMarksModifier', () => {
     const { lines, distanceToNext } = draw('3/4', true);
 
     expect(lines.at(-1)!.y2).toBe(200 + distanceToNext - 22);
+  });
+
+  it('draws the lines on the column centre line, spread evenly about it', () => {
+    // Notes this short have no strokes, so every line drawn is a duration line
+    const lineXs = (duration: string) => {
+      const { strokes, lines } = draw(duration, false, 'center');
+      return [...strokes, ...lines].map((l) => l.x1).sort((a, b) => a - b);
+    };
+
+    expect(lineXs('1/2')).toEqual([100]);
+    const [left, right] = lineXs('1/4');
+    expect((left + right) / 2).toBe(100);
+    // A gap of an eighth of the 32px font, as in Kurokami
+    expect(right - left).toBe(4);
+  });
+
+  it('runs a centre line from the middle of this glyph to the middle of the next', () => {
+    // Kurokami: the line starts in the glyph, not above it
+    const glyphMiddle = 32 * GLYPH_CENTRE;
+    const { strokes, distanceToNext } = draw('1/2', true, 'center');
+
+    expect(strokes).toHaveLength(1);
+    expect(strokes[0].y1).toBeCloseTo(200 - glyphMiddle);
+    expect(strokes[0].y2).toBeCloseTo(200 + distanceToNext - glyphMiddle);
+  });
+
+  it('centres the line of a half-beat note alone on its glyph, half way to the next note each way', () => {
+    const glyphMiddle = 200 - 32 * GLYPH_CENTRE;
+    const { strokes, distanceToNext } = draw('1/2', false, 'center');
+
+    expect(strokes).toHaveLength(1);
+    expect(strokes[0].y1).toBeCloseTo(glyphMiddle - distanceToNext / 2);
+    expect(strokes[0].y2).toBeCloseTo(glyphMiddle + distanceToNext / 2);
+  });
+
+  it("draws nothing above the middle of a group's last glyph", () => {
+    // The previous note's line already runs to the middle of this glyph
+    const { strokes } = draw('1/2', false, 'center', true);
+
+    expect(strokes.every((l) => l.y1 >= 200 - 32 * GLYPH_CENTRE - 0.001)).toBe(
+      true,
+    );
+  });
+
+  it('runs a centre line as far past the glyph at both ends of a column break', () => {
+    // The ideographic face of the note at baseline 200, in a 32px font
+    const faceTop = 200 - 32 * IDEOGRAPHIC_FACE_TOP;
+    const faceBottom = 200 - 32 * IDEOGRAPHIC_FACE_BOTTOM;
+    // Last in its column, the line going on in the next column
+    const [end] = draw('1/2', true, 'center', true, true).strokes;
+    // First in its column, the line coming on from the previous column
+    const [start] = draw('1/2', true, 'center', true, false, true).strokes;
+
+    expect(end.y2 - faceBottom).toBeGreaterThan(0);
+    expect(faceTop - start.y1).toBeCloseTo(end.y2 - faceBottom);
   });
 
   it('is as wide as its most lines', () => {

@@ -160,6 +160,7 @@ describe('RenderOptions', () => {
         meriKariFontSize: 16,
         meriKariFontWeight: 600,
         durationDotGap: 15,
+        durationLines: 'center',
         debugLabelFontSize: 10,
         debugLabelOffsetX: 30,
         debugLabelOffsetY: -10,
@@ -200,6 +201,14 @@ describe('RenderOptions', () => {
       expect(
         mergeWithDefaults({ octaveMarkFontSize: 20, topMargin: 50 }).topMargin,
       ).toBe(50);
+    });
+
+    it('leaves room above the first note for a centre line from the previous column', () => {
+      // The ideographic face reaches 0.838em above the baseline, then half an em of line
+      expect(
+        mergeWithDefaults({ durationLines: 'center' }).topMargin,
+      ).toBeCloseTo(32 * 0.838 + 32 * 0.5);
+      expect(mergeWithDefaults({ durationLines: 'side' }).topMargin).toBe(32);
     });
 
     it('should leave width and height unset unless provided', () => {

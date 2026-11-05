@@ -15,6 +15,10 @@ const dotted = () =>
   new DurationMarksModifier(durationSlots({ num: 3, den: 2 }), false);
 import { OctaveMarksModifier } from '../modifiers/OctaveMarksModifier';
 import { mergeWithDefaults } from './RenderOptions';
+import {
+  columnBreakLineReachBelow,
+  GLYPH_CENTRE,
+} from '../modifiers/mark-geometry';
 
 describe('ColumnLayoutCalculator', () => {
   describe('calculateLayout', () => {
@@ -228,9 +232,12 @@ describe('ColumnLayoutCalculator', () => {
         options,
       ).columns[0].notePositions;
 
-      // A stroke ends 0.2 of the font size above its slot's baseline, so the
-      // dot after it takes that much less space than after a note
-      expect(positions[1].y).toBeCloseTo(50 + 44 + 44 - 32 * 0.2 + 12 + 5);
+      // A stroke, 0.4em long on the glyph centre, ends GLYPH_CENTRE - 0.2em
+      // above its slot's baseline, so the dot after it takes that much less
+      // space than after a note
+      expect(positions[1].y).toBeCloseTo(
+        50 + 44 + 44 - 32 * (GLYPH_CENTRE - 0.2) + 12 + 5,
+      );
     });
 
     it('gives each stroke of a long note the space of a note', () => {
@@ -270,6 +277,18 @@ describe('ColumnLayoutCalculator', () => {
 
       expect(layout.columns[0].noteEndIndex).toBe(12);
       expect(layout.columns[1].noteStartIndex).toBe(12);
+    });
+
+    it('leaves room below the last note for a centre line going on to the next column', () => {
+      const options = mergeWithDefaults({ durationLines: 'center' });
+      const height = ColumnLayoutCalculator.columnHeight(
+        [new ShakuNote({ symbol: 'ro' })],
+        options,
+      );
+
+      expect(height).toBeGreaterThanOrEqual(
+        options.topMargin + columnBreakLineReachBelow(options.noteFontSize),
+      );
     });
 
     it('fits a column in exactly the height columnHeight gives it', () => {

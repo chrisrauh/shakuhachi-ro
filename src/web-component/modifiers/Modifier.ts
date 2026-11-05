@@ -26,7 +26,16 @@ export interface ModifierLayout extends SlotSpacing {
    * strokes and dot after it
    */
   distanceToNext: number;
+  /** Where the lines that halve or quarter a note go */
+  durationLines: DurationLinePosition;
+  /** Whether this note is the first in its column */
+  firstInColumn: boolean;
+  /** Whether this note is the last in its column */
+  lastInColumn: boolean;
 }
+
+/** Duration lines beside the note, or on the column's centre line (#507) */
+export type DurationLinePosition = 'side' | 'center';
 
 /** What the heights of the slots in the column follow from */
 export interface SlotSpacing {

@@ -50,12 +50,15 @@ Notes carry no layout information. Column breaks are the renderer's decision —
 | `columns`          | `auto` or a positive integer            | `auto`               | ✅   |
 | `auto-resize`      | `false` disables; anything else enables | enabled              | ✅   |
 | `notation-font`    | `sans`, `serif`                         | `sans`               | ✅   |
+| `duration-lines`   | `side`, `center`                        | `side`               | ✅   |
 | `width` / `height` | pixels                                  | measured or computed | ❌   |
 | `debug`            | present / absent                        | absent               | ❌   |
 
 **Live** means the element re-renders when the attribute changes. The last two are read at render time but not observed, so set them before the element is connected — changing them later has no effect until something else triggers a render.
 
-`columns` and `notation-font` fall back to their defaults on an unrecognised value; `columns` also warns to the console. `debug` draws romaji labels beside each note.
+`columns`, `notation-font` and `duration-lines` fall back to their defaults on an unrecognised value; `columns` also warns to the console. `debug` draws romaji labels beside each note.
+
+`duration-lines` sets where the lines that halve or quarter a note go: `side` draws them to the right of the column, `center` on the column's centre line, over the notes, as in Koga's scores.
 
 ## Sizing
 

@@ -16,7 +16,11 @@
 
 import { ScoreRenderer, type NoteBox } from './renderer/ScoreRenderer';
 import { ScoreParser } from './parser/ScoreParser';
-import { DEFAULT_RENDER_OPTIONS } from './renderer/RenderOptions';
+import {
+  DEFAULT_RENDER_OPTIONS,
+  mergeWithDefaults,
+} from './renderer/RenderOptions';
+import type { DurationLinePosition } from './modifiers/Modifier';
 import { ColumnLayoutCalculator } from './renderer/ColumnLayoutCalculator';
 import type { ScoreData } from './types/ScoreData';
 import type { ShakuNote } from './notes/ShakuNote';
@@ -27,7 +31,13 @@ class ShakuhachiScore extends HTMLElement {
   private shadow: ShadowRoot;
 
   static get observedAttributes() {
-    return ['data-score', 'columns', 'auto-resize', 'notation-font'];
+    return [
+      'data-score',
+      'columns',
+      'auto-resize',
+      'notation-font',
+      'duration-lines',
+    ];
   }
 
   constructor() {
@@ -227,12 +237,19 @@ class ShakuhachiScore extends HTMLElement {
 
       const columnHeight = ColumnLayoutCalculator.columnHeight(
         notes.slice(startIdx, endIdx),
-        DEFAULT_RENDER_OPTIONS,
+        mergeWithDefaults({ durationLines: this.durationLines() }),
       );
       maxHeight = Math.max(maxHeight, columnHeight);
     }
 
     return maxHeight;
+  }
+
+  /** The duration-lines attribute: 'center', or 'side' for anything else */
+  private durationLines(): DurationLinePosition {
+    return this.getAttribute('duration-lines')?.toLowerCase() === 'center'
+      ? 'center'
+      : 'side';
   }
 
   /**
@@ -347,6 +364,7 @@ class ShakuhachiScore extends HTMLElement {
         noteFontWeight: DEFAULT_RENDER_OPTIONS.noteFontWeight,
         noteFontFamily: resolveNotationFont(this.getAttribute('notation-font')),
         noteVerticalSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
+        durationLines: this.durationLines(),
       };
 
       // Render using ScoreRenderer

@@ -322,6 +322,9 @@ describe('ModifierConfigurator', () => {
           noteFontSize: 32,
           noteSpacing: 44,
           dotGap: 14,
+          durationLines: 'side',
+          firstInColumn: false,
+          lastInColumn: false,
         },
       );
       expect(drawCircle).toHaveBeenCalledWith(

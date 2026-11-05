@@ -8,6 +8,8 @@
  * A dot after whole beats is half a beat with no line, as in Koga's Dawn in the
  * Forest: ロ・ リ, the line starting at リ. A dot after half a beat is a
  * quarter, inside the note's line, as in Gyoson: リ レ・ under one line (#438).
+ * Koga's scores draw the same lines on the column's centre line instead, over
+ * the notes; the render option durationLines picks where they go (#507).
  *
  * The layout gives each stroke a note's height, which it reads from
  * extraHeight(). A dot hangs a fixed gap below the mark above it, and takes
@@ -19,6 +21,11 @@ import { Modifier, type ModifierLayout, type SlotSpacing } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Beats } from '../types/Duration';
 import { hasHalf, writtenLength } from '../types/Duration';
+import {
+  columnBreakLineReachAbove,
+  columnBreakLineReachBelow,
+  GLYPH_CENTRE,
+} from './mark-geometry';
 
 /** One slot of a note's length in the column, and the lines beside it */
 export interface DurationSlot {
@@ -29,7 +36,7 @@ export interface DurationSlot {
 /**
  * Where a duration line meets a note, as a fraction of the font size above the
  * baseline. Tuned so consecutive segments join cleanly; this is not the glyph's
- * optical centre (KANA_OPTICAL_CENTER_RATIO).
+ * centre (GLYPH_CENTRE).
  */
 const NOTE_VERTICAL_MIDDLE_RATIO = 0.25;
 
@@ -39,8 +46,13 @@ const LINE_START_OFFSET_Y = -22;
 /** Lines sit right of the note, a little past its meri and kari marks */
 const LINE_OFFSET_X = 26;
 
-/** Optical centre of a kana glyph above the baseline, as in ShakuNote */
-const KANA_OPTICAL_CENTER_RATIO = 0.4;
+/**
+ * The gap between the lines of a quarter note on the column's centre line, as
+ * a fraction of the font size: 4px at 32px. Matched to Koga's Kurokami, where
+ * the gap is about 0.19 of the glyph's height (#507). Beside the note, the gap
+ * stays lineSpacing.
+ */
+const CENTRE_LINE_SPACING_RATIO = 0.125;
 
 /** A stroke's length as a fraction of the font size, as in the Koga duet */
 const STROKE_LENGTH_RATIO = 0.4;
@@ -90,6 +102,9 @@ export class DurationMarksModifier extends Modifier {
   /** Whether the next note has lines, so the last slot's lines run on to it */
   private readonly linesContinue: boolean;
 
+  /** Whether the previous note's lines run on into this note */
+  private readonly linesFromPrevious: boolean;
+
   private lineSpacing = 8;
   private lineWidth = 1.5;
   private strokeWidth = 2;
@@ -98,11 +113,18 @@ export class DurationMarksModifier extends Modifier {
   /**
    * @param slots - The note's slots, from durationSlots()
    * @param linesContinue - Whether the next note starts with lines
+   * @param linesFromPrevious - Whether the previous note's lines run on into
+   * this one
    */
-  constructor(slots: DurationSlot[], linesContinue: boolean) {
+  constructor(
+    slots: DurationSlot[],
+    linesContinue: boolean,
+    linesFromPrevious = false,
+  ) {
     super('right');
     this.slots = slots;
     this.linesContinue = linesContinue;
+    this.linesFromPrevious = linesFromPrevious;
     this.offsetX = LINE_OFFSET_X;
     this.offsetY = LINE_START_OFFSET_Y;
   }
@@ -133,6 +155,21 @@ export class DurationMarksModifier extends Modifier {
   ): void {
     const { noteFontSize, distanceToNext } = layout;
 
+    // Beside the note, lines go right from the offset, from just above the
+    // note. On the centre line, they are spread evenly about it, and start and
+    // end at the middle of the glyph, as in Koga's Kurokami.
+    const centered = layout.durationLines === 'center';
+    const lineX = (i: number, lines: number) =>
+      centered
+        ? noteX +
+          (i - (lines - 1) / 2) * noteFontSize * CENTRE_LINE_SPACING_RATIO
+        : noteX + this.offsetX + i * this.lineSpacing;
+    const glyphMiddle = -noteFontSize * GLYPH_CENTRE;
+    const lineStartOffsetY = centered ? glyphMiddle : LINE_START_OFFSET_Y;
+    const lineEndOffsetY = centered
+      ? glyphMiddle
+      : -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
     let baseline = noteY;
@@ -141,7 +178,7 @@ export class DurationMarksModifier extends Modifier {
       baseline += slotHeight(this.slots, s, layout);
     });
 
-    // A stroke sits on the optical centre of the glyph its slot stands in
+    // A stroke sits on the centre of the glyph its slot stands in
     // for. A dot hangs the gap below the mark above it.
     const markY = (s: number) =>
       this.slots[s].kind === 'dot'
@@ -149,7 +186,7 @@ export class DurationMarksModifier extends Modifier {
           markBottom(this.slots[s - 1], noteFontSize) +
           layout.dotGap +
           DOT_RADIUS
-        : baselines[s] - noteFontSize * KANA_OPTICAL_CENTER_RATIO;
+        : baselines[s] - noteFontSize * GLYPH_CENTRE;
 
     // Where a slot's lines start. The slot before runs its lines to here, so
     // segments meet without overlapping: overlaps show as two colours on the
@@ -157,7 +194,7 @@ export class DurationMarksModifier extends Modifier {
     const lineTop = (s: number) =>
       this.slots[s].kind === 'dot'
         ? markY(s) - DOT_RADIUS * 3
-        : baselines[s] + LINE_START_OFFSET_Y;
+        : baselines[s] + lineStartOffsetY;
 
     this.slots.forEach((slot, s) => {
       if (slot.kind === 'stroke') {
@@ -177,19 +214,46 @@ export class DurationMarksModifier extends Modifier {
       if (slot.lines === 0) return;
       const next = this.slots[s + 1];
       const runsOn = next ? next.lines > 0 : this.linesContinue;
+      let top = lineTop(s);
       let end: number;
-      if (runsOn) {
-        end = next
-          ? lineTop(s + 1)
-          : noteY + distanceToNext + LINE_START_OFFSET_Y;
+      if (
+        centered &&
+        s === 0 &&
+        this.linesFromPrevious &&
+        layout.firstInColumn
+      ) {
+        // The line comes on from the previous column, so it starts above the
+        // glyph, as far past its ink as it ran past the last glyph there
+        top = baselines[s] - columnBreakLineReachAbove(noteFontSize);
+      }
+      if (centered && s === 0 && !runsOn && !this.linesFromPrevious) {
+        // A note alone under its line would get a line from its middle to its
+        // middle, which is nothing. It gets a line centred on the middle of
+        // the glyph that reaches half way to the next note each way: past the
+        // glyph, so it shows, but not into the next note's line. Kurokami has
+        // no example of this.
+        top = baselines[s] + glyphMiddle - distanceToNext / 2;
+        end = baselines[s] + glyphMiddle + distanceToNext / 2;
+      } else if (
+        centered &&
+        runsOn &&
+        !next &&
+        layout.lastInColumn &&
+        slot.kind === 'note'
+      ) {
+        // The line goes on in the next column, so it runs past the glyph's
+        // ink, as far as it comes in above the first glyph there
+        end = baselines[s] + columnBreakLineReachBelow(noteFontSize);
+      } else if (runsOn) {
+        end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {
         end = markY(s) + DOT_RADIUS * 3;
       } else {
-        end = baselines[s] - noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+        end = baselines[s] + lineEndOffsetY;
       }
       for (let i = 0; i < slot.lines; i++) {
-        const x = noteX + this.offsetX + i * this.lineSpacing;
-        renderer.drawLine(x, lineTop(s), x, end, this.color, this.lineWidth);
+        const x = lineX(i, slot.lines);
+        renderer.drawLine(x, top, x, end, this.color, this.lineWidth);
       }
     });
   }
@@ -232,9 +296,9 @@ function slotHeight(
 
 /**
  * Where a slot's mark ends, below its baseline: a kana sits on the baseline,
- * and a stroke, centred on the kana's optical centre, ends above it
+ * and a stroke, centred on the kana's centre, ends above it
  */
 function markBottom(slot: DurationSlot, noteFontSize: number): number {
   if (slot.kind !== 'stroke') return 0;
-  return -noteFontSize * (KANA_OPTICAL_CENTER_RATIO - STROKE_LENGTH_RATIO / 2);
+  return -noteFontSize * (GLYPH_CENTRE - STROKE_LENGTH_RATIO / 2);
 }
