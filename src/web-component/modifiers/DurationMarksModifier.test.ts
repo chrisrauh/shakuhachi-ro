@@ -143,7 +143,8 @@ describe('DurationMarksModifier', () => {
     expect(lineXs('1/2')).toEqual([100]);
     const [left, right] = lineXs('1/4');
     expect((left + right) / 2).toBe(100);
-    expect(right - left).toBe(8);
+    // A gap of an eighth of the 32px font, as in Kurokami
+    expect(right - left).toBe(4);
   });
 
   it('runs a centre line from the middle of this glyph to the middle of the next', () => {

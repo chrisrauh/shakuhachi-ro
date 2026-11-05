@@ -46,6 +46,14 @@ const LINE_START_OFFSET_Y = -22;
 /** Lines sit right of the note, a little past its meri and kari marks */
 const LINE_OFFSET_X = 26;
 
+/**
+ * The gap between the lines of a quarter note on the column's centre line, as
+ * a fraction of the font size: 4px at 32px. Matched to Koga's Kurokami, where
+ * the gap is about 0.19 of the glyph's height (#507). Beside the note, the gap
+ * stays lineSpacing.
+ */
+const CENTRE_LINE_SPACING_RATIO = 0.125;
+
 /** A stroke's length as a fraction of the font size, as in the Koga duet */
 const STROKE_LENGTH_RATIO = 0.4;
 
@@ -153,7 +161,8 @@ export class DurationMarksModifier extends Modifier {
     const centered = layout.durationLines === 'center';
     const lineX = (i: number, lines: number) =>
       centered
-        ? noteX + (i - (lines - 1) / 2) * this.lineSpacing
+        ? noteX +
+          (i - (lines - 1) / 2) * noteFontSize * CENTRE_LINE_SPACING_RATIO
         : noteX + this.offsetX + i * this.lineSpacing;
     const glyphMiddle = -noteFontSize * GLYPH_CENTRE;
     const lineStartOffsetY = centered ? glyphMiddle : LINE_START_OFFSET_Y;
