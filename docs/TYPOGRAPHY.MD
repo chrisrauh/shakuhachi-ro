@@ -45,9 +45,9 @@ In `src/web-component/modifiers/mark-geometry.ts`:
 | `GLYPH_CENTRE`                  | 0.38   | Centre of the ideographic character face | The middle of a note: strokes, rest circles, and the ends of centre duration lines         |
 | `COLUMN_BREAK_LINE_REACH_RATIO` | 0.5    | Chosen by eye, not a font metric         | How far a centre duration line runs past the face at a column break, at both ends (#507)   |
 
-In `DurationMarksModifier.ts`, `CENTRE_LINE_SPACING_RATIO` (0.125em, 4px at 32px) sets the gap between the two lines of a quarter note on the centre line. It is matched to Koga's Kurokami, where the gap is about 0.19 of the glyph's height; our ロ is 0.69em tall. It is not a font metric. Lines beside the note keep a fixed 8px gap (#517).
-
 The Serif values differ by 1/1000 em (0.03px at 32px), so one set of constants serves both fonts. If a notation font is added, read its `BASE` table and check that this is still true.
+
+In `DurationMarksModifier.ts`, `CENTRE_LINE_SPACING_RATIO` (0.125em, 4px at 32px) sets the gap between the two lines of a quarter note on the centre line. It is matched to Koga's Kurokami, where the gap is about 0.19 of the glyph's height; our ロ is 0.69em tall. It is not a font metric. Lines beside the note keep a fixed 8px gap (#517).
 
 ## Kana sit inside the face
 
