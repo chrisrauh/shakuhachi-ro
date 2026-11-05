@@ -34,27 +34,34 @@ export function meriKariReachLeft(fontSize: number): number {
 }
 
 /**
- * How far a kana's ink reaches above and below its baseline, as fractions of
- * its font size. Measured in Noto Sans JP: at 32px, ツ, チ and リ reach 25px
- * above the baseline and 2px below it. Other kana differ by a pixel or two.
+ * The ideographic character face of the notation fonts, in em above the
+ * baseline: the box that the type designer says CJK ink fills. Read from the
+ * BASE table (icft, icfb) of Noto Sans JP; Noto Serif JP differs by 1/1000 em.
+ * Kana ink sits inside it. See docs/TYPOGRAPHY.MD.
  */
-export const KANA_INK_ABOVE_RATIO = 25 / 32;
-export const KANA_INK_BELOW_RATIO = 2 / 32;
+export const IDEOGRAPHIC_FACE_TOP = 0.838;
+export const IDEOGRAPHIC_FACE_BOTTOM = -0.078;
 
 /**
- * How far a duration line on the column's centre line runs past the ink at a
- * column break, as a fraction of the font size: below the last note of one
+ * The middle of a note glyph, in em above the baseline: the centre of the
+ * ideographic face. Strokes, rests and centre duration lines align to it.
+ */
+export const GLYPH_CENTRE =
+  (IDEOGRAPHIC_FACE_TOP + IDEOGRAPHIC_FACE_BOTTOM) / 2;
+
+/**
+ * How far a duration line on the column's centre line runs past the
+ * ideographic face at a column break, in em: below the last note of one
  * column, and above the first note of the next, the same at both ends (#507).
- * At 32px, 18px: the line then ends inside the column's bottom padding.
  */
 const COLUMN_BREAK_LINE_REACH_RATIO = 18 / 32;
 
 /** How far above a note's baseline a centre line from the previous column starts. */
 export function columnBreakLineReachAbove(fontSize: number): number {
-  return fontSize * (KANA_INK_ABOVE_RATIO + COLUMN_BREAK_LINE_REACH_RATIO);
+  return fontSize * (IDEOGRAPHIC_FACE_TOP + COLUMN_BREAK_LINE_REACH_RATIO);
 }
 
 /** How far below a note's baseline a centre line to the next column ends. */
 export function columnBreakLineReachBelow(fontSize: number): number {
-  return fontSize * (KANA_INK_BELOW_RATIO + COLUMN_BREAK_LINE_REACH_RATIO);
+  return fontSize * (COLUMN_BREAK_LINE_REACH_RATIO - IDEOGRAPHIC_FACE_BOTTOM);
 }

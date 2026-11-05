@@ -103,6 +103,8 @@ The bundle is a generated artifact and is gitignored, not committed. `npm run de
 
 **VexFlow-inspired:** Constructor takes container + options. Explicit render() calls. Separation of data and presentation.
 
+**Font metrics, not pixels:** Marks are placed relative to the glyph by metrics read from the font files, as fractions of the em (`modifiers/mark-geometry.ts`). See [TYPOGRAPHY.MD](./TYPOGRAPHY.MD) for each value and where it comes from.
+
 ## Extension Points
 
 **New modifiers:** Extend `Modifier` base class, implement `render()`, add to `ModifierConfigurator` if needed. `render()` receives a `RenderingBackend`, not an `SVGRenderer`, so a unit test can pass a plain object with the draw methods it needs.

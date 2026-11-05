@@ -9,6 +9,7 @@
 import type { ShakuNote } from '../notes/ShakuNote';
 import type { ResolvedRenderOptions } from './RenderOptions';
 import type { SlotSpacing } from '../modifiers/Modifier';
+import { columnBreakLineReachBelow } from '../modifiers/mark-geometry';
 
 /**
  * Position of a note within a column
@@ -95,7 +96,15 @@ function columnBottom(
   note: ShakuNote,
   options: ResolvedRenderOptions,
 ): number {
-  return y + note.extraHeight(slotSpacing(options)) + BOTTOM_PADDING;
+  // A centre duration line can run on below the last note to the next column
+  const padding =
+    options.durationLines === 'center'
+      ? Math.max(
+          BOTTOM_PADDING,
+          columnBreakLineReachBelow(options.noteFontSize),
+        )
+      : BOTTOM_PADDING;
+  return y + note.extraHeight(slotSpacing(options)) + padding;
 }
 
 /**

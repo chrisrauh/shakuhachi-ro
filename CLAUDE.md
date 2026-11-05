@@ -2,7 +2,7 @@
 
 - Tasks: [GitHub Issues](https://github.com/chrisrauh/shakuhachi-ro/issues) — the [`focus`](https://github.com/chrisrauh/shakuhachi-ro/issues?q=is%3Aopen+label%3Afocus) label marks what is queued now, and `bug` ranks alongside it — a bug is a promise already broken. Labels: `area:*` (subsystem), `autonomy:high|medium|low` (how much direction the task needs), `type:ux` (user-facing — changes what users see or do; **preferred over internal work when choosing what to do next**), `type:idea` (speculative — **excluded from every backlog view**, never picked up as work; add `--search "-label:type:idea"` to `gh issue list`).
 - **Claim before you build:** assign an issue to yourself (`gh issue edit <n> --add-assignee @me`) before writing code, pick only unassigned issues (`--search "no:assignee"`), unassign if you abandon it, and re-check it is still open before pushing. Terminal and web sessions run concurrently against one backlog and will otherwise build the same thing twice. See `/dev-workflow` Phase 1.
-- Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD)
+- Architecture: [Renderer](./docs/ARCHITECTURE-RENDERER.MD) | [Platform](./docs/ARCHITECTURE-PLATFORM.MD) | [Typography](./docs/TYPOGRAPHY.MD) — the font metrics marks are placed by
 - Environment: [Local terminal (macOS)](./docs/ENVIRONMENT-LOCAL.md) | [Cloud (claude.ai/code, mobile app)](./docs/ENVIRONMENT-CLOUD.md) — read the one you are in; `/get-ready` tells you which
 
 ## ⚠️ MANDATORY SKILL RULES — HIGHEST PRIORITY

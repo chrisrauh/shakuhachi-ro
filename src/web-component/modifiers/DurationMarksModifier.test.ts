@@ -6,6 +6,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { DurationMarksModifier, durationSlots } from './DurationMarksModifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import { parseBeats } from '../types/Duration';
+import {
+  GLYPH_CENTRE,
+  IDEOGRAPHIC_FACE_BOTTOM,
+  IDEOGRAPHIC_FACE_TOP,
+} from './mark-geometry';
 
 const layout = {
   distanceToNext: 0,
@@ -143,7 +148,7 @@ describe('DurationMarksModifier', () => {
 
   it('runs a centre line from the middle of this glyph to the middle of the next', () => {
     // Kurokami: the line starts in the glyph, not above it
-    const glyphMiddle = 32 * 0.4;
+    const glyphMiddle = 32 * GLYPH_CENTRE;
     const { strokes, distanceToNext } = draw('1/2', true, 'center');
 
     expect(strokes).toHaveLength(1);
@@ -152,7 +157,7 @@ describe('DurationMarksModifier', () => {
   });
 
   it('centres the line of a half-beat note alone on its glyph, half way to the next note each way', () => {
-    const glyphMiddle = 200 - 32 * 0.4;
+    const glyphMiddle = 200 - 32 * GLYPH_CENTRE;
     const { strokes, distanceToNext } = draw('1/2', false, 'center');
 
     expect(strokes).toHaveLength(1);
@@ -164,20 +169,22 @@ describe('DurationMarksModifier', () => {
     // The previous note's line already runs to the middle of this glyph
     const { strokes } = draw('1/2', false, 'center', true);
 
-    expect(strokes.every((l) => l.y1 >= 200 - 32 * 0.4 - 0.001)).toBe(true);
+    expect(strokes.every((l) => l.y1 >= 200 - 32 * GLYPH_CENTRE - 0.001)).toBe(
+      true,
+    );
   });
 
-  it('runs a centre line as far past the ink at both ends of a column break', () => {
-    // At 32px, a kana's ink reaches 25px above the baseline and 2px below
-    const inkTop = 200 - 25;
-    const inkBottom = 200 + 2;
+  it('runs a centre line as far past the glyph at both ends of a column break', () => {
+    // The ideographic face of the note at baseline 200, in a 32px font
+    const faceTop = 200 - 32 * IDEOGRAPHIC_FACE_TOP;
+    const faceBottom = 200 - 32 * IDEOGRAPHIC_FACE_BOTTOM;
     // Last in its column, the line going on in the next column
     const [end] = draw('1/2', true, 'center', true, true).strokes;
     // First in its column, the line coming on from the previous column
     const [start] = draw('1/2', true, 'center', true, false, true).strokes;
 
-    expect(end.y2 - inkBottom).toBeGreaterThan(0);
-    expect(inkTop - start.y1).toBeCloseTo(end.y2 - inkBottom);
+    expect(end.y2 - faceBottom).toBeGreaterThan(0);
+    expect(faceTop - start.y1).toBeCloseTo(end.y2 - faceBottom);
   });
 
   it('is as wide as its most lines', () => {

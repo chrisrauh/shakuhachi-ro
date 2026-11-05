@@ -24,6 +24,7 @@ import { hasHalf, writtenLength } from '../types/Duration';
 import {
   columnBreakLineReachAbove,
   columnBreakLineReachBelow,
+  GLYPH_CENTRE,
 } from './mark-geometry';
 
 /** One slot of a note's length in the column, and the lines beside it */
@@ -35,7 +36,7 @@ export interface DurationSlot {
 /**
  * Where a duration line meets a note, as a fraction of the font size above the
  * baseline. Tuned so consecutive segments join cleanly; this is not the glyph's
- * optical centre (KANA_OPTICAL_CENTER_RATIO).
+ * centre (GLYPH_CENTRE).
  */
 const NOTE_VERTICAL_MIDDLE_RATIO = 0.25;
 
@@ -44,9 +45,6 @@ const LINE_START_OFFSET_Y = -22;
 
 /** Lines sit right of the note, a little past its meri and kari marks */
 const LINE_OFFSET_X = 26;
-
-/** Optical centre of a kana glyph above the baseline, as in ShakuNote */
-const KANA_OPTICAL_CENTER_RATIO = 0.4;
 
 /** A stroke's length as a fraction of the font size, as in the Koga duet */
 const STROKE_LENGTH_RATIO = 0.4;
@@ -157,7 +155,7 @@ export class DurationMarksModifier extends Modifier {
       centered
         ? noteX + (i - (lines - 1) / 2) * this.lineSpacing
         : noteX + this.offsetX + i * this.lineSpacing;
-    const glyphMiddle = -noteFontSize * KANA_OPTICAL_CENTER_RATIO;
+    const glyphMiddle = -noteFontSize * GLYPH_CENTRE;
     const lineStartOffsetY = centered ? glyphMiddle : LINE_START_OFFSET_Y;
     const lineEndOffsetY = centered
       ? glyphMiddle
@@ -171,7 +169,7 @@ export class DurationMarksModifier extends Modifier {
       baseline += slotHeight(this.slots, s, layout);
     });
 
-    // A stroke sits on the optical centre of the glyph its slot stands in
+    // A stroke sits on the centre of the glyph its slot stands in
     // for. A dot hangs the gap below the mark above it.
     const markY = (s: number) =>
       this.slots[s].kind === 'dot'
@@ -179,7 +177,7 @@ export class DurationMarksModifier extends Modifier {
           markBottom(this.slots[s - 1], noteFontSize) +
           layout.dotGap +
           DOT_RADIUS
-        : baselines[s] - noteFontSize * KANA_OPTICAL_CENTER_RATIO;
+        : baselines[s] - noteFontSize * GLYPH_CENTRE;
 
     // Where a slot's lines start. The slot before runs its lines to here, so
     // segments meet without overlapping: overlaps show as two colours on the
@@ -289,9 +287,9 @@ function slotHeight(
 
 /**
  * Where a slot's mark ends, below its baseline: a kana sits on the baseline,
- * and a stroke, centred on the kana's optical centre, ends above it
+ * and a stroke, centred on the kana's centre, ends above it
  */
 function markBottom(slot: DurationSlot, noteFontSize: number): number {
   if (slot.kind !== 'stroke') return 0;
-  return -noteFontSize * (KANA_OPTICAL_CENTER_RATIO - STROKE_LENGTH_RATIO / 2);
+  return -noteFontSize * (GLYPH_CENTRE - STROKE_LENGTH_RATIO / 2);
 }
