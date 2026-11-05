@@ -12,7 +12,10 @@ import {
   NOTATION_FONTS,
   DEFAULT_NOTATION_FONT,
 } from '../constants/notation-fonts';
-import { octaveMarkReachAbove } from '../modifiers/mark-geometry';
+import {
+  columnBreakLineReachAbove,
+  octaveMarkReachAbove,
+} from '../modifiers/mark-geometry';
 import type { DurationLinePosition } from '../modifiers/Modifier';
 
 /**
@@ -81,7 +84,9 @@ export interface RenderOptions extends ViewportOptions {
   /**
    * Top margin in pixels to prevent octave mark clipping
    * Must clear the octave mark, so unless set it is derived from where the
-   * octave mark is drawn and octaveMarkFontSize (see mark-geometry)
+   * octave mark is drawn and octaveMarkFontSize (see mark-geometry). With
+   * durationLines 'center', it also clears a duration line that comes on from
+   * the previous column (columnBreakLineReachAbove).
    * @default 34, at the default octaveMarkFontSize
    */
   topMargin?: number;
@@ -280,7 +285,9 @@ export const DEFAULT_RENDER_OPTIONS: ResolvedRenderOptions = {
  * Merges user-provided options with defaults
  *
  * A top margin that isn't given follows the octave mark's font size, so the
- * first note's octave mark stays clear of the top whatever its size.
+ * first note's octave mark stays clear of the top whatever its size. On the
+ * centre line, a duration line that comes on from the previous column starts
+ * above the first note, so the margin leaves room for that too (#507).
  *
  * @param options - User-provided options (partial)
  * @returns Options with all values defined except width/height
@@ -292,7 +299,11 @@ export function mergeWithDefaults(
     ...DEFAULT_RENDER_OPTIONS,
     ...options,
   };
-  return options.topMargin === undefined
-    ? { ...merged, topMargin: octaveMarkReachAbove(merged.octaveMarkFontSize) }
-    : merged;
+  if (options.topMargin !== undefined) return merged;
+  const octaveMarkRoom = octaveMarkReachAbove(merged.octaveMarkFontSize);
+  const topMargin =
+    merged.durationLines === 'center'
+      ? Math.max(octaveMarkRoom, columnBreakLineReachAbove(merged.noteFontSize))
+      : octaveMarkRoom;
+  return { ...merged, topMargin };
 }

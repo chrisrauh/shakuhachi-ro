@@ -203,6 +203,12 @@ describe('RenderOptions', () => {
       ).toBe(50);
     });
 
+    it('leaves room above the first note for a centre line from the previous column', () => {
+      // 25px of ink above the baseline, then 18px of line
+      expect(mergeWithDefaults({ durationLines: 'center' }).topMargin).toBe(43);
+      expect(mergeWithDefaults({ durationLines: 'side' }).topMargin).toBe(32);
+    });
+
     it('should leave width and height unset unless provided', () => {
       expect('width' in DEFAULT_RENDER_OPTIONS).toBe(false);
       expect('height' in DEFAULT_RENDER_OPTIONS).toBe(false);

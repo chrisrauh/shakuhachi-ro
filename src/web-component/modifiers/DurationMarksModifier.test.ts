@@ -167,17 +167,17 @@ describe('DurationMarksModifier', () => {
     expect(strokes.every((l) => l.y1 >= 200 - 32 * 0.4 - 0.001)).toBe(true);
   });
 
-  it('runs a centre line as far past both ends of a column break', () => {
-    const glyphMiddle = 200 - 32 * 0.4;
+  it('runs a centre line as far past the ink at both ends of a column break', () => {
+    // At 32px, a kana's ink reaches 25px above the baseline and 2px below
+    const inkTop = 200 - 25;
+    const inkBottom = 200 + 2;
     // Last in its column, the line going on in the next column
     const [end] = draw('1/2', true, 'center', true, true).strokes;
     // First in its column, the line coming on from the previous column
     const [start] = draw('1/2', true, 'center', true, false, true).strokes;
 
-    expect(end.y2 - glyphMiddle).toBeGreaterThan(0);
-    expect(glyphMiddle - start.y1).toBeCloseTo(end.y2 - glyphMiddle);
-    // It starts a note's spacing above the baseline
-    expect(start.y1).toBeCloseTo(200 - 44);
+    expect(end.y2 - inkBottom).toBeGreaterThan(0);
+    expect(inkTop - start.y1).toBeCloseTo(end.y2 - inkBottom);
   });
 
   it('is as wide as its most lines', () => {

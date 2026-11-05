@@ -21,6 +21,10 @@ import { Modifier, type ModifierLayout, type SlotSpacing } from './Modifier';
 import type { RenderingBackend } from '../renderer/RenderingBackend';
 import type { Beats } from '../types/Duration';
 import { hasHalf, writtenLength } from '../types/Duration';
+import {
+  columnBreakLineReachAbove,
+  columnBreakLineReachBelow,
+} from './mark-geometry';
 
 /** One slot of a note's length in the column, and the lines beside it */
 export interface DurationSlot {
@@ -158,10 +162,6 @@ export class DurationMarksModifier extends Modifier {
     const lineEndOffsetY = centered
       ? glyphMiddle
       : -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
-    // How far past the middle of the glyph a centre line reaches at a column
-    // break, at both ends: at the top of a column, it starts a note's spacing
-    // above the baseline (#507)
-    const columnBreakReach = layout.noteSpacing + glyphMiddle;
 
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
@@ -216,8 +216,8 @@ export class DurationMarksModifier extends Modifier {
         layout.firstInColumn
       ) {
         // The line comes on from the previous column, so it starts above the
-        // glyph
-        top = markY(s) - columnBreakReach;
+        // glyph, as far past its ink as it ran past the last glyph there
+        top = baselines[s] - columnBreakLineReachAbove(noteFontSize);
       }
       if (centered && s === 0 && !runsOn && !this.linesFromPrevious) {
         // A note alone under its line would get a line from its middle to its
@@ -227,10 +227,16 @@ export class DurationMarksModifier extends Modifier {
         // no example of this.
         top = baselines[s] + glyphMiddle - distanceToNext / 2;
         end = baselines[s] + glyphMiddle + distanceToNext / 2;
-      } else if (centered && runsOn && !next && layout.lastInColumn) {
-        // The line goes on in the next column, so it runs past the glyph,
-        // as far as it comes in above the first glyph there
-        end = markY(s) + columnBreakReach;
+      } else if (
+        centered &&
+        runsOn &&
+        !next &&
+        layout.lastInColumn &&
+        slot.kind === 'note'
+      ) {
+        // The line goes on in the next column, so it runs past the glyph's
+        // ink, as far as it comes in above the first glyph there
+        end = baselines[s] + columnBreakLineReachBelow(noteFontSize);
       } else if (runsOn) {
         end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {
