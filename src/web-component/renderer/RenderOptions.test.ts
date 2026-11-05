@@ -204,10 +204,10 @@ describe('RenderOptions', () => {
     });
 
     it('leaves room above the first note for a centre line from the previous column', () => {
-      // The ideographic face reaches 0.838em above the baseline, then 18px of line
+      // The ideographic face reaches 0.838em above the baseline, then half an em of line
       expect(
         mergeWithDefaults({ durationLines: 'center' }).topMargin,
-      ).toBeCloseTo(32 * 0.838 + 18);
+      ).toBeCloseTo(32 * 0.838 + 32 * 0.5);
       expect(mergeWithDefaults({ durationLines: 'side' }).topMargin).toBe(32);
     });
 

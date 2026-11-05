@@ -38,11 +38,12 @@ The ideographic character face is the box that kanji fill: 水, 大 and 中 touc
 
 In `src/web-component/modifiers/mark-geometry.ts`:
 
-| Constant                  | Value  | From                                     | Used for                                                                                   |
-| ------------------------- | ------ | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `IDEOGRAPHIC_FACE_TOP`    | 0.838  | `BASE` `icft`, Noto Sans JP              | Where a centre duration line from the previous column starts its reach above a note (#507) |
-| `IDEOGRAPHIC_FACE_BOTTOM` | −0.078 | `BASE` `icfb`, Noto Sans JP              | Where a centre duration line to the next column starts its reach below a note (#507)       |
-| `GLYPH_CENTRE`            | 0.38   | Centre of the ideographic character face | The middle of a note: strokes, rest circles, and the ends of centre duration lines         |
+| Constant                        | Value  | From                                     | Used for                                                                                   |
+| ------------------------------- | ------ | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `IDEOGRAPHIC_FACE_TOP`          | 0.838  | `BASE` `icft`, Noto Sans JP              | Where a centre duration line from the previous column starts its reach above a note (#507) |
+| `IDEOGRAPHIC_FACE_BOTTOM`       | −0.078 | `BASE` `icfb`, Noto Sans JP              | Where a centre duration line to the next column starts its reach below a note (#507)       |
+| `GLYPH_CENTRE`                  | 0.38   | Centre of the ideographic character face | The middle of a note: strokes, rest circles, and the ends of centre duration lines         |
+| `COLUMN_BREAK_LINE_REACH_RATIO` | 0.5    | Chosen by eye, not a font metric         | How far a centre duration line runs past the face at a column break, at both ends (#507)   |
 
 The Serif values differ by 1/1000 em (0.03px at 32px), so one set of constants serves both fonts. If a notation font is added, read its `BASE` table and check that this is still true.
 

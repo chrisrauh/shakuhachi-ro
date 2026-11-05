@@ -53,8 +53,9 @@ export const GLYPH_CENTRE =
  * How far a duration line on the column's centre line runs past the
  * ideographic face at a column break, in em: below the last note of one
  * column, and above the first note of the next, the same at both ends (#507).
+ * Half an em: 16px at the default 32px font. Chosen by eye, from 18px.
  */
-const COLUMN_BREAK_LINE_REACH_RATIO = 18 / 32;
+const COLUMN_BREAK_LINE_REACH_RATIO = 0.5;
 
 /** How far above a note's baseline a centre line from the previous column starts. */
 export function columnBreakLineReachAbove(fontSize: number): number {
