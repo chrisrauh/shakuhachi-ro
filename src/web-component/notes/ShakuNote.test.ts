@@ -19,6 +19,8 @@ function layout(distanceToNext: number) {
     noteSpacing: 44,
     dotGap: 14,
     durationLines: 'side' as const,
+    firstInColumn: false,
+    lastInColumn: false,
   };
 }
 

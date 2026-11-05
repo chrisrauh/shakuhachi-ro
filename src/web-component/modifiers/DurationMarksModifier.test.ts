@@ -13,6 +13,8 @@ const layout = {
   noteSpacing: 44,
   dotGap: 14,
   durationLines: 'side' as const,
+  firstInColumn: false,
+  lastInColumn: false,
 };
 
 const DOT_RADIUS = 2.5;
@@ -23,6 +25,8 @@ function draw(
   linesContinue = false,
   durationLines: 'side' | 'center' = 'side',
   linesFromPrevious = false,
+  lastInColumn = false,
+  firstInColumn = false,
 ) {
   const marks = new DurationMarksModifier(
     durationSlots(parseBeats(duration)!),
@@ -36,7 +40,13 @@ function draw(
     { drawLine, drawCircle } as unknown as RenderingBackend,
     100,
     200,
-    { ...layout, distanceToNext, durationLines },
+    {
+      ...layout,
+      distanceToNext,
+      durationLines,
+      lastInColumn,
+      firstInColumn,
+    },
   );
   const lines = drawLine.mock.calls.map(([x1, y1, x2, y2]) => ({
     x1,
@@ -155,6 +165,19 @@ describe('DurationMarksModifier', () => {
     const { strokes } = draw('1/2', false, 'center', true);
 
     expect(strokes.every((l) => l.y1 >= 200 - 32 * 0.4 - 0.001)).toBe(true);
+  });
+
+  it('runs a centre line as far past both ends of a column break', () => {
+    const glyphMiddle = 200 - 32 * 0.4;
+    // Last in its column, the line going on in the next column
+    const [end] = draw('1/2', true, 'center', true, true).strokes;
+    // First in its column, the line coming on from the previous column
+    const [start] = draw('1/2', true, 'center', true, false, true).strokes;
+
+    expect(end.y2 - glyphMiddle).toBeGreaterThan(0);
+    expect(glyphMiddle - start.y1).toBeCloseTo(end.y2 - glyphMiddle);
+    // It starts a note's spacing above the baseline
+    expect(start.y1).toBeCloseTo(200 - 44);
   });
 
   it('is as wide as its most lines', () => {

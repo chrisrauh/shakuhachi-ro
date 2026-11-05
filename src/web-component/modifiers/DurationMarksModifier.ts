@@ -158,6 +158,10 @@ export class DurationMarksModifier extends Modifier {
     const lineEndOffsetY = centered
       ? glyphMiddle
       : -noteFontSize * NOTE_VERTICAL_MIDDLE_RATIO;
+    // How far past the middle of the glyph a centre line reaches at a column
+    // break, at both ends: at the top of a column, it starts a note's spacing
+    // above the baseline (#507)
+    const columnBreakReach = layout.noteSpacing + glyphMiddle;
 
     // Each slot's baseline, as if a note sat there
     const baselines: number[] = [];
@@ -205,6 +209,16 @@ export class DurationMarksModifier extends Modifier {
       const runsOn = next ? next.lines > 0 : this.linesContinue;
       let top = lineTop(s);
       let end: number;
+      if (
+        centered &&
+        s === 0 &&
+        this.linesFromPrevious &&
+        layout.firstInColumn
+      ) {
+        // The line comes on from the previous column, so it starts above the
+        // glyph
+        top = markY(s) - columnBreakReach;
+      }
       if (centered && s === 0 && !runsOn && !this.linesFromPrevious) {
         // A note alone under its line would get a line from its middle to its
         // middle, which is nothing. It gets a line centred on the middle of
@@ -213,6 +227,10 @@ export class DurationMarksModifier extends Modifier {
         // no example of this.
         top = baselines[s] + glyphMiddle - distanceToNext / 2;
         end = baselines[s] + glyphMiddle + distanceToNext / 2;
+      } else if (centered && runsOn && !next && layout.lastInColumn) {
+        // The line goes on in the next column, so it runs past the glyph,
+        // as far as it comes in above the first glyph there
+        end = markY(s) + columnBreakReach;
       } else if (runsOn) {
         end = next ? lineTop(s + 1) : noteY + distanceToNext + lineStartOffsetY;
       } else if (slot.kind === 'dot') {

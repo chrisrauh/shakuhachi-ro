@@ -150,6 +150,8 @@ export class ShakuNote {
       noteSpacing: DEFAULT_RENDER_OPTIONS.noteVerticalSpacing,
       dotGap: DEFAULT_RENDER_OPTIONS.durationDotGap,
       durationLines: DEFAULT_RENDER_OPTIONS.durationLines,
+      firstInColumn: false,
+      lastInColumn: false,
     };
 
     if (options.modifiers) {

@@ -203,6 +203,8 @@ export class ScoreRenderer {
           noteSpacing: this.options.noteVerticalSpacing,
           dotGap: this.options.durationDotGap,
           durationLines: this.options.durationLines,
+          firstInColumn: index === 0,
+          lastInColumn: index === columnInfo.notePositions.length - 1,
         });
 
         // Render debug label if enabled
