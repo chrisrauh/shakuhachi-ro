@@ -149,7 +149,7 @@
   grid-template-columns: minmax(0, 1fr) 9rem 7rem 3rem 6rem auto;
   align-items: center;
   column-gap: var(--spacing-x-large);
-  padding: var(--spacing-x-small) var(--spacing-medium);
+  padding: var(--spacing-small) var(--spacing-medium);
   color: inherit;
   text-decoration: none;
 }
