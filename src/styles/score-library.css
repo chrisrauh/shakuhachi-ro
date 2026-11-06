@@ -1,298 +1,402 @@
+/* The landing page's library: a toolbar (tabs, search, sort) over a list of
+   scores. The page has no top padding (index.astro), so the header's own
+   bottom padding is the gap above the toolbar, the same as the side margins. */
+
 .score-library {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
+  padding: 0 var(--spacing-medium) var(--spacing-3x-large);
 }
 
-.search-bar {
-  max-width: 640px;
-  margin: var(--spacing-2x-large) auto var(--spacing-2x-large);
+/* ============================================
+   TOOLBAR
+   ============================================ */
+
+.library-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-small);
 }
 
-.search-bar-field {
+.library-tabs .segmented-option {
+  min-width: 7rem;
+}
+
+/* In place of the tabs when logged out */
+.library-heading {
+  margin: 0;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-heading);
+}
+
+.library-search {
   position: relative;
+  width: 15rem;
+  margin-left: auto;
 }
 
-.search-bar-icon {
+.library-search-icon,
+.library-search-clear {
   position: absolute;
-  left: var(--spacing-large);
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-text-secondary);
+  display: flex;
+  color: var(--color-text-tertiary);
+}
+
+.library-search-icon {
+  left: var(--spacing-x-small);
   pointer-events: none;
-  display: flex;
-  align-items: center;
 }
 
-.search-bar-clear {
-  position: absolute;
-  right: var(--spacing-large);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.library-search-clear {
+  right: var(--spacing-x-small);
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--color-text-tertiary);
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--transition-fast),
-    color var(--transition-fast);
-  line-height: 0;
 }
 
-.search-bar-clear.search-bar-clear--visible {
-  opacity: 1;
-  pointer-events: auto;
+/* Its display above would otherwise beat the global [hidden] rule */
+.library-search-clear[hidden] {
+  display: none;
 }
 
-.search-bar-clear:hover {
+.library-search-clear:hover {
   color: var(--color-text-secondary);
 }
 
-.score-count {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-small);
-  margin-top: var(--spacing-small);
-  margin-bottom: 0;
+.library-search svg,
+.library-sort-icon svg {
+  width: 1em;
+  height: 1em;
 }
 
-.search-bar input {
+.library-search input {
   width: 100%;
-  padding: var(--input-spacing-small) var(--spacing-3x-large)
-    var(--input-spacing-small) var(--spacing-3x-large);
-  border: var(--input-border-width) solid var(--input-border-color);
-  border-radius: var(--border-radius-pill);
-  font-size: var(--input-font-size-medium);
-  background: var(--input-background-color);
-  color: var(--input-color);
-  transition: border-color var(--transition-fast);
+  height: var(--size-toolbar-item);
   box-sizing: border-box;
-}
-
-.search-bar input:hover {
-  border-color: var(--input-border-color-hover);
-}
-
-.search-bar input:focus {
-  outline: none;
-  border-color: var(--input-border-color-focus);
-  box-shadow: 0 0 0 var(--input-focus-ring-offset) var(--input-focus-ring-color);
-}
-
-.search-bar input::placeholder {
-  color: var(--input-placeholder-color);
-}
-
-.filter-group {
-  margin-bottom: var(--spacing-medium);
-}
-
-.filter-group:last-child {
-  margin-bottom: 0;
-}
-
-.filter-group label {
-  display: block;
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--spacing-x-small);
-  color: var(--color-text-primary);
-}
-
-.filter-group select {
-  padding: var(--spacing-x-small) var(--spacing-small);
-  border: var(--input-border-width) solid var(--input-border-color);
-  border-radius: var(--input-border-radius-medium);
-  font-size: var(--input-font-size-medium);
-  min-width: 200px;
-  background: var(--input-background-color);
+  padding: 0 var(--spacing-x-large);
+  border: none;
+  border-radius: var(--border-radius-large);
+  background: var(--color-bg-active);
   color: var(--input-color);
-}
-
-.score-library-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-large);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-top: var(--spacing-x-large);
-  margin-bottom: 0;
-}
-
-.section-header:first-child {
-  margin-top: 0;
-}
-
-.section-header h2 {
-  font-size: var(--font-size-large);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-heading);
-  margin: 0;
-  text-box-trim: trim-both;
-  text-box-edge: cap alphabetic;
-}
-
-.section-count {
+  font: inherit;
   font-size: var(--font-size-small);
-  color: var(--color-text-secondary);
 }
 
-.score-grid-section {
+/* The field draws its own clear button */
+.library-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.library-search input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.library-search input:focus {
+  outline: var(--input-border-width) solid var(--input-border-color-focus);
+}
+
+/* A native select, so phones open their own picker, drawn as a text menu */
+.library-sort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2x-small);
+  height: var(--size-toolbar-item);
+  padding-left: var(--spacing-x-small);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.library-sort select {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0 var(--spacing-medium) 0 0;
+  font: inherit;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.library-sort-icon {
+  position: absolute;
+  right: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+/* ============================================
+   LIST
+   ============================================ */
+
+.library-list {
+  background: var(--panel-background-color);
+  border: var(--panel-border-width) solid var(--panel-border-color);
+  border-radius: var(--border-radius-panel);
+  overflow: hidden;
+  font-size: var(--font-size-small);
+  /* With a row's own 12px, the first tile is 16px from the top, as from the
+     side; the same at the bottom */
+  padding-block: var(--spacing-2x-small);
+}
+
+/* Title and description take the space left; the one-line columns keep a
+   fixed width each, as in a table */
+.library-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-large);
-}
-
-.empty-state {
-  text-align: center;
-  padding: var(--spacing-x-large);
-  color: var(--color-text-secondary);
-  grid-column: 1 / -1;
-}
-
-.empty-state p {
-  margin: 0 0 var(--spacing-small) 0;
-}
-
-.empty-state p:last-child {
-  margin-bottom: 0;
-}
-
-.empty-state .create-score-link {
-  color: var(--color-primary);
+  grid-template-columns: minmax(0, 1fr) 9rem 7rem 3rem 6rem auto;
+  align-items: center;
+  column-gap: var(--spacing-x-large);
+  padding: var(--spacing-small) var(--spacing-medium);
+  color: inherit;
   text-decoration: none;
 }
 
-.empty-state .create-score-link:hover {
-  text-decoration: underline;
+.library-row + .library-row {
+  border-top: var(--panel-border-width) solid var(--color-border-subtle);
 }
 
-.empty-state + .section-header {
-  margin-top: 0;
-}
-
-.score-card {
-  background: var(--panel-background-color);
-  border: var(--panel-border-width) solid var(--panel-border-color);
-  border-radius: var(--border-radius-large);
-  padding: var(--spacing-large);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.score-card:hover {
+a.library-row:hover {
   background: var(--color-bg-hover);
 }
 
-.score-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-small);
-  gap: var(--spacing-small);
+/* Inside the row: the list clips anything outside it */
+a.library-row:focus-visible {
+  outline: var(--input-border-width) solid var(--input-border-color-focus);
+  outline-offset: calc(-2 * var(--input-border-width));
 }
 
-.score-title {
-  font-size: var(--font-size-large);
-  margin: 0;
-  color: var(--color-text-primary);
+.library-row-lead {
+  /* As tall as the title and description beside it */
+  --size-library-note: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  min-width: 0;
+}
+
+/* A tile with the score's first note, drawn by the renderer with its marks,
+   to anchor the row on the left and give each score a face */
+.library-row-note {
+  flex: none;
+  width: var(--size-library-note);
+  height: var(--size-library-note);
+  border-radius: var(--border-radius-large);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+}
+
+.library-row-note svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The renderer names a font; the tile follows the reader's notation font */
+.library-row-note text {
+  font-family: var(--font-notation);
+}
+
+.library-row-main {
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-x-small);
+  min-width: 0;
 }
 
-.forked-indicator {
-  display: inline-flex;
-  align-items: center;
-  color: var(--color-text-secondary);
-}
-
-.forked-indicator svg {
-  width: 16px;
-  height: 16px;
-}
-
-.score-card-body {
-  margin-bottom: var(--spacing-medium);
-}
-
-.score-composer {
-  color: var(--color-text-secondary);
-  margin: 0 0 var(--spacing-small) 0;
-  font-style: italic;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-small);
-}
-
-.score-description {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-small);
-  margin: var(--spacing-small) 0;
-  line-height: var(--line-height-dense);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+.library-row-title,
+.library-row-description {
+  margin: 0;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.score-card-footer {
+.library-row-title {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--spacing-small);
-  border-top: var(--panel-border-width) solid var(--color-border-subtle);
+  gap: var(--spacing-x-small);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.library-row-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-row-description {
   font-size: var(--font-size-x-small);
+  color: var(--color-text-tertiary);
+}
+
+.library-row-byline {
   color: var(--color-text-secondary);
 }
 
-.score-stat {
+/* On a wide screen the date and the byline have their own columns */
+.library-row-title-date,
+.library-row-byline {
+  display: none;
+}
+
+.library-row-cell {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-row-cell-empty {
+  color: var(--color-text-tertiary);
+}
+
+/* A small count beside a larger icon, as Flat.io does: the contrast in size
+   breaks up the even 14px of the other columns */
+.library-row-forks {
+  --fork-icon-size: 16px;
+  font-size: var(--font-size-x-small);
+}
+
+/* The icon is centred on the digits' cap height. The offset is rounded to
+   whole pixels: text snaps to the pixel grid, and a fractional offset puts
+   the icon up to 1px off-centre on some rows. */
+.library-row-forks svg {
+  width: var(--fork-icon-size);
+  height: var(--fork-icon-size);
+  vertical-align: round(calc(0.5cap - var(--fork-icon-size) / 2), 1px);
+  margin-right: var(--spacing-2x-small);
+  color: var(--color-text-tertiary);
+}
+
+.library-row-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.library-row-chevron {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-2x-small);
-}
-
-.score-stat svg {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
-}
-
-.no-scores {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: var(--spacing-3x-large) var(--spacing-large);
   color: var(--color-text-tertiary);
 }
 
-.no-scores p {
-  font-size: var(--font-size-large);
-  margin-bottom: var(--spacing-large);
+.library-row-chevron svg {
+  width: 1em;
+  height: 1em;
 }
 
-.score-library-loading {
-  text-align: center;
-  color: var(--color-text-tertiary);
-  padding: var(--spacing-3x-large) var(--spacing-large);
-}
-
-@media (max-width: 768px) {
-  .score-grid-section {
-    grid-template-columns: 1fr;
+@media (max-width: 640px) {
+  .library-toolbar {
+    flex-wrap: wrap;
   }
 
-  .filter-group select {
+  .library-tabs {
     width: 100%;
+  }
+
+  .library-tabs .segmented-option {
+    flex: 1;
     min-width: 0;
   }
+
+  .library-search {
+    flex: 1;
+    width: auto;
+    margin-left: 0;
+  }
+
+  .library-row {
+    display: flex;
+    gap: var(--spacing-small);
+  }
+
+  .library-row-lead {
+    flex: 1;
+  }
+
+  .library-row-cell {
+    display: none;
+  }
+
+  .library-row-byline {
+    display: inline;
+  }
+
+  .library-row-title-date {
+    display: inline;
+    margin-left: auto;
+    flex: none;
+    font-size: var(--font-size-x-small);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-tertiary);
+  }
+}
+
+/* ============================================
+   LOADING, EMPTY AND NO-MATCH STATES
+   ============================================ */
+
+.skeleton {
+  display: block;
+  height: 1cap;
+  border-radius: var(--border-radius-small);
+  background: var(--color-bg-active);
+}
+
+.library-row-skeleton .library-row-note {
+  background: var(--color-bg-active);
+}
+
+.library-row-skeleton .library-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-x-small);
+  padding-block: var(--spacing-2x-small);
+}
+
+.skeleton-title {
+  width: 30%;
+}
+
+.skeleton-description {
+  width: 70%;
+  font-size: var(--font-size-x-small);
+}
+
+.skeleton-cell {
+  width: 60%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    animation: skeleton-pulse var(--transition-x-slow) ease-in-out infinite
+      alternate;
+  }
+}
+
+@keyframes skeleton-pulse {
+  to {
+    opacity: 0.4;
+  }
+}
+
+.library-empty,
+.no-scores {
+  text-align: center;
+  padding: var(--spacing-3x-large) var(--spacing-large);
+  color: var(--color-text-secondary);
+}
+
+.library-empty p,
+.no-scores p {
+  margin: 0 0 var(--spacing-small);
+}
+
+.library-empty p:last-child,
+.no-scores p:last-child {
+  margin-bottom: 0;
+}
+
+.library-empty a {
+  color: var(--color-link);
 }

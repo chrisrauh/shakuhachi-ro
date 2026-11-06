@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { User } from '@supabase/supabase-js';
 import { ScoreLibrary } from './ScoreLibrary';
+import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
+import { onAuthReady } from '../api/auth';
 
 // vi.mock must be at top level for Vitest hoisting to work
 vi.mock('../api/scores');
@@ -8,12 +11,7 @@ vi.mock('../api/auth', () => ({
   onAuthReady: vi.fn(() => ({ unsubscribe: vi.fn() })),
 }));
 vi.mock('../utils/icons', () => ({
-  renderIcon: vi.fn(() => '<svg data-icon="git-fork"></svg>'),
-  initIcons: vi.fn(),
-  getIconHTML: vi.fn(() => '<svg data-icon="search"></svg>'),
-}));
-vi.mock('./LoadingSpinner', () => ({
-  buildSpinnerSVG: vi.fn(() => '<svg class="spinner"></svg>'),
+  getIconHTML: vi.fn(() => '<svg></svg>'),
 }));
 vi.mock('../constants/strings', () => ({
   STRING_FACTORIES: {
@@ -51,11 +49,50 @@ function makeScore(overrides: Partial<Score> = {}): Score {
   } as Score;
 }
 
-// Bind the real private helper methods for use in test contexts.
-// escapeHtml uses document.createElement which is available in jsdom.
 const realEscapeHtml = ScoreLibrary.prototype['escapeHtml'];
-const realRenderNoScores = ScoreLibrary.prototype['renderNoScores'];
-const realRenderScoreCard = ScoreLibrary.prototype['renderScoreCard'];
+
+/** The library the last mount() made. */
+let mounted: ScoreLibrary;
+
+/**
+ * Mounts a library with the given user and scores, and waits for it to load.
+ * `mine` is what getUserScores returns for the logged-in user.
+ */
+async function mount({
+  user = null as { id: string } | null,
+  library = [] as Score[],
+  mine = [] as Score[],
+  holdLoading = false,
+} = {}): Promise<HTMLElement> {
+  document.body.innerHTML = '<div id="score-library"></div>';
+  vi.mocked(onAuthReady).mockImplementation((cb) => {
+    cb(user as User | null);
+    return { unsubscribe: vi.fn() } as unknown as ReturnType<
+      typeof onAuthReady
+    >;
+  });
+  vi.mocked(getAllScores).mockResolvedValue({ scores: library, error: null });
+  vi.mocked(getUserScores).mockResolvedValue({ scores: mine, error: null });
+  mounted = new ScoreLibrary('score-library', { holdLoading });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return document.getElementById('score-library')!;
+}
+
+function rowTitles(container: HTMLElement): string[] {
+  return [...container.querySelectorAll('.library-row-title-text')].map(
+    (el) => el.textContent ?? '',
+  );
+}
+
+function type(container: HTMLElement, query: string): void {
+  const input = container.querySelector('#search-input') as HTMLInputElement;
+  input.value = query;
+  input.dispatchEvent(new Event('input'));
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 // --- escapeHtml() ---
 
@@ -79,325 +116,249 @@ describe('ScoreLibrary.escapeHtml', () => {
   });
 });
 
-// --- renderNoScores() ---
+// --- Rows ---
 
-describe('ScoreLibrary.renderNoScores', () => {
-  it('renders a no-scores div containing the message', () => {
-    const html = realRenderNoScores.call(
-      {},
-      'No scores found matching "test"',
-    ) as string;
-    expect(html).toContain('class="no-scores"');
-    expect(html).toContain('No scores found matching "test"');
-  });
-});
-
-// --- renderScoreCard() ---
-
-describe('ScoreLibrary.renderScoreCard', () => {
-  // The method calls this.escapeHtml and this.renderIcon (module-level import)
-  const ctx = { escapeHtml: realEscapeHtml };
-
-  function call(score: Score): string {
-    return realRenderScoreCard.call(ctx, score) as string;
-  }
-
-  it('includes the score title and slug', () => {
-    const html = call(makeScore());
-    expect(html).toContain('Akatombo');
-    expect(html).toContain('data-score-slug="akatombo"');
+describe('ScoreLibrary rows', () => {
+  it('links each row to its score page', async () => {
+    const container = await mount({ library: [makeScore()] });
+    const row = container.querySelector('a.library-row') as HTMLAnchorElement;
+    expect(row.getAttribute('href')).toBe('/score/akatombo');
+    expect(row.textContent).toContain('Akatombo');
   });
 
-  it('includes the composer', () => {
-    expect(call(makeScore())).toContain('Traditional');
+  it('draws the first note of the score with its marks, skipping rests', async () => {
+    const container = await mount({
+      library: [
+        makeScore({
+          data: {
+            notes: [
+              { rest: true, duration: '1' },
+              {
+                character: 'tsu',
+                register: 1,
+                accidental: 'meri',
+                duration: '1',
+              },
+              { character: 'ro', register: 0, duration: '1' },
+            ],
+          },
+        }),
+      ],
+    });
+    const texts = [
+      ...container.querySelectorAll('.library-row-note svg text'),
+    ].map((el) => el.textContent);
+    expect(texts).toEqual(expect.arrayContaining(['ツ', 'メ', '甲']));
+    expect(texts).not.toContain('ロ');
   });
 
-  it('shows "Unknown composer" when composer is null', () => {
-    expect(call(makeScore({ composer: null }))).toContain('Unknown composer');
-  });
-
-  it('includes description when present', () => {
-    const html = call(makeScore({ description: 'A peaceful melody' }));
-    expect(html).toContain('A peaceful melody');
-  });
-
-  it('shows forked-indicator when score is a fork', () => {
-    const html = call(makeScore({ forked_from: 'original-slug' }));
-    expect(html).toContain('forked-indicator');
-  });
-
-  it('omits forked-indicator when score is not a fork', () => {
-    expect(call(makeScore({ forked_from: null }))).not.toContain(
-      'forked-indicator',
+  it('shows the composer, school and fork count as columns', async () => {
+    const container = await mount({
+      library: [
+        makeScore({ composer: 'Traditional', school: 'kinko', fork_count: 3 }),
+      ],
+    });
+    const cells = [...container.querySelectorAll('.library-row-cell')].map(
+      (el) => el.textContent?.trim(),
+    );
+    expect(cells).toContain('Traditional');
+    expect(cells).toContain('Kinko-ryū');
+    expect(container.querySelector('.library-row-count')?.textContent).toBe(
+      '3',
     );
   });
 
-  it('dates the card by its last update, not its creation', () => {
-    const html = call(
-      makeScore({
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-06-01T00:00:00Z',
-      }),
+  it('dates the row by its last update, not its creation', async () => {
+    const container = await mount({
+      library: [
+        makeScore({
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-06-01T00:00:00Z',
+        }),
+      ],
+    });
+    const times = [...container.querySelectorAll('relative-time')].map((el) =>
+      el.getAttribute('datetime'),
     );
-    expect(html).toContain('Updated <relative-time');
-    expect(html).toContain('datetime="2024-06-01T00:00:00Z"');
-    expect(html).not.toContain('datetime="2024-01-01T00:00:00Z"');
+    expect(times.length).toBeGreaterThan(0);
+    expect(times.every((t) => t === '2024-06-01T00:00:00Z')).toBe(true);
   });
 
-  it('escapes HTML in title to prevent XSS', () => {
-    const html = call(makeScore({ title: '<script>alert(1)</script>' }));
-    expect(html).not.toContain('<script>');
-    expect(html).toContain('&lt;script&gt;');
+  it('escapes HTML in the title and description', async () => {
+    const container = await mount({
+      library: [
+        makeScore({
+          title: '<img src=x onerror=alert(1)>',
+          description: '<script>alert(1)</script>',
+        }),
+      ],
+    });
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('script')).toBeNull();
+    expect(rowTitles(container)).toEqual(['<img src=x onerror=alert(1)>']);
   });
 });
 
-// --- applyFilters() ---
+// --- Tabs ---
 
-describe('ScoreLibrary.applyFilters', () => {
+describe('ScoreLibrary tabs', () => {
+  it('shows a heading in place of the tabs when logged out', async () => {
+    const container = await mount({ library: [makeScore()] });
+    expect(container.querySelector('.library-tabs')).toBeNull();
+    expect(container.querySelector('.library-heading')?.textContent).toBe(
+      'Library',
+    );
+  });
+
+  it('switches between the whole library and the user’s own scores', async () => {
+    const own = makeScore({ id: '2', title: 'Mine', slug: 'mine' });
+    const container = await mount({
+      user: { id: 'u1' },
+      library: [makeScore(), own],
+      mine: [own],
+    });
+    expect(rowTitles(container)).toEqual(['Akatombo', 'Mine']);
+
+    (container.querySelector('[data-tab="mine"]') as HTMLButtonElement).click();
+    expect(rowTitles(container)).toEqual(['Mine']);
+    expect(
+      container
+        .querySelector('[data-tab="mine"]')
+        ?.getAttribute('aria-pressed'),
+    ).toBe('true');
+  });
+
+  it('offers to create a score when the user has none', async () => {
+    const container = await mount({
+      user: { id: 'u1' },
+      library: [makeScore()],
+    });
+    (container.querySelector('[data-tab="mine"]') as HTMLButtonElement).click();
+    expect(
+      container.querySelector('.library-empty a')?.getAttribute('href'),
+    ).toBe('/score/new/edit');
+  });
+});
+
+// --- Search and sort ---
+
+describe('ScoreLibrary search and sort', () => {
   const scores = [
-    makeScore({ id: '1', title: 'Akatombo', composer: 'Traditional' }),
-    makeScore({ id: '2', title: 'Sakura Sakura', composer: 'Traditional' }),
-    makeScore({ id: '3', title: 'Love Story', composer: 'Modern' }),
+    makeScore({
+      id: '1',
+      title: 'Sakura Sakura',
+      composer: 'Traditional',
+      updated_at: '2024-03-01T00:00:00Z',
+    }),
+    makeScore({
+      id: '2',
+      title: 'Akatombo',
+      composer: 'Kosaku Yamada',
+      updated_at: '2024-01-01T00:00:00Z',
+    }),
+    makeScore({
+      id: '3',
+      title: 'Shika no Tone',
+      composer: null,
+      school: 'kinko',
+      updated_at: '2024-02-01T00:00:00Z',
+    }),
   ];
 
-  function callApplyFilters(
-    searchQuery: string,
-    myScores = scores,
-    libraryScores = scores,
-  ) {
-    const ctx = {
-      searchQuery,
-      myScores,
-      libraryScores,
-      filteredMyScores: [] as Score[],
-      filteredLibraryScores: [] as Score[],
-      renderGrid: vi.fn(),
-    };
-    ScoreLibrary.prototype['applyFilters'].call(ctx);
-    return ctx;
-  }
-
-  it('returns all scores when query is empty', () => {
-    const ctx = callApplyFilters('');
-    expect(ctx.filteredMyScores).toHaveLength(3);
-    expect(ctx.filteredLibraryScores).toHaveLength(3);
+  it('lists the most recently updated first', async () => {
+    const container = await mount({ library: scores });
+    expect(rowTitles(container)).toEqual([
+      'Sakura Sakura',
+      'Shika no Tone',
+      'Akatombo',
+    ]);
   });
 
-  it('filters by title (case-insensitive)', () => {
-    const ctx = callApplyFilters('akatombo');
-    expect(ctx.filteredMyScores).toHaveLength(1);
-    expect(ctx.filteredMyScores[0].title).toBe('Akatombo');
+  it('sorts by title when chosen', async () => {
+    const container = await mount({ library: scores });
+    const select = container.querySelector('#sort-select') as HTMLSelectElement;
+    select.value = 'title';
+    select.dispatchEvent(new Event('change'));
+    expect(rowTitles(container)).toEqual([
+      'Akatombo',
+      'Sakura Sakura',
+      'Shika no Tone',
+    ]);
   });
 
-  it('filters by composer', () => {
-    const ctx = callApplyFilters('modern');
-    expect(ctx.filteredMyScores).toHaveLength(1);
-    expect(ctx.filteredMyScores[0].title).toBe('Love Story');
+  it('filters by title, composer or school, ignoring case', async () => {
+    const container = await mount({ library: scores });
+    type(container, 'sakura');
+    expect(rowTitles(container)).toEqual(['Sakura Sakura']);
+    type(container, 'YAMADA');
+    expect(rowTitles(container)).toEqual(['Akatombo']);
+    type(container, 'kinko');
+    expect(rowTitles(container)).toEqual(['Shika no Tone']);
   });
 
-  it('returns empty arrays when no scores match', () => {
-    const ctx = callApplyFilters('zzznomatch');
-    expect(ctx.filteredMyScores).toHaveLength(0);
-    expect(ctx.filteredLibraryScores).toHaveLength(0);
-  });
+  it('says what matched nothing, and shows the clear button', async () => {
+    const container = await mount({ library: scores });
+    const clear = container.querySelector('#search-clear-btn')!;
+    expect(clear.hasAttribute('hidden')).toBe(true);
 
-  it('calls renderGrid after filtering', () => {
-    const ctx = callApplyFilters('');
-    expect(ctx.renderGrid).toHaveBeenCalledOnce();
-  });
-});
-
-// --- renderGridContent() ---
-
-describe('ScoreLibrary.renderGridContent', () => {
-  const score = makeScore();
-
-  function makeCtx(overrides: object) {
-    return {
-      escapeHtml: realEscapeHtml,
-      renderNoScores: realRenderNoScores,
-      renderScoreCard: vi.fn(() => '<div class="score-card"></div>'),
-      currentUser: null,
-      myScores: [],
-      libraryScores: [],
-      filteredMyScores: [],
-      filteredLibraryScores: [],
-      searchQuery: '',
-      ...overrides,
-    };
-  }
-
-  function call(ctx: object): string {
-    return ScoreLibrary.prototype['renderGridContent'].call(ctx) as string;
-  }
-
-  it('shows My Scores and Library sections when logged in with scores', () => {
-    const ctx = makeCtx({
-      currentUser: { id: 'u1' },
-      myScores: [score],
-      filteredMyScores: [score],
-      filteredLibraryScores: [score],
-    });
-    const html = call(ctx);
-    expect(html).toContain('My Scores');
-    expect(html).toContain('Library');
-  });
-
-  it('shows empty-state onboarding (not no-scores) when logged in with zero ever-created scores', () => {
-    const ctx = makeCtx({
-      currentUser: { id: 'u1' },
-      myScores: [],
-      libraryScores: [],
-    });
-    const html = call(ctx);
-    expect(html).toContain('empty-state');
-    expect(html).not.toContain('no-scores');
-  });
-
-  it('shows no-scores message with query when searching and logged out', () => {
-    const ctx = makeCtx({
-      searchQuery: 'zzz',
-      filteredLibraryScores: [],
-    });
-    const html = call(ctx);
-    expect(html).toContain('no-scores');
-    expect(html).toContain('No scores found matching');
-    expect(html).toContain('zzz');
-  });
-
-  it('shows generic empty message when no query and logged out', () => {
-    const ctx = makeCtx({
-      searchQuery: '',
-      filteredLibraryScores: [],
-    });
-    const html = call(ctx);
-    expect(html).toContain('No scores in the library yet');
-  });
-});
-
-// --- Constructor ---
-
-describe('ScoreLibrary constructor', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="score-library"></div>';
-  });
-
-  it('throws when container element is not found', () => {
-    expect(() => new ScoreLibrary('nonexistent')).toThrow(
-      'Container not found: nonexistent',
+    type(container, 'zzz');
+    expect(container.querySelector('.no-scores')?.textContent).toContain(
+      'No scores found matching "zzz"',
     );
+    expect(clear.hasAttribute('hidden')).toBe(false);
   });
 
-  it('renders the search bar into the container on first render', () => {
-    new ScoreLibrary('score-library');
-    expect(document.getElementById('score-library')!.innerHTML).toContain(
-      'search-input',
-    );
-  });
-});
-
-// --- Search query restoration ---
-
-describe('ScoreLibrary search input value', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="score-library"></div>';
-  });
-
-  it('restores the query as a property rather than a markup attribute', () => {
-    const library = new ScoreLibrary('score-library');
+  it('restores the query as a property rather than a markup attribute', async () => {
+    const container = await mount({ library: scores });
     // A quote in the query would break out of value="..." if it were
     // interpolated into the markup — escapeHtml does not escape quotes.
     const query = '" onfocus="alert(1)';
-
-    (library as unknown as { searchQuery: string }).searchQuery = query;
-    ScoreLibrary.prototype['render'].call(library);
-
-    const input = document.getElementById('search-input') as HTMLInputElement;
+    type(container, query);
+    // A reload redraws the toolbar, with the query put back in the field
+    mounted.refresh();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const input = container.querySelector('#search-input') as HTMLInputElement;
     expect(input.value).toBe(query);
     expect(input.getAttribute('onfocus')).toBeNull();
   });
 });
 
-// --- Clear button visibility ---
+// --- Constructor, error and loading states ---
 
-describe('ScoreLibrary clear button', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="score-library"></div>';
-  });
-
-  it('clear button is hidden when searchQuery is empty', () => {
-    new ScoreLibrary('score-library');
-    const btn = document.getElementById('search-clear-btn');
-    expect(btn).not.toBeNull();
-    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(false);
-  });
-
-  it('clear button is not hidden when searchQuery is non-empty', () => {
-    new ScoreLibrary('score-library');
-    ScoreLibrary.prototype['updateClearButton'].call({
-      searchQuery: 'test',
-      container: document.getElementById('score-library'),
-    });
-    const btn = document.getElementById('search-clear-btn');
-    expect(btn).not.toBeNull();
-    expect(btn!.classList.contains('search-bar-clear--visible')).toBe(true);
-  });
-});
-
-// --- Error state ---
-
-describe('ScoreLibrary error state', () => {
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    document.body.innerHTML = '<div id="error-library"></div>';
-
-    const { onAuthReady } = await import('../api/auth');
-    vi.mocked(onAuthReady).mockImplementation((cb) => {
-      cb(null);
-      return { unsubscribe: vi.fn() } as any;
-    });
+describe('ScoreLibrary states', () => {
+  it('throws when container element is not found', () => {
+    document.body.innerHTML = '';
+    expect(() => new ScoreLibrary('nonexistent')).toThrow(
+      'Container not found: nonexistent',
+    );
   });
 
   it('shows page-error with retry button when getAllScores fails', async () => {
-    const container = document.getElementById('error-library')!;
-    const { getAllScores } = await import('../api/scores');
+    document.body.innerHTML = '<div id="score-library"></div>';
+    vi.mocked(onAuthReady).mockImplementation((cb) => {
+      cb(null);
+      return { unsubscribe: vi.fn() } as unknown as ReturnType<
+        typeof onAuthReady
+      >;
+    });
     vi.mocked(getAllScores).mockResolvedValue({
       scores: [],
       error: new Error('Network error'),
     });
 
-    new ScoreLibrary('error-library');
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(container.querySelector('.page-error')).not.toBeNull();
-    expect(container.querySelector('#retry-btn')).not.toBeNull();
-  });
-});
-
-// --- Held loading state ---
-
-describe('ScoreLibrary held loading state', () => {
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    document.body.innerHTML = '<div id="score-library"></div>';
-
-    const { onAuthReady } = await import('../api/auth');
-    vi.mocked(onAuthReady).mockImplementation((cb) => {
-      cb(null);
-      return { unsubscribe: vi.fn() } as any;
-    });
-  });
-
-  it('keeps showing the spinner and never fetches scores', async () => {
-    const { getAllScores } = await import('../api/scores');
-
-    new ScoreLibrary('score-library', { holdLoading: true });
+    new ScoreLibrary('score-library');
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     const container = document.getElementById('score-library')!;
-    expect(
-      container.querySelector('.score-library-loading .spinner'),
-    ).not.toBeNull();
+    expect(container.querySelector('.page-error')?.textContent).toContain(
+      'Network error',
+    );
+    expect(container.querySelector('#retry-btn')).not.toBeNull();
+  });
+
+  it('holds the skeleton and never fetches scores', async () => {
+    const container = await mount({ holdLoading: true });
+    expect(container.querySelector('.library-skeleton')).not.toBeNull();
     expect(getAllScores).not.toHaveBeenCalled();
   });
 });
