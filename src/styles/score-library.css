@@ -169,26 +169,34 @@ a.library-row:focus-visible {
 }
 
 .library-row-lead {
+  /* As tall as the title and description beside it */
+  --size-library-note: 2.5rem;
   display: flex;
   align-items: center;
   gap: var(--spacing-small);
   min-width: 0;
 }
 
-/* A tile with the score's first note, in the notation font, to anchor the
-   row on the left and give each score a face */
+/* A tile with the score's first note, drawn by the renderer with its marks,
+   to anchor the row on the left and give each score a face */
 .library-row-note {
   flex: none;
-  display: grid;
-  place-items: center;
-  width: var(--size-toolbar-item);
-  height: var(--size-toolbar-item);
+  width: var(--size-library-note);
+  height: var(--size-library-note);
   border-radius: var(--border-radius-large);
   background: var(--color-bg-hover);
-  font-family: var(--font-notation);
-  font-size: var(--font-size-large);
-  line-height: 1;
   color: var(--color-text-secondary);
+}
+
+.library-row-note svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The renderer names a font; the tile follows the reader's notation font */
+.library-row-note text {
+  font-family: var(--font-notation);
 }
 
 .library-row-main {

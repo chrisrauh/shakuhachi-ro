@@ -7,7 +7,7 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { SCHOOLS, composerLine } from '../utils/school';
-import { kinkoMap } from '../web-component/constants/kinko-symbols';
+import { ScoreRenderer } from '../web-component/renderer/ScoreRenderer';
 
 type Tab = 'library' | 'mine';
 type Sort = 'recent' | 'title';
@@ -15,10 +15,37 @@ type Sort = 'recent' | 'title';
 /** Rows the loading state shows. About one screen of a phone. */
 const SKELETON_ROWS = 8;
 
-/** The kana of a score's first note, or '' if it has none (rests only). */
-function firstNoteKana(score: Score): string {
-  const first = score.data.notes.find((note) => note.character);
-  return first?.character ? kinkoMap[first.character].kana : '';
+/**
+ * The part of the renderer's drawing a row's tile shows, in the renderer's
+ * pixels, centred on the note: room for a meri mark on its left, an octave
+ * mark above it and a duration dot below it.
+ */
+const NOTE_VIEW_SIZE = 64;
+
+/**
+ * Draws a score's first note, with its marks, into a row's tile. Rests are
+ * skipped. A score with no notes leaves the tile empty.
+ */
+function drawFirstNote(tile: HTMLElement, score: Score): void {
+  const first = score.data.notes.find((note) => !note.rest);
+  if (!first) return;
+  const renderer = new ScoreRenderer(tile, {
+    width: 2 * NOTE_VIEW_SIZE,
+    height: 2 * NOTE_VIEW_SIZE,
+    autoResize: false,
+    noteColor: 'currentColor',
+  });
+  renderer.renderFromScoreData({ notes: [first] });
+  const [{ centerX, centerY }] = renderer.getNoteBoxes();
+  const svg = tile.querySelector('svg')!;
+  const half = NOTE_VIEW_SIZE / 2;
+  svg.setAttribute(
+    'viewBox',
+    `${centerX - half} ${centerY - half} ${NOTE_VIEW_SIZE} ${NOTE_VIEW_SIZE}`,
+  );
+  // The tile sizes the drawing
+  svg.removeAttribute('width');
+  svg.removeAttribute('height');
 }
 
 export class ScoreLibrary {
@@ -35,6 +62,8 @@ export class ScoreLibrary {
   private error: Error | null = null;
   private authSubscription?: { unsubscribe: () => void };
   private holdLoading: boolean;
+  /** The scores the list shows as rows, in order. Empty while it shows none. */
+  private rowScores: Score[] = [];
 
   /**
    * @param options.holdLoading - Show the loading state and never load
@@ -137,6 +166,7 @@ export class ScoreLibrary {
       </div>
     `;
 
+    this.drawFirstNotes();
     this.attachEventListeners();
   }
 
@@ -155,6 +185,7 @@ export class ScoreLibrary {
     const list = this.container.querySelector('#score-list');
     if (!list) return;
     list.innerHTML = this.renderListContent();
+    this.drawFirstNotes();
     this.container
       .querySelector('#search-clear-btn')
       ?.toggleAttribute('hidden', !this.searchQuery);
@@ -162,6 +193,7 @@ export class ScoreLibrary {
   }
 
   private renderListContent(): string {
+    this.rowScores = [];
     if (this.isLoading) {
       return this.renderSkeleton();
     }
@@ -193,7 +225,15 @@ export class ScoreLibrary {
       );
     }
 
+    this.rowScores = scores;
     return scores.map((score) => this.renderRow(score)).join('');
+  }
+
+  /** Draws each row's first note in its tile, once the rows are in the page. */
+  private drawFirstNotes(): void {
+    this.container
+      .querySelectorAll<HTMLElement>('a.library-row .library-row-note')
+      .forEach((tile, i) => drawFirstNote(tile, this.rowScores[i]));
   }
 
   /** Grey rows shaped like the loaded ones, shown while scores load. */
@@ -225,7 +265,8 @@ export class ScoreLibrary {
   }
 
   /**
-   * One score as a row, led by a tile with its first note. On a wide screen the composer, school, forks and date
+   * One score as a row, led by a tile for its first note (drawFirstNote). On
+   * a wide screen the composer, school, forks and date
    * are columns. On a phone they are hidden, and the row shows the date beside
    * the title and the composer before the description.
    */
@@ -238,7 +279,7 @@ export class ScoreLibrary {
     return `
       <a class="library-row" href="/score/${encodeURIComponent(score.slug)}">
         <div class="library-row-lead">
-          <span class="library-row-note" aria-hidden="true">${firstNoteKana(score)}</span>
+          <span class="library-row-note" aria-hidden="true"></span>
           <div class="library-row-main">
             <p class="library-row-title">
               <span class="library-row-title-text">${this.escapeHtml(score.title)}</span>

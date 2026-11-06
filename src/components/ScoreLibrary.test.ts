@@ -126,22 +126,30 @@ describe('ScoreLibrary rows', () => {
     expect(row.textContent).toContain('Akatombo');
   });
 
-  it('leads with the first note of the score, skipping rests', async () => {
+  it('draws the first note of the score with its marks, skipping rests', async () => {
     const container = await mount({
       library: [
         makeScore({
           data: {
             notes: [
               { rest: true, duration: '1' },
-              { character: 'tsu', register: 0, duration: '1' },
+              {
+                character: 'tsu',
+                register: 1,
+                accidental: 'meri',
+                duration: '1',
+              },
+              { character: 'ro', register: 0, duration: '1' },
             ],
           },
         }),
       ],
     });
-    expect(container.querySelector('.library-row-note')?.textContent).toBe(
-      'ツ',
-    );
+    const texts = [
+      ...container.querySelectorAll('.library-row-note svg text'),
+    ].map((el) => el.textContent);
+    expect(texts).toEqual(expect.arrayContaining(['ツ', 'メ', '甲']));
+    expect(texts).not.toContain('ロ');
   });
 
   it('shows the composer, school and fork count as columns', async () => {
