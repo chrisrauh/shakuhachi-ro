@@ -1,30 +1,37 @@
 import { getAllScores, getUserScores } from '../api/scores';
 import type { Score } from '../api/scores';
-import { Search, CircleX } from 'lucide';
-import { renderIcon, initIcons, getIconHTML } from '../utils/icons';
+import { Search, CircleX, GitFork, ChevronRight, ChevronDown } from 'lucide';
+import { getIconHTML } from '../utils/icons';
 import { onAuthReady } from '../api/auth';
 import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
-import { buildSpinnerSVG } from './LoadingSpinner';
 import { SCHOOLS, composerLine } from '../utils/school';
+
+type Tab = 'library' | 'mine';
+type Sort = 'recent' | 'title';
+
+/** Rows the loading state shows. About one screen of a phone. */
+const SKELETON_ROWS = 8;
 
 export class ScoreLibrary {
   private container: HTMLElement;
   private currentUser: User | null = null;
   private myScores: Score[] = [];
   private libraryScores: Score[] = [];
-  private filteredMyScores: Score[] = [];
-  private filteredLibraryScores: Score[] = [];
+  private tab: Tab = 'library';
+  private sort: Sort = 'recent';
   private searchQuery: string = '';
-  private isLoading: boolean = false;
+  // Loading from the start, so the first render shows the skeleton, not
+  // "No scores in the library yet" before auth settles
+  private isLoading: boolean = true;
   private error: Error | null = null;
   private authSubscription?: { unsubscribe: () => void };
   private holdLoading: boolean;
 
   /**
    * @param options.holdLoading - Show the loading state and never load
-   *   scores, to check the spinner in place (index.astro sets it from
+   *   scores, to check the skeleton in place (index.astro sets it from
    *   `?loading` in the URL)
    */
   constructor(containerId: string, { holdLoading = false } = {}) {
@@ -40,7 +47,8 @@ export class ScoreLibrary {
     this.authSubscription = onAuthReady((user) => {
       const userChanged = this.currentUser?.id !== user?.id;
       this.currentUser = user;
-      if (userChanged || !this.myScores.length) {
+      if (!user) this.tab = 'library';
+      if (userChanged || !this.libraryScores.length) {
         this.loadScores();
       }
     });
@@ -54,144 +62,148 @@ export class ScoreLibrary {
     this.render();
     if (this.holdLoading) return;
 
-    // Fetch user's scores if logged in
-    if (this.currentUser) {
-      const { scores: userScores, error: userError } = await getUserScores(
-        this.currentUser.id,
-      );
-      if (userError) {
-        this.error = userError;
-        this.isLoading = false;
-        this.render();
-        return;
-      }
-      this.myScores = userScores || [];
-    } else {
-      this.myScores = [];
-    }
-
-    // Fetch all scores
-    const result = await getAllScores();
+    const [library, mine] = await Promise.all([
+      getAllScores(),
+      this.currentUser ? getUserScores(this.currentUser.id) : null,
+    ]);
 
     this.isLoading = false;
-
-    if (result.error) {
-      this.error = result.error;
-    } else {
-      // If authenticated, filter out user's scores from library
-      this.libraryScores = this.currentUser
-        ? result.scores.filter(
-            (score) => score.user_id !== this.currentUser!.id,
-          )
-        : result.scores;
+    this.error = library.error ?? mine?.error ?? null;
+    if (!this.error) {
+      this.libraryScores = library.scores;
+      this.myScores = mine?.scores ?? [];
     }
-
-    this.applyFilters();
     this.render();
   }
 
-  private applyFilters(): void {
+  /** The scores of the open tab that match the search, in the chosen order. */
+  private visibleScores(): Score[] {
     const query = this.searchQuery.toLowerCase();
-
     const matches = (score: Score) =>
       [score.title, score.composer, score.school && SCHOOLS[score.school]].some(
         (text) => text?.toLowerCase().includes(query),
       );
-    this.filteredMyScores = this.myScores.filter(matches);
-    this.filteredLibraryScores = this.libraryScores.filter(matches);
-
-    this.renderGrid();
-  }
-
-  private handleSearch(query: string): void {
-    this.searchQuery = query;
-    this.applyFilters();
-  }
-
-  private handleScoreClick(scoreSlug: string): void {
-    // Navigate to score detail page
-    window.location.href = `/score/${encodeURIComponent(scoreSlug)}`;
+    const scores = (
+      this.tab === 'mine' ? this.myScores : this.libraryScores
+    ).filter(matches);
+    return this.sort === 'title'
+      ? scores.sort((a, b) => a.title.localeCompare(b.title))
+      : scores.sort(
+          (a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at),
+        );
   }
 
   private render(): void {
-    if (this.isLoading) {
-      this.container.innerHTML = `
-        <div class="score-library-loading">
-          ${buildSpinnerSVG()}
-        </div>
-      `;
-      return;
-    }
-
-    if (this.error) {
-      this.container.innerHTML = `
-        <div class="page-error">
-          <p>${this.error.message}</p>
-          <button id="retry-btn" class="btn btn-small btn-primary"><span class="btn-text">Retry</span></button>
-        </div>
-      `;
-
-      const retryBtn = this.container.querySelector('#retry-btn');
-      retryBtn?.addEventListener('click', () => this.loadScores());
-      return;
-    }
-
     this.container.innerHTML = `
       <div class="score-library">
-        <div class="search-bar">
-          <div class="search-bar-field">
-            <span class="search-bar-icon" aria-hidden="true">${getIconHTML(Search)}</span>
+        <div class="library-toolbar">
+          ${this.currentUser ? this.renderTabs() : ''}
+          <div class="library-search">
+            <span class="library-search-icon" aria-hidden="true">${getIconHTML(Search)}</span>
             <input
-              type="text"
+              type="search"
               id="search-input"
-              placeholder="Search by title, composer or school..."
+              placeholder="Search"
+              aria-label="Search by title, composer or school"
             />
             <button
-              class="search-bar-clear${this.searchQuery ? ' search-bar-clear--visible' : ''}"
+              class="library-search-clear"
               id="search-clear-btn"
               aria-label="Clear search"
               title="Clear the search field"
               type="button"
+              ${this.searchQuery ? '' : 'hidden'}
             >${getIconHTML(CircleX)}</button>
           </div>
+          <label class="library-sort">
+            <span>Sort:</span>
+            <select id="sort-select">
+              <option value="recent"${this.sort === 'recent' ? ' selected' : ''}>Recent</option>
+              <option value="title"${this.sort === 'title' ? ' selected' : ''}>Title</option>
+            </select>
+            <span class="library-sort-icon" aria-hidden="true">${getIconHTML(ChevronDown)}</span>
+          </label>
         </div>
-
-        <div class="score-library-grid" id="score-grid">
-          ${this.renderGridContent()}
+        <div class="library-list" id="score-list">
+          ${this.renderListContent()}
         </div>
       </div>
     `;
 
     this.attachEventListeners();
-    initIcons();
   }
 
-  private renderGrid(): void {
-    const gridElement = this.container.querySelector('#score-grid');
+  private renderTabs(): string {
+    const option = (tab: Tab, label: string) =>
+      `<button type="button" class="segmented-option" data-tab="${tab}" aria-pressed="${this.tab === tab}">${label}</button>`;
+    return `
+      <div class="segmented library-tabs" role="group" aria-label="Scores to show">
+        ${option('library', 'Library')}${option('mine', 'My Scores')}
+      </div>
+    `;
+  }
 
-    if (!gridElement) {
-      // Fallback to full render if grid not found
-      this.render();
-      return;
+  /** Redraws the list alone, so the search field keeps its focus. */
+  private renderList(): void {
+    const list = this.container.querySelector('#score-list');
+    if (!list) return;
+    list.innerHTML = this.renderListContent();
+    this.container
+      .querySelector('#search-clear-btn')
+      ?.toggleAttribute('hidden', !this.searchQuery);
+    this.attachRetryListener();
+  }
+
+  private renderListContent(): string {
+    if (this.isLoading) {
+      return this.renderSkeleton();
     }
 
-    // Update grid with new content
-    gridElement.innerHTML = this.renderGridContent();
+    if (this.error) {
+      return `
+        <div class="page-error">
+          <p>${this.escapeHtml(this.error.message)}</p>
+          <button id="retry-btn" class="btn btn-small btn-primary"><span class="btn-text">Retry</span></button>
+        </div>
+      `;
+    }
 
-    // Initialize icons
-    initIcons();
+    if (this.tab === 'mine' && this.myScores.length === 0) {
+      return `
+        <div class="library-empty">
+          <p>You haven't created any scores yet.</p>
+          <p><a href="/score/new/edit">Create your first score</a></p>
+        </div>
+      `;
+    }
 
-    // Reattach score card listeners
-    this.attachScoreCardListeners(gridElement);
+    const scores = this.visibleScores();
+    if (scores.length === 0) {
+      return this.renderNoScores(
+        this.searchQuery
+          ? `No scores found matching "${this.escapeHtml(this.searchQuery)}"`
+          : 'No scores in the library yet',
+      );
+    }
 
-    // Reattach create score link listener if present
-    const createScoreLink = gridElement.querySelector('.create-score-link');
-    createScoreLink?.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = '/score/new/edit';
-    });
+    return scores.map((score) => this.renderRow(score)).join('');
+  }
 
-    this.updateClearButton();
+  /** Grey rows shaped like the loaded ones, shown while scores load. */
+  private renderSkeleton(): string {
+    const row = `
+      <div class="library-row library-row-skeleton">
+        <div class="library-row-main">
+          <span class="skeleton skeleton-title"></span>
+          <span class="skeleton skeleton-description"></span>
+        </div>
+        <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
+        <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
+        <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
+        <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
+      </div>
+    `;
+    return `<div class="library-skeleton" role="status" aria-label="Loading scores">${row.repeat(SKELETON_ROWS)}</div>`;
   }
 
   private renderNoScores(message: string): string {
@@ -202,16 +214,38 @@ export class ScoreLibrary {
     `;
   }
 
-  private updateClearButton(): void {
-    const btn = this.container.querySelector(
-      '#search-clear-btn',
-    ) as HTMLButtonElement | null;
-    if (!btn) return;
-    btn.classList.toggle('search-bar-clear--visible', !!this.searchQuery);
+  /**
+   * One score as a row. On a wide screen the composer, school, forks and date
+   * are columns. On a phone they are hidden, and the row shows the date beside
+   * the title and the composer before the description.
+   */
+  private renderRow(score: Score): string {
+    const updated = `<relative-time datetime="${score.updated_at}" format="relative"></relative-time>`;
+    const byline = this.escapeHtml(composerLine(score.composer, score.school));
+    const description = score.description
+      ? this.escapeHtml(score.description)
+      : '';
+    return `
+      <a class="library-row" href="/score/${encodeURIComponent(score.slug)}">
+        <div class="library-row-main">
+          <p class="library-row-title">
+            <span class="library-row-title-text">${this.escapeHtml(score.title)}</span>
+            <span class="library-row-title-date">${updated}</span>
+          </p>
+          <p class="library-row-description"><span class="library-row-byline">${byline}${description ? ' · ' : ''}</span>${description || '&nbsp;'}</p>
+        </div>
+        <span class="library-row-cell">${this.escapeHtml(score.composer?.trim() || 'Unknown composer')}</span>
+        <span class="library-row-cell${score.school ? '' : ' library-row-cell-empty'}">${score.school ? SCHOOLS[score.school] : '—'}</span>
+        <span class="library-row-cell library-row-forks${score.fork_count ? '' : ' library-row-cell-empty'}" title="Forks">${getIconHTML(GitFork)}<span class="library-row-count">${score.fork_count}</span></span>
+        <span class="library-row-cell library-row-cell-empty">${updated}</span>
+        <span class="library-row-chevron" aria-hidden="true">${getIconHTML(ChevronRight)}</span>
+      </a>
+    `;
   }
 
   private clearSearch(): void {
-    this.handleSearch('');
+    this.searchQuery = '';
+    this.renderList();
     const input = this.container.querySelector(
       '#search-input',
     ) as HTMLInputElement | null;
@@ -221,155 +255,10 @@ export class ScoreLibrary {
     }
   }
 
-  private renderGridContent(): string {
-    // User logged in with scores - show two sections
-    if (this.currentUser && this.myScores.length > 0) {
-      return `
-        <div class="section-header">
-          <h2>My Scores</h2>
-          <div class="section-count">${this.filteredMyScores.length} ${
-            this.filteredMyScores.length === 1 ? 'score' : 'scores'
-          }</div>
-        </div>
-        <div class="score-grid-section">
-          ${
-            this.filteredMyScores.length === 0
-              ? this.renderNoScores(
-                  `No scores found matching "${this.escapeHtml(this.searchQuery)}"`,
-                )
-              : this.filteredMyScores
-                  .map((score) => this.renderScoreCard(score))
-                  .join('')
-          }
-        </div>
-
-        <div class="section-header">
-          <h2>Library</h2>
-          <div class="section-count">${this.filteredLibraryScores.length} ${
-            this.filteredLibraryScores.length === 1 ? 'score' : 'scores'
-          }</div>
-        </div>
-        <div class="score-grid-section">
-          ${
-            this.filteredLibraryScores.length === 0
-              ? this.renderNoScores(
-                  this.searchQuery
-                    ? `No scores found matching "${this.escapeHtml(this.searchQuery)}"`
-                    : 'No scores in the library yet',
-                )
-              : this.filteredLibraryScores
-                  .map((score) => this.renderScoreCard(score))
-                  .join('')
-          }
-        </div>
-      `;
-    }
-
-    // User logged in but no scores - show empty state + library
-    if (this.currentUser && this.myScores.length === 0) {
-      return `
-        <div class="empty-state">
-          <p>You haven't created any scores yet.</p>
-          <p><a href="/score/new/edit" class="create-score-link">Create your first score</a></p>
-        </div>
-
-        ${
-          this.libraryScores.length > 0
-            ? `
-          <div class="section-header">
-            <h2>Library</h2>
-            <div class="section-count">${this.filteredLibraryScores.length} ${
-              this.filteredLibraryScores.length === 1 ? 'score' : 'scores'
-            }</div>
-          </div>
-          <div class="score-grid-section">
-            ${this.filteredLibraryScores
-              .map((score) => this.renderScoreCard(score))
-              .join('')}
-          </div>
-        `
-            : ''
-        }
-      `;
-    }
-
-    // User not logged in - show single section
-    return `
-      <div class="score-grid-section">
-        ${
-          this.filteredLibraryScores.length === 0
-            ? this.renderNoScores(
-                this.searchQuery
-                  ? `No scores found matching "${this.escapeHtml(this.searchQuery)}"`
-                  : 'No scores in the library yet',
-              )
-            : this.filteredLibraryScores
-                .map((score) => this.renderScoreCard(score))
-                .join('')
-        }
-      </div>
-    `;
-  }
-
-  private attachScoreCardListeners(container: Element): void {
-    const scoreCards = container.querySelectorAll('.score-card');
-    scoreCards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const scoreSlug = card.getAttribute('data-score-slug');
-        if (scoreSlug) {
-          this.handleScoreClick(scoreSlug);
-        }
-      });
-    });
-  }
-
-  private renderScoreCard(score: Score): string {
-    return `
-      <div class="score-card" data-score-slug="${score.slug}">
-        <div class="score-card-header">
-          <h3 class="score-title">
-            ${this.escapeHtml(score.title)}
-            ${
-              score.forked_from
-                ? `<span class="forked-indicator" title="This is a forked score">${renderIcon(
-                    'git-fork',
-                  )}</span>`
-                : ''
-            }
-          </h3>
-        </div>
-
-        <div class="score-card-body">
-          <p class="score-composer">
-            ${this.escapeHtml(composerLine(score.composer, score.school))}
-          </p>
-
-          ${
-            score.description
-              ? `
-            <p class="score-description">${this.escapeHtml(
-              score.description,
-            )}</p>
-          `
-              : ''
-          }
-        </div>
-
-        <div class="score-card-footer">
-          <span class="score-stat" title="Fork count">${renderIcon(
-            'git-fork',
-          )} ${score.fork_count}</span>
-          <span class="score-stat" title="Last updated">Updated <relative-time datetime="${score.updated_at}" format="relative"></relative-time></span>
-        </div>
-      </div>
-    `;
-  }
-
   private attachEventListeners(): void {
-    // Search input
     const searchInput = this.container.querySelector(
       '#search-input',
-    ) as HTMLInputElement;
+    ) as HTMLInputElement | null;
 
     // Restore the query as a property, not a value="" attribute: escapeHtml does
     // not escape quotes, so interpolating it into the markup would let a typed `"`
@@ -379,31 +268,48 @@ export class ScoreLibrary {
     }
 
     searchInput?.addEventListener('input', (e) => {
-      this.handleSearch((e.target as HTMLInputElement).value);
+      this.searchQuery = (e.target as HTMLInputElement).value;
+      this.renderList();
     });
 
-    // Clear button click
-    const clearBtn = this.container.querySelector('#search-clear-btn');
-    clearBtn?.addEventListener('click', () => {
-      this.clearSearch();
-    });
-
-    // Escape key on search input
     searchInput?.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Escape' && this.searchQuery) {
         this.clearSearch();
       }
     });
 
-    // Score cards
-    this.attachScoreCardListeners(this.container);
+    this.container
+      .querySelector('#search-clear-btn')
+      ?.addEventListener('click', () => this.clearSearch());
 
-    // Create score link
-    const createScoreLink = this.container.querySelector('.create-score-link');
-    createScoreLink?.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = '/score/new/edit';
-    });
+    this.container
+      .querySelector('#sort-select')
+      ?.addEventListener('change', (e) => {
+        this.sort = (e.target as HTMLSelectElement).value as Sort;
+        this.renderList();
+      });
+
+    this.container
+      .querySelectorAll<HTMLButtonElement>('.library-tabs [data-tab]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          this.tab = button.dataset.tab as Tab;
+          this.container
+            .querySelectorAll('.library-tabs [data-tab]')
+            .forEach((b) =>
+              b.setAttribute('aria-pressed', String(b === button)),
+            );
+          this.renderList();
+        });
+      });
+
+    this.attachRetryListener();
+  }
+
+  private attachRetryListener(): void {
+    this.container
+      .querySelector('#retry-btn')
+      ?.addEventListener('click', () => this.loadScores());
   }
 
   private escapeHtml(text: string): string {

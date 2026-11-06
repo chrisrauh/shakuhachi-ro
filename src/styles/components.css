@@ -255,6 +255,42 @@
 }
 
 /* ============================================
+   SEGMENTED CONTROL
+   A row of options where one is chosen, drawn as a track with the chosen
+   option raised. Each option is a button with aria-pressed. Use it to switch
+   between views of the same content (the library's Library / My Scores).
+   ============================================ */
+
+.segmented {
+  display: inline-flex;
+  padding: var(--spacing-3x-small);
+  border-radius: var(--border-radius-large);
+  background: var(--segmented-background-color);
+}
+
+.segmented-option {
+  height: calc(var(--size-toolbar-item) - 2 * var(--spacing-3x-small));
+  padding: 0 var(--spacing-small);
+  border: none;
+  border-radius: var(--border-radius-medium);
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.segmented-option[aria-pressed='true'] {
+  background: var(--segmented-selected-background-color);
+  box-shadow: var(--shadow-x-small), var(--shadow-ring);
+}
+
+.segmented-option:focus-visible {
+  outline: var(--input-border-width) solid var(--input-border-color-focus);
+}
+
+/* ============================================
    PALETTE KEY
    A square key in the score editor's palette panel: a note, length, mark or
    edit action. Raised on the panel by a lighter fill. A key whose value the

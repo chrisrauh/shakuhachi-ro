@@ -882,6 +882,9 @@
   --panel-border-color: var(--color-gray-200);
   --panel-border-width: 1px;
 
+  --segmented-background-color: var(--color-gray-200);
+  --segmented-selected-background-color: oklch(1 0 0);
+
   --tooltip-border-radius: var(--border-radius-medium);
   --tooltip-background-color: var(--color-gray-800);
   --tooltip-color: oklch(1 0 0);
@@ -1071,6 +1074,10 @@
   /* PANEL */
   --panel-background-color: var(--color-gray-100);
   --panel-border-color: var(--color-gray-400);
+
+  /* SEGMENTED CONTROL: the chosen option is lighter than the track, as in
+     light mode, not darker as the inverted gray scale would make it */
+  --segmented-selected-background-color: var(--color-gray-300);
 
   /* SHADOWS */
   --shadow-x-small: 0 1px 2px oklch(0 0 0 / 18%);
