@@ -126,6 +126,24 @@ describe('ScoreLibrary rows', () => {
     expect(row.textContent).toContain('Akatombo');
   });
 
+  it('leads with the first note of the score, skipping rests', async () => {
+    const container = await mount({
+      library: [
+        makeScore({
+          data: {
+            notes: [
+              { rest: true, duration: '1' },
+              { character: 'tsu', register: 0, duration: '1' },
+            ],
+          },
+        }),
+      ],
+    });
+    expect(container.querySelector('.library-row-note')?.textContent).toBe(
+      'ツ',
+    );
+  });
+
   it('shows the composer, school and fork count as columns', async () => {
     const container = await mount({
       library: [
@@ -176,9 +194,12 @@ describe('ScoreLibrary rows', () => {
 // --- Tabs ---
 
 describe('ScoreLibrary tabs', () => {
-  it('shows no tabs when logged out', async () => {
+  it('shows a heading in place of the tabs when logged out', async () => {
     const container = await mount({ library: [makeScore()] });
     expect(container.querySelector('.library-tabs')).toBeNull();
+    expect(container.querySelector('.library-heading')?.textContent).toBe(
+      'Library',
+    );
   });
 
   it('switches between the whole library and the user’s own scores', async () => {

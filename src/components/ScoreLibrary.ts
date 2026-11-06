@@ -7,12 +7,19 @@ import type { User } from '@supabase/supabase-js';
 import '@github/relative-time-element';
 import { STRING_FACTORIES } from '../constants/strings';
 import { SCHOOLS, composerLine } from '../utils/school';
+import { kinkoMap } from '../web-component/constants/kinko-symbols';
 
 type Tab = 'library' | 'mine';
 type Sort = 'recent' | 'title';
 
 /** Rows the loading state shows. About one screen of a phone. */
 const SKELETON_ROWS = 8;
+
+/** The kana of a score's first note, or '' if it has none (rests only). */
+function firstNoteKana(score: Score): string {
+  const first = score.data.notes.find((note) => note.character);
+  return first?.character ? kinkoMap[first.character].kana : '';
+}
 
 export class ScoreLibrary {
   private container: HTMLElement;
@@ -97,7 +104,7 @@ export class ScoreLibrary {
     this.container.innerHTML = `
       <div class="score-library">
         <div class="library-toolbar">
-          ${this.currentUser ? this.renderTabs() : ''}
+          ${this.currentUser ? this.renderTabs() : '<h2 class="library-heading">Library</h2>'}
           <div class="library-search">
             <span class="library-search-icon" aria-hidden="true">${getIconHTML(Search)}</span>
             <input
@@ -193,9 +200,12 @@ export class ScoreLibrary {
   private renderSkeleton(): string {
     const row = `
       <div class="library-row library-row-skeleton">
-        <div class="library-row-main">
-          <span class="skeleton skeleton-title"></span>
-          <span class="skeleton skeleton-description"></span>
+        <div class="library-row-lead">
+          <span class="library-row-note"></span>
+          <div class="library-row-main">
+            <span class="skeleton skeleton-title"></span>
+            <span class="skeleton skeleton-description"></span>
+          </div>
         </div>
         <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
         <span class="library-row-cell"><span class="skeleton skeleton-cell"></span></span>
@@ -215,7 +225,7 @@ export class ScoreLibrary {
   }
 
   /**
-   * One score as a row. On a wide screen the composer, school, forks and date
+   * One score as a row, led by a tile with its first note. On a wide screen the composer, school, forks and date
    * are columns. On a phone they are hidden, and the row shows the date beside
    * the title and the composer before the description.
    */
@@ -227,12 +237,15 @@ export class ScoreLibrary {
       : '';
     return `
       <a class="library-row" href="/score/${encodeURIComponent(score.slug)}">
-        <div class="library-row-main">
-          <p class="library-row-title">
-            <span class="library-row-title-text">${this.escapeHtml(score.title)}</span>
-            <span class="library-row-title-date">${updated}</span>
-          </p>
-          <p class="library-row-description"><span class="library-row-byline">${byline}${description ? ' · ' : ''}</span>${description || '&nbsp;'}</p>
+        <div class="library-row-lead">
+          <span class="library-row-note" aria-hidden="true">${firstNoteKana(score)}</span>
+          <div class="library-row-main">
+            <p class="library-row-title">
+              <span class="library-row-title-text">${this.escapeHtml(score.title)}</span>
+              <span class="library-row-title-date">${updated}</span>
+            </p>
+            <p class="library-row-description"><span class="library-row-byline">${byline}${description ? ' · ' : ''}</span>${description || '&nbsp;'}</p>
+          </div>
         </div>
         <span class="library-row-cell">${this.escapeHtml(score.composer?.trim() || 'Unknown composer')}</span>
         <span class="library-row-cell${score.school ? '' : ' library-row-cell-empty'}">${score.school ? SCHOOLS[score.school] : '—'}</span>

@@ -21,6 +21,14 @@
   min-width: 7rem;
 }
 
+/* In place of the tabs when logged out */
+.library-heading {
+  margin: 0;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-heading);
+}
+
 .library-search {
   position: relative;
   width: 15rem;
@@ -160,7 +168,31 @@ a.library-row:focus-visible {
   outline-offset: calc(-2 * var(--input-border-width));
 }
 
+.library-row-lead {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  min-width: 0;
+}
+
+/* A tile with the score's first note, in the notation font, to anchor the
+   row on the left and give each score a face */
+.library-row-note {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--size-toolbar-item);
+  height: var(--size-toolbar-item);
+  border-radius: var(--border-radius-large);
+  background: var(--color-bg-hover);
+  font-family: var(--font-notation);
+  font-size: var(--font-size-large);
+  line-height: 1;
+  color: var(--color-text-secondary);
+}
+
 .library-row-main {
+  flex: 1;
   min-width: 0;
 }
 
@@ -210,14 +242,21 @@ a.library-row:focus-visible {
   color: var(--color-text-tertiary);
 }
 
-/* The icon is 1em, centred on the digits' cap height. The offset is rounded
-   to whole pixels: text snaps to the pixel grid, and a fractional offset puts
+/* A small count beside a larger icon, as Flat.io does: the contrast in size
+   breaks up the even 14px of the other columns */
+.library-row-forks {
+  --fork-icon-size: 16px;
+  font-size: var(--font-size-x-small);
+}
+
+/* The icon is centred on the digits' cap height. The offset is rounded to
+   whole pixels: text snaps to the pixel grid, and a fractional offset puts
    the icon up to 1px off-centre on some rows. */
 .library-row-forks svg {
-  width: 1em;
-  height: 1em;
-  vertical-align: round(calc(0.5cap - 0.5em), 1px);
-  margin-right: var(--spacing-button-icon-gap);
+  width: var(--fork-icon-size);
+  height: var(--fork-icon-size);
+  vertical-align: round(calc(0.5cap - var(--fork-icon-size) / 2), 1px);
+  margin-right: var(--spacing-2x-small);
   color: var(--color-text-tertiary);
 }
 
@@ -260,7 +299,7 @@ a.library-row:focus-visible {
     gap: var(--spacing-small);
   }
 
-  .library-row-main {
+  .library-row-lead {
     flex: 1;
   }
 
@@ -290,6 +329,10 @@ a.library-row:focus-visible {
   display: block;
   height: 1cap;
   border-radius: var(--border-radius-small);
+  background: var(--color-bg-active);
+}
+
+.library-row-skeleton .library-row-note {
   background: var(--color-bg-active);
 }
 
