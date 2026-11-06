@@ -140,6 +140,9 @@
   border-radius: var(--border-radius-panel);
   overflow: hidden;
   font-size: var(--font-size-small);
+  /* With a row's own 12px, the first tile is 16px from the top, as from the
+     side; the same at the bottom */
+  padding-block: var(--spacing-2x-small);
 }
 
 /* Title and description take the space left; the one-line columns keep a
