@@ -68,7 +68,7 @@ Tested in Chromium 153. Not yet tested in Firefox or Safari.
 | Feature                                          | Result                                                                                                                       |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | CSS units `cap`, `ex`, `ic`                      | Work. They read `OS/2` `sCapHeight` and `sxHeight`, and the advance of 水. These are Latin metrics, not kana ink.            |
-| `text-box-edge: cap \| ex \| alphabetic \| text` | Supported. Used by the design system for button text.                                                                        |
+| `text-box-edge: cap \| ex \| alphabetic \| text` | Supported. Used by the design system for button text. Has no effect on the text of an `<input>` or its `::placeholder`.      |
 | `text-box-edge: ideographic \| ideographic-ink`  | In the CSS Inline 3 specification. Not supported.                                                                            |
 | SVG `dominant-baseline: central`                 | Supported, but centres on the `hhea` line box: 0.435em above the baseline, not 0.38.                                         |
 | SVG `dominant-baseline: ideographic`             | Supported, but uses the `hhea` descent (−0.288em), not `BASE` `ideo` (−0.12em).                                              |

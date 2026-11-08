@@ -775,6 +775,14 @@
      ============================================ */
 
   /* Font family removed - overridden in Layout.astro */
+
+  /* How far the middle of the capitals sits below the middle of a line of
+     Noto Sans JP, the UI font: (hhea ascent − descent − cap height) / 2 =
+     (1.160 − 0.288 − 0.733) / 2. A text field centres its line, not its
+     capitals, so its text looks low by this much. Buttons centre their
+     capitals with text-box-trim, which does not reach a field's text.
+     The metrics are in docs/TYPOGRAPHY.MD; change this with the font. */
+  --font-sans-cap-offset: 0.0695em;
   --font-serif: Georgia, 'Times New Roman', serif;
   --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 
@@ -854,6 +862,10 @@
   --input-font-size-small: var(--font-size-small);
   --input-font-size-medium: var(--font-size-medium);
   --input-font-size-large: var(--font-size-large);
+  /* A compact field or select: as tall as a toolbar item, its text the size
+     of the text around it, except on a touch screen (below) */
+  --input-height-compact: var(--size-toolbar-item);
+  --input-font-size-compact: var(--font-size-small);
 
   --input-color: var(--color-gray-700);
   --input-color-hover: var(--color-gray-700);
@@ -908,6 +920,17 @@
 @media (max-width: 768px) {
   :root {
     --size-spinner-dot: 0.5rem; /* 8px */
+  }
+}
+
+/* Phone browsers zoom the page in on a field or select with text smaller
+   than 16px when it gets focus, and do not zoom back out. All iOS browsers
+   do this (WebKit). With 16px text, the page keeps its zoom. The field
+   grows with its text, so the text fills the same part of it. */
+@media (pointer: coarse) {
+  :root {
+    --input-height-compact: 2.25rem; /* 36px */
+    --input-font-size-compact: var(--font-size-medium);
   }
 }
 

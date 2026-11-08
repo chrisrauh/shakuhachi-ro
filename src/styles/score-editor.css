@@ -363,7 +363,7 @@
   background: var(--input-background-color);
   color: var(--input-color);
   font-family: var(--font-mono);
-  font-size: var(--font-size-small);
+  font-size: var(--input-font-size-compact);
 }
 
 /* ---- Details dialog ---- */
