@@ -114,7 +114,9 @@
   align-items: center;
   gap: var(--spacing-2x-small);
   height: var(--size-toolbar-item);
-  padding-left: var(--spacing-x-small);
+  /* The bottom padding raises the text so its capitals are centred, as in
+     the search field (see --font-sans-cap-offset) */
+  padding: 0 0 calc(2 * var(--font-sans-cap-offset)) var(--spacing-x-small);
   /* The label too, so it matches the select's text */
   font-size: var(--input-font-size-compact);
   font-weight: var(--font-weight-medium);
@@ -133,10 +135,14 @@
   cursor: pointer;
 }
 
+/* Centred on the whole menu, not on its raised text box: there it is level
+   with the capitals */
 .library-sort-icon {
   position: absolute;
+  inset-block: 0;
   right: 0;
   display: flex;
+  align-items: center;
   pointer-events: none;
 }
 
