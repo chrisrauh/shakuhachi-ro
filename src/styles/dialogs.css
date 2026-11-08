@@ -111,11 +111,13 @@ dialog.app-dialog::backdrop {
 
 .auth-modal-input {
   width: 100%;
-  /* Raises the text so its capitals are centred in the field, keeping the
-     field's height (see --font-sans-cap-offset) */
-  padding: calc(var(--spacing-x-small) - var(--font-sans-cap-offset))
-    var(--spacing-small)
-    calc(var(--spacing-x-small) + var(--font-sans-cap-offset));
+  /* A fixed height, as the search field has: with padding, the field grows
+     with its text, and on a phone the dialog then no longer fits above the
+     keyboard */
+  height: var(--input-height-compact);
+  /* The bottom padding raises the text so its capitals are centred (see
+     --font-sans-cap-offset) */
+  padding: 0 var(--spacing-small) calc(2 * var(--font-sans-cap-offset));
   border: var(--input-border-width) solid var(--input-border-color);
   border-radius: var(--input-border-radius-medium);
   background: var(--input-background-color);
