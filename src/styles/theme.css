@@ -854,6 +854,9 @@
   --input-font-size-small: var(--font-size-small);
   --input-font-size-medium: var(--font-size-medium);
   --input-font-size-large: var(--font-size-large);
+  /* The text of a compact field or select: the size of the text around it,
+     except on a touch screen (below) */
+  --input-font-size-compact: var(--font-size-small);
 
   --input-color: var(--color-gray-700);
   --input-color-hover: var(--color-gray-700);
@@ -908,6 +911,15 @@
 @media (max-width: 768px) {
   :root {
     --size-spinner-dot: 0.5rem; /* 8px */
+  }
+}
+
+/* Phone browsers zoom the page in on a field or select with text smaller
+   than 16px when it gets focus, and do not zoom back out. All iOS browsers
+   do this (WebKit). With 16px text, the page keeps its zoom. */
+@media (pointer: coarse) {
+  :root {
+    --input-font-size-compact: var(--font-size-medium);
   }
 }
 

@@ -82,7 +82,7 @@
   background: var(--color-bg-active);
   color: var(--input-color);
   font: inherit;
-  font-size: var(--font-size-small);
+  font-size: var(--input-font-size-compact);
 }
 
 /* The field draws its own clear button */
@@ -106,7 +106,8 @@
   gap: var(--spacing-2x-small);
   height: var(--size-toolbar-item);
   padding-left: var(--spacing-x-small);
-  font-size: var(--font-size-small);
+  /* The label too, so it matches the select's text */
+  font-size: var(--input-font-size-compact);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   white-space: nowrap;

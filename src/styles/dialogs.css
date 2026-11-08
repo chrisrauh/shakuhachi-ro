@@ -105,7 +105,7 @@ dialog.app-dialog::backdrop {
 .auth-modal-label {
   display: block;
   margin-bottom: var(--spacing-x-small);
-  font-size: var(--input-font-size-small);
+  font-size: var(--font-size-small);
   color: var(--color-text-secondary);
 }
 
@@ -116,7 +116,7 @@ dialog.app-dialog::backdrop {
   border-radius: var(--input-border-radius-medium);
   background: var(--input-background-color);
   color: var(--input-color);
-  font-size: var(--input-font-size-small);
+  font-size: var(--input-font-size-compact);
   box-sizing: border-box;
 }
 
