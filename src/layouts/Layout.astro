@@ -137,6 +137,14 @@ const {
         letter-spacing: var(--letter-spacing-override, normal);
       }
 
+      /* Browsers give form controls their own font; use the site's */
+      input,
+      textarea,
+      select,
+      button {
+        font-family: inherit;
+      }
+
       body.full-height {
         height: 100vh;
         display: flex;
