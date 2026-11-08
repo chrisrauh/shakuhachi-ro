@@ -74,7 +74,7 @@
 
 .library-search input {
   width: 100%;
-  height: var(--size-toolbar-item);
+  height: var(--input-height-compact);
   box-sizing: border-box;
   padding: 0 var(--spacing-x-large);
   border: none;
@@ -304,6 +304,17 @@ a.library-row:focus-visible {
     flex: 1;
     width: auto;
     margin-left: 0;
+  }
+
+  /* The header names the site, so the search field takes the heading's
+     place. Screen readers still find the heading. */
+  .library-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .library-row {
