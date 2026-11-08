@@ -775,6 +775,14 @@
      ============================================ */
 
   /* Font family removed - overridden in Layout.astro */
+
+  /* How far the middle of the capitals sits below the middle of a line of
+     Noto Sans JP, the UI font: (hhea ascent − descent − cap height) / 2 =
+     (1.160 − 0.288 − 0.733) / 2. A text field centres its line, not its
+     capitals, so its text looks low by this much. Buttons centre their
+     capitals with text-box-trim, which does not reach a field's text.
+     The metrics are in docs/TYPOGRAPHY.MD; change this with the font. */
+  --font-sans-cap-offset: 0.0695em;
   --font-serif: Georgia, 'Times New Roman', serif;
   --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 

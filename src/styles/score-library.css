@@ -36,20 +36,13 @@
   margin-left: auto;
 }
 
-/* The icons are centred on the capitals of the field's text, not on the
-   field. Each holds one line of text in the field's font, centred on the
-   field as the field centres its own text, so the icon can sit on the same
-   baseline. The offset is rounded to whole pixels: text snaps to the pixel
-   grid, and a fractional offset puts the icon up to 1px off-centre. */
+/* Centred on the field, as the field's text is (below) */
 .library-search-icon,
 .library-search-clear {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  display: block;
-  font: inherit;
-  font-size: var(--input-font-size-compact);
-  line-height: normal;
+  display: flex;
   color: var(--color-text-tertiary);
 }
 
@@ -57,7 +50,6 @@
 .library-search-clear svg {
   width: var(--search-icon-size);
   height: var(--search-icon-size);
-  vertical-align: round(calc(0.5cap - var(--search-icon-size) / 2), 1px);
 }
 
 .library-search-icon {
@@ -91,7 +83,9 @@
   width: 100%;
   height: var(--input-height-compact);
   box-sizing: border-box;
-  padding: 0 var(--spacing-x-large);
+  /* The field centres its line box, which puts the capitals below its
+     middle. The bottom padding raises the text so the capitals are centred. */
+  padding: 0 var(--spacing-x-large) calc(2 * var(--font-sans-cap-offset));
   border: none;
   border-radius: var(--border-radius-large);
   background: var(--color-bg-active);
