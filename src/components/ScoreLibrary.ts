@@ -139,7 +139,7 @@ export class ScoreLibrary {
             <input
               type="search"
               id="search-input"
-              placeholder="Search"
+              placeholder="${this.searchPlaceholder()}"
               aria-label="Search by title, composer or school"
             />
             <button
@@ -168,6 +168,11 @@ export class ScoreLibrary {
 
     this.drawFirstNotes();
     this.attachEventListeners();
+  }
+
+  /** Names what the search field searches: the open tab's scores. */
+  private searchPlaceholder(): string {
+    return this.tab === 'mine' ? 'Search my scores' : 'Search the library';
   }
 
   private renderTabs(): string {
@@ -348,6 +353,7 @@ export class ScoreLibrary {
       .forEach((button) => {
         button.addEventListener('click', () => {
           this.tab = button.dataset.tab as Tab;
+          searchInput?.setAttribute('placeholder', this.searchPlaceholder());
           this.container
             .querySelectorAll('.library-tabs [data-tab]')
             .forEach((b) =>

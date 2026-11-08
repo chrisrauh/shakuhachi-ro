@@ -30,11 +30,13 @@
 }
 
 .library-search {
+  --search-icon-size: 1rem;
   position: relative;
   width: 15rem;
   margin-left: auto;
 }
 
+/* Centred on the field, as the field's text is (below) */
 .library-search-icon,
 .library-search-clear {
   position: absolute;
@@ -42,6 +44,12 @@
   transform: translateY(-50%);
   display: flex;
   color: var(--color-text-tertiary);
+}
+
+.library-search-icon svg,
+.library-search-clear svg {
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
 }
 
 .library-search-icon {
@@ -66,7 +74,6 @@
   color: var(--color-text-secondary);
 }
 
-.library-search svg,
 .library-sort-icon svg {
   width: 1em;
   height: 1em;
@@ -74,15 +81,17 @@
 
 .library-search input {
   width: 100%;
-  height: var(--size-toolbar-item);
+  height: var(--input-height-compact);
   box-sizing: border-box;
-  padding: 0 var(--spacing-x-large);
+  /* The field centres its line box, which puts the capitals below its
+     middle. The bottom padding raises the text so the capitals are centred. */
+  padding: 0 var(--spacing-x-large) calc(2 * var(--font-sans-cap-offset));
   border: none;
   border-radius: var(--border-radius-large);
   background: var(--color-bg-active);
   color: var(--input-color);
   font: inherit;
-  font-size: var(--font-size-small);
+  font-size: var(--input-font-size-compact);
 }
 
 /* The field draws its own clear button */
@@ -105,8 +114,11 @@
   align-items: center;
   gap: var(--spacing-2x-small);
   height: var(--size-toolbar-item);
-  padding-left: var(--spacing-x-small);
-  font-size: var(--font-size-small);
+  /* The bottom padding raises the text so its capitals are centred, as in
+     the search field (see --font-sans-cap-offset) */
+  padding: 0 0 calc(2 * var(--font-sans-cap-offset)) var(--spacing-x-small);
+  /* The label too, so it matches the select's text */
+  font-size: var(--input-font-size-compact);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -123,10 +135,14 @@
   cursor: pointer;
 }
 
+/* Centred on the whole menu, not on its raised text box: there it is level
+   with the capitals */
 .library-sort-icon {
   position: absolute;
+  inset-block: 0;
   right: 0;
   display: flex;
+  align-items: center;
   pointer-events: none;
 }
 
@@ -303,6 +319,17 @@ a.library-row:focus-visible {
     flex: 1;
     width: auto;
     margin-left: 0;
+  }
+
+  /* The header names the site, so the search field takes the heading's
+     place. Screen readers still find the heading. */
+  .library-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .library-row {

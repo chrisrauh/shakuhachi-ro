@@ -105,18 +105,22 @@ dialog.app-dialog::backdrop {
 .auth-modal-label {
   display: block;
   margin-bottom: var(--spacing-x-small);
-  font-size: var(--input-font-size-small);
+  font-size: var(--font-size-small);
   color: var(--color-text-secondary);
 }
 
 .auth-modal-input {
   width: 100%;
-  padding: var(--spacing-x-small) var(--spacing-small);
+  /* Raises the text so its capitals are centred in the field, keeping the
+     field's height (see --font-sans-cap-offset) */
+  padding: calc(var(--spacing-x-small) - var(--font-sans-cap-offset))
+    var(--spacing-small)
+    calc(var(--spacing-x-small) + var(--font-sans-cap-offset));
   border: var(--input-border-width) solid var(--input-border-color);
   border-radius: var(--input-border-radius-medium);
   background: var(--input-background-color);
   color: var(--input-color);
-  font-size: var(--input-font-size-small);
+  font-size: var(--input-font-size-compact);
   box-sizing: border-box;
 }
 

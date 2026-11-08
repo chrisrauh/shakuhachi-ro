@@ -217,10 +217,13 @@ describe('ScoreLibrary tabs', () => {
       library: [makeScore(), own],
       mine: [own],
     });
+    const search = container.querySelector('#search-input')!;
     expect(rowTitles(container)).toEqual(['Akatombo', 'Mine']);
+    expect(search.getAttribute('placeholder')).toBe('Search the library');
 
     (container.querySelector('[data-tab="mine"]') as HTMLButtonElement).click();
     expect(rowTitles(container)).toEqual(['Mine']);
+    expect(search.getAttribute('placeholder')).toBe('Search my scores');
     expect(
       container
         .querySelector('[data-tab="mine"]')
