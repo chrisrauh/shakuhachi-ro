@@ -30,18 +30,34 @@
 }
 
 .library-search {
+  --search-icon-size: 1rem;
   position: relative;
   width: 15rem;
   margin-left: auto;
 }
 
+/* The icons are centred on the capitals of the field's text, not on the
+   field. Each holds one line of text in the field's font, centred on the
+   field as the field centres its own text, so the icon can sit on the same
+   baseline. The offset is rounded to whole pixels: text snaps to the pixel
+   grid, and a fractional offset puts the icon up to 1px off-centre. */
 .library-search-icon,
 .library-search-clear {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
+  display: block;
+  font: inherit;
+  font-size: var(--input-font-size-compact);
+  line-height: normal;
   color: var(--color-text-tertiary);
+}
+
+.library-search-icon svg,
+.library-search-clear svg {
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+  vertical-align: round(calc(0.5cap - var(--search-icon-size) / 2), 1px);
 }
 
 .library-search-icon {
@@ -66,7 +82,6 @@
   color: var(--color-text-secondary);
 }
 
-.library-search svg,
 .library-sort-icon svg {
   width: 1em;
   height: 1em;
