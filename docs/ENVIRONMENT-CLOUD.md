@@ -163,7 +163,7 @@ The footer is still added when a body is created; only the update removes it. **
 
 ## Workflow differences from the skills
 
-- **Branch** (`/dev-workflow` Phase 1, `/agent-workflow` Phase 2): use the branch from the injected task, not `feature/<name>`, and no worktree. Create it from current `main`: `git fetch origin main`, then `git checkout -B <branch-from-task> origin/main`.
+- **Branch** (`/dev-workflow` Phase 1, `/agent-workflow` Phase 2): use the branch from the injected task, not `feature/<name>`, and no worktree. Create it from current `main`: `git fetch --prune origin`, then `git checkout -B <branch-from-task> origin/main`. `--prune` removes the local copy of a remote branch that GitHub deleted after its merge. Without it, a stale `origin/<branch-from-task>` makes the branch look like it still holds merged commits, and the push looks like it needs force. It does not. Fetch all of `origin`: with a branch name, `--prune` prunes only that branch.
 - **Push + PR**: push (`git push -u origin <branch-from-task>`), then create the PR with `mcp__github__create_pull_request`, re-send its body with `update_pull_request` and read it back (see "No attribution" above).
 - **Cleanup** (`/dev-workflow` Phase 4, `/agent-workflow`): run only `git checkout main` and `git pull`; skip both delete steps. The GitHub proxy drops `git push origin --delete` ("remote end hung up"), and the local branch is reset by the next task's `git checkout -B` anyway. GitHub deletes the remote branch itself on merge (the repository's "Automatically delete head branches" setting).
 - **After a merge**: the next piece of work restarts the same branch name from `origin/main`; never stack new commits on merged history.
