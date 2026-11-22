@@ -10,6 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The attribution check reads the PR's commits, not only its merge
+          fetch-depth: 0
+
+      # The cloud environment can credit Claude in commits (see "No
+      # attribution" in docs/ENVIRONMENT-CLOUD.md). GitHub's rulesets cannot
+      # refuse commit metadata on this repository, so this check does.
+      - name: No Claude attribution in the PR's commits
+        if: github.event_name == 'pull_request'
+        env:
+          RANGE: ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+        run: |
+          found=$(
+            git log --format='%h %s' -i --author='anthropic\.com' "$RANGE"
+            git log --format='%h %s' -i --committer='anthropic\.com' "$RANGE"
+            git log --format='%h %s' -i -E \
+              --grep='co-authored-by:.*(claude|anthropic)' \
+              --grep='claude\.ai/code/session' "$RANGE"
+          )
+          if [ -n "$found" ]; then
+            echo "::error::These commits credit Claude. Set the author to the maintainer and remove Co-authored-by lines and session links:"
+            sort -u <<<"$found"
+            exit 1
+          fi
 
       - uses: actions/setup-node@v4
         with:
