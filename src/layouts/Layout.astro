@@ -65,24 +65,27 @@ const {
     <script is:inline>
       // Prevent flash of wrong theme - runs before body renders
       (function () {
-        var prefersDark = window.matchMedia(
-          '(prefers-color-scheme: dark)',
-        ).matches;
-        document.documentElement.setAttribute(
-          'data-theme',
-          prefersDark ? 'dark' : 'light',
-        );
-
-        // Notation font preference persists across sessions
+        // The reader's saved preferences. ThemeSwitcher saves a theme only
+        // when it differs from the system's; with none saved, follow the system
+        var theme = null;
         var notationFont = 'sans';
         try {
+          theme = localStorage.getItem('theme');
           notationFont =
             localStorage.getItem('notation-font') === 'serif'
               ? 'serif'
               : 'sans';
         } catch (e) {
-          // Private mode or blocked storage - fall back to the default
+          // Private mode or blocked storage - fall back to the defaults
         }
+
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+
         document.documentElement.setAttribute(
           'data-notation-font',
           notationFont,
