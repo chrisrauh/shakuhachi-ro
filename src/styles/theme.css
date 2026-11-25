@@ -639,6 +639,15 @@
     --color-gray-650
   ); /* Logo — one shade lighter than text-primary (gray-700) */
 
+  /* ANNOTATION PEN - the four stops of the ink gradient on the handwritten
+     notes on the About page, from the faded end of a stroke to the dark end.
+     The SVG <stop>s read them in style="", because presentation attributes
+     cannot read custom properties */
+  --color-annotation-pen-1: var(--color-blue-350);
+  --color-annotation-pen-2: var(--color-blue-450);
+  --color-annotation-pen-3: var(--color-blue-550);
+  --color-annotation-pen-4: var(--color-blue-800);
+
   /* STATUS COLORS - Success */
   --color-text-success: var(--color-green-700); /* Success text */
   --color-bg-success: var(--color-green-50); /* Success backgrounds */
@@ -1149,6 +1158,13 @@
   --color-bg-primary-brand: var(--color-blue-950);
 
   /* SPECIAL - gray-800 auto-adapts via inverted grays, no override needed */
+
+  /* ANNOTATION PEN - blue isn't inverted, so the ink fades from dark blue,
+     not from a pale tint */
+  --color-annotation-pen-1: var(--color-blue-950);
+  --color-annotation-pen-2: var(--color-blue-900);
+  --color-annotation-pen-3: var(--color-blue-700);
+  --color-annotation-pen-4: var(--color-blue-800);
 }
 
 /* Set on <html> by Layout.astro and NotationFontSwitcher */
