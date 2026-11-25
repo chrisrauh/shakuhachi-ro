@@ -120,23 +120,6 @@ const { Content } = await render(aboutPage);
       --shakuhachi-note-color: var(--color-text-primary);
     }
 
-    /* Annotation pen gradient stops — light and dark mode.
-       Applied via style="stop-color: var(...)" on SVG <stop> elements, not as
-       presentation attributes (which don't support custom properties). */
-    :root {
-      --annotation-pen-1: #8bb0ee;
-      --annotation-pen-2: #5f8ade;
-      --annotation-pen-3: #4070cc;
-      --annotation-pen-4: #2855ae;
-    }
-
-    :global([data-theme='dark']) {
-      --annotation-pen-1: #172554;
-      --annotation-pen-2: #1e3a8a;
-      --annotation-pen-3: #1d4ed8;
-      --annotation-pen-4: #2855ae;
-    }
-
     /* Desktop annotation: absolutely positioned right of centered score. */
     .about-section :global(.score-annotation-desktop) {
       position: absolute;
